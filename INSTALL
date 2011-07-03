@@ -1,0 +1,11 @@
+BUILDING EVILWM
+
+1) Edit Makefile to suit what you want.  Instructions are included by any
+   user-editable option.
+
+2) Run 'make'
+
+3) Run 'make install'
+
+That's it.  The README file has information on starting evilwm.
+
