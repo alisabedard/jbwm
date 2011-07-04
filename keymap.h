@@ -30,4 +30,23 @@
 #define KEY_KILL	XK_Escape
 #endif
 
+
+#define ARWM_VWM_KEYS \
+                KEY_FIX, KEY_PREVDESK, KEY_NEXTDESK,\
+                XK_1, XK_2, XK_3, XK_4, XK_5, XK_6, XK_7, XK_8
+
+#define ARWM_KEYS_TO_GRAB \
+{\
+        KEY_NEW, KEY_KILL,\
+        KEY_TOPLEFT, KEY_TOPRIGHT, KEY_BOTTOMLEFT, KEY_BOTTOMRIGHT,\
+        KEY_LEFT, KEY_RIGHT, KEY_DOWN, KEY_UP,\
+        KEY_LOWER, KEY_ALTLOWER, KEY_INFO, KEY_MAXVERT, KEY_MAX,\
+        ARWM_VWM_KEYS, KEY_XLOCK, 0\
+};
+
+#define ARWM_ALT_KEYS_TO_GRAB \
+{\
+        KEY_KILL, KEY_LEFT, KEY_RIGHT, KEY_DOWN, KEY_UP, 0\
+};
+
 #endif /* _KEYMAP_H */
