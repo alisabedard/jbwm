@@ -9,25 +9,28 @@
 static inline void 
 draw_outline(Client * c)
 {
-	Client ca = *c;
-	ScreenInfo sa = *ca.screen;
-	GC gc=sa.invert_gc;
-	int x, y;
-	unsigned int width, height;
-	Display * dpy = arwm.X.dpy;
+	Client ca;
+	ScreenInfo sa;
+	GC gc;
+	XRectangle geo;
+	Display *dpy;
+	
+	ca = *c;
+	sa = *ca.screen;
+	gc=sa.invert_gc;
+	dpy = arwm.X.dpy;
 
-	//XClearWindow(dpy, sa.root);
-
-	x=ca.geometry.x - ca.border; /* + 1; */
-	y=ca.geometry.y - ca.border/2
+	geo.x=ca.geometry.x - ca.border;
+	geo.y=ca.geometry.y - ca.border/2
 #ifdef TITLEBAR
 		-(
 		(c->flags & AR_CLIENT_SHAPED) ? 0 :
 		TITLEBAR_HEIGHT)
 #endif /* TITLEBAR */
-		-1 ; /* HACK/FIX for residual boreder */
-	width=ca.geometry.width + ca.border;
-	height=ca.geometry.height + ca.border
+		-1;
+#define CLIENT_IS_SHAPED (c->flags & AR_CLIENT_SHAPED)
+	geo.width=ca.geometry.width + ca.border;
+	geo.height=ca.geometry.height + ca.border
 #ifdef TITLEBAR
 		+ (
 		(c->flags & AR_CLIENT_SHAPED) ? 0 :
@@ -35,7 +38,7 @@ draw_outline(Client * c)
 		+ TITLEBAR_HEIGHT))
 #endif /* TITLEBAR */
 		;
-	XDrawRectangle(dpy, sa.root, gc, x, y, width, height);
+	XDrawRectangle(dpy, sa.root, gc, geo.x, geo.y, geo.width, geo.height);
 }
 
 static void
@@ -178,20 +181,14 @@ snap_client(Client * c)
 				- c->border - ci->border - ci->geometry.height 
 				- ci->geometry.y <= arwm.options.snap)
 			{
-				dx = absmin(dx, ci->geometry.x 
-					+ ci->geometry.width 
-					- c->geometry.x + c->border 
-					+ ci->border);
-				dx = absmin(dx, ci->geometry.x 
-					+ ci->geometry.width 
-					- c->geometry.x
+#define DSET(AXIS, EXP) d##AXIS=absmin(d##AXIS, ci->geometry.AXIS + EXP);
+				DSET(x, ci->geometry.width - c->geometry.x 
+					+ c->border + ci->border);
+				DSET(x, ci->geometry.width - c->geometry.x
 					- c->geometry.width);
-				dx = absmin(dx, ci->geometry.x 
-					- c->geometry.x 
-					- c->geometry.width
+				DSET(x, - c->geometry.x - c->geometry.width
 					- c->border - ci->border);
-				dx = absmin(dx, ci->geometry.x 
-					- c->geometry.x);
+				DSET(x, - c->geometry.x);
 			}
 			if (ci->geometry.x - ci->border - c->border 
 				- c->geometry.width - c->geometry.x
@@ -200,17 +197,13 @@ snap_client(Client * c)
 				- ci->geometry.x 
 				<= arwm.options.snap)
 			{
-				dy = absmin(dy, ci->geometry.y 
-					+ ci->geometry.height 
-					- c->geometry.y + c->border 
-					+ ci->border);
-				dy = absmin(dy, ci->geometry.y 
-					+ ci->geometry.height 
-					- c->geometry.y - c->geometry.height);
-				dy = absmin(dy, ci->geometry.y - c->geometry.y 
-					- c->geometry.height - c->border 
-					- ci->border);
-				dy = absmin(dy, ci->geometry.y - c->geometry.y);
+				DSET(y, ci->geometry.height - c->geometry.y
+					+ c->border + ci->border);
+				DSET(y, ci->geometry.height - c->geometry.y 
+					- c->geometry.height);
+				DSET(y, - c->geometry.y - c->geometry.height
+					- c->border - ci->border);
+				DSET(y, - c->geometry.y);
 			}
 		}
 	}
@@ -569,47 +562,40 @@ static void
 grab_keysym(Window w, unsigned int mask, KeySym keysym)
 {
 	KeyCode keycode = XKeysymToKeycode(arwm.X.dpy, keysym);
-
-	XGrabKey(arwm.X.dpy, keycode, mask, w, True,
-		GrabModeAsync, GrabModeAsync);
-	XGrabKey(arwm.X.dpy, keycode, mask | LockMask, w, True,
-		GrabModeAsync, GrabModeAsync);
+#define XGK(maskmod) XGrabKey(arwm.X.dpy, keycode, mask | maskmod,\
+	w, True, GrabModeAsync, GrabModeAsync)
+	XGK(0);
+	XGK(LockMask);
 	if (arwm.keymasks.numlock)
 	{
-		XGrabKey(arwm.X.dpy, keycode, mask | arwm.keymasks.numlock, 
-			w, True, GrabModeAsync, GrabModeAsync);
-		XGrabKey(arwm.X.dpy, keycode, mask | arwm.keymasks.numlock 
-			| LockMask, w, True, GrabModeAsync, GrabModeAsync);
+		XGK(arwm.keymasks.numlock);
+		XGK(arwm.keymasks.numlock|LockMask);
 	}
+}
+
+static void
+grab_keysyms(ScreenInfo *s, KeySym keys_to_grab[], unsigned int mask)
+{
+	KeySym *keysym;
+
+	for(keysym = keys_to_grab; *keysym; keysym++)
+		grab_keysym(s->root, arwm.keymasks.grab1 | mask, *keysym);
 }
 
 void 
 grab_keys_for_screen(ScreenInfo * s)
 {
-	KeySym *keysym;
-
 	/* The key lists are split to macros, 
            as one may wish to define which
 	   keys to grab quickly when adding key bindings.  */
-
+	
+	KeySym keys_to_grab[]=ARWM_KEYS_TO_GRAB;
+	KeySym alt_keys_to_grab[]=ARWM_ALT_KEYS_TO_GRAB;
 	/* Release any previous grabs */
 	XUngrabKey(arwm.X.dpy, AnyKey, AnyModifier, s->root);
 	/* Grab key combinations we're interested in */
-	{
-		KeySym keys_to_grab[] = ARWM_KEYS_TO_GRAB;
-
-		for (keysym = keys_to_grab; *keysym; keysym++)
-			grab_keysym(s->root, 
-				arwm.keymasks.grab1, 
-				*keysym);
-	}
-	{
-		KeySym alt_keys_to_grab[] = ARWM_ALT_KEYS_TO_GRAB;
-
-		for (keysym = alt_keys_to_grab; *keysym; keysym++)
-			grab_keysym(s->root, arwm.keymasks.grab1 
-				| arwm.keymasks.alt, *keysym);
-	}
+	grab_keysyms(s,keys_to_grab, 0);
+	grab_keysyms(s,alt_keys_to_grab, arwm.keymasks.alt);
 	grab_keysym(s->root, arwm.keymasks.grab2, KEY_NEXT);
 }
 
