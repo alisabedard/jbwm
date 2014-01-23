@@ -1,0 +1,40 @@
+.TH "/home/jefbed/src/arwm/configure_event.c" 3 "Wed Mar 7 2012" "arwm" \" -*- nroff -*-
+.ad l
+.nh
+.SH NAME
+/home/jefbed/src/arwm/configure_event.c \- 
+.SH SYNOPSIS
+.br
+.PP
+\fC#include 'arwm.h'\fP
+.br
+
+.SS "Defines"
+
+.in +1c
+.ti -1c
+.RI "#define \fBISV\fP(cg)   value_mask & CW##cg"
+.br
+.ti -1c
+.RI "#define \fBMSKGEO\fP(cg, geo)   if(ISV(cg)) g->geo=e->geo;"
+.br
+.in -1c
+.SS "Functions"
+
+.in +1c
+.ti -1c
+.RI "void \fBarwm_handle_configure_request\fP (XConfigureRequestEvent *e)"
+.br
+.in -1c
+.SH "Define Documentation"
+.PP 
+.SS "#define ISV(cg)   value_mask & CW##cg"
+.SS "#define MSKGEO(cg, geo)   if(ISV(cg)) g->geo=e->geo;"
+.SH "Function Documentation"
+.PP 
+.SS "void arwm_handle_configure_request (XConfigureRequestEvent *e)"
+.PP
+Definition at line 44 of file configure_event.c.
+.SH "Author"
+.PP 
+Generated automatically by Doxygen for arwm from the source code.

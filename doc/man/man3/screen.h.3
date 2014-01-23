@@ -1,0 +1,106 @@
+.TH "/home/jefbed/src/arwm/screen.h" 3 "Wed Mar 7 2012" "arwm" \" -*- nroff -*-
+.ad l
+.nh
+.SH NAME
+/home/jefbed/src/arwm/screen.h \- 
+.SH SYNOPSIS
+.br
+.PP
+.SS "Data Structures"
+
+.in +1c
+.ti -1c
+.RI "struct \fBPosition\fP"
+.br
+.in -1c
+.SS "Defines"
+
+.in +1c
+.ti -1c
+.RI "#define \fBget_mouse_position\fP(x, y, root)"
+.br
+.ti -1c
+.RI "#define \fBsetmouse\fP(w, x, y)   XWarpPointer(arwm.X.dpy, None, w, 0, 0, 0, 0, x, y)"
+.br
+.in -1c
+.SS "Functions"
+
+.in +1c
+.ti -1c
+.RI "void \fBdrag\fP (\fBClient\fP *c)"
+.br
+.ti -1c
+.RI "void \fBmoveresize\fP (\fBClient\fP *c)"
+.br
+.ti -1c
+.RI "void \fBshow_info\fP (\fBClient\fP *c, KeySym key)"
+.br
+.ti -1c
+.RI "void \fBsweep\fP (\fBClient\fP *c)"
+.br
+.ti -1c
+.RI "void \fBunhide\fP (\fBClient\fP *c, int raise_win)"
+.br
+.ti -1c
+.RI "void \fBnext\fP (void)"
+.br
+.ti -1c
+.RI "void \fBhide\fP (\fBClient\fP *c)"
+.br
+.ti -1c
+.RI "void \fBswitch_vdesk\fP (\fBScreenInfo\fP *s, const \fBubyte\fP v)"
+.br
+.ti -1c
+.RI "void \fBgrab_keys_for_screen\fP (\fBScreenInfo\fP *s)"
+.br
+.ti -1c
+.RI "void \fBmaximize\fP (\fBClient\fP *c)"
+.br
+.in -1c
+.SH "Define Documentation"
+.PP 
+.SS "#define get_mouse_position(x, y, root)"\fBValue:\fP
+.PP
+.nf
+XQueryPointer(arwm.X.dpy, \
+                root, &root, &root, x, y, (int *)&root, (int *)&root, \
+                (unsigned int *)&root);
+.fi
+.PP
+Definition at line 21 of file screen.h.
+.SS "#define setmouse(w, x, y)   XWarpPointer(arwm.X.dpy, None, w, 0, 0, 0, 0, x, y)"
+.PP
+Definition at line 25 of file screen.h.
+.SH "Function Documentation"
+.PP 
+.SS "void drag (\fBClient\fP *c)"
+.PP
+Definition at line 241 of file screen.c.
+.SS "void grab_keys_for_screen (\fBScreenInfo\fP *s)"
+.PP
+Definition at line 53 of file keymap.c.
+.SS "void hide (\fBClient\fP *c)"
+.PP
+Definition at line 308 of file screen.c.
+.SS "void maximize (\fBClient\fP *c)"
+.PP
+Definition at line 281 of file screen.c.
+.SS "void moveresize (\fBClient\fP *c)"
+.PP
+Definition at line 256 of file screen.c.
+.SS "void next (void)"
+.PP
+Definition at line 326 of file screen.c.
+.SS "void show_info (\fBClient\fP *c, KeySymkey)"
+.SS "void sweep (\fBClient\fP *c)"
+.PP
+Definition at line 104 of file screen.c.
+.SS "void switch_vdesk (\fBScreenInfo\fP *s, const \fBubyte\fPv)"
+.PP
+Definition at line 357 of file screen.c.
+.SS "void unhide (\fBClient\fP *c, intraise_win)"
+.PP
+Definition at line 318 of file screen.c.
+.SH "Author"
+.PP 
+Generated automatically by Doxygen for arwm from the source code.

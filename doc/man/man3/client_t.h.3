@@ -1,0 +1,120 @@
+.TH "/home/jefbed/src/arwm/client_t.h" 3 "Wed Mar 7 2012" "arwm" \" -*- nroff -*-
+.ad l
+.nh
+.SH NAME
+/home/jefbed/src/arwm/client_t.h \- 
+.SH SYNOPSIS
+.br
+.PP
+.SS "Data Structures"
+
+.in +1c
+.ti -1c
+.RI "struct \fBClient\fP"
+.br
+.in -1c
+.SS "Defines"
+
+.in +1c
+.ti -1c
+.RI "#define \fBAR_CLIENT_IS_STICKY\fP   (1<<0)"
+.br
+.ti -1c
+.RI "#define \fBAR_CLIENT_REMOVE\fP   (1<<1)"
+.br
+.ti -1c
+.RI "#define \fBAR_CLIENT_ACTIVE\fP   (1<<2)"
+.br
+.ti -1c
+.RI "#define \fBAR_CLIENT_SHADED\fP   (1<<3)"
+.br
+.ti -1c
+.RI "#define \fBAR_CLIENT_DONT_MANAGE\fP   (1<<4)"
+.br
+.ti -1c
+.RI "#define \fBAR_CLIENT_DONT_USE_TITLEBAR\fP   (1<<5)"
+.br
+.ti -1c
+.RI "#define \fBAR_CLIENT_BLACK_BORDER\fP   (1<<6)"
+.br
+.ti -1c
+.RI "#define \fBAR_CLIENT_SHAPED\fP   (1<<7)"
+.br
+.ti -1c
+.RI "#define \fBis_sticky\fP(c)   (c->flags & AR_CLIENT_IS_STICKY)"
+.br
+.ti -1c
+.RI "#define \fBadd_sticky\fP(c)   c->flags |= AR_CLIENT_IS_STICKY"
+.br
+.ti -1c
+.RI "#define \fBremove_sticky\fP(c)   c->flags &= ~AR_CLIENT_IS_STICKY"
+.br
+.ti -1c
+.RI "#define \fBtoggle_sticky\fP(c)   c->flags ^= AR_CLIENT_IS_STICKY"
+.br
+.in -1c
+.SS "Typedefs"
+
+.in +1c
+.ti -1c
+.RI "typedef struct \fBClient\fP \fBClient\fP"
+.br
+.in -1c
+.SS "Functions"
+
+.in +1c
+.ti -1c
+.RI "void \fBinitialize_client_ce\fP (\fBClient\fP *c)"
+.br
+.in -1c
+.SH "Define Documentation"
+.PP 
+.SS "#define add_sticky(c)   c->flags |= AR_CLIENT_IS_STICKY"
+.PP
+Definition at line 64 of file client_t.h.
+.SS "#define AR_CLIENT_ACTIVE   (1<<2)"
+.PP
+Definition at line 37 of file client_t.h.
+.SS "#define AR_CLIENT_BLACK_BORDER   (1<<6)"
+.PP
+Definition at line 41 of file client_t.h.
+.SS "#define AR_CLIENT_DONT_MANAGE   (1<<4)"
+.PP
+Definition at line 39 of file client_t.h.
+.SS "#define AR_CLIENT_DONT_USE_TITLEBAR   (1<<5)"
+.PP
+Definition at line 40 of file client_t.h.
+.SS "#define AR_CLIENT_IS_STICKY   (1<<0)"
+.PP
+Definition at line 34 of file client_t.h.
+.SS "#define AR_CLIENT_REMOVE   (1<<1)"
+.PP
+Definition at line 36 of file client_t.h.
+.SS "#define AR_CLIENT_SHADED   (1<<3)"
+.PP
+Definition at line 38 of file client_t.h.
+.SS "#define AR_CLIENT_SHAPED   (1<<7)"
+.PP
+Definition at line 42 of file client_t.h.
+.SS "#define is_sticky(c)   (c->flags & AR_CLIENT_IS_STICKY)"
+.PP
+Definition at line 63 of file client_t.h.
+.SS "#define remove_sticky(c)   c->flags &= ~AR_CLIENT_IS_STICKY"
+.PP
+Definition at line 65 of file client_t.h.
+.SS "#define toggle_sticky(c)   c->flags ^= AR_CLIENT_IS_STICKY"
+.PP
+Definition at line 66 of file client_t.h.
+.SH "Typedef Documentation"
+.PP 
+.SS "typedef struct \fBClient\fP \fBClient\fP"
+.PP
+Definition at line 7 of file client_t.h.
+.SH "Function Documentation"
+.PP 
+.SS "void initialize_client_ce (\fBClient\fP *c)"
+.PP
+Definition at line 50 of file client.c.
+.SH "Author"
+.PP 
+Generated automatically by Doxygen for arwm from the source code.

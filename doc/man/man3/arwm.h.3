@@ -1,0 +1,221 @@
+.TH "/home/jefbed/src/arwm/arwm.h" 3 "Wed Mar 7 2012" "arwm" \" -*- nroff -*-
+.ad l
+.nh
+.SH NAME
+/home/jefbed/src/arwm/arwm.h \- 
+.SH SYNOPSIS
+.br
+.PP
+\fC#include <string.h>\fP
+.br
+\fC#include <stdlib.h>\fP
+.br
+\fC#include <X11/X.h>\fP
+.br
+\fC#include <X11/Xatom.h>\fP
+.br
+\fC#include <X11/Xlib.h>\fP
+.br
+\fC#include <X11/Xmd.h>\fP
+.br
+\fC#include <X11/Xutil.h>\fP
+.br
+\fC#include <X11/keysym.h>\fP
+.br
+\fC#include <X11/extensions/shape.h>\fP
+.br
+\fC#include 'macros.h'\fP
+.br
+\fC#include 'ScreenInfo.h'\fP
+.br
+\fC#include 'client_t.h'\fP
+.br
+\fC#include 'application_t.h'\fP
+.br
+\fC#include 'arwmenv.h'\fP
+.br
+\fC#include 'misc.h'\fP
+.br
+\fC#include 'screen.h'\fP
+.br
+\fC#include 'arwmmod.h'\fP
+.br
+\fC#include 'atoms.h'\fP
+.br
+
+.SS "Data Structures"
+
+.in +1c
+.ti -1c
+.RI "struct \fBPropMwmHints\fP"
+.br
+.in -1c
+.SS "Defines"
+
+.in +1c
+.ti -1c
+.RI "#define \fB_XA_MWM_HINTS\fP   '_MOTIF_WM_HINTS'"
+.br
+.ti -1c
+.RI "#define \fBPROP_MWM_HINTS_ELEMENTS\fP   3"
+.br
+.ti -1c
+.RI "#define \fBMWM_HINTS_DECORATIONS\fP   (1L << 1)"
+.br
+.ti -1c
+.RI "#define \fBMWM_DECOR_ALL\fP   (1L << 0)"
+.br
+.ti -1c
+.RI "#define \fBMWM_DECOR_BORDER\fP   (1L << 1)"
+.br
+.ti -1c
+.RI "#define \fBKEY_TO_VDESK\fP(key)   ((key) - XK_1)"
+.br
+.ti -1c
+.RI "#define \fBvalid_vdesk\fP(v)   ((unsigned)(v) < KEY_TO_VDESK(XK_8))"
+.br
+.ti -1c
+.RI "#define \fBRAISE\fP   1"
+.br
+.ti -1c
+.RI "#define \fBNO_RAISE\fP   0"
+.br
+.ti -1c
+.RI "#define \fBMAXIMISE_HORZ\fP   (1<<0)"
+.br
+.ti -1c
+.RI "#define \fBMAXIMISE_VERT\fP   (1<<1)"
+.br
+.ti -1c
+.RI "#define \fBChildMask\fP   (SubstructureRedirectMask|SubstructureNotifyMask)"
+.br
+.ti -1c
+.RI "#define \fBButtonMask\fP   (ButtonPressMask|ButtonReleaseMask)"
+.br
+.ti -1c
+.RI "#define \fBMouseMask\fP   (ButtonMask|PointerMotionMask)"
+.br
+.in -1c
+.SS "Typedefs"
+
+.in +1c
+.ti -1c
+.RI "typedef char \fBbyte\fP"
+.br
+.ti -1c
+.RI "typedef unsigned char \fBubyte\fP"
+.br
+.in -1c
+.SS "Functions"
+
+.in +1c
+.ti -1c
+.RI "void \fBarwm_grab_button\fP (Window w, unsigned int mask, unsigned int button)"
+.br
+.ti -1c
+.RI "void \fBmake_new_client\fP (Window w, \fBScreenInfo\fP *s)"
+.br
+.ti -1c
+.RI "long \fBget_wm_normal_hints\fP (\fBClient\fP *c)"
+.br
+.in -1c
+.SS "Variables"
+
+.in +1c
+.ti -1c
+.RI "\fBARWMEnvironment\fP \fBarwm\fP"
+.br
+.ti -1c
+.RI "const char * \fBopt_term\fP [3]"
+.br
+.ti -1c
+.RI "\fBApplication\fP * \fBhead_app\fP"
+.br
+.ti -1c
+.RI "\fBClient\fP * \fBhead_client\fP"
+.br
+.ti -1c
+.RI "\fBClient\fP * \fBcurrent\fP"
+.br
+.in -1c
+.SH "Define Documentation"
+.PP 
+.SS "#define _XA_MWM_HINTS   '_MOTIF_WM_HINTS'"
+.PP
+Definition at line 26 of file arwm.h.
+.SS "#define ButtonMask   (ButtonPressMask|ButtonReleaseMask)"
+.PP
+Definition at line 52 of file arwm.h.
+.SS "#define ChildMask   (SubstructureRedirectMask|SubstructureNotifyMask)"
+.PP
+Definition at line 51 of file arwm.h.
+.SS "#define KEY_TO_VDESK(key)   ((key) - XK_1)"
+.PP
+Definition at line 40 of file arwm.h.
+.SS "#define MAXIMISE_HORZ   (1<<0)"
+.PP
+Definition at line 46 of file arwm.h.
+.SS "#define MAXIMISE_VERT   (1<<1)"
+.PP
+Definition at line 47 of file arwm.h.
+.SS "#define MouseMask   (ButtonMask|PointerMotionMask)"
+.PP
+Definition at line 53 of file arwm.h.
+.SS "#define MWM_DECOR_ALL   (1L << 0)"
+.PP
+Definition at line 29 of file arwm.h.
+.SS "#define MWM_DECOR_BORDER   (1L << 1)"
+.PP
+Definition at line 30 of file arwm.h.
+.SS "#define MWM_HINTS_DECORATIONS   (1L << 1)"
+.PP
+Definition at line 28 of file arwm.h.
+.SS "#define NO_RAISE   0"
+.PP
+Definition at line 44 of file arwm.h.
+.SS "#define PROP_MWM_HINTS_ELEMENTS   3"
+.PP
+Definition at line 27 of file arwm.h.
+.SS "#define RAISE   1"
+.PP
+Definition at line 43 of file arwm.h.
+.SS "#define valid_vdesk(v)   ((unsigned)(v) < KEY_TO_VDESK(XK_8))"
+.PP
+Definition at line 41 of file arwm.h.
+.SH "Typedef Documentation"
+.PP 
+.SS "typedef char \fBbyte\fP"
+.PP
+Definition at line 22 of file arwm.h.
+.SS "typedef unsigned char \fBubyte\fP"
+.PP
+Definition at line 23 of file arwm.h.
+.SH "Function Documentation"
+.PP 
+.SS "void arwm_grab_button (Windoww, unsigned intmask, unsigned intbutton)"
+.PP
+Definition at line 205 of file arwm.c.
+.SS "long get_wm_normal_hints (\fBClient\fP *c)"
+.PP
+Definition at line 384 of file new.c.
+.SS "void make_new_client (Windoww, \fBScreenInfo\fP *s)"
+.PP
+Definition at line 125 of file new.c.
+.SH "Variable Documentation"
+.PP 
+.SS "\fBARWMEnvironment\fP \fBarwm\fP"
+.PP
+Definition at line 14 of file arwm.c.
+.SS "\fBClient\fP* \fBcurrent\fP"
+.PP
+Definition at line 47 of file arwm.c.
+.SS "\fBApplication\fP* \fBhead_app\fP"
+.PP
+Definition at line 43 of file arwm.c.
+.SS "\fBClient\fP* \fBhead_client\fP"
+.PP
+Definition at line 46 of file arwm.c.
+.SS "const char* \fBopt_term\fP[3]"
+.SH "Author"
+.PP 
+Generated automatically by Doxygen for arwm from the source code.

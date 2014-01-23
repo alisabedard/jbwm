@@ -1,0 +1,162 @@
+!_TAG_FILE_FORMAT	2	/extended format; --format=1 will not append ;" to lines/
+!_TAG_FILE_SORTED	1	/0=unsorted, 1=sorted, 2=foldcase/
+!_TAG_PROGRAM_AUTHOR	Darren Hiebert	/dhiebert@users.sourceforge.net/
+!_TAG_PROGRAM_NAME	Exuberant Ctags	//
+!_TAG_PROGRAM_URL	http://ctags.sourceforge.net	/official site/
+!_TAG_PROGRAM_VERSION	5.8	//
+ARG	arwm.c	130;"	d	file:
+ARWMButton_delete	ARWMButton.c	/^ARWMButton_delete(ARWMButton * button)$/;"	f
+ARWMButton_draw	ARWMButton.c	/^ARWMButton_draw(ARWMButton * button)$/;"	f
+ARWMButton_new	ARWMButton.c	/^ARWMButton_new(Window parent, GC gc, const unsigned short width,$/;"	f
+ARWMTitlebarData_delete	titlebar.c	/^ARWMTitlebarData_delete(ARWMTitlebarData * titlebar)$/;"	f
+COLORALLOC	arwm.c	239;"	d	file:
+Client_new	new.c	/^Client_new(Window w, ScreenInfo * s)$/;"	f
+FONTOPEN	arwm.c	192;"	d	file:
+GRAB	arwm.c	209;"	d	file:
+IMG	titlebar.c	170;"	d	file:
+IMGDIM	titlebar.c	172;"	d	file:
+ISV	configure_event.c	18;"	d	file:
+MAXIMUM_PROPERTY_LENGTH	new.c	11;"	d	file:
+MSKGEO	configure_event.c	19;"	d	file:
+POS_IMG	ARWMButton.c	44;"	d	file:
+RGB_TBUTTON	titlebar.c	186;"	d	file:
+SBORDER	screen.c	140;"	d	file:
+SETARG	arwm.c	131;"	d	file:
+SETNARG	arwm.c	132;"	d	file:
+SIZE_TYPE_ASSIGN	new.c	394;"	d	file:
+TBUTTON	titlebar.c	183;"	d	file:
+XCOLOR_TBUTTON	titlebar.c	187;"	d	file:
+XPMIMAGE	titlebar.c	143;"	d	file:
+absmin	screen.c	147;"	d	file:
+allocate_colors	arwm.c	/^allocate_colors(const ubyte i)$/;"	f	file:
+arwm	arwm.c	/^ARWMEnvironment arwm;$/;"	v
+arwm_ARWMTitlebarData_init	titlebar.c	/^arwm_ARWMTitlebarData_init(ARWMTitlebarData * titlebar)$/;"	f
+arwm_current_to_head	events.c	/^arwm_current_to_head(void)$/;"	f
+arwm_draw_close_button	titlebar.c	/^arwm_draw_close_button(Client * c)$/;"	f
+arwm_draw_close_button	titlebar.c	103;"	d	file:
+arwm_ewmh_state	ewmh.c	/^arwm_ewmh_state(Client * c)$/;"	f
+arwm_ewmh_type	ewmh.c	/^arwm_ewmh_type(Client * c)$/;"	f
+arwm_exit	misc.c	/^arwm_exit(const int status)$/;"	f
+arwm_get_XColor	graphics.c	/^arwm_get_XColor(const ubyte r, const ubyte g, const ubyte b)$/;"	f
+arwm_get_property	new.c	/^arwm_get_property(Window w, Atom property, Atom req_type,$/;"	f
+arwm_grab_button	arwm.c	/^arwm_grab_button(Window w, unsigned int mask, unsigned int button)$/;"	f
+arwm_handle_button_event	button_event.c	/^arwm_handle_button_event(XButtonEvent * e)$/;"	f
+arwm_handle_configure_request	configure_event.c	/^arwm_handle_configure_request(XConfigureRequestEvent * e)$/;"	f
+arwm_handle_key_event	key_event.c	/^arwm_handle_key_event(XKeyEvent * e)$/;"	f
+arwm_new_gc_for_XColor	graphics.c	/^arwm_new_gc_for_XColor(XColor color)$/;"	f
+arwm_process_events	events.c	/^arwm_process_events(void)$/;"	f	file:
+arwm_system	key_event.c	/^arwm_system(const char *exec)$/;"	f	file:
+bg_cmd	key_event.c	/^bg_cmd(const char *command)$/;"	f	file:
+button1_event	button_event.c	/^button1_event(XButtonEvent * e, Client * c)$/;"	f	file:
+configure_client	configure_event.c	/^configure_client(Client * c, XConfigureRequestEvent * e)$/;"	f	file:
+current	arwm.c	/^Client *current = NULL;$/;"	v
+debug_wm_normal_hints	new.c	20;"	d	file:
+delete_buttons	titlebar.c	/^delete_buttons(ARWMTitlebarData * titlebar)$/;"	f	file:
+do_client_tidy	events.c	/^do_client_tidy()$/;"	f	file:
+drag	screen.c	/^drag(Client * c)$/;"	f
+drag_button_release	screen.c	/^drag_button_release(Client * c)$/;"	f	file:
+drag_event_loop	screen.c	/^drag_event_loop(Client * c, int x1, int y1, int old_cx, int old_cy)$/;"	f	file:
+drag_motion	screen.c	/^drag_motion(Client * c, XEvent ev, int x1, int y1, int old_cx,$/;"	f	file:
+draw_button	titlebar.c	/^draw_button(ARWMButton * button, Window w, const short x)$/;"	f	file:
+draw_gradient	graphics.c	/^draw_gradient(Window win, GC gc, const int x, const int y,$/;"	f
+draw_info_strings	titlebar.c	/^draw_info_strings(Client * c, char *name)$/;"	f	file:
+draw_outline	screen.c	/^draw_outline(Client * c)$/;"	f	file:
+draw_outline_information	screen.c	/^draw_outline_information(Client * c)$/;"	f	file:
+draw_titlebar	titlebar.c	/^draw_titlebar(Client * c, char *name)$/;"	f	file:
+event_main_loop	events.c	/^event_main_loop(void)$/;"	f
+ewm_update_net_wm_state	ewmh.c	/^ewm_update_net_wm_state(Client * c)$/;"	f
+find_client	client.c	/^find_client(Window w)$/;"	f
+find_screen	events.c	/^find_screen(Window root)$/;"	f	file:
+fix_client	client.c	/^fix_client(Client * c)$/;"	f
+free_XImage	titlebar.c	/^free_XImage(ARWMTitlebarData * t)$/;"	f	file:
+free_Xft_data	titlebar.c	/^free_Xft_data(ARWMTitlebarData * titlebar)$/;"	f	file:
+get_prop	ewmh.c	/^get_prop(Window w, Atom prop)$/;"	f	file:
+get_wm_normal_hints	new.c	/^get_wm_normal_hints(Client * c)$/;"	f
+grab_keys_for_mask	keymap.c	/^grab_keys_for_mask(ScreenInfo * s, KeySym * ks,$/;"	f	file:
+grab_keys_for_screen	keymap.c	/^grab_keys_for_screen(ScreenInfo * s)$/;"	f
+grab_keysym	keymap.c	/^grab_keysym(Window w, const unsigned int mask, KeySym keysym)$/;"	f	file:
+grab_mod_keys_for_screen	keymap.c	/^grab_mod_keys_for_screen(ScreenInfo *s)$/;"	f	file:
+grab_pointer	screen.c	85;"	d	file:
+grabkey	keymap.c	/^grabkey(Window w, KeyCode kc, const unsigned int mask)$/;"	f	file:
+handle_client_key_event	key_event.c	/^handle_client_key_event(XKeyEvent * e, Client * c, KeySym key)$/;"	f	file:
+handle_colormap_change	events.c	/^handle_colormap_change(XColormapEvent * e)$/;"	f	file:
+handle_enter_event	events.c	/^handle_enter_event(XCrossingEvent * e)$/;"	f	file:
+handle_expose_event	events.c	/^handle_expose_event(XEvent * ev)$/;"	f	file:
+handle_map_request	events.c	/^handle_map_request(XMapRequestEvent * e)$/;"	f	file:
+handle_motion_notify	screen.c	/^handle_motion_notify(Client * c, XRectangle * g, XMotionEvent * mev)$/;"	f	file:
+handle_mwm_hints	new.c	/^handle_mwm_hints(Client * c)$/;"	f	file:
+handle_property_change	events.c	/^handle_property_change(XPropertyEvent * e)$/;"	f	file:
+handle_unmap_event	events.c	/^handle_unmap_event(XUnmapEvent * e)$/;"	f	file:
+handle_xerror	misc.c	/^handle_xerror(Display * dpy, XErrorEvent * e)$/;"	f
+head_app	arwm.c	/^Application *head_app = NULL;$/;"	v
+head_client	arwm.c	/^Client *head_client = NULL;$/;"	v
+hide	screen.c	/^hide(Client * c)$/;"	f
+init_atom_properties	new.c	/^init_atom_properties(Client * c, unsigned long * nitems)$/;"	f	file:
+init_geometry	new.c	/^init_geometry(Client * c)$/;"	f	file:
+init_geometry_position	new.c	/^init_geometry_position(Client *c, XWindowAttributes * attr, const long sflags)$/;"	f	file:
+init_geometry_properties	new.c	/^init_geometry_properties(Client * c)$/;"	f	file:
+init_geometry_size	new.c	/^init_geometry_size(Client *c, XWindowAttributes * attr)$/;"	f	file:
+init_long_properties	new.c	/^init_long_properties(Client * c, unsigned long * nitems)$/;"	f	file:
+initialize_ARWMEnvironment	arwm.c	/^initialize_ARWMEnvironment(void)$/;"	f	file:
+initialize_ARWMEnvironment_keymasks	arwm.c	/^initialize_ARWMEnvironment_keymasks(void)$/;"	f	file:
+initialize_buttons	titlebar.c	/^initialize_buttons(ARWMTitlebarData * titlebar, Display * dpy)$/;"	f	file:
+initialize_client_ce	client.c	/^initialize_client_ce(Client * c)$/;"	f
+initialize_client_fields	new.c	/^initialize_client_fields(Client * c, ScreenInfo * s, Window w)$/;"	f	file:
+initialize_font_data	titlebar.c	/^initialize_font_data(ARWMTitlebarData * titlebar, Display * dpy)$/;"	f	file:
+initialize_images	titlebar.c	/^initialize_images(ARWMTitlebarData * titlebar)$/;"	f	file:
+key_moveresize	key_event.c	/^key_moveresize(Client * c)$/;"	f	file:
+kill_parent_window	client.c	/^kill_parent_window(Client * c)$/;"	f	file:
+main	arwm.c	/^main(int argc$/;"	f
+make_new_client	new.c	/^make_new_client(Window w, ScreenInfo * s)$/;"	f
+map_client	new.c	/^map_client(Client * c, ScreenInfo * s)$/;"	f	file:
+maximize	screen.c	/^maximize(Client * c)$/;"	f
+move_client_with_vdesk	button_event.c	/^move_client_with_vdesk(Client * c, Bool next)$/;"	f	file:
+moveresize	screen.c	/^moveresize(Client * c)$/;"	f
+moveresize_dir	key_event.c	/^moveresize_dir(Client * c, XKeyEvent * e, short * xy, $/;"	f	file:
+next	screen.c	/^next(void)$/;"	f
+opt	arwm.c	/^GlobalOptions opt = $/;"	v
+parse_command_line_args	arwm.c	/^parse_command_line_args(int argc, char **argv)$/;"	f	file:
+parse_geometry	arwm.c	/^parse_geometry(const char * arg)$/;"	f	file:
+parse_modifiers	arwm.c	/^parse_modifiers(char *s)$/;"	f	file:
+print_size_hints	new.c	/^print_size_hints(Window w)$/;"	f
+process_app_class_options	arwm.c	/^process_app_class_options(const char *name)$/;"	f	file:
+recalculate_position	screen.c	/^recalculate_position(Client * c, Position p1, Position p2)$/;"	f	file:
+recalculate_size	screen.c	/^recalculate_size(Client * c, Position p1, Position p2)$/;"	f	file:
+recalculate_sweep	screen.c	/^recalculate_sweep(Client * c, Position p1, Position p2)$/;"	f	file:
+relink_window_list	client.c	/^relink_window_list(Client * c)$/;"	f	file:
+remove_client	client.c	/^remove_client(Client * c)$/;"	f
+remove_info_window	titlebar.c	/^remove_info_window(Client * c)$/;"	f
+reparent	new.c	/^reparent(Client * c)$/;"	f	file:
+select_client	client.c	/^select_client(Client * c)$/;"	f
+send_config	client.c	/^send_config(Client * c)$/;"	f
+send_wm_delete	client.c	/^send_wm_delete(Client * c, int kill_client)$/;"	f
+send_xmessage	client.c	/^send_xmessage(Window w, Atom a, long x)$/;"	f	file:
+set_class_attributes	new.c	/^set_class_attributes(Client * c, Window w)$/;"	f	file:
+set_class_geometry_attribute	new.c	/^set_class_geometry_attribute(Client *c, Application * a)$/;"	f	file:
+set_position	new.c	/^set_position(Client * c, const int x, const int y)$/;"	f	file:
+set_shape	client.c	/^set_shape(Client * c)$/;"	f
+set_size	new.c	/^set_size(Client * c, const unsigned int width, const unsigned int height)$/;"	f	file:
+set_wm_state	client.c	/^set_wm_state(Client * c, int state)$/;"	f
+setup_clients	arwm.c	/^setup_clients(const ubyte i)$/;"	f	file:
+setup_display	arwm.c	/^setup_display(void)$/;"	f	file:
+setup_display_per_screen	arwm.c	/^setup_display_per_screen(int i)$/;"	f	file:
+setup_dock	ewmh.c	/^setup_dock(Client * c)$/;"	f	file:
+setup_each_client	arwm.c	/^setup_each_client(int i, int j, Window * wins)$/;"	f	file:
+setup_event_listeners	arwm.c	/^setup_event_listeners(const ubyte i)$/;"	f	file:
+setup_fonts	arwm.c	/^setup_fonts(void)$/;"	f	file:
+setup_gc	arwm.c	/^setup_gc(const ubyte i)$/;"	f	file:
+setup_gc_parameters	arwm.c	/^setup_gc_parameters(XGCValues * gv, const ubyte i)$/;"	f	file:
+setup_screen_elements	arwm.c	/^setup_screen_elements(const ubyte i)$/;"	f	file:
+setup_screens	arwm.c	/^setup_screens(void)$/;"	f	file:
+setup_shape	arwm.c	/^setup_shape(void)$/;"	f	file:
+setup_titlebar	titlebar.c	/^setup_titlebar(Client * c)$/;"	f	file:
+setwh	screen.c	57;"	d	file:
+shade_window	button_event.c	/^shade_window(Client * c)$/;"	f	file:
+snap_client	screen.c	/^snap_client(Client * c)$/;"	f	file:
+snap_client_to_screen_border	screen.c	/^snap_client_to_screen_border(Client * c)$/;"	f	file:
+snap_dim	screen.c	/^snap_dim(short * cxy, unsigned short * cwh, short * cixy, $/;"	f	file:
+spawn_terminal	key_event.c	112;"	d	file:
+sweep	screen.c	/^sweep(Client * c)$/;"	f
+switch_vdesk	screen.c	/^switch_vdesk(ScreenInfo * s, const ubyte v)$/;"	f
+unhide	screen.c	/^unhide(Client * c, int raise_win)$/;"	f
+update_info_window	titlebar.c	/^update_info_window(Client * c)$/;"	f

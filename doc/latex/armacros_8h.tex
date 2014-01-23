@@ -1,0 +1,222 @@
+\hypertarget{armacros_8h}{
+\section{/home/jefbed/src/arwm/armacros.h File Reference}
+\label{armacros_8h}\index{/home/jefbed/src/arwm/armacros.h@{/home/jefbed/src/arwm/armacros.h}}
+}
+\subsection*{Defines}
+\begin{DoxyCompactItemize}
+\item 
+\#define \hyperlink{armacros_8h_a77e631dbfbce6d868b14d197f03df17b}{ARBUGPARAM}(message)~\char`\"{}\%s:\%d: \%s\char`\"{}, \_\-\_\-FILE\_\-\_\-, \_\-\_\-LINE\_\-\_\-, message
+\item 
+\#define \hyperlink{armacros_8h_a53390c1156f372676244dab08f8f1209}{ARBUG}(message)~g\_\-debug(ARBUGPARAM(message))
+\item 
+\#define \hyperlink{armacros_8h_ae40013e84022e7f184d2ac248337c653}{ARWARN}(message)~g\_\-warning(ARBUGPARAM(message))
+\item 
+\#define \hyperlink{armacros_8h_a04c9c1d1af6a41371c67ee91c5d0d94c}{ARERR}(message)~g\_\-error(ARBUGPARAM(message))
+\item 
+\#define \hyperlink{armacros_8h_ae4d1ef8874f310c689ed0915d4835787}{ARBBOOL}(x)~(x == TRUE)
+\item 
+\#define \hyperlink{armacros_8h_a185918273e65f36fa081d99509aadb2e}{ARPBOOL}(x)~(x != NULL)
+\item 
+\#define \hyperlink{armacros_8h_a50ffef8a3225fe1bb276f2e340180d6f}{ARASSERT}
+\item 
+\#define \hyperlink{armacros_8h_aa0fed9625cf9e4e79d9cf0ff35ba95fb}{ARBASSERT}(x)
+\item 
+\#define \hyperlink{armacros_8h_a805f9ad37ecfc6611542279d31eb3257}{ARPASSERT}(x)
+\item 
+\#define \hyperlink{armacros_8h_a0ad447c24c11cd1ca69fb3709890e7aa}{ARIFB}(x)~if(ARBBOOL(x))
+\item 
+\#define \hyperlink{armacros_8h_ac7d14dd93ad379dd0868b4bdb187f629}{ARIFNB}(x)~if(!ARBBOOL(x))
+\item 
+\#define \hyperlink{armacros_8h_ab7b99ffdeb11a557fa92c0ba31dad7a2}{ARIFP}(x)~if(ARPBOOL(x))
+\item 
+\#define \hyperlink{armacros_8h_a59773e96c3265bf00009be24281dd060}{ARIFNP}(x)~if(!ARPBOOL(x))
+\item 
+\#define \hyperlink{armacros_8h_a975379b115e077a32456d9369784c3d3}{ARWIFNP}(x)
+\end{DoxyCompactItemize}
+
+
+\subsection{Define Documentation}
+\hypertarget{armacros_8h_a50ffef8a3225fe1bb276f2e340180d6f}{
+\index{armacros.h@{armacros.h}!ARASSERT@{ARASSERT}}
+\index{ARASSERT@{ARASSERT}!armacros.h@{armacros.h}}
+\subsubsection[{ARASSERT}]{\setlength{\rightskip}{0pt plus 5cm}\#define ARASSERT}}
+\label{armacros_8h_a50ffef8a3225fe1bb276f2e340180d6f}
+
+
+Definition at line 44 of file armacros.h.
+
+\hypertarget{armacros_8h_aa0fed9625cf9e4e79d9cf0ff35ba95fb}{
+\index{armacros.h@{armacros.h}!ARBASSERT@{ARBASSERT}}
+\index{ARBASSERT@{ARBASSERT}!armacros.h@{armacros.h}}
+\subsubsection[{ARBASSERT}]{\setlength{\rightskip}{0pt plus 5cm}\#define ARBASSERT(
+\begin{DoxyParamCaption}
+\item[{}]{x}
+\end{DoxyParamCaption}
+)}}
+\label{armacros_8h_aa0fed9625cf9e4e79d9cf0ff35ba95fb}
+
+
+Definition at line 54 of file armacros.h.
+
+\hypertarget{armacros_8h_ae4d1ef8874f310c689ed0915d4835787}{
+\index{armacros.h@{armacros.h}!ARBBOOL@{ARBBOOL}}
+\index{ARBBOOL@{ARBBOOL}!armacros.h@{armacros.h}}
+\subsubsection[{ARBBOOL}]{\setlength{\rightskip}{0pt plus 5cm}\#define ARBBOOL(
+\begin{DoxyParamCaption}
+\item[{}]{x}
+\end{DoxyParamCaption}
+)~(x == TRUE)}}
+\label{armacros_8h_ae4d1ef8874f310c689ed0915d4835787}
+
+
+Definition at line 38 of file armacros.h.
+
+\hypertarget{armacros_8h_a53390c1156f372676244dab08f8f1209}{
+\index{armacros.h@{armacros.h}!ARBUG@{ARBUG}}
+\index{ARBUG@{ARBUG}!armacros.h@{armacros.h}}
+\subsubsection[{ARBUG}]{\setlength{\rightskip}{0pt plus 5cm}\#define ARBUG(
+\begin{DoxyParamCaption}
+\item[{}]{message}
+\end{DoxyParamCaption}
+)~g\_\-debug(ARBUGPARAM(message))}}
+\label{armacros_8h_a53390c1156f372676244dab08f8f1209}
+
+
+Definition at line 29 of file armacros.h.
+
+\hypertarget{armacros_8h_a77e631dbfbce6d868b14d197f03df17b}{
+\index{armacros.h@{armacros.h}!ARBUGPARAM@{ARBUGPARAM}}
+\index{ARBUGPARAM@{ARBUGPARAM}!armacros.h@{armacros.h}}
+\subsubsection[{ARBUGPARAM}]{\setlength{\rightskip}{0pt plus 5cm}\#define ARBUGPARAM(
+\begin{DoxyParamCaption}
+\item[{}]{message}
+\end{DoxyParamCaption}
+)~\char`\"{}\%s:\%d: \%s\char`\"{}, \_\-\_\-FILE\_\-\_\-, \_\-\_\-LINE\_\-\_\-, message}}
+\label{armacros_8h_a77e631dbfbce6d868b14d197f03df17b}
+
+
+Definition at line 26 of file armacros.h.
+
+\hypertarget{armacros_8h_a04c9c1d1af6a41371c67ee91c5d0d94c}{
+\index{armacros.h@{armacros.h}!ARERR@{ARERR}}
+\index{ARERR@{ARERR}!armacros.h@{armacros.h}}
+\subsubsection[{ARERR}]{\setlength{\rightskip}{0pt plus 5cm}\#define ARERR(
+\begin{DoxyParamCaption}
+\item[{}]{message}
+\end{DoxyParamCaption}
+)~g\_\-error(ARBUGPARAM(message))}}
+\label{armacros_8h_a04c9c1d1af6a41371c67ee91c5d0d94c}
+
+
+Definition at line 35 of file armacros.h.
+
+\hypertarget{armacros_8h_a0ad447c24c11cd1ca69fb3709890e7aa}{
+\index{armacros.h@{armacros.h}!ARIFB@{ARIFB}}
+\index{ARIFB@{ARIFB}!armacros.h@{armacros.h}}
+\subsubsection[{ARIFB}]{\setlength{\rightskip}{0pt plus 5cm}\#define ARIFB(
+\begin{DoxyParamCaption}
+\item[{}]{x}
+\end{DoxyParamCaption}
+)~if(ARBBOOL(x))}}
+\label{armacros_8h_a0ad447c24c11cd1ca69fb3709890e7aa}
+
+
+Definition at line 58 of file armacros.h.
+
+\hypertarget{armacros_8h_ac7d14dd93ad379dd0868b4bdb187f629}{
+\index{armacros.h@{armacros.h}!ARIFNB@{ARIFNB}}
+\index{ARIFNB@{ARIFNB}!armacros.h@{armacros.h}}
+\subsubsection[{ARIFNB}]{\setlength{\rightskip}{0pt plus 5cm}\#define ARIFNB(
+\begin{DoxyParamCaption}
+\item[{}]{x}
+\end{DoxyParamCaption}
+)~if(!ARBBOOL(x))}}
+\label{armacros_8h_ac7d14dd93ad379dd0868b4bdb187f629}
+
+
+Definition at line 61 of file armacros.h.
+
+\hypertarget{armacros_8h_a59773e96c3265bf00009be24281dd060}{
+\index{armacros.h@{armacros.h}!ARIFNP@{ARIFNP}}
+\index{ARIFNP@{ARIFNP}!armacros.h@{armacros.h}}
+\subsubsection[{ARIFNP}]{\setlength{\rightskip}{0pt plus 5cm}\#define ARIFNP(
+\begin{DoxyParamCaption}
+\item[{}]{x}
+\end{DoxyParamCaption}
+)~if(!ARPBOOL(x))}}
+\label{armacros_8h_a59773e96c3265bf00009be24281dd060}
+
+
+Definition at line 67 of file armacros.h.
+
+\hypertarget{armacros_8h_ab7b99ffdeb11a557fa92c0ba31dad7a2}{
+\index{armacros.h@{armacros.h}!ARIFP@{ARIFP}}
+\index{ARIFP@{ARIFP}!armacros.h@{armacros.h}}
+\subsubsection[{ARIFP}]{\setlength{\rightskip}{0pt plus 5cm}\#define ARIFP(
+\begin{DoxyParamCaption}
+\item[{}]{x}
+\end{DoxyParamCaption}
+)~if(ARPBOOL(x))}}
+\label{armacros_8h_ab7b99ffdeb11a557fa92c0ba31dad7a2}
+
+
+Definition at line 64 of file armacros.h.
+
+\hypertarget{armacros_8h_a805f9ad37ecfc6611542279d31eb3257}{
+\index{armacros.h@{armacros.h}!ARPASSERT@{ARPASSERT}}
+\index{ARPASSERT@{ARPASSERT}!armacros.h@{armacros.h}}
+\subsubsection[{ARPASSERT}]{\setlength{\rightskip}{0pt plus 5cm}\#define ARPASSERT(
+\begin{DoxyParamCaption}
+\item[{}]{x}
+\end{DoxyParamCaption}
+)}}
+\label{armacros_8h_a805f9ad37ecfc6611542279d31eb3257}
+
+
+Definition at line 55 of file armacros.h.
+
+\hypertarget{armacros_8h_a185918273e65f36fa081d99509aadb2e}{
+\index{armacros.h@{armacros.h}!ARPBOOL@{ARPBOOL}}
+\index{ARPBOOL@{ARPBOOL}!armacros.h@{armacros.h}}
+\subsubsection[{ARPBOOL}]{\setlength{\rightskip}{0pt plus 5cm}\#define ARPBOOL(
+\begin{DoxyParamCaption}
+\item[{}]{x}
+\end{DoxyParamCaption}
+)~(x != NULL)}}
+\label{armacros_8h_a185918273e65f36fa081d99509aadb2e}
+
+
+Definition at line 39 of file armacros.h.
+
+\hypertarget{armacros_8h_ae40013e84022e7f184d2ac248337c653}{
+\index{armacros.h@{armacros.h}!ARWARN@{ARWARN}}
+\index{ARWARN@{ARWARN}!armacros.h@{armacros.h}}
+\subsubsection[{ARWARN}]{\setlength{\rightskip}{0pt plus 5cm}\#define ARWARN(
+\begin{DoxyParamCaption}
+\item[{}]{message}
+\end{DoxyParamCaption}
+)~g\_\-warning(ARBUGPARAM(message))}}
+\label{armacros_8h_ae40013e84022e7f184d2ac248337c653}
+
+
+Definition at line 32 of file armacros.h.
+
+\hypertarget{armacros_8h_a975379b115e077a32456d9369784c3d3}{
+\index{armacros.h@{armacros.h}!ARWIFNP@{ARWIFNP}}
+\index{ARWIFNP@{ARWIFNP}!armacros.h@{armacros.h}}
+\subsubsection[{ARWIFNP}]{\setlength{\rightskip}{0pt plus 5cm}\#define ARWIFNP(
+\begin{DoxyParamCaption}
+\item[{}]{x}
+\end{DoxyParamCaption}
+)}}
+\label{armacros_8h_a975379b115e077a32456d9369784c3d3}
+{\bfseries Value:}
+\begin{DoxyCode}
+ARIFNP(x) \
+                ARWARN("NULL data passed, operation not performed"); \
+        else
+\end{DoxyCode}
+
+
+Definition at line 70 of file armacros.h.
+

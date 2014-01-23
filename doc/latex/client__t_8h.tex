@@ -1,0 +1,201 @@
+\hypertarget{client__t_8h}{
+\section{/home/jefbed/src/arwm/client\_\-t.h File Reference}
+\label{client__t_8h}\index{/home/jefbed/src/arwm/client\_\-t.h@{/home/jefbed/src/arwm/client\_\-t.h}}
+}
+\subsection*{Data Structures}
+\begin{DoxyCompactItemize}
+\item 
+struct \hyperlink{struct_client}{Client}
+\end{DoxyCompactItemize}
+\subsection*{Defines}
+\begin{DoxyCompactItemize}
+\item 
+\#define \hyperlink{client__t_8h_a33e89febe90f7192b889507d66b887bb}{AR\_\-CLIENT\_\-IS\_\-STICKY}~(1$<$$<$0)
+\item 
+\#define \hyperlink{client__t_8h_a7151560ac0b7198f72043a85febdaf27}{AR\_\-CLIENT\_\-REMOVE}~(1$<$$<$1)
+\item 
+\#define \hyperlink{client__t_8h_a46070753a7b9285b35d065d8bfdcaad3}{AR\_\-CLIENT\_\-ACTIVE}~(1$<$$<$2)
+\item 
+\#define \hyperlink{client__t_8h_a526b27a89dcfc58264144477658923cd}{AR\_\-CLIENT\_\-SHADED}~(1$<$$<$3)
+\item 
+\#define \hyperlink{client__t_8h_afd14f6494a27379876958ac093bd1ca0}{AR\_\-CLIENT\_\-DONT\_\-MANAGE}~(1$<$$<$4)
+\item 
+\#define \hyperlink{client__t_8h_adc1817d921b36134b39d63d8b1e23edb}{AR\_\-CLIENT\_\-DONT\_\-USE\_\-TITLEBAR}~(1$<$$<$5)
+\item 
+\#define \hyperlink{client__t_8h_a2310c23cbc29b4aefaae4bcdc118200f}{AR\_\-CLIENT\_\-BLACK\_\-BORDER}~(1$<$$<$6)
+\item 
+\#define \hyperlink{client__t_8h_a405df754ddc76a5111fcad9aac6f7715}{AR\_\-CLIENT\_\-SHAPED}~(1$<$$<$7)
+\item 
+\#define \hyperlink{client__t_8h_ae1cec73ad23c9fc7e1bc9791ebf21808}{is\_\-sticky}(c)~(c-\/$>$flags \& AR\_\-CLIENT\_\-IS\_\-STICKY)
+\item 
+\#define \hyperlink{client__t_8h_a6e5b8f7d4eed35ad2a5e5bd461da719a}{add\_\-sticky}(c)~c-\/$>$flags $|$= AR\_\-CLIENT\_\-IS\_\-STICKY
+\item 
+\#define \hyperlink{client__t_8h_a28e994382e9c94bccd40352136bbb08a}{remove\_\-sticky}(c)~c-\/$>$flags \&= $\sim$AR\_\-CLIENT\_\-IS\_\-STICKY
+\item 
+\#define \hyperlink{client__t_8h_a1fda0d134e2bc891bcf1ae215f96f0c3}{toggle\_\-sticky}(c)~c-\/$>$flags $^\wedge$= AR\_\-CLIENT\_\-IS\_\-STICKY
+\end{DoxyCompactItemize}
+\subsection*{Typedefs}
+\begin{DoxyCompactItemize}
+\item 
+typedef struct \hyperlink{struct_client}{Client} \hyperlink{client__t_8h_a7302c9ba9fef6f7473f52cc61bd4bc40}{Client}
+\end{DoxyCompactItemize}
+\subsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+void \hyperlink{client__t_8h_af23437e93d4ccbe43b1e1264107a45d9}{initialize\_\-client\_\-ce} (\hyperlink{struct_client}{Client} $\ast$c)
+\end{DoxyCompactItemize}
+
+
+\subsection{Define Documentation}
+\hypertarget{client__t_8h_a6e5b8f7d4eed35ad2a5e5bd461da719a}{
+\index{client\_\-t.h@{client\_\-t.h}!add\_\-sticky@{add\_\-sticky}}
+\index{add\_\-sticky@{add\_\-sticky}!client_t.h@{client\_\-t.h}}
+\subsubsection[{add\_\-sticky}]{\setlength{\rightskip}{0pt plus 5cm}\#define add\_\-sticky(
+\begin{DoxyParamCaption}
+\item[{}]{c}
+\end{DoxyParamCaption}
+)~c-\/$>$flags $|$= AR\_\-CLIENT\_\-IS\_\-STICKY}}
+\label{client__t_8h_a6e5b8f7d4eed35ad2a5e5bd461da719a}
+
+
+Definition at line 64 of file client\_\-t.h.
+
+\hypertarget{client__t_8h_a46070753a7b9285b35d065d8bfdcaad3}{
+\index{client\_\-t.h@{client\_\-t.h}!AR\_\-CLIENT\_\-ACTIVE@{AR\_\-CLIENT\_\-ACTIVE}}
+\index{AR\_\-CLIENT\_\-ACTIVE@{AR\_\-CLIENT\_\-ACTIVE}!client_t.h@{client\_\-t.h}}
+\subsubsection[{AR\_\-CLIENT\_\-ACTIVE}]{\setlength{\rightskip}{0pt plus 5cm}\#define AR\_\-CLIENT\_\-ACTIVE~(1$<$$<$2)}}
+\label{client__t_8h_a46070753a7b9285b35d065d8bfdcaad3}
+
+
+Definition at line 37 of file client\_\-t.h.
+
+\hypertarget{client__t_8h_a2310c23cbc29b4aefaae4bcdc118200f}{
+\index{client\_\-t.h@{client\_\-t.h}!AR\_\-CLIENT\_\-BLACK\_\-BORDER@{AR\_\-CLIENT\_\-BLACK\_\-BORDER}}
+\index{AR\_\-CLIENT\_\-BLACK\_\-BORDER@{AR\_\-CLIENT\_\-BLACK\_\-BORDER}!client_t.h@{client\_\-t.h}}
+\subsubsection[{AR\_\-CLIENT\_\-BLACK\_\-BORDER}]{\setlength{\rightskip}{0pt plus 5cm}\#define AR\_\-CLIENT\_\-BLACK\_\-BORDER~(1$<$$<$6)}}
+\label{client__t_8h_a2310c23cbc29b4aefaae4bcdc118200f}
+
+
+Definition at line 41 of file client\_\-t.h.
+
+\hypertarget{client__t_8h_afd14f6494a27379876958ac093bd1ca0}{
+\index{client\_\-t.h@{client\_\-t.h}!AR\_\-CLIENT\_\-DONT\_\-MANAGE@{AR\_\-CLIENT\_\-DONT\_\-MANAGE}}
+\index{AR\_\-CLIENT\_\-DONT\_\-MANAGE@{AR\_\-CLIENT\_\-DONT\_\-MANAGE}!client_t.h@{client\_\-t.h}}
+\subsubsection[{AR\_\-CLIENT\_\-DONT\_\-MANAGE}]{\setlength{\rightskip}{0pt plus 5cm}\#define AR\_\-CLIENT\_\-DONT\_\-MANAGE~(1$<$$<$4)}}
+\label{client__t_8h_afd14f6494a27379876958ac093bd1ca0}
+
+
+Definition at line 39 of file client\_\-t.h.
+
+\hypertarget{client__t_8h_adc1817d921b36134b39d63d8b1e23edb}{
+\index{client\_\-t.h@{client\_\-t.h}!AR\_\-CLIENT\_\-DONT\_\-USE\_\-TITLEBAR@{AR\_\-CLIENT\_\-DONT\_\-USE\_\-TITLEBAR}}
+\index{AR\_\-CLIENT\_\-DONT\_\-USE\_\-TITLEBAR@{AR\_\-CLIENT\_\-DONT\_\-USE\_\-TITLEBAR}!client_t.h@{client\_\-t.h}}
+\subsubsection[{AR\_\-CLIENT\_\-DONT\_\-USE\_\-TITLEBAR}]{\setlength{\rightskip}{0pt plus 5cm}\#define AR\_\-CLIENT\_\-DONT\_\-USE\_\-TITLEBAR~(1$<$$<$5)}}
+\label{client__t_8h_adc1817d921b36134b39d63d8b1e23edb}
+
+
+Definition at line 40 of file client\_\-t.h.
+
+\hypertarget{client__t_8h_a33e89febe90f7192b889507d66b887bb}{
+\index{client\_\-t.h@{client\_\-t.h}!AR\_\-CLIENT\_\-IS\_\-STICKY@{AR\_\-CLIENT\_\-IS\_\-STICKY}}
+\index{AR\_\-CLIENT\_\-IS\_\-STICKY@{AR\_\-CLIENT\_\-IS\_\-STICKY}!client_t.h@{client\_\-t.h}}
+\subsubsection[{AR\_\-CLIENT\_\-IS\_\-STICKY}]{\setlength{\rightskip}{0pt plus 5cm}\#define AR\_\-CLIENT\_\-IS\_\-STICKY~(1$<$$<$0)}}
+\label{client__t_8h_a33e89febe90f7192b889507d66b887bb}
+
+
+Definition at line 34 of file client\_\-t.h.
+
+\hypertarget{client__t_8h_a7151560ac0b7198f72043a85febdaf27}{
+\index{client\_\-t.h@{client\_\-t.h}!AR\_\-CLIENT\_\-REMOVE@{AR\_\-CLIENT\_\-REMOVE}}
+\index{AR\_\-CLIENT\_\-REMOVE@{AR\_\-CLIENT\_\-REMOVE}!client_t.h@{client\_\-t.h}}
+\subsubsection[{AR\_\-CLIENT\_\-REMOVE}]{\setlength{\rightskip}{0pt plus 5cm}\#define AR\_\-CLIENT\_\-REMOVE~(1$<$$<$1)}}
+\label{client__t_8h_a7151560ac0b7198f72043a85febdaf27}
+
+
+Definition at line 36 of file client\_\-t.h.
+
+\hypertarget{client__t_8h_a526b27a89dcfc58264144477658923cd}{
+\index{client\_\-t.h@{client\_\-t.h}!AR\_\-CLIENT\_\-SHADED@{AR\_\-CLIENT\_\-SHADED}}
+\index{AR\_\-CLIENT\_\-SHADED@{AR\_\-CLIENT\_\-SHADED}!client_t.h@{client\_\-t.h}}
+\subsubsection[{AR\_\-CLIENT\_\-SHADED}]{\setlength{\rightskip}{0pt plus 5cm}\#define AR\_\-CLIENT\_\-SHADED~(1$<$$<$3)}}
+\label{client__t_8h_a526b27a89dcfc58264144477658923cd}
+
+
+Definition at line 38 of file client\_\-t.h.
+
+\hypertarget{client__t_8h_a405df754ddc76a5111fcad9aac6f7715}{
+\index{client\_\-t.h@{client\_\-t.h}!AR\_\-CLIENT\_\-SHAPED@{AR\_\-CLIENT\_\-SHAPED}}
+\index{AR\_\-CLIENT\_\-SHAPED@{AR\_\-CLIENT\_\-SHAPED}!client_t.h@{client\_\-t.h}}
+\subsubsection[{AR\_\-CLIENT\_\-SHAPED}]{\setlength{\rightskip}{0pt plus 5cm}\#define AR\_\-CLIENT\_\-SHAPED~(1$<$$<$7)}}
+\label{client__t_8h_a405df754ddc76a5111fcad9aac6f7715}
+
+
+Definition at line 42 of file client\_\-t.h.
+
+\hypertarget{client__t_8h_ae1cec73ad23c9fc7e1bc9791ebf21808}{
+\index{client\_\-t.h@{client\_\-t.h}!is\_\-sticky@{is\_\-sticky}}
+\index{is\_\-sticky@{is\_\-sticky}!client_t.h@{client\_\-t.h}}
+\subsubsection[{is\_\-sticky}]{\setlength{\rightskip}{0pt plus 5cm}\#define is\_\-sticky(
+\begin{DoxyParamCaption}
+\item[{}]{c}
+\end{DoxyParamCaption}
+)~(c-\/$>$flags \& AR\_\-CLIENT\_\-IS\_\-STICKY)}}
+\label{client__t_8h_ae1cec73ad23c9fc7e1bc9791ebf21808}
+
+
+Definition at line 63 of file client\_\-t.h.
+
+\hypertarget{client__t_8h_a28e994382e9c94bccd40352136bbb08a}{
+\index{client\_\-t.h@{client\_\-t.h}!remove\_\-sticky@{remove\_\-sticky}}
+\index{remove\_\-sticky@{remove\_\-sticky}!client_t.h@{client\_\-t.h}}
+\subsubsection[{remove\_\-sticky}]{\setlength{\rightskip}{0pt plus 5cm}\#define remove\_\-sticky(
+\begin{DoxyParamCaption}
+\item[{}]{c}
+\end{DoxyParamCaption}
+)~c-\/$>$flags \&= $\sim$AR\_\-CLIENT\_\-IS\_\-STICKY}}
+\label{client__t_8h_a28e994382e9c94bccd40352136bbb08a}
+
+
+Definition at line 65 of file client\_\-t.h.
+
+\hypertarget{client__t_8h_a1fda0d134e2bc891bcf1ae215f96f0c3}{
+\index{client\_\-t.h@{client\_\-t.h}!toggle\_\-sticky@{toggle\_\-sticky}}
+\index{toggle\_\-sticky@{toggle\_\-sticky}!client_t.h@{client\_\-t.h}}
+\subsubsection[{toggle\_\-sticky}]{\setlength{\rightskip}{0pt plus 5cm}\#define toggle\_\-sticky(
+\begin{DoxyParamCaption}
+\item[{}]{c}
+\end{DoxyParamCaption}
+)~c-\/$>$flags $^\wedge$= AR\_\-CLIENT\_\-IS\_\-STICKY}}
+\label{client__t_8h_a1fda0d134e2bc891bcf1ae215f96f0c3}
+
+
+Definition at line 66 of file client\_\-t.h.
+
+
+
+\subsection{Typedef Documentation}
+\hypertarget{client__t_8h_a7302c9ba9fef6f7473f52cc61bd4bc40}{
+\index{client\_\-t.h@{client\_\-t.h}!Client@{Client}}
+\index{Client@{Client}!client_t.h@{client\_\-t.h}}
+\subsubsection[{Client}]{\setlength{\rightskip}{0pt plus 5cm}typedef struct {\bf Client} {\bf Client}}}
+\label{client__t_8h_a7302c9ba9fef6f7473f52cc61bd4bc40}
+
+
+Definition at line 7 of file client\_\-t.h.
+
+
+
+\subsection{Function Documentation}
+\hypertarget{client__t_8h_af23437e93d4ccbe43b1e1264107a45d9}{
+\index{client\_\-t.h@{client\_\-t.h}!initialize\_\-client\_\-ce@{initialize\_\-client\_\-ce}}
+\index{initialize\_\-client\_\-ce@{initialize\_\-client\_\-ce}!client_t.h@{client\_\-t.h}}
+\subsubsection[{initialize\_\-client\_\-ce}]{\setlength{\rightskip}{0pt plus 5cm}void initialize\_\-client\_\-ce (
+\begin{DoxyParamCaption}
+\item[{{\bf Client} $\ast$}]{c}
+\end{DoxyParamCaption}
+)}}
+\label{client__t_8h_af23437e93d4ccbe43b1e1264107a45d9}
+
+
+Definition at line 50 of file client.c.
+

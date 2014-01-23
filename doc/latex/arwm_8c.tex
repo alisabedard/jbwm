@@ -1,0 +1,166 @@
+\hypertarget{arwm_8c}{
+\section{/home/jefbed/src/arwm/arwm.c File Reference}
+\label{arwm_8c}\index{/home/jefbed/src/arwm/arwm.c@{/home/jefbed/src/arwm/arwm.c}}
+}
+{\ttfamily \#include $<$signal.h$>$}\par
+{\ttfamily \#include $<$X11/cursorfont.h$>$}\par
+{\ttfamily \#include $<$unistd.h$>$}\par
+{\ttfamily \#include \char`\"{}arwm.h\char`\"{}}\par
+\subsection*{Defines}
+\begin{DoxyCompactItemize}
+\item 
+\#define \hyperlink{arwm_8c_a941258a4d3b751e47e8dad2628212cb1}{FONTOPEN}(f)~XLoadQueryFont(arwm.X.dpy, f)
+\item 
+\#define \hyperlink{arwm_8c_a0f910d2573717528aa1c80df109d5d06}{GRAB}(mod)
+\item 
+\#define \hyperlink{arwm_8c_a340bfe8a0bf49c90b8380eb348e7e0d2}{COLORALLOC}(item)
+\end{DoxyCompactItemize}
+\subsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+void \hyperlink{arwm_8c_a5b73dfa0ad1787c60e6064caaa19b59a}{arwm\_\-grab\_\-button} (Window w, unsigned int mask, unsigned int button)
+\item 
+int \hyperlink{arwm_8c_a5d6593faf282c1f0cec0d54c63dba874}{main} (int argc \_\-\_\-attribute\_\-\_\-((unused)), char $\ast$$\ast$argv \_\-\_\-attribute\_\-\_\-((unused)))
+\end{DoxyCompactItemize}
+\subsection*{Variables}
+\begin{DoxyCompactItemize}
+\item 
+\hyperlink{struct_a_r_w_m_environment}{ARWMEnvironment} \hyperlink{arwm_8c_add664a04efff673d86a4f004cd50aebe}{arwm}
+\item 
+\hyperlink{struct_global_options}{GlobalOptions} \hyperlink{arwm_8c_ab234602dfc581d956b141ba6fba98697}{opt}
+\item 
+\hyperlink{struct_application}{Application} $\ast$ \hyperlink{arwm_8c_adb1955db952a5e2d81f90fb91eb220c2}{head\_\-app} = NULL
+\item 
+\hyperlink{struct_client}{Client} $\ast$ \hyperlink{arwm_8c_adb00c3fa7cb93c5b6340eeaf22f462e1}{head\_\-client} = NULL
+\item 
+\hyperlink{struct_client}{Client} $\ast$ \hyperlink{arwm_8c_aeb316242aed4abfe5a2f44dba9594ee2}{current} = NULL
+\end{DoxyCompactItemize}
+
+
+\subsection{Define Documentation}
+\hypertarget{arwm_8c_a340bfe8a0bf49c90b8380eb348e7e0d2}{
+\index{arwm.c@{arwm.c}!COLORALLOC@{COLORALLOC}}
+\index{COLORALLOC@{COLORALLOC}!arwm.c@{arwm.c}}
+\subsubsection[{COLORALLOC}]{\setlength{\rightskip}{0pt plus 5cm}\#define COLORALLOC(
+\begin{DoxyParamCaption}
+\item[{}]{item}
+\end{DoxyParamCaption}
+)}}
+\label{arwm_8c_a340bfe8a0bf49c90b8380eb348e7e0d2}
+{\bfseries Value:}
+\begin{DoxyCode}
+XAllocNamedColor(arwm.X.dpy, DefaultColormap(arwm.X.dpy, i),\
+                opt.color.item, &arwm.X.screens[i].item, &dummy);
+\end{DoxyCode}
+\hypertarget{arwm_8c_a941258a4d3b751e47e8dad2628212cb1}{
+\index{arwm.c@{arwm.c}!FONTOPEN@{FONTOPEN}}
+\index{FONTOPEN@{FONTOPEN}!arwm.c@{arwm.c}}
+\subsubsection[{FONTOPEN}]{\setlength{\rightskip}{0pt plus 5cm}\#define FONTOPEN(
+\begin{DoxyParamCaption}
+\item[{}]{f}
+\end{DoxyParamCaption}
+)~XLoadQueryFont(arwm.X.dpy, f)}}
+\label{arwm_8c_a941258a4d3b751e47e8dad2628212cb1}
+\hypertarget{arwm_8c_a0f910d2573717528aa1c80df109d5d06}{
+\index{arwm.c@{arwm.c}!GRAB@{GRAB}}
+\index{GRAB@{GRAB}!arwm.c@{arwm.c}}
+\subsubsection[{GRAB}]{\setlength{\rightskip}{0pt plus 5cm}\#define GRAB(
+\begin{DoxyParamCaption}
+\item[{}]{mod}
+\end{DoxyParamCaption}
+)}}
+\label{arwm_8c_a0f910d2573717528aa1c80df109d5d06}
+{\bfseries Value:}
+\begin{DoxyCode}
+XGrabButton(arwm.X.dpy, button, mask | mod, w, False,\
+        ButtonMask, GrabModeAsync, GrabModeSync, None, None)
+\end{DoxyCode}
+
+
+\subsection{Function Documentation}
+\hypertarget{arwm_8c_a5b73dfa0ad1787c60e6064caaa19b59a}{
+\index{arwm.c@{arwm.c}!arwm\_\-grab\_\-button@{arwm\_\-grab\_\-button}}
+\index{arwm\_\-grab\_\-button@{arwm\_\-grab\_\-button}!arwm.c@{arwm.c}}
+\subsubsection[{arwm\_\-grab\_\-button}]{\setlength{\rightskip}{0pt plus 5cm}void arwm\_\-grab\_\-button (
+\begin{DoxyParamCaption}
+\item[{Window}]{w, }
+\item[{unsigned int}]{mask, }
+\item[{unsigned int}]{button}
+\end{DoxyParamCaption}
+)}}
+\label{arwm_8c_a5b73dfa0ad1787c60e6064caaa19b59a}
+
+
+Definition at line 205 of file arwm.c.
+
+\hypertarget{arwm_8c_a5d6593faf282c1f0cec0d54c63dba874}{
+\index{arwm.c@{arwm.c}!main@{main}}
+\index{main@{main}!arwm.c@{arwm.c}}
+\subsubsection[{main}]{\setlength{\rightskip}{0pt plus 5cm}int main (
+\begin{DoxyParamCaption}
+\item[{int argc }]{\_\-\_\-attribute\_\-\_\-(unused), }
+\item[{char $\ast$$\ast$argv }]{\_\-\_\-attribute\_\-\_\-(unused)}
+\end{DoxyParamCaption}
+)}}
+\label{arwm_8c_a5d6593faf282c1f0cec0d54c63dba874}
+
+
+Definition at line 366 of file arwm.c.
+
+
+
+\subsection{Variable Documentation}
+\hypertarget{arwm_8c_add664a04efff673d86a4f004cd50aebe}{
+\index{arwm.c@{arwm.c}!arwm@{arwm}}
+\index{arwm@{arwm}!arwm.c@{arwm.c}}
+\subsubsection[{arwm}]{\setlength{\rightskip}{0pt plus 5cm}{\bf ARWMEnvironment} {\bf arwm}}}
+\label{arwm_8c_add664a04efff673d86a4f004cd50aebe}
+
+
+Definition at line 14 of file arwm.c.
+
+\hypertarget{arwm_8c_aeb316242aed4abfe5a2f44dba9594ee2}{
+\index{arwm.c@{arwm.c}!current@{current}}
+\index{current@{current}!arwm.c@{arwm.c}}
+\subsubsection[{current}]{\setlength{\rightskip}{0pt plus 5cm}{\bf Client}$\ast$ {\bf current} = NULL}}
+\label{arwm_8c_aeb316242aed4abfe5a2f44dba9594ee2}
+
+
+Definition at line 47 of file arwm.c.
+
+\hypertarget{arwm_8c_adb1955db952a5e2d81f90fb91eb220c2}{
+\index{arwm.c@{arwm.c}!head\_\-app@{head\_\-app}}
+\index{head\_\-app@{head\_\-app}!arwm.c@{arwm.c}}
+\subsubsection[{head\_\-app}]{\setlength{\rightskip}{0pt plus 5cm}{\bf Application}$\ast$ {\bf head\_\-app} = NULL}}
+\label{arwm_8c_adb1955db952a5e2d81f90fb91eb220c2}
+
+
+Definition at line 43 of file arwm.c.
+
+\hypertarget{arwm_8c_adb00c3fa7cb93c5b6340eeaf22f462e1}{
+\index{arwm.c@{arwm.c}!head\_\-client@{head\_\-client}}
+\index{head\_\-client@{head\_\-client}!arwm.c@{arwm.c}}
+\subsubsection[{head\_\-client}]{\setlength{\rightskip}{0pt plus 5cm}{\bf Client}$\ast$ {\bf head\_\-client} = NULL}}
+\label{arwm_8c_adb00c3fa7cb93c5b6340eeaf22f462e1}
+
+
+Definition at line 46 of file arwm.c.
+
+\hypertarget{arwm_8c_ab234602dfc581d956b141ba6fba98697}{
+\index{arwm.c@{arwm.c}!opt@{opt}}
+\index{opt@{opt}!arwm.c@{arwm.c}}
+\subsubsection[{opt}]{\setlength{\rightskip}{0pt plus 5cm}{\bf GlobalOptions} {\bf opt}}}
+\label{arwm_8c_ab234602dfc581d956b141ba6fba98697}
+{\bfseries Initial value:}
+\begin{DoxyCode}
+ 
+{
+        DEF_FONT,
+        {DEF_FG, DEF_BG, DEF_FC},
+        DEF_TERM
+}
+\end{DoxyCode}
+
+
+Definition at line 36 of file arwm.c.
+

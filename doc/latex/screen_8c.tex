@@ -1,0 +1,181 @@
+\hypertarget{screen_8c}{
+\section{/home/jefbed/src/arwm/screen.c File Reference}
+\label{screen_8c}\index{/home/jefbed/src/arwm/screen.c@{/home/jefbed/src/arwm/screen.c}}
+}
+{\ttfamily \#include \char`\"{}arwm.h\char`\"{}}\par
+{\ttfamily \#include $<$string.h$>$}\par
+{\ttfamily \#include \char`\"{}screen.h\char`\"{}}\par
+\subsection*{Defines}
+\begin{DoxyCompactItemize}
+\item 
+\#define \hyperlink{screen_8c_a3ad75a6266319e0b4dc322105f721bcb}{setwh}(wh, mm, gtlt)
+\item 
+\#define \hyperlink{screen_8c_afcdfa26a06d72dcbb3076deab34e0261}{grab\_\-pointer}(w, mask, curs)
+\end{DoxyCompactItemize}
+\subsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+void \hyperlink{screen_8c_a7c8d3f391be6fbe302623d42e9ce19a6}{sweep} (\hyperlink{struct_client}{Client} $\ast$c)
+\item 
+void \hyperlink{screen_8c_a42cdc67b96d0ed62a680cb6e21650011}{drag} (\hyperlink{struct_client}{Client} $\ast$c)
+\item 
+void \hyperlink{screen_8c_a91e5b3c040557915daa392db06021078}{moveresize} (\hyperlink{struct_client}{Client} $\ast$c)
+\item 
+void \hyperlink{screen_8c_a0b53d7861c6a2ce495fdacb87a6cc99e}{maximize} (\hyperlink{struct_client}{Client} $\ast$c)
+\item 
+void \hyperlink{screen_8c_ac3204c7615a10baafddef111d07d7593}{hide} (\hyperlink{struct_client}{Client} $\ast$c)
+\item 
+void \hyperlink{screen_8c_a1892b55035e98e4ef8d62d30e6c593f3}{unhide} (\hyperlink{struct_client}{Client} $\ast$c, int raise\_\-win)
+\item 
+void \hyperlink{screen_8c_a5922084f81d438be481450dc6aee9a10}{next} (void)
+\item 
+void \hyperlink{screen_8c_a37776f7c86728d059fd01c532179537c}{switch\_\-vdesk} (\hyperlink{struct_screen_info}{ScreenInfo} $\ast$s, const \hyperlink{arwm_8h_a5dd4f281954ce1405c92d62a427f839a}{ubyte} v)
+\end{DoxyCompactItemize}
+
+
+\subsection{Define Documentation}
+\hypertarget{screen_8c_afcdfa26a06d72dcbb3076deab34e0261}{
+\index{screen.c@{screen.c}!grab\_\-pointer@{grab\_\-pointer}}
+\index{grab\_\-pointer@{grab\_\-pointer}!screen.c@{screen.c}}
+\subsubsection[{grab\_\-pointer}]{\setlength{\rightskip}{0pt plus 5cm}\#define grab\_\-pointer(
+\begin{DoxyParamCaption}
+\item[{}]{w, }
+\item[{}]{mask, }
+\item[{}]{curs}
+\end{DoxyParamCaption}
+)}}
+\label{screen_8c_afcdfa26a06d72dcbb3076deab34e0261}
+{\bfseries Value:}
+\begin{DoxyCode}
+(XGrabPointer(arwm.X.dpy, w, False, mask, GrabModeAsync,\
+        GrabModeAsync, None, curs, CurrentTime) == GrabSuccess)
+\end{DoxyCode}
+
+
+Definition at line 85 of file screen.c.
+
+\hypertarget{screen_8c_a3ad75a6266319e0b4dc322105f721bcb}{
+\index{screen.c@{screen.c}!setwh@{setwh}}
+\index{setwh@{setwh}!screen.c@{screen.c}}
+\subsubsection[{setwh}]{\setlength{\rightskip}{0pt plus 5cm}\#define setwh(
+\begin{DoxyParamCaption}
+\item[{}]{wh, }
+\item[{}]{mm, }
+\item[{}]{gtlt}
+\end{DoxyParamCaption}
+)}}
+\label{screen_8c_a3ad75a6266319e0b4dc322105f721bcb}
+{\bfseries Value:}
+\begin{DoxyCode}
+if(c->mm##_##wh && g->wh gtlt c->mm##_##wh)\
+        g->wh = c->mm##_##wh;
+\end{DoxyCode}
+
+
+\subsection{Function Documentation}
+\hypertarget{screen_8c_a42cdc67b96d0ed62a680cb6e21650011}{
+\index{screen.c@{screen.c}!drag@{drag}}
+\index{drag@{drag}!screen.c@{screen.c}}
+\subsubsection[{drag}]{\setlength{\rightskip}{0pt plus 5cm}void drag (
+\begin{DoxyParamCaption}
+\item[{{\bf Client} $\ast$}]{c}
+\end{DoxyParamCaption}
+)}}
+\label{screen_8c_a42cdc67b96d0ed62a680cb6e21650011}
+
+
+Definition at line 241 of file screen.c.
+
+\hypertarget{screen_8c_ac3204c7615a10baafddef111d07d7593}{
+\index{screen.c@{screen.c}!hide@{hide}}
+\index{hide@{hide}!screen.c@{screen.c}}
+\subsubsection[{hide}]{\setlength{\rightskip}{0pt plus 5cm}void hide (
+\begin{DoxyParamCaption}
+\item[{{\bf Client} $\ast$}]{c}
+\end{DoxyParamCaption}
+)}}
+\label{screen_8c_ac3204c7615a10baafddef111d07d7593}
+
+
+Definition at line 308 of file screen.c.
+
+\hypertarget{screen_8c_a0b53d7861c6a2ce495fdacb87a6cc99e}{
+\index{screen.c@{screen.c}!maximize@{maximize}}
+\index{maximize@{maximize}!screen.c@{screen.c}}
+\subsubsection[{maximize}]{\setlength{\rightskip}{0pt plus 5cm}void maximize (
+\begin{DoxyParamCaption}
+\item[{{\bf Client} $\ast$}]{c}
+\end{DoxyParamCaption}
+)}}
+\label{screen_8c_a0b53d7861c6a2ce495fdacb87a6cc99e}
+
+
+Definition at line 281 of file screen.c.
+
+\hypertarget{screen_8c_a91e5b3c040557915daa392db06021078}{
+\index{screen.c@{screen.c}!moveresize@{moveresize}}
+\index{moveresize@{moveresize}!screen.c@{screen.c}}
+\subsubsection[{moveresize}]{\setlength{\rightskip}{0pt plus 5cm}void moveresize (
+\begin{DoxyParamCaption}
+\item[{{\bf Client} $\ast$}]{c}
+\end{DoxyParamCaption}
+)}}
+\label{screen_8c_a91e5b3c040557915daa392db06021078}
+
+
+Definition at line 256 of file screen.c.
+
+\hypertarget{screen_8c_a5922084f81d438be481450dc6aee9a10}{
+\index{screen.c@{screen.c}!next@{next}}
+\index{next@{next}!screen.c@{screen.c}}
+\subsubsection[{next}]{\setlength{\rightskip}{0pt plus 5cm}void next (
+\begin{DoxyParamCaption}
+\item[{void}]{}
+\end{DoxyParamCaption}
+)}}
+\label{screen_8c_a5922084f81d438be481450dc6aee9a10}
+
+
+Definition at line 326 of file screen.c.
+
+\hypertarget{screen_8c_a7c8d3f391be6fbe302623d42e9ce19a6}{
+\index{screen.c@{screen.c}!sweep@{sweep}}
+\index{sweep@{sweep}!screen.c@{screen.c}}
+\subsubsection[{sweep}]{\setlength{\rightskip}{0pt plus 5cm}void sweep (
+\begin{DoxyParamCaption}
+\item[{{\bf Client} $\ast$}]{c}
+\end{DoxyParamCaption}
+)}}
+\label{screen_8c_a7c8d3f391be6fbe302623d42e9ce19a6}
+
+
+Definition at line 104 of file screen.c.
+
+\hypertarget{screen_8c_a37776f7c86728d059fd01c532179537c}{
+\index{screen.c@{screen.c}!switch\_\-vdesk@{switch\_\-vdesk}}
+\index{switch\_\-vdesk@{switch\_\-vdesk}!screen.c@{screen.c}}
+\subsubsection[{switch\_\-vdesk}]{\setlength{\rightskip}{0pt plus 5cm}void switch\_\-vdesk (
+\begin{DoxyParamCaption}
+\item[{{\bf ScreenInfo} $\ast$}]{s, }
+\item[{const {\bf ubyte}}]{v}
+\end{DoxyParamCaption}
+)}}
+\label{screen_8c_a37776f7c86728d059fd01c532179537c}
+
+
+Definition at line 357 of file screen.c.
+
+\hypertarget{screen_8c_a1892b55035e98e4ef8d62d30e6c593f3}{
+\index{screen.c@{screen.c}!unhide@{unhide}}
+\index{unhide@{unhide}!screen.c@{screen.c}}
+\subsubsection[{unhide}]{\setlength{\rightskip}{0pt plus 5cm}void unhide (
+\begin{DoxyParamCaption}
+\item[{{\bf Client} $\ast$}]{c, }
+\item[{int}]{raise\_\-win}
+\end{DoxyParamCaption}
+)}}
+\label{screen_8c_a1892b55035e98e4ef8d62d30e6c593f3}
+
+
+Definition at line 318 of file screen.c.
+

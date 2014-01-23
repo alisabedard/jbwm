@@ -1,0 +1,127 @@
+\hypertarget{new_8c}{
+\section{/home/jefbed/src/arwm/new.c File Reference}
+\label{new_8c}\index{/home/jefbed/src/arwm/new.c@{/home/jefbed/src/arwm/new.c}}
+}
+{\ttfamily \#include $<$stdlib.h$>$}\par
+{\ttfamily \#include $<$string.h$>$}\par
+{\ttfamily \#include $<$stdio.h$>$}\par
+{\ttfamily \#include \char`\"{}arwm.h\char`\"{}}\par
+\subsection*{Defines}
+\begin{DoxyCompactItemize}
+\item 
+\#define \hyperlink{new_8c_a4d30cfb3453b8d4cb198aaaaa8f527b8}{MAXIMUM\_\-PROPERTY\_\-LENGTH}~4096
+\item 
+\#define \hyperlink{new_8c_a951a4ebcb7d7d1bf7512ff7117f9f462}{debug\_\-wm\_\-normal\_\-hints}(s)
+\item 
+\#define \hyperlink{new_8c_aab5ad70d82eeaf218f50e246a449c198}{SIZE\_\-TYPE\_\-ASSIGN}(type)
+\end{DoxyCompactItemize}
+\subsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+\hyperlink{struct_client}{Client} $\ast$ \hyperlink{new_8c_a47a4752d167756fc7fc5015dd3145386}{Client\_\-new} (Window w, \hyperlink{struct_screen_info}{ScreenInfo} $\ast$s)
+\item 
+void \hyperlink{new_8c_ab341b08a6084a581ea06676cdf5bc496}{make\_\-new\_\-client} (Window w, \hyperlink{struct_screen_info}{ScreenInfo} $\ast$s)
+\item 
+long \hyperlink{new_8c_af7f830e99a37c96dfc4111766d420a43}{get\_\-wm\_\-normal\_\-hints} (\hyperlink{struct_client}{Client} $\ast$c)
+\item 
+void $\ast$ \hyperlink{new_8c_a1305ddcc489ca6089754fef7b21ca077}{arwm\_\-get\_\-property} (Window w, Atom property, Atom req\_\-type, unsigned long $\ast$nitems\_\-return)
+\end{DoxyCompactItemize}
+
+
+\subsection{Define Documentation}
+\hypertarget{new_8c_a951a4ebcb7d7d1bf7512ff7117f9f462}{
+\index{new.c@{new.c}!debug\_\-wm\_\-normal\_\-hints@{debug\_\-wm\_\-normal\_\-hints}}
+\index{debug\_\-wm\_\-normal\_\-hints@{debug\_\-wm\_\-normal\_\-hints}!new.c@{new.c}}
+\subsubsection[{debug\_\-wm\_\-normal\_\-hints}]{\setlength{\rightskip}{0pt plus 5cm}\#define debug\_\-wm\_\-normal\_\-hints(
+\begin{DoxyParamCaption}
+\item[{}]{s}
+\end{DoxyParamCaption}
+)}}
+\label{new_8c_a951a4ebcb7d7d1bf7512ff7117f9f462}
+
+
+Definition at line 20 of file new.c.
+
+\hypertarget{new_8c_a4d30cfb3453b8d4cb198aaaaa8f527b8}{
+\index{new.c@{new.c}!MAXIMUM\_\-PROPERTY\_\-LENGTH@{MAXIMUM\_\-PROPERTY\_\-LENGTH}}
+\index{MAXIMUM\_\-PROPERTY\_\-LENGTH@{MAXIMUM\_\-PROPERTY\_\-LENGTH}!new.c@{new.c}}
+\subsubsection[{MAXIMUM\_\-PROPERTY\_\-LENGTH}]{\setlength{\rightskip}{0pt plus 5cm}\#define MAXIMUM\_\-PROPERTY\_\-LENGTH~4096}}
+\label{new_8c_a4d30cfb3453b8d4cb198aaaaa8f527b8}
+
+
+Definition at line 11 of file new.c.
+
+\hypertarget{new_8c_aab5ad70d82eeaf218f50e246a449c198}{
+\index{new.c@{new.c}!SIZE\_\-TYPE\_\-ASSIGN@{SIZE\_\-TYPE\_\-ASSIGN}}
+\index{SIZE\_\-TYPE\_\-ASSIGN@{SIZE\_\-TYPE\_\-ASSIGN}!new.c@{new.c}}
+\subsubsection[{SIZE\_\-TYPE\_\-ASSIGN}]{\setlength{\rightskip}{0pt plus 5cm}\#define SIZE\_\-TYPE\_\-ASSIGN(
+\begin{DoxyParamCaption}
+\item[{}]{type}
+\end{DoxyParamCaption}
+)}}
+\label{new_8c_aab5ad70d82eeaf218f50e246a449c198}
+{\bfseries Value:}
+\begin{DoxyCode}
+c->type##_width=size->type##_width;\
+        c->type##_height=size->type##_height;
+\end{DoxyCode}
+
+
+\subsection{Function Documentation}
+\hypertarget{new_8c_a1305ddcc489ca6089754fef7b21ca077}{
+\index{new.c@{new.c}!arwm\_\-get\_\-property@{arwm\_\-get\_\-property}}
+\index{arwm\_\-get\_\-property@{arwm\_\-get\_\-property}!new.c@{new.c}}
+\subsubsection[{arwm\_\-get\_\-property}]{\setlength{\rightskip}{0pt plus 5cm}void$\ast$ arwm\_\-get\_\-property (
+\begin{DoxyParamCaption}
+\item[{Window}]{w, }
+\item[{Atom}]{property, }
+\item[{Atom}]{req\_\-type, }
+\item[{unsigned long $\ast$}]{nitems\_\-return}
+\end{DoxyParamCaption}
+)}}
+\label{new_8c_a1305ddcc489ca6089754fef7b21ca077}
+
+
+Definition at line 434 of file new.c.
+
+\hypertarget{new_8c_a47a4752d167756fc7fc5015dd3145386}{
+\index{new.c@{new.c}!Client\_\-new@{Client\_\-new}}
+\index{Client\_\-new@{Client\_\-new}!new.c@{new.c}}
+\subsubsection[{Client\_\-new}]{\setlength{\rightskip}{0pt plus 5cm}{\bf Client}$\ast$ Client\_\-new (
+\begin{DoxyParamCaption}
+\item[{Window}]{w, }
+\item[{{\bf ScreenInfo} $\ast$}]{s}
+\end{DoxyParamCaption}
+)}}
+\label{new_8c_a47a4752d167756fc7fc5015dd3145386}
+
+
+Definition at line 112 of file new.c.
+
+\hypertarget{new_8c_af7f830e99a37c96dfc4111766d420a43}{
+\index{new.c@{new.c}!get\_\-wm\_\-normal\_\-hints@{get\_\-wm\_\-normal\_\-hints}}
+\index{get\_\-wm\_\-normal\_\-hints@{get\_\-wm\_\-normal\_\-hints}!new.c@{new.c}}
+\subsubsection[{get\_\-wm\_\-normal\_\-hints}]{\setlength{\rightskip}{0pt plus 5cm}long get\_\-wm\_\-normal\_\-hints (
+\begin{DoxyParamCaption}
+\item[{{\bf Client} $\ast$}]{c}
+\end{DoxyParamCaption}
+)}}
+\label{new_8c_af7f830e99a37c96dfc4111766d420a43}
+
+
+Definition at line 384 of file new.c.
+
+\hypertarget{new_8c_ab341b08a6084a581ea06676cdf5bc496}{
+\index{new.c@{new.c}!make\_\-new\_\-client@{make\_\-new\_\-client}}
+\index{make\_\-new\_\-client@{make\_\-new\_\-client}!new.c@{new.c}}
+\subsubsection[{make\_\-new\_\-client}]{\setlength{\rightskip}{0pt plus 5cm}void make\_\-new\_\-client (
+\begin{DoxyParamCaption}
+\item[{Window}]{w, }
+\item[{{\bf ScreenInfo} $\ast$}]{s}
+\end{DoxyParamCaption}
+)}}
+\label{new_8c_ab341b08a6084a581ea06676cdf5bc496}
+
+
+Definition at line 125 of file new.c.
+

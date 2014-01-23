@@ -1,0 +1,98 @@
+.TH "/home/jefbed/src/arwm/client.h" 3 "Wed Mar 7 2012" "arwm" \" -*- nroff -*-
+.ad l
+.nh
+.SH NAME
+/home/jefbed/src/arwm/client.h \- 
+.SH SYNOPSIS
+.br
+.PP
+.SS "Defines"
+
+.in +1c
+.ti -1c
+.RI "#define \fBSET_CLIENT_CE\fP(c)"
+.br
+.ti -1c
+.RI "#define \fBSEND_CONFIG\fP(c)"
+.br
+.in -1c
+.SS "Functions"
+
+.in +1c
+.ti -1c
+.RI "void \fBsend_wm_delete\fP (\fBClient\fP *c, int kill_client)"
+.br
+.ti -1c
+.RI "\fBClient\fP * \fBfind_client\fP (Window w)"
+.br
+.ti -1c
+.RI "void \fBgravitate_client\fP (\fBClient\fP *c, int sign)"
+.br
+.ti -1c
+.RI "void \fBselect_client\fP (\fBClient\fP *c)"
+.br
+.ti -1c
+.RI "void \fBfix_client\fP (\fBClient\fP *c)"
+.br
+.ti -1c
+.RI "void \fBremove_client\fP (\fBClient\fP *c)"
+.br
+.ti -1c
+.RI "void \fBsend_config\fP (\fBClient\fP *c)"
+.br
+.ti -1c
+.RI "void \fBset_wm_state\fP (\fBClient\fP *c, int state)"
+.br
+.ti -1c
+.RI "void \fBset_shape\fP (\fBClient\fP *c)"
+.br
+.in -1c
+.SH "Define Documentation"
+.PP 
+.SS "#define SEND_CONFIG(c)"\fBValue:\fP
+.PP
+.nf
+XSendEvent(arwm.X.dpy, c->window, False, StructureNotifyMask,\
+                   (XEvent *)&(c->ce))
+.fi
+.PP
+Definition at line 20 of file client.h.
+.SS "#define SET_CLIENT_CE(c)"\fBValue:\fP
+.PP
+.nf
+c->ce.event=c->window;\
+        c->ce.x=c->geometry.x;\
+        c->ce.y=c->geometry.y;\
+        c->ce.width=c->geometry.width;\
+        c->ce.height=c->geometry.height;
+.fi
+.PP
+Definition at line 9 of file client.h.
+.SH "Function Documentation"
+.PP 
+.SS "\fBClient\fP* find_client (Windoww)"
+.PP
+Definition at line 14 of file client.c.
+.SS "void fix_client (\fBClient\fP *c)"
+.PP
+Definition at line 102 of file client.c.
+.SS "void gravitate_client (\fBClient\fP *c, intsign)"
+.SS "void remove_client (\fBClient\fP *c)"
+.PP
+Definition at line 139 of file client.c.
+.SS "void select_client (\fBClient\fP *c)"
+.PP
+Definition at line 67 of file client.c.
+.SS "void send_config (\fBClient\fP *c)"
+.PP
+Definition at line 60 of file client.c.
+.SS "void send_wm_delete (\fBClient\fP *c, intkill_client)"
+.PP
+Definition at line 168 of file client.c.
+.SS "void set_shape (\fBClient\fP *c)"
+.SS "void set_wm_state (\fBClient\fP *c, intstate)"
+.PP
+Definition at line 33 of file client.c.
+.SH "Author"
+.PP 
+Generated automatically by Doxygen for arwm from the source code.

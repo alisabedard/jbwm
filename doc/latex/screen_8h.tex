@@ -1,0 +1,210 @@
+\hypertarget{screen_8h}{
+\section{/home/jefbed/src/arwm/screen.h File Reference}
+\label{screen_8h}\index{/home/jefbed/src/arwm/screen.h@{/home/jefbed/src/arwm/screen.h}}
+}
+\subsection*{Data Structures}
+\begin{DoxyCompactItemize}
+\item 
+struct \hyperlink{struct_position}{Position}
+\end{DoxyCompactItemize}
+\subsection*{Defines}
+\begin{DoxyCompactItemize}
+\item 
+\#define \hyperlink{screen_8h_aa50b261e3f0c4a1863127282c7d4f337}{get\_\-mouse\_\-position}(x, y, root)
+\item 
+\#define \hyperlink{screen_8h_a30b90a33e59b8936917e9c8762ffa66d}{setmouse}(w, x, y)~XWarpPointer(arwm.X.dpy, None, w, 0, 0, 0, 0, x, y)
+\end{DoxyCompactItemize}
+\subsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+void \hyperlink{screen_8h_a42cdc67b96d0ed62a680cb6e21650011}{drag} (\hyperlink{struct_client}{Client} $\ast$c)
+\item 
+void \hyperlink{screen_8h_a91e5b3c040557915daa392db06021078}{moveresize} (\hyperlink{struct_client}{Client} $\ast$c)
+\item 
+void \hyperlink{screen_8h_a632ebb13af1841b98d4fa27251662504}{show\_\-info} (\hyperlink{struct_client}{Client} $\ast$c, KeySym key)
+\item 
+void \hyperlink{screen_8h_a7c8d3f391be6fbe302623d42e9ce19a6}{sweep} (\hyperlink{struct_client}{Client} $\ast$c)
+\item 
+void \hyperlink{screen_8h_a1892b55035e98e4ef8d62d30e6c593f3}{unhide} (\hyperlink{struct_client}{Client} $\ast$c, int raise\_\-win)
+\item 
+void \hyperlink{screen_8h_a5922084f81d438be481450dc6aee9a10}{next} (void)
+\item 
+void \hyperlink{screen_8h_ac3204c7615a10baafddef111d07d7593}{hide} (\hyperlink{struct_client}{Client} $\ast$c)
+\item 
+void \hyperlink{screen_8h_a37776f7c86728d059fd01c532179537c}{switch\_\-vdesk} (\hyperlink{struct_screen_info}{ScreenInfo} $\ast$s, const \hyperlink{arwm_8h_a5dd4f281954ce1405c92d62a427f839a}{ubyte} v)
+\item 
+void \hyperlink{screen_8h_a117d95d07bf443975ee31a3a781d7a0d}{grab\_\-keys\_\-for\_\-screen} (\hyperlink{struct_screen_info}{ScreenInfo} $\ast$s)
+\item 
+void \hyperlink{screen_8h_a0b53d7861c6a2ce495fdacb87a6cc99e}{maximize} (\hyperlink{struct_client}{Client} $\ast$c)
+\end{DoxyCompactItemize}
+
+
+\subsection{Define Documentation}
+\hypertarget{screen_8h_aa50b261e3f0c4a1863127282c7d4f337}{
+\index{screen.h@{screen.h}!get\_\-mouse\_\-position@{get\_\-mouse\_\-position}}
+\index{get\_\-mouse\_\-position@{get\_\-mouse\_\-position}!screen.h@{screen.h}}
+\subsubsection[{get\_\-mouse\_\-position}]{\setlength{\rightskip}{0pt plus 5cm}\#define get\_\-mouse\_\-position(
+\begin{DoxyParamCaption}
+\item[{}]{x, }
+\item[{}]{y, }
+\item[{}]{root}
+\end{DoxyParamCaption}
+)}}
+\label{screen_8h_aa50b261e3f0c4a1863127282c7d4f337}
+{\bfseries Value:}
+\begin{DoxyCode}
+XQueryPointer(arwm.X.dpy, \
+                root, &root, &root, x, y, (int *)&root, (int *)&root, \
+                (unsigned int *)&root);
+\end{DoxyCode}
+
+
+Definition at line 21 of file screen.h.
+
+\hypertarget{screen_8h_a30b90a33e59b8936917e9c8762ffa66d}{
+\index{screen.h@{screen.h}!setmouse@{setmouse}}
+\index{setmouse@{setmouse}!screen.h@{screen.h}}
+\subsubsection[{setmouse}]{\setlength{\rightskip}{0pt plus 5cm}\#define setmouse(
+\begin{DoxyParamCaption}
+\item[{}]{w, }
+\item[{}]{x, }
+\item[{}]{y}
+\end{DoxyParamCaption}
+)~XWarpPointer(arwm.X.dpy, None, w, 0, 0, 0, 0, x, y)}}
+\label{screen_8h_a30b90a33e59b8936917e9c8762ffa66d}
+
+
+Definition at line 25 of file screen.h.
+
+
+
+\subsection{Function Documentation}
+\hypertarget{screen_8h_a42cdc67b96d0ed62a680cb6e21650011}{
+\index{screen.h@{screen.h}!drag@{drag}}
+\index{drag@{drag}!screen.h@{screen.h}}
+\subsubsection[{drag}]{\setlength{\rightskip}{0pt plus 5cm}void drag (
+\begin{DoxyParamCaption}
+\item[{{\bf Client} $\ast$}]{c}
+\end{DoxyParamCaption}
+)}}
+\label{screen_8h_a42cdc67b96d0ed62a680cb6e21650011}
+
+
+Definition at line 241 of file screen.c.
+
+\hypertarget{screen_8h_a117d95d07bf443975ee31a3a781d7a0d}{
+\index{screen.h@{screen.h}!grab\_\-keys\_\-for\_\-screen@{grab\_\-keys\_\-for\_\-screen}}
+\index{grab\_\-keys\_\-for\_\-screen@{grab\_\-keys\_\-for\_\-screen}!screen.h@{screen.h}}
+\subsubsection[{grab\_\-keys\_\-for\_\-screen}]{\setlength{\rightskip}{0pt plus 5cm}void grab\_\-keys\_\-for\_\-screen (
+\begin{DoxyParamCaption}
+\item[{{\bf ScreenInfo} $\ast$}]{s}
+\end{DoxyParamCaption}
+)}}
+\label{screen_8h_a117d95d07bf443975ee31a3a781d7a0d}
+
+
+Definition at line 53 of file keymap.c.
+
+\hypertarget{screen_8h_ac3204c7615a10baafddef111d07d7593}{
+\index{screen.h@{screen.h}!hide@{hide}}
+\index{hide@{hide}!screen.h@{screen.h}}
+\subsubsection[{hide}]{\setlength{\rightskip}{0pt plus 5cm}void hide (
+\begin{DoxyParamCaption}
+\item[{{\bf Client} $\ast$}]{c}
+\end{DoxyParamCaption}
+)}}
+\label{screen_8h_ac3204c7615a10baafddef111d07d7593}
+
+
+Definition at line 308 of file screen.c.
+
+\hypertarget{screen_8h_a0b53d7861c6a2ce495fdacb87a6cc99e}{
+\index{screen.h@{screen.h}!maximize@{maximize}}
+\index{maximize@{maximize}!screen.h@{screen.h}}
+\subsubsection[{maximize}]{\setlength{\rightskip}{0pt plus 5cm}void maximize (
+\begin{DoxyParamCaption}
+\item[{{\bf Client} $\ast$}]{c}
+\end{DoxyParamCaption}
+)}}
+\label{screen_8h_a0b53d7861c6a2ce495fdacb87a6cc99e}
+
+
+Definition at line 281 of file screen.c.
+
+\hypertarget{screen_8h_a91e5b3c040557915daa392db06021078}{
+\index{screen.h@{screen.h}!moveresize@{moveresize}}
+\index{moveresize@{moveresize}!screen.h@{screen.h}}
+\subsubsection[{moveresize}]{\setlength{\rightskip}{0pt plus 5cm}void moveresize (
+\begin{DoxyParamCaption}
+\item[{{\bf Client} $\ast$}]{c}
+\end{DoxyParamCaption}
+)}}
+\label{screen_8h_a91e5b3c040557915daa392db06021078}
+
+
+Definition at line 256 of file screen.c.
+
+\hypertarget{screen_8h_a5922084f81d438be481450dc6aee9a10}{
+\index{screen.h@{screen.h}!next@{next}}
+\index{next@{next}!screen.h@{screen.h}}
+\subsubsection[{next}]{\setlength{\rightskip}{0pt plus 5cm}void next (
+\begin{DoxyParamCaption}
+\item[{void}]{}
+\end{DoxyParamCaption}
+)}}
+\label{screen_8h_a5922084f81d438be481450dc6aee9a10}
+
+
+Definition at line 326 of file screen.c.
+
+\hypertarget{screen_8h_a632ebb13af1841b98d4fa27251662504}{
+\index{screen.h@{screen.h}!show\_\-info@{show\_\-info}}
+\index{show\_\-info@{show\_\-info}!screen.h@{screen.h}}
+\subsubsection[{show\_\-info}]{\setlength{\rightskip}{0pt plus 5cm}void show\_\-info (
+\begin{DoxyParamCaption}
+\item[{{\bf Client} $\ast$}]{c, }
+\item[{KeySym}]{key}
+\end{DoxyParamCaption}
+)}}
+\label{screen_8h_a632ebb13af1841b98d4fa27251662504}
+\hypertarget{screen_8h_a7c8d3f391be6fbe302623d42e9ce19a6}{
+\index{screen.h@{screen.h}!sweep@{sweep}}
+\index{sweep@{sweep}!screen.h@{screen.h}}
+\subsubsection[{sweep}]{\setlength{\rightskip}{0pt plus 5cm}void sweep (
+\begin{DoxyParamCaption}
+\item[{{\bf Client} $\ast$}]{c}
+\end{DoxyParamCaption}
+)}}
+\label{screen_8h_a7c8d3f391be6fbe302623d42e9ce19a6}
+
+
+Definition at line 104 of file screen.c.
+
+\hypertarget{screen_8h_a37776f7c86728d059fd01c532179537c}{
+\index{screen.h@{screen.h}!switch\_\-vdesk@{switch\_\-vdesk}}
+\index{switch\_\-vdesk@{switch\_\-vdesk}!screen.h@{screen.h}}
+\subsubsection[{switch\_\-vdesk}]{\setlength{\rightskip}{0pt plus 5cm}void switch\_\-vdesk (
+\begin{DoxyParamCaption}
+\item[{{\bf ScreenInfo} $\ast$}]{s, }
+\item[{const {\bf ubyte}}]{v}
+\end{DoxyParamCaption}
+)}}
+\label{screen_8h_a37776f7c86728d059fd01c532179537c}
+
+
+Definition at line 357 of file screen.c.
+
+\hypertarget{screen_8h_a1892b55035e98e4ef8d62d30e6c593f3}{
+\index{screen.h@{screen.h}!unhide@{unhide}}
+\index{unhide@{unhide}!screen.h@{screen.h}}
+\subsubsection[{unhide}]{\setlength{\rightskip}{0pt plus 5cm}void unhide (
+\begin{DoxyParamCaption}
+\item[{{\bf Client} $\ast$}]{c, }
+\item[{int}]{raise\_\-win}
+\end{DoxyParamCaption}
+)}}
+\label{screen_8h_a1892b55035e98e4ef8d62d30e6c593f3}
+
+
+Definition at line 318 of file screen.c.
+

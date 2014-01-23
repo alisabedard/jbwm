@@ -1,0 +1,77 @@
+.TH "/home/jefbed/src/arwm/new.c" 3 "Wed Mar 7 2012" "arwm" \" -*- nroff -*-
+.ad l
+.nh
+.SH NAME
+/home/jefbed/src/arwm/new.c \- 
+.SH SYNOPSIS
+.br
+.PP
+\fC#include <stdlib.h>\fP
+.br
+\fC#include <string.h>\fP
+.br
+\fC#include <stdio.h>\fP
+.br
+\fC#include 'arwm.h'\fP
+.br
+
+.SS "Defines"
+
+.in +1c
+.ti -1c
+.RI "#define \fBMAXIMUM_PROPERTY_LENGTH\fP   4096"
+.br
+.ti -1c
+.RI "#define \fBdebug_wm_normal_hints\fP(s)"
+.br
+.ti -1c
+.RI "#define \fBSIZE_TYPE_ASSIGN\fP(type)"
+.br
+.in -1c
+.SS "Functions"
+
+.in +1c
+.ti -1c
+.RI "\fBClient\fP * \fBClient_new\fP (Window w, \fBScreenInfo\fP *s)"
+.br
+.ti -1c
+.RI "void \fBmake_new_client\fP (Window w, \fBScreenInfo\fP *s)"
+.br
+.ti -1c
+.RI "long \fBget_wm_normal_hints\fP (\fBClient\fP *c)"
+.br
+.ti -1c
+.RI "void * \fBarwm_get_property\fP (Window w, Atom property, Atom req_type, unsigned long *nitems_return)"
+.br
+.in -1c
+.SH "Define Documentation"
+.PP 
+.SS "#define debug_wm_normal_hints(s)"
+.PP
+Definition at line 20 of file new.c.
+.SS "#define MAXIMUM_PROPERTY_LENGTH   4096"
+.PP
+Definition at line 11 of file new.c.
+.SS "#define SIZE_TYPE_ASSIGN(type)"\fBValue:\fP
+.PP
+.nf
+c->type##_width=size->type##_width;\
+        c->type##_height=size->type##_height;
+.fi
+.SH "Function Documentation"
+.PP 
+.SS "void* arwm_get_property (Windoww, Atomproperty, Atomreq_type, unsigned long *nitems_return)"
+.PP
+Definition at line 434 of file new.c.
+.SS "\fBClient\fP* Client_new (Windoww, \fBScreenInfo\fP *s)"
+.PP
+Definition at line 112 of file new.c.
+.SS "long get_wm_normal_hints (\fBClient\fP *c)"
+.PP
+Definition at line 384 of file new.c.
+.SS "void make_new_client (Windoww, \fBScreenInfo\fP *s)"
+.PP
+Definition at line 125 of file new.c.
+.SH "Author"
+.PP 
+Generated automatically by Doxygen for arwm from the source code.

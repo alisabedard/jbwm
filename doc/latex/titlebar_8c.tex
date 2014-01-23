@@ -1,0 +1,162 @@
+\hypertarget{titlebar_8c}{
+\section{/home/jefbed/src/arwm/titlebar.c File Reference}
+\label{titlebar_8c}\index{/home/jefbed/src/arwm/titlebar.c@{/home/jefbed/src/arwm/titlebar.c}}
+}
+{\ttfamily \#include \char`\"{}arwm.h\char`\"{}}\par
+{\ttfamily \#include \char`\"{}ARWMButton.h\char`\"{}}\par
+\subsection*{Defines}
+\begin{DoxyCompactItemize}
+\item 
+\#define \hyperlink{titlebar_8c_aca6be109345ca044a8ebe9804c51ec29}{arwm\_\-draw\_\-close\_\-button}(c)
+\item 
+\#define \hyperlink{titlebar_8c_a0577776ea89f8a364845fced98ac3792}{IMG}(item)~NULL
+\item 
+\#define \hyperlink{titlebar_8c_ad0ed246e0c8392a0994db9b349634f15}{IMGDIM}(item)
+\item 
+\#define \hyperlink{titlebar_8c_a624fc81ed6f22430691d23bb34358768}{TBUTTON}(item, bg)
+\item 
+\#define \hyperlink{titlebar_8c_aec885fea1146ebe4eeb9e70ef693aaf4}{RGB\_\-TBUTTON}(item, bg)~TBUTTON(item, arwm\_\-new\_\-gc(bg))
+\item 
+\#define \hyperlink{titlebar_8c_a5721f4e86d76ebe4e7089f41205acac3}{XCOLOR\_\-TBUTTON}(item, bg)~TBUTTON(item, arwm\_\-new\_\-gc\_\-for\_\-XColor(bg))
+\end{DoxyCompactItemize}
+\subsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+void \hyperlink{titlebar_8c_ad928a6eb6700d6bd8180e4630d8d80fc}{arwm\_\-ARWMTitlebarData\_\-init} (\hyperlink{struct___a_r_w_m_titlebar_data}{ARWMTitlebarData} $\ast$titlebar)
+\item 
+void \hyperlink{titlebar_8c_a2294ca40b077ad3b9cdd37385d83d49d}{ARWMTitlebarData\_\-delete} (\hyperlink{struct___a_r_w_m_titlebar_data}{ARWMTitlebarData} $\ast$titlebar)
+\item 
+void \hyperlink{titlebar_8c_a4463a25572a9f6c35e861815d78976ed}{update\_\-info\_\-window} (\hyperlink{struct_client}{Client} $\ast$c)
+\item 
+void \hyperlink{titlebar_8c_a0fe4a62d01d355c9d3607c3f149c0768}{remove\_\-info\_\-window} (\hyperlink{struct_client}{Client} $\ast$c)
+\end{DoxyCompactItemize}
+
+
+\subsection{Define Documentation}
+\hypertarget{titlebar_8c_aca6be109345ca044a8ebe9804c51ec29}{
+\index{titlebar.c@{titlebar.c}!arwm\_\-draw\_\-close\_\-button@{arwm\_\-draw\_\-close\_\-button}}
+\index{arwm\_\-draw\_\-close\_\-button@{arwm\_\-draw\_\-close\_\-button}!titlebar.c@{titlebar.c}}
+\subsubsection[{arwm\_\-draw\_\-close\_\-button}]{\setlength{\rightskip}{0pt plus 5cm}\#define arwm\_\-draw\_\-close\_\-button(
+\begin{DoxyParamCaption}
+\item[{}]{c}
+\end{DoxyParamCaption}
+)}}
+\label{titlebar_8c_aca6be109345ca044a8ebe9804c51ec29}
+{\bfseries Value:}
+\begin{DoxyCode}
+draw_button(arwm.titlebar.buttons.close,\
+                c->info_window, 0);
+\end{DoxyCode}
+
+
+Definition at line 102 of file titlebar.c.
+
+\hypertarget{titlebar_8c_a0577776ea89f8a364845fced98ac3792}{
+\index{titlebar.c@{titlebar.c}!IMG@{IMG}}
+\index{IMG@{IMG}!titlebar.c@{titlebar.c}}
+\subsubsection[{IMG}]{\setlength{\rightskip}{0pt plus 5cm}\#define IMG(
+\begin{DoxyParamCaption}
+\item[{}]{item}
+\end{DoxyParamCaption}
+)~NULL}}
+\label{titlebar_8c_a0577776ea89f8a364845fced98ac3792}
+\hypertarget{titlebar_8c_ad0ed246e0c8392a0994db9b349634f15}{
+\index{titlebar.c@{titlebar.c}!IMGDIM@{IMGDIM}}
+\index{IMGDIM@{IMGDIM}!titlebar.c@{titlebar.c}}
+\subsubsection[{IMGDIM}]{\setlength{\rightskip}{0pt plus 5cm}\#define IMGDIM(
+\begin{DoxyParamCaption}
+\item[{}]{item}
+\end{DoxyParamCaption}
+)}}
+\label{titlebar_8c_ad0ed246e0c8392a0994db9b349634f15}
+\hypertarget{titlebar_8c_aec885fea1146ebe4eeb9e70ef693aaf4}{
+\index{titlebar.c@{titlebar.c}!RGB\_\-TBUTTON@{RGB\_\-TBUTTON}}
+\index{RGB\_\-TBUTTON@{RGB\_\-TBUTTON}!titlebar.c@{titlebar.c}}
+\subsubsection[{RGB\_\-TBUTTON}]{\setlength{\rightskip}{0pt plus 5cm}\#define RGB\_\-TBUTTON(
+\begin{DoxyParamCaption}
+\item[{}]{item, }
+\item[{}]{bg}
+\end{DoxyParamCaption}
+)~TBUTTON(item, arwm\_\-new\_\-gc(bg))}}
+\label{titlebar_8c_aec885fea1146ebe4eeb9e70ef693aaf4}
+\hypertarget{titlebar_8c_a624fc81ed6f22430691d23bb34358768}{
+\index{titlebar.c@{titlebar.c}!TBUTTON@{TBUTTON}}
+\index{TBUTTON@{TBUTTON}!titlebar.c@{titlebar.c}}
+\subsubsection[{TBUTTON}]{\setlength{\rightskip}{0pt plus 5cm}\#define TBUTTON(
+\begin{DoxyParamCaption}
+\item[{}]{item, }
+\item[{}]{bg}
+\end{DoxyParamCaption}
+)}}
+\label{titlebar_8c_a624fc81ed6f22430691d23bb34358768}
+{\bfseries Value:}
+\begin{DoxyCode}
+item = titlebar->buttons.item = ARWMButton_new(\
+        root, bg, TITLEBAR_HEIGHT,\
+        TITLEBAR_HEIGHT, IMG(item)); IMGDIM(item)
+\end{DoxyCode}
+\hypertarget{titlebar_8c_a5721f4e86d76ebe4e7089f41205acac3}{
+\index{titlebar.c@{titlebar.c}!XCOLOR\_\-TBUTTON@{XCOLOR\_\-TBUTTON}}
+\index{XCOLOR\_\-TBUTTON@{XCOLOR\_\-TBUTTON}!titlebar.c@{titlebar.c}}
+\subsubsection[{XCOLOR\_\-TBUTTON}]{\setlength{\rightskip}{0pt plus 5cm}\#define XCOLOR\_\-TBUTTON(
+\begin{DoxyParamCaption}
+\item[{}]{item, }
+\item[{}]{bg}
+\end{DoxyParamCaption}
+)~TBUTTON(item, arwm\_\-new\_\-gc\_\-for\_\-XColor(bg))}}
+\label{titlebar_8c_a5721f4e86d76ebe4e7089f41205acac3}
+
+
+\subsection{Function Documentation}
+\hypertarget{titlebar_8c_ad928a6eb6700d6bd8180e4630d8d80fc}{
+\index{titlebar.c@{titlebar.c}!arwm\_\-ARWMTitlebarData\_\-init@{arwm\_\-ARWMTitlebarData\_\-init}}
+\index{arwm\_\-ARWMTitlebarData\_\-init@{arwm\_\-ARWMTitlebarData\_\-init}!titlebar.c@{titlebar.c}}
+\subsubsection[{arwm\_\-ARWMTitlebarData\_\-init}]{\setlength{\rightskip}{0pt plus 5cm}void arwm\_\-ARWMTitlebarData\_\-init (
+\begin{DoxyParamCaption}
+\item[{{\bf ARWMTitlebarData} $\ast$}]{titlebar}
+\end{DoxyParamCaption}
+)}}
+\label{titlebar_8c_ad928a6eb6700d6bd8180e4630d8d80fc}
+
+
+Definition at line 213 of file titlebar.c.
+
+\hypertarget{titlebar_8c_a2294ca40b077ad3b9cdd37385d83d49d}{
+\index{titlebar.c@{titlebar.c}!ARWMTitlebarData\_\-delete@{ARWMTitlebarData\_\-delete}}
+\index{ARWMTitlebarData\_\-delete@{ARWMTitlebarData\_\-delete}!titlebar.c@{titlebar.c}}
+\subsubsection[{ARWMTitlebarData\_\-delete}]{\setlength{\rightskip}{0pt plus 5cm}void ARWMTitlebarData\_\-delete (
+\begin{DoxyParamCaption}
+\item[{{\bf ARWMTitlebarData} $\ast$}]{titlebar}
+\end{DoxyParamCaption}
+)}}
+\label{titlebar_8c_a2294ca40b077ad3b9cdd37385d83d49d}
+
+
+Definition at line 268 of file titlebar.c.
+
+\hypertarget{titlebar_8c_a0fe4a62d01d355c9d3607c3f149c0768}{
+\index{titlebar.c@{titlebar.c}!remove\_\-info\_\-window@{remove\_\-info\_\-window}}
+\index{remove\_\-info\_\-window@{remove\_\-info\_\-window}!titlebar.c@{titlebar.c}}
+\subsubsection[{remove\_\-info\_\-window}]{\setlength{\rightskip}{0pt plus 5cm}void remove\_\-info\_\-window (
+\begin{DoxyParamCaption}
+\item[{{\bf Client} $\ast$}]{c}
+\end{DoxyParamCaption}
+)}}
+\label{titlebar_8c_a0fe4a62d01d355c9d3607c3f149c0768}
+
+
+Definition at line 311 of file titlebar.c.
+
+\hypertarget{titlebar_8c_a4463a25572a9f6c35e861815d78976ed}{
+\index{titlebar.c@{titlebar.c}!update\_\-info\_\-window@{update\_\-info\_\-window}}
+\index{update\_\-info\_\-window@{update\_\-info\_\-window}!titlebar.c@{titlebar.c}}
+\subsubsection[{update\_\-info\_\-window}]{\setlength{\rightskip}{0pt plus 5cm}void update\_\-info\_\-window (
+\begin{DoxyParamCaption}
+\item[{{\bf Client} $\ast$}]{c}
+\end{DoxyParamCaption}
+)}}
+\label{titlebar_8c_a4463a25572a9f6c35e861815d78976ed}
+
+
+Definition at line 282 of file titlebar.c.
+
