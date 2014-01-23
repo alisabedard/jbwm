@@ -5,37 +5,18 @@
 
 #include "flags.h"
 
-#ifndef MIN
-#define MIN(x, y) (((x)>(y)) ? (x) : (y))
-#endif /* ! MIN */
-
 #ifndef MAX
 #define MAX(x, y) (((x)>(y)) ? (x) : (y))
 #endif /* ! MAX */
 
-/* Simple object oriented programming interface for C.  */
+#include <stdio.h>
 
-#define AR_STACK_METHOD(class, method, ...)\
-	(class.method(&class, ##__VA_ARGS__))
+#ifdef DEBUG
+#define LOG(msg) fprintf(stderr, "%s:%d - %s\n", __FILE__, __LINE__, msg)
+#else /* !DEBUG */
+#define LOG(msg)
+#endif /* DEBUG */
 
-#define ARMETHOD(class, method, ...)\
-	(class->method(class, ##__VA_ARGS__))
-
-#define $(...) ARMETHOD(__VA_ARGS__)
-
-#define ARNEW(package, class, ...)\
-	(package##_new_##class(__VA_ARGS__))
-
-#define ARDELETE(class)\
-	{ if(class) { $(class, delete); } }
-
-#define $$(...) $(this, __VA_ARGS__)
-
-#define ARINHERIT(parent, child, member)\
-	child->member=parent->member
-
-#define AROVERRIDE(parent, child, member)\
-	parent->member=child->member
+#define LOG_ERROR(msg) {fputs(msg, stderr); exit(1);}
 
 #endif /* MACROS */
-

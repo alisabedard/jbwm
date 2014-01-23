@@ -4,17 +4,17 @@
 
 #include <stdlib.h>
 #include "arwm.h"
-#include "log.h"
 
-void 
-arwm_current_to_head(void) 
+void
+arwm_current_to_head(void)
 {
-	if (current && (current != head_client)) 
+	if(current && (current != head_client))
 	{
 		Client *c;
 
 		/* Advance to either end of list or current node.  */
-		for (c = head_client; c && (c->next != current) ; c = c->next)
+		for(c = head_client; c && (c->next != current);
+			c = c->next)
 			;
 		if(c && (c->next == current))
 		{
@@ -25,231 +25,231 @@ arwm_current_to_head(void)
 	}
 }
 
-static void 
-handle_map_request(XMapRequestEvent *e) 
+static ScreenInfo *
+find_screen(Window root)
+{
+	ubyte i;
+
+	for(i = 0; i < arwm.X.num_screens; i++)
+		if(arwm.X.screens[i].root == root)
+			return &arwm.X.screens[i];
+
+	return NULL;
+}
+
+static void
+handle_map_request(XMapRequestEvent * e)
 {
 	Client *c = find_client(e->window);
-	LOG_DEBUG("handle_map_request()\n");
-	if (c) 
+	
+	if(c)
 	{
-		if (c->vdesk != c->screen->vdesk)
+		if(c->vdesk != c->screen->vdesk)
 			switch_vdesk(c->screen, c->vdesk);
 		unhide(c, RAISE);
-	} 
-	else 
+		c->ignore_unmap++;
+	}
+	else
 	{
 		XWindowAttributes attr;
-		LOG_DEBUG("handle_map_request() : don't know this window,"
-			" calling make_new_client();\n");
+
 		XGetWindowAttributes(arwm.X.dpy, e->window, &attr);
-		LOG_DEBUG("XGWA():w:\t%d\th:%d\n",attr.width,attr.height);
 		make_new_client(e->window, find_screen(attr.root));
 	}
 }
+static void
+handle_unmap_event(XUnmapEvent * e)
+{
+	Client *c = find_client(e->window);
+	if(c)
+	{
+		if(c->ignore_unmap>0)
+			c->ignore_unmap--;
+		else
+		{
+			c->flags |= AR_CLIENT_REMOVE;
+			arwm.flags |= ARWM_FLAG_NEED_TIDY;
+		}
+	}
+}
 
-static void 
-handle_unmap_event(XUnmapEvent *e) 
+#ifdef USE_CMAP
+static void
+handle_colormap_change(XColormapEvent * e)
 {
 	Client *c = find_client(e->window);
 
-	LOG_DEBUG("handle_unmap_event():  ");
-	if (c) 
+	if(c && e->new)
 	{
-		if (c->ignore_unmap) 
-		{
-			c->ignore_unmap--;
-			LOG_DEBUG("ignored (%d ignores remaining)\n", 
-				c->ignore_unmap);
-		} 
-		else 
-		{
-			LOG_DEBUG("flagging client for removal\n");
-			c->flags |= AR_CLIENT_REMOVE;
-			need_client_tidy = 1;
-		}
-	} 
-}
-
-static void 
-handle_colormap_change(XColormapEvent *e) {
-	Client *c = find_client(e->window);
-	MARK;
-	if (c && e->new) {
 		c->cmap = e->colormap;
 		XInstallColormap(arwm.X.dpy, c->cmap);
 	}
 }
+#endif /* USE_CMAP */
 
-static void 
-handle_property_change(XPropertyEvent *e) 
+static void
+handle_property_change(XPropertyEvent * e)
 {
-	Atom atom = e->atom;
 	Client *c;
 
-	/* Filter extraneous atoms to improve performance.  */
-        switch(atom)
-          {
-          case 221:
-          case 309:
-          case 37:
-            return;
-          default:
-            break;
-          }
+	const Atom atom = e->atom;
 
-	LOG_DEBUG("handle_property_change(e);\n");
-	c=find_client(e->window);
-	if (c)
+	c = find_client(e->window);
+	if(c)
 	{
-
-		LOG_DEBUG("\tProperty atom:  %d\n", (int)atom);
-		if (atom == XA_WM_NORMAL_HINTS) 
-		{
-			LOG_DEBUG("\tget_wm_normal_hints(c);\n");
+		moveresize(c);
+		if(atom == XA_WM_NORMAL_HINTS)
 			get_wm_normal_hints(c);
-		}
-		else if(atom==XA_WM_NAME)
+#ifdef USE_TBAR
+		else if(atom == XA_WM_NAME)
 			update_info_window(c);
-		else 
-			arwm_handle_net_wm_state_hints(c);
+#endif
 	}
 }
 
-static void 
-handle_enter_event(XCrossingEvent *e) 
+static void
+handle_enter_event(XCrossingEvent * e)
 {
 	Client *c;
 
-	if ((c = find_client(e->window))) 
+	if((c = find_client(e->window)))
 	{
 		/* The first check insures that the window which
 		   received the enter event is on the current virtual
 		   desktop.  The second check isolates the event to
 		   only the application window in order to avoid
 		   extraneous enter event processing.  */
-		if((c->vdesk != c->screen->vdesk) 
-                   || (e->window != c->window) 
-                   || (current==c))
+		if((c->vdesk != c->screen->vdesk)
+			|| (e->window != c->window))
 			return;
 		select_client(c);
 		arwm_current_to_head();
 	}
+	else
+		XUnmapWindow(arwm.X.dpy, e->window);
 }
 
-static void 
-handle_mappingnotify_event(XMappingEvent *e) 
+#if 0
+static void
+handle_mappingnotify_event(XMappingEvent * e)
 {
-	LOG_DEBUG("handle_mappingnotify_event\n");
+	LOG("handle_mappingnotify_event\n");
 	XRefreshKeyboardMapping(e);
-	if (e->request == MappingKeyboard) 
+	if(e->request == MappingKeyboard)
 	{
-		int i;
-		for (i = 0; i < arwm.X.num_screens; i++) 
+		unsigned short i;
+
+		for(i = 0; i < arwm.X.num_screens; i++)
 			grab_keys_for_screen(&arwm.X.screens[i]);
 	}
 }
-
-static void 
-handle_shape_event(XEvent *xe) 
-{
-
-	Client * c;
-
-	c = find_client(xe->xany.window);
-	if (c) set_shape(c);
-}
-
-#ifdef TITLEBAR
+#endif
+#ifdef USE_TBAR
 static void
 handle_expose_event(XEvent * ev)
 {
-	if(ev->xexpose.count==0)
+	if(ev->xexpose.count == 0)
 	{
 		/* xproperty was used instead of xexpose, previously.  */
 		Window ev_win = ev->xexpose.window;
-		Client * c = find_client(ev_win);
-
-		LOG_DEBUG("handle_expose_event(ev);\n");
+		Client *c = find_client(ev_win);
 
 		if(c && (ev_win == c->info_window))
 			update_info_window(c);
 	}
 }
-#endif /* TITLEBAR */
+#endif
 
-void 
-arwm_process_events(void);
-
-void 
-event_main_loop(void)
+static void
+do_client_tidy()
 {
-	/* main event loop here */
-	for(;;) {
-		arwm_process_events();
-		if (need_client_tidy) 
+
+	if(arwm.flags & ARWM_FLAG_NEED_TIDY)
+	{
+		Client *c;
+		Client *nc;
+
+		for(c=head_client; c; c=nc)
 		{
-			Client *c, *nc;
-			for (c = head_client; c; c = nc) 
-			{
-				nc = c->next;
-				if (c->flags & AR_CLIENT_REMOVE)
-					remove_client(c);
-			}
+			nc=c->next;
+			if(c->flags & AR_CLIENT_REMOVE)
+				remove_client(c);
 		}
-	}
+	}		
 }
 
-void 
+
+static void
 arwm_process_events(void)
 {
 	XEvent ev;
 
 	XNextEvent(arwm.X.dpy, &ev);
-	LOG_XDEBUG("Event ID: %d\n", ev.type);
-	switch (ev.type) 
+	switch (ev.type)
 	{
-	case NoExpose:
-		LOG_DEBUG("event_main_loop():  NoExpose\n");
-		break;
-#ifdef TITLEBAR
-	case Expose:
-		handle_expose_event(&ev);
-		break;
-#endif /* TITLEBAR */
-	case KeyPress:
-		arwm_handle_key_event(&ev.xkey); 
-		break;
-	case ButtonPress:
-		arwm_handle_button_event(&ev.xbutton); 
-		break;
-	case ConfigureRequest:
-		LOG_DEBUG("event_main_loop(): ConfigureRequest\n");
-		arwm_handle_configure_request(&ev.xconfigurerequest); 
-		break;
-	case MapRequest:
-		LOG_DEBUG("event_main_loop():  MapRequest\n");
-		handle_map_request(&ev.xmaprequest); 
-		break;
-	case ColormapNotify:
-		handle_colormap_change(&ev.xcolormap); 
-		break;
 	case EnterNotify:
-		handle_enter_event(&ev.xcrossing); 
-		break;
-	case PropertyNotify:
-		handle_property_change(&ev.xproperty); 
+		LOG("EnterNotify");
+		handle_enter_event(&ev.xcrossing);
 		break;
 	case UnmapNotify:
-		handle_unmap_event(&ev.xunmap); 
+		LOG("UnmapNotify");
+		handle_unmap_event(&ev.xunmap);
 		break;
-	case MapNotify:
+	case PropertyNotify:
+		LOG("PropertyNotify");
+		handle_property_change(&ev.xproperty);
 		break;
+	case MapRequest:
+		LOG("MapRequest");
+		handle_map_request(&ev.xmaprequest);
+		break;
+	case KeyPress:
+		LOG("KeyPress");
+		arwm_handle_key_event(&ev.xkey);
+		break;
+#ifdef USE_TBAR
+	case Expose:
+		LOG("Expose");
+		handle_expose_event(&ev);
+		break;
+#endif
+	case ButtonPress:
+		LOG("ButtonPress");
+		arwm_handle_button_event(&ev.xbutton);
+		break;
+	case ConfigureRequest:
+		LOG("ConfigureRequest");
+		arwm_handle_configure_request(&ev.xconfigurerequest);
+		break;
+#ifdef USE_CMAP
+	case ColormapNotify:
+		LOG("ColormapNotify");
+		handle_colormap_change(&ev.xcolormap);
+		break;
+#endif /* USE_CMAP */
+#if 0
 	case MappingNotify:
-		handle_mappingnotify_event(&ev.xmapping); 
+		LOG("MappingNotify");
+		handle_mappingnotify_event(&ev.xmapping);
 		break;
-	default:
-		if (arwm.X.have_shape && ev.type == arwm.X.shape_event) 
-			handle_shape_event(&ev);
+#endif
+#ifdef USE_SHAPE
+	case ShapeNotify:
+		LOG("ShapeNotify");
+		set_shape(find_client(ev.xany.window));
+		break;
+#endif /* USE_SHAPE */
+	}
+}
+
+void
+event_main_loop(void)
+{
+	/* main event loop here */
+	for(;;)
+	{
+		arwm_process_events();
+		do_client_tidy();
 	}
 }
 

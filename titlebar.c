@@ -1,142 +1,315 @@
-#ifdef TITLEBAR
 
 #include "arwm.h"
 /* Include the title button bitmaps.  */
+#ifdef USE_XPM
+#include <X11/xpm.h>
+#include "close_button.xpm"
+#include "close_button_inactive.xpm"
+#include "resize_button.xpm"
+#include "gradient.xpm"
+#include "shade.xpm"
+#elif USE_XBM
+#include "close.xbm"
+#include "resize.xbm"
+#include "shade.xbm"
+#endif /* USE_XPM */
+
+#ifdef USE_XFT
 #include <X11/Xft/Xft.h>
+#endif /* USE_XFT */
+
+#include "ARWMButton.h"
 
 static void
 setup_titlebar(Client * c)
 {
-	Display * dpy = arwm.X.dpy;
+	Display *dpy = arwm.X.dpy;
 	Window info_window;
 
 	if(c->flags & AR_CLIENT_SHAPED)
 		return;
 
-	info_window=c->info_window 
-		= XCreateSimpleWindow(dpy, c->parent, 0, 0,
-			c->geometry.width, TITLEBAR_HEIGHT,
-			TB_BRDR_WDTH, 0, 
-			arwm_get_pixel_for_color(TITLEBAR_BG));
+	info_window = c->info_window = XCreateSimpleWindow(dpy, c->parent, 
+		0, 0, c->geometry.width, TITLEBAR_HEIGHT, 0, 0, 0);
 	XSelectInput(arwm.X.dpy, info_window, ExposureMask);
 	XMapRaised(dpy, info_window);
 	arwm_grab_button(info_window, 0, AnyButton);
 }
 
+
+static unsigned int
+draw_info_strings(Client * c, char *name)
+{
+	const size_t name_length = name?strlen(name):0;
+	const int x = BUTTON_WIDTH + 2 * ARWM_BORDER_WIDTH;
+	Window info_window = c->info_window;
+
+	if(!name)
+		return 0;
+#ifdef USE_XFT
+	XftDrawChange(arwm.titlebar.xft.draw, info_window);
+	{
+		/* Prevent the text from going over the resize button.  */
+		const unsigned short max_width = c->geometry.width - 3 
+			* TITLEBAR_HEIGHT;
+		XGlyphInfo e;
+
+		XftTextExtentsUtf8(arwm.X.dpy, arwm.X.font, (XftChar8 *) name, 
+				name_length, &e);
+		XftDrawChange(arwm.titlebar.xft.draw, info_window);
+		XftDrawStringUtf8(arwm.titlebar.xft.draw, 
+				&(arwm.titlebar.xft.fg), 
+				arwm.X.font, x+4, (TITLEBAR_HEIGHT-e.y) +e.y/2, 
+				(XftChar8 *) name, e.width > max_width 
+				&& e.width > 0 ? name_length * max_width 
+				/ e.width : name_length);
+	}
+#else /* ! USE_XFT */
+	XDrawString(arwm.X.dpy, info_window, c->screen->gc, x+5, 
+			TITLE_FONT_HEIGHT*1.25-FONT_Y_OFFSET, 
+			name, name_length);
+#endif /* USE_XFT */
+	XFree(name);
+
+	return name_length;
+}
+
 static void
-draw_handles(Client * c)
+draw_button(ARWMButton * button, Window w, const short x)
+{
+	button->parent=w;
+	button->geometry.x = x;
+	ARWMButton_draw(button);
+}
+
+#ifdef USE_XPM
+void
+arwm_draw_close_button(Client * c)
+{
+	ARWMButton *close = arwm.titlebar.buttons.close;
+
+#ifdef TITLEBAR_DEBUG
+	LOG_DEBUG("arwm_draw_close_button(c)\n");
+	LOG_DEBUG("x:%d\ty:%d\tw:%d\th:%d\n", close->geometry->x,
+		close->geometry->y, close->geometry->width,
+		close->geometry->height);
+#endif /* TITLEBAR_DEBUG */
+	close->image =
+		(c->flags & AR_CLIENT_ACTIVE) ? arwm.titlebar.
+		close : arwm.titlebar.close_inactive;
+	draw_button(close, c->info_window, 0);
+}
+#else
+#define arwm_draw_close_button(c) draw_button(arwm.titlebar.buttons.close,\
+		c->info_window, 0);
+#endif /* USE_XPM */
+
+static void
+draw_titlebar(Client * c, char *name)
 {
 	Window w = c->info_window;
-	ARWMButton *close, *resize, *shade, *handle;
-	const unsigned int width = c->geometry.width;
-#define ARWM_HANDLE_OFFSET(x) (width-((TITLEBAR_HEIGHT)*x))
+	ARWMButton *handle;
+	const unsigned short width = c->geometry.width;
+	const unsigned short resize_offset = width - AR_RESIZE_DELTA;
+	const unsigned short shade_offset = width - AR_SHADE_DELTA;
 
-	close=arwm.titlebar.buttons.close;
-	resize=arwm.titlebar.buttons.resize;
-	shade=arwm.titlebar.buttons.shade;
-	handle=arwm.titlebar.buttons.handle;
+	if(c->flags & AR_CLIENT_SHAPED)
+		return;
+	handle = arwm.titlebar.buttons.handle;
 
-	close->parent=resize->parent=shade->parent=handle->parent=w;
-	close->c=resize->c=shade->c=handle->c=c;
-	handle->geometry->width=ARWM_HANDLE_OFFSET(3);
-	handle->geometry->x = TITLEBAR_HEIGHT;
-	$(handle, draw);
-	$(close, draw);
-	shade->geometry->x=ARWM_HANDLE_OFFSET(2);
-	$(shade, draw); 
-	resize->geometry->x=ARWM_HANDLE_OFFSET(1);
-	$(resize, draw);
+#ifndef USE_XBM
+	handle->geometry.width = width;
+	draw_button(handle, w, 0);
+#endif /* !USE_XBM */
+	arwm_draw_close_button(c);
+	draw_info_strings(c, name);
+	draw_button(arwm.titlebar.buttons.shade, w, shade_offset);
+	draw_button(arwm.titlebar.buttons.resize, w, resize_offset);
 }
+
+#if defined(USE_XPM) || defined(USE_XBM)
+static void
+initialize_images(ARWMTitlebarData * titlebar)
+{
+
+#ifdef USE_XPM
+	Display *dpy = arwm.X.dpy;
+
+#ifdef TITLEBAR_DEBUG
+	LOG_DEBUG("Load pixmaps...");
+#endif /* TITLEBAR_DEBUG */
+#define XPMIMAGE(xpm, dest) XpmCreateImageFromData(dpy, xpm##_xpm,\
+	&(titlebar->dest), NULL, NULL)
+	XPMIMAGE(gradient, handle);
+	XPMIMAGE(resize_button, resize);
+	XPMIMAGE(close_button, close);
+	XPMIMAGE(close_button_inactive, close_inactive);
+	XPMIMAGE(shade, shade);
+#elif USE_XBM
+#define XBMIMAGE(i) titlebar->i = arwm_get_XImage_for_XBM(\
+	i##_bits, i##_width, i##_height)
+	XBMIMAGE(resize);
+	XBMIMAGE(close);
+	XBMIMAGE(shade);
+#endif /* USE_XPM */
+}
+#endif /* USE_XPM || USE_XBM */
 
 static void
-arwm_ARWMTitlebarData_destroy(ARWMTitlebarData * titlebar);
-
-static ARWMButton *
-initialize_button(const int r, const int g, const int b)
+initialize_buttons(ARWMTitlebarData * titlebar, Display * dpy)
 {
-	ARWMButton * button;
+	Window root = DefaultRootWindow(dpy);
+/*	ARWMButton *close, *resize, *shade;*/
+#ifndef USE_XBM
+	ARWMButton *handle;
+#endif /* ! USE_XBM */
 
-	button = new_ARWMButton(DefaultRootWindow(arwm.X.dpy));
-	$(button, set_color, get_ARWMColor_for(r, g, b));
-	button->geometry->height=button->geometry->width
-		= TITLEBAR_HEIGHT;
-	
-	return button;
+#if defined(USE_XPM) || defined(USE_XBM)
+#define IMG(item) titlebar->item
+#ifdef USE_XBM
+#define IMGDIM(item)\
+	item->image_height = item##_height;\
+	item->image_width= item##_width;
+#else /* !USE_XBM */
+#define IMGDIM(item)
+#endif /* USE_XBM */
+#else /* USE_XBM || USE_XPM */
+#define IMG(item) NULL
+#define IMGDIM(item)
+#endif /* USE_XBM */
+
+#define TBUTTON(item, bg) titlebar->buttons.item = ARWMButton_new(\
+	root, bg, TITLEBAR_HEIGHT,\
+	TITLEBAR_HEIGHT, IMG(item)); IMGDIM(item)
+#define RGB_TBUTTON(item, bg) TBUTTON(item, arwm_new_gc(bg))
+#define XCOLOR_TBUTTON(item, bg) TBUTTON(item, arwm_new_gc_for_XColor(bg))
+	RGB_TBUTTON(close, TITLEBAR_CLOSE_BG);
+	RGB_TBUTTON(resize, TITLEBAR_RESIZE_BG);
+	RGB_TBUTTON(shade, TITLEBAR_SHADE_BG);
+#ifndef USE_XBM
+	handle=XCOLOR_TBUTTON(handle, arwm.X.screens->bg);
+	handle->span_image=True;
+#endif /* ! USE_XBM */
 }
 
+#ifdef USE_XFT
 static void
-initialize_buttons(ARWMTitlebarData * titlebar)
+initialize_font_data(ARWMTitlebarData * titlebar, Display * dpy)
 {
-	titlebar->buttons.close=initialize_button(0xae, 0x80, 0x80);
-	titlebar->buttons.resize=initialize_button(0x80, 0xb2, 0x80);
-	titlebar->buttons.shade=initialize_button(0x80, 0x80, 0xc3);
-	titlebar->buttons.handle=initialize_button(0x50, 0x50, 0x50);
-	titlebar->buttons.handle->flags|=ARWMBUTTON_IS_CONTAINER;
+	const int scr = DefaultScreen(dpy);
+	Visual *visual = DefaultVisual(dpy, scr);
+	Colormap colormap = DefaultColormap(dpy, scr);
+
+	XftColorAllocName(dpy, visual, colormap, opt.color.fg,
+		&(titlebar->xft.fg));
+	titlebar->xft.draw =
+		XftDrawCreate(dpy, DefaultRootWindow(dpy), visual,
+		colormap);
 }
+#endif /* USE_XFT */
 
 void
 arwm_ARWMTitlebarData_init(ARWMTitlebarData * titlebar)
 {
+	Display *dpy = arwm.X.dpy;
+
 	if(titlebar->initialized)
 		return;
-	initialize_buttons(titlebar);
-	titlebar->delete=&arwm_ARWMTitlebarData_destroy;
-	titlebar->initialized=True;
+
+#if defined(USE_XPM) || defined(USE_XBM)
+	initialize_images(titlebar);
+#endif /* USE_XPM || USE_XBM */
+	initialize_buttons(titlebar, dpy);
+#ifdef USE_XFT
+	initialize_font_data(titlebar, dpy);
+#endif /* USE_XFT */
+	titlebar->initialized = True;
 }
 
 static void
 delete_buttons(ARWMTitlebarData * titlebar)
 {
-	$(titlebar->buttons.close, delete);
-	$(titlebar->buttons.resize, delete);
-	$(titlebar->buttons.shade, delete);
-	$(titlebar->buttons.handle, delete);
+	ARWMButton_delete(titlebar->buttons.close);
+	ARWMButton_delete(titlebar->buttons.resize);
+	ARWMButton_delete(titlebar->buttons.shade);
+#ifdef USE_XPM
+	ARWMButton_delete(titlebar->buttons.handle);
+#endif /* USE_XPM */
 }
+
+#ifdef USE_XPM
+static void
+free_XImage(ARWMTitlebarData * t)
+{
+	XDestroyImage(t->close);
+	XDestroyImage(t->resize);
+	XDestroyImage(t->shade);
+	XDestroyImage(t->handle);
+	XDestroyImage(t->close_inactive);
+}
+#endif /* USE_XPM */
+
+#ifdef USE_XFT
+static void
+free_Xft_data(ARWMTitlebarData * titlebar)
+{
+	XftDraw *draw = titlebar->xft.draw;
+
+	XftColorFree(arwm.X.dpy, XftDrawVisual(draw),
+		XftDrawColormap(draw), &(titlebar->xft.fg));
+	XftDrawDestroy(draw);
+}
+#endif /* USE_XFT */
 
 /* This assumes that the memory of the ARWMTitlebarData instance
    passed is managed externally.  */
-static void
-arwm_ARWMTitlebarData_destroy(ARWMTitlebarData * titlebar)
+void
+ARWMTitlebarData_delete(ARWMTitlebarData * titlebar)
 {
 	if(!titlebar->initialized)
 		return;
+#ifdef USE_XPM
+	free_XImage(titlebar);
+#endif /* USE_XPM */
+#ifdef USE_XFT
+	free_Xft_data(titlebar);
+#endif /* USE_XFT */
 	delete_buttons(titlebar);
 }
 
 void
 update_info_window(Client * c)
 {
-	if(!c || (c->flags & AR_CLIENT_DONT_USE_TITLEBAR)
-		|| (c->flags & AR_CLIENT_DONT_MANAGE))
+	Window iw = c->info_window;
+
+#ifdef USE_SHAPE
+	set_shape(c);
+#endif /* USE_SHAPE */
+	if(!iw)
 	{
-		remove_info_window(c);
+		setup_titlebar(c);
+		/* Return here to prevent BadWindow/BadDrawable errors */
 		return;
 	}
-	else
-		set_shape(c);
-	if (!c->info_window)
-		setup_titlebar(c);
+
 	/* Client specific data.  */
+	XMoveResizeWindow(arwm.X.dpy, iw, 0, 0, 
+			c->geometry.width, TITLEBAR_HEIGHT);
+	XClearWindow(arwm.X.dpy, iw);
+	/* Depending on common data.  */
 	arwm_ARWMTitlebarData_init(&(arwm.titlebar));
-	XFetchName(arwm.X.dpy, c->window, 
-		&(arwm.titlebar.buttons.handle->text));
-	XMoveResizeWindow(arwm.X.dpy, c->info_window, 0, 0, 
-		c->geometry.width,
-		TITLEBAR_HEIGHT);	
-	draw_handles(c);
+	{
+		char *name;
+
+		XFetchName(arwm.X.dpy, c->window, &name);
+		draw_titlebar(c, name);
+	}
 }
 
 void
 remove_info_window(Client * c)
 {
-	if (c && c->info_window && arwm.X.dpy)
-          {
-            LOG_DEBUG("XDestroyWindow()\n");
+	if(c && c->info_window)
 		XDestroyWindow(arwm.X.dpy, c->info_window);
-          }
-        LOG_DEBUG("DONT Set INFO_WINDOW to None\n");
-	//c->info_window = None;
+	c->info_window = None;
 }
-
-#endif /* TITLEBAR */
-

@@ -1,7 +1,27 @@
-/* Copyright 2007, Jeffrey E. Bedard */
+/* Copyright 2007-2011, Jeffrey E. Bedard */
 #ifndef ARWM_SCREEN_H
 #define ARWM_SCREEN_H
 
-#define MAXIMIZE(c) maximize(c, MAXIMIZE_HORZ|MAXIMIZE_VERT)
+typedef struct
+{
+	short x, y;
+} Position;
+
+void drag(Client * c);
+void moveresize(Client * c);
+void show_info(Client * c, KeySym key);
+void sweep(Client * c);
+void unhide(Client * c, int raise_win);
+void next(void);
+void hide(Client * c);
+void switch_vdesk(ScreenInfo * s, const ubyte v);
+void grab_keys_for_screen(ScreenInfo * s);
+void maximize(Client * c);
+
+#define get_mouse_position(x, y, root) XQueryPointer(arwm.X.dpy, \
+		root, &root, &root, x, y, (int *)&root, (int *)&root, \
+		(unsigned int *)&root);
+
+#define setmouse(w, x, y) XWarpPointer(arwm.X.dpy, None, w, 0, 0, 0, 0, x, y)
 
 #endif /* ARWM_SCREEN_H */

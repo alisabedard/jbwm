@@ -1,4 +1,4 @@
-/* Copyright 2008, Jeffrey Bedard <antiright@gmail.com> */
+/* Copyright 2008-2011, Jeffrey Bedard <antiright@gmail.com> */
 
 /* arwm - Minimalist Window Manager for X
  * Copyright (C) 1999-2006 Ciaran Anscomb <arwm@6809.org.uk>
@@ -6,73 +6,67 @@
 
 #include "arwm.h"
 
-void 
-arwm_handle_configure_request(XConfigureRequestEvent *e) 
+
+static void
+configure_client(Client * c, XConfigureRequestEvent * e)
 {
 	XWindowChanges wc;
-	Client *c = find_client(e->window);
+	XRectangle * g = &(c->geometry);
 	unsigned int value_mask = e->value_mask;
-	Display * dpy = arwm.X.dpy;
+	const ubyte border = c->border;
 
-	LOG_DEBUG("handle_configure_request(e);\n");
+#define ISV(cg) value_mask & CW##cg
+#define MSKGEO(cg, geo) if(ISV(cg)) g->geo=e->geo;
+	MSKGEO(Width, width);
+	MSKGEO(Height, height);
+	MSKGEO(X, x);
+	MSKGEO(Y, y);
+	if(ISV(StackMode) && ISV(Sibling))
+	{
+		Client *sibling;
 
+		if((sibling = find_client(e->above)))
+			wc.sibling = sibling->parent;
+	}
+	wc.x = g->x - border;
+	wc.y = g->y - border;
+	wc.border_width = border;
+	if(!(c->flags & AR_CLIENT_SHAPED))
+	{
+		value_mask |= CWHeight | CWY;
+		wc.height += TITLEBAR_HEIGHT;
+		wc.y -= TITLEBAR_HEIGHT;
+	}
+	XConfigureWindow(arwm.X.dpy, c->parent, value_mask, &wc);
+	moveresize(c);
+}
+
+void
+arwm_handle_configure_request(XConfigureRequestEvent * e)
+{
+	XWindowChanges wc;
+	Client *c;
+
+	LOG("handle_configure_request(e);");
 	wc.sibling = e->above;
 	wc.stack_mode = e->detail;
 	wc.height = e->height;
 	wc.width = e->width;
-	if (c) {
-		XRectangle * geometry = &(c->geometry);
-
-		ungravitate(c);
-		if (value_mask & CWWidth) geometry->width = e->width;
-		if (value_mask & CWHeight) geometry->height = e->height;
-		if (value_mask & CWX) geometry->x = e->x;
-		if (value_mask & CWY) geometry->y = e->y;
-		if (value_mask & CWStackMode && value_mask & CWSibling) 
-		{
-			Client *sibling = find_client(e->above);
-			if (sibling) 
-				wc.sibling = sibling->parent;
-		}
-		if (geometry->x == 0 && geometry->width 
-			>= DisplayWidth(dpy, c->screen->screen)) 
-			geometry->x -= c->border;
-		if (geometry->y == 0 && geometry->height 
-			>= DisplayHeight(dpy, c->screen->screen)) 
-			geometry->y -= c->border;
-		gravitate(c);
-		wc.x = geometry->x - c->border;
-		wc.y = geometry->y - c->border;
-		wc.border_width = c->border;
-		LOG_XDEBUG("%s:%d:XConfigureWindow(arwm.X.dpy, "
-			"parent(%x), %x, &wc);\n", 
-			__FILE__, __LINE__,
-			(unsigned int)c->parent, value_mask);
-#ifdef TITLEBAR
-#ifdef SHAPE
-		if(!(c->flags & AR_CLIENT_SHAPED))
-		{
-#endif
-			value_mask |= CWHeight;
-			wc.height += TITLEBAR_HEIGHT; 
-			value_mask |= CWY;
-			wc.y -= TITLEBAR_HEIGHT; 
-#ifdef SHAPE
-		}
-#endif
-#endif /* TITLEBAR */
-		XConfigureWindow(dpy, c->parent, value_mask, &wc);
-		moveresize(c);
-	} 
-	else 
+	if((c = find_client(e->window)))
+		configure_client(c, e);
+	else
 	{
-		wc.x = c ? 0 : e->x;
-		wc.y = c ? 0 : e->y;
-		MARK;
-		LOG_XDEBUG("XConfigureWindow(dpy, window(%x), %x, &wc);\n", 
-			   (unsigned int)e->window, value_mask);
-		XConfigureWindow(dpy, e->window, value_mask, &wc);
+		wc.x = e->x;
+		wc.y = e->y;
+		wc.width=e->width;
+		wc.height=e->height;
+#ifdef DEBUG
+		fprintf(stderr, "wx:%d\twy:%d\tww:%d\twh:%d\n",
+			wc.x, wc.y, wc.width, wc.height);
+#endif /* DEBUG */
+		if(wc.width==wc.height)
+			return;
+		XConfigureWindow(e->display, e->window, e->value_mask, &wc);
 	}
 }
-
 

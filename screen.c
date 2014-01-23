@@ -1,453 +1,321 @@
 /*
- * - Minimalist Window Manager for X Copyright (C) 1999-2006 Ciaran
- * Anscomb <6809.org.uk> see README for license and other details.
+ * arwm - Restructuring, optimization, and feature fork
+ *        Copyright 2007-2012, Jeffrey E. Bedard <jefbed@gmail.com>
+ * evilwm - Minimalist Window Manager for X Copyright (C) 1999-2006 Ciaran
+ * Anscomb <arwm@6809.org.uk> see README for license and other details.
  */
 #include "arwm.h"
 #include <string.h>
 #include "screen.h"
 
-static inline void 
+#ifdef INFORMATION_ON_OUTLINE
+static void
+draw_outline_information(Client * c)
+{
+	ScreenInfo * s = c->screen;
+	XRectangle * g = &(c->geometry);
+	char buf[27];
+
+	snprintf(buf, sizeof(buf), "%dx%d+%d+%d", 
+		g->x, g->y, g->width, g->height);
+	XDrawString(arwm.X.dpy, s->root, s->gc, 
+		g->x, g->y, buf, strlen(buf));
+}
+#endif /* INFORMATION_ON_OUTLINE */
+
+static void
 draw_outline(Client * c)
 {
-	Client ca;
-	ScreenInfo sa;
-	GC gc;
-	XRectangle geo;
-	Display *dpy;
-	
-	ca = *c;
-	sa = *ca.screen;
-	gc=sa.invert_gc;
-	dpy = arwm.X.dpy;
+	XRectangle * g;
+	XRectangle box;
+	const ubyte border = c->border;
 
-	geo.x=ca.geometry.x - ca.border;
-	geo.y=ca.geometry.y - ca.border/2
-#ifdef TITLEBAR
-		-(
-		(c->flags & AR_CLIENT_SHAPED) ? 0 :
-		TITLEBAR_HEIGHT)
-#endif /* TITLEBAR */
-		-1;
-#define CLIENT_IS_SHAPED (c->flags & AR_CLIENT_SHAPED)
-	geo.width=ca.geometry.width + ca.border;
-	geo.height=ca.geometry.height + ca.border
-#ifdef TITLEBAR
-		+ (
-		(c->flags & AR_CLIENT_SHAPED) ? 0 :
-		(((c->flags & AR_CLIENT_SHADED)?-TITLEBAR_HEIGHT:0)
-		+ TITLEBAR_HEIGHT))
-#endif /* TITLEBAR */
-		;
-	XDrawRectangle(dpy, sa.root, gc, geo.x, geo.y, geo.width, geo.height);
+	if(!c->screen)
+		return;
+	g=&(c->geometry);
+	box.x=g->x-border;
+	box.y=g->y-TITLEBAR_HEIGHT;
+	box.width=g->width+border;
+	box.height=g->height+(c->flags & AR_CLIENT_SHADED?0:TITLEBAR_HEIGHT);
+	XDrawRectangle(arwm.X.dpy, c->screen->root, c->screen->gc, 
+		box.x, box.y, box.width, box.height);
+
+#ifdef INFORMATION_ON_OUTLINE
+	draw_outline_information(c);
+#endif /* INFORMATION_ON_OUTLINE */
 }
 
 static void
-recalculate_size(Client * c, int x1, int y1, int x2, int y2)
+recalculate_size(Client * c, Position p1, Position p2)
 {
-	{
-		c->geometry.width=abs(x1 - x2);
-		c->geometry.height=abs(y1 - y2);
-		c->geometry.width-=(c->geometry.width - c->base_width) 
-			% c->width_inc;
-		c->geometry.height-=(c->geometry.height - c->base_height) 
-			% c->height_inc;
-	}
-	{
-		if (c->min_width && c->geometry.width < c->min_width)
-			c->geometry.width = c->min_width;
-		if (c->min_height && c->geometry.height < c->min_height)
-			c->geometry.height = c->min_height;
-		if (c->max_width && c->geometry.width > c->max_width)
-			c->geometry.width = c->max_width;
-		if (c->max_height && c->geometry.height > c->max_height)
-			c->geometry.height = c->max_height;
-	}
+	XRectangle * g = &(c->geometry);
+
+	g->width = abs(p1.x - p2.x);
+	g->height = abs(p1.y - p2.y);
+	g->width -= (g->width - c->base_width) % c->width_inc;
+	g->height -= (g->height - c->base_height) % c->height_inc;
+#define setwh(wh, mm, gtlt) if(c->mm##_##wh && g->wh gtlt c->mm##_##wh)\
+	g->wh = c->mm##_##wh;
+	setwh(width, min, <);
+	setwh(height, min, <);
+	setwh(width, max, >);
+	setwh(height, max, >);
 }
 
 static void
-recalculate_position(Client * c, int x1, int y1, int x2, int y2)
+recalculate_position(Client * c, Position p1, Position p2)
 {
-	c->geometry.x = (x1 <= x2) ? x1 : x1 - c->geometry.width;
-	c->geometry.y = (y1 <= y2) ? y1 : y1 - c->geometry.height;
-}
+	XRectangle * g = &(c->geometry);
 
+	g->x = (p1.x <= p2.x) ? p1.x : p1.x - g->width;
+	g->y = (p1.y <= p2.y) ? p1.y : p1.y - g->height;
+}
 static void
-recalculate_sweep(Client * c, int x1, int y1, int x2, int y2)
+recalculate_sweep(Client * c, Position p1, Position p2)
 {
 	/* This is a quick hack for gshterm.  */
-	c->min_height=c->min_width=0;
+	c->min_height = c->min_width = 0;
 
-	recalculate_size(c, x1, y1, x2, y2);
-	recalculate_position(c, x1, y1, x2, y2);
+	recalculate_size(c, p1, p2);
+	recalculate_position(c, p1, p2);
 
 	SET_CLIENT_CE(c);
 }
 
-void 
+#define grab_pointer(w, mask, curs) \
+	(XGrabPointer(arwm.X.dpy, w, False, mask, GrabModeAsync,\
+	GrabModeAsync, None, curs, CurrentTime) == GrabSuccess)
+
+static void
+handle_motion_notify(Client * c, XRectangle * g, XMotionEvent * mev)
+{
+	Position p1, p2;
+
+	p1.x=g->x;
+	p1.y=g->y;
+	p2.x=mev->x;
+	p2.y=mev->y;
+	draw_outline(c); 
+	recalculate_sweep(c, p1, p2);
+	draw_outline(c);
+}
+
+void
 sweep(Client * c)
 {
 	XEvent ev;
-	int old_cx = c->geometry.x;
-	int old_cy = c->geometry.y;
+	XRectangle * g = &(c->geometry);
 
-	if (!grab_pointer(c->screen->root, MouseMask, arwm.X.cursors.resize))
+	if(!grab_pointer(c->screen->root, MouseMask, arwm.X.cursor))
 		return;
-
-	XGrabServer(arwm.X.dpy);
-#ifdef WITHRESIZEBORDER
-	draw_outline(c);
-#endif	/* WITHRESIZEBORDER */
-	setmouse(c->window, c->geometry.width, c->geometry.height);
-	for (;;)
+	setmouse(c->window, g->width, g->height);
+	for(;;)
 	{
 		XMaskEvent(arwm.X.dpy, MouseMask, &ev);
 		switch (ev.type)
 		{
 		case MotionNotify:
-#ifdef WITHRESIZEBORDER
-			draw_outline(c);	/* clear */
-#endif	/* WITHRESIZEBORDER */
-			XUngrabServer(arwm.X.dpy);
-			recalculate_sweep(c, old_cx, old_cy,
-				ev.xmotion.x, ev.xmotion.y);
-			XSync(arwm.X.dpy, False);
-			XGrabServer(arwm.X.dpy);
-#ifdef WITHRESIZEBORDER
-			draw_outline(c);
-#endif	/* WITHRESIZEBORDER */
-			break;
+			handle_motion_notify(c, g, &(ev.xmotion));
+						break;
 		case ButtonRelease:
-#ifdef WITHRESIZEBORDER
-			draw_outline(c);	/* clear */
-#endif	/* WITHRESIZEBORDER */
-			XUngrabServer(arwm.X.dpy);
 			XUngrabPointer(arwm.X.dpy, CurrentTime);
 			moveresize(c);
 			return;
-		default:
-			break;
 		}
 	}
 }
 
-#ifdef SNAP
-static int 
-absmin(int a, int b)
-{
-	if (abs(a) < abs(b))
-		return a;
-	return b;
-}
-
+#ifdef USE_SNAP
 static void
 snap_client_to_screen_border(Client * c)
 {
-	int display_width = DisplayWidth(arwm.X.dpy, c->screen->screen);
-	int display_height = DisplayHeight(arwm.X.dpy, c->screen->screen);
+	XRectangle *g;
+	const unsigned short dw = c->screen->width;
+	const unsigned short dh = c->screen->height;
+	const ubyte snap = ARWM_SNAP_DISTANCE;
+	const ubyte b = c->border;
 
+	g=&(c->geometry);
 	/* snap to screen border */
-	if (abs(c->geometry.x - c->border) < arwm.options.snap)
-		c->geometry.x = c->border;
-	if (abs(c->geometry.x + c->geometry.width + c->border - display_width) 
-		< arwm.options.snap)
-		c->geometry.x = display_width - c->geometry.width - c->border;
-	if (abs(c->geometry.y - c->border) < arwm.options.snap)
-		c->geometry.y = c->border;
-	if (abs(c->geometry.y + c->geometry.height + c->border 
-		- display_height) < arwm.options.snap)
-		c->geometry.y = display_height - c->geometry.height 
-			- c->border;
+#define SBORDER(xy, b) if(abs(g->xy+b)<snap) g->xy=-(b);
+	SBORDER(x, -b);
+	SBORDER(x, g->width+b-dw);
+	SBORDER(y, -b);
+	SBORDER(y, g->height+b-dh);
+}
+
+#define absmin(a, b) (abs(a)<abs(b)?a:b)
+static int
+snap_dim(short * cxy, unsigned short * cwh, short * cixy, 
+		unsigned short * ciwh, const ubyte border, const ubyte snap)
+{
+	int d=snap;
+
+	d = absmin(d, *cixy + *ciwh - *cxy + 2*border);
+	d = absmin(d, *cixy + *ciwh - *cxy - *cwh);
+	d = absmin(d, *cixy - *cxy - *cwh - 2*border);
+	d = absmin(d, *cixy - *cxy);
+
+	return d;
 }
 
 static void 
 snap_client(Client * c)
 {
-	int dx, dy;
-	Client *ci;
+        int dx, dy;
+        Client *ci;
+	XRectangle * g = &(c->geometry);
+	const ubyte snap = ARWM_SNAP_DISTANCE;
 
-	snap_client_to_screen_border(c);
-	/* snap to other windows */
-	dx = dy = arwm.options.snap;
-	for (ci = head_client; ci; ci = ci->next)
-	{
-		if (ci != c
-			&& (ci->screen == c->screen)
-			&& (ci->vdesk == c->vdesk)
-			)
-		{
-			if (ci->geometry.y - ci->border - c->border 
-				- c->geometry.height - c->geometry.y
-				<= arwm.options.snap && c->geometry.y 
-				- c->border - ci->border - ci->geometry.height 
-				- ci->geometry.y <= arwm.options.snap)
-			{
-#define DSET(AXIS, EXP) d##AXIS=absmin(d##AXIS, ci->geometry.AXIS + EXP);
-				DSET(x, ci->geometry.width - c->geometry.x 
-					+ c->border + ci->border);
-				DSET(x, ci->geometry.width - c->geometry.x
-					- c->geometry.width);
-				DSET(x, - c->geometry.x - c->geometry.width
-					- c->border - ci->border);
-				DSET(x, - c->geometry.x);
-			}
-			if (ci->geometry.x - ci->border - c->border 
-				- c->geometry.width - c->geometry.x
-				<= arwm.options.snap && c->geometry.x 
-				- c->border - ci->border - ci->geometry.width 
-				- ci->geometry.x 
-				<= arwm.options.snap)
-			{
-				DSET(y, ci->geometry.height - c->geometry.y
-					+ c->border + ci->border);
-				DSET(y, ci->geometry.height - c->geometry.y 
-					- c->geometry.height);
-				DSET(y, - c->geometry.y - c->geometry.height
-					- c->border - ci->border);
-				DSET(y, - c->geometry.y);
-			}
-		}
-	}
-	if (abs(dx) < arwm.options.snap)
-		c->geometry.x += dx;
-	if (abs(dy) < arwm.options.snap)
-		c->geometry.y += dy;
+        snap_client_to_screen_border(c);
+        /* snap to other windows */
+        dx = dy = snap;
+        for (ci = head_client; ci; ci = ci->next)
+        {
+		XRectangle * gi = &(ci->geometry);
+
+                if (ci != c && (ci->screen == c->screen) 
+			&& (ci->vdesk == c->vdesk))
+                {
+			const ubyte border=c->border;
+
+                        if (gi->y - g->height - g->y <= snap && g->y 
+				- gi->height - gi->y <= snap)
+				dx=snap_dim(&(g->x), &(g->width), &(gi->x), 
+						&(gi->width), border, snap);
+                        if (gi->x - g->width - g->x <= snap && g->x 
+				- gi->width - gi->x <= snap)
+				dy=snap_dim(&(g->y), &(g->height), &(gi->y), 
+						&(gi->height), border, snap);
+                }
+        }
+        if (abs(dx) < snap)
+                g->x += dx;
+        if (abs(dy) < snap)
+                g->y += dy;
 }
-#endif	/* SNAP */
+#endif /* USE_SNAP */
 
 static void
-handle_drag_type(Client * c)
+drag_motion(Client * c, XEvent ev, int x1, int y1, int old_cx,
+	int old_cy)
 {
-#ifdef SOLIDDRAG
-	if (!arwm.options.solid_drag)
-	{
-#endif /* SOLIDDRAG */
-		XSync(arwm.X.dpy, False);
-		XGrabServer(arwm.X.dpy); 
-#ifdef WITHRESIZEBORDER
-		draw_outline(c);
-#endif	/* WITHRESIZEBORDER */
-#ifdef SOLIDDRAG
-	}
-	else
-	{
-		Client ca = *c;
-
-		XMoveWindow(arwm.X.dpy, ca.parent,
-			ca.geometry.x - ca.border,
-			ca.geometry.y - ca.border);
-		SEND_CONFIG(c);
-#ifdef TITLEBAR
-		/* This call allows expose events to be processed,
-		   properly rendering the titlebars when uncovered.  */
-#ifdef SHAPE
-	if(!(c->flags & AR_CLIENT_SHAPED))
-#endif /* SHAPE */
-		arwm_process_events();
-#endif /* TITLEBAR */
-	}
-#endif /* SOLIDDRAG */
-}
-
-static inline void
-drag_motion(Client * c, XEvent ev, const int x1, const int y1,
-	const int old_cx, const int old_cy)
-{
-#ifdef SOLIDDRAG
-	if (!arwm.options.solid_drag)
-	{
-#endif /* SOLIDDRAG */
-#ifdef WITHRESIZEBORDER
-		draw_outline(c);	/* clear */
-#endif	/* WITHRESIZEBORDER */
-		XUngrabServer(arwm.X.dpy);
-#ifdef SOLIDDRAG
-	}
-#endif /* SOLIDDRAG */
+	draw_outline(c);	/* clear */
 	c->geometry.x = old_cx + (ev.xmotion.x - x1);
 	c->geometry.y = old_cy + (ev.xmotion.y - y1);
 	SET_CLIENT_CE(c);
-#ifdef SNAP
-	if (arwm.options.snap)
-		snap_client(c);
-#endif
-	handle_drag_type(c);
+#ifdef USE_SNAP
+	snap_client(c);
+#endif /* USE_SNAP */
+	draw_outline(c);
 }
 
 static void
 drag_button_release(Client * c)
 {
-	LOG_DEBUG("drag_button_release(c);\n");
-#ifdef SOLIDDRAG
-	if (!arwm.options.solid_drag)
-	{
-#endif /* SOLIDDRAG */
-#ifdef WITHRESIZEBORDER
-		draw_outline(c);	/* clear */
-#endif	/* WITHRESIZEBORDER */
-		XUngrabServer(arwm.X.dpy);
-#ifdef SOLIDDRAG 
-	}
-#endif /* SOLIDDRAG */
+	draw_outline(c);	/* clear */
 	XUngrabPointer(arwm.X.dpy, CurrentTime);
-#ifdef SOLIDDRAG
-	if (!arwm.options.solid_drag)
-#endif /* SOLIDDRAG */
-		moveresize(c);
-#if defined(INFORMATION_ON_OUTLINE) && defined(USE_XFT)
-	XClearWindow(arwm.X.dpy, c->screen->root);
-#endif
+	moveresize(c);
 }
 
 static void
-drag_event_loop(Client * c, const int x1, const int y1,
-	const int old_cx, const int old_cy)
+drag_event_loop(Client * c, int x1, int y1, int old_cx, int old_cy)
 {
 	XEvent ev;
-	for (;;)
+
+	for(;;)
 	{
 		XMaskEvent(arwm.X.dpy, MouseMask, &ev);
-		switch (ev.type)
+		if(ev.type==MotionNotify)
+			drag_motion(c, ev, x1, y1, old_cx, old_cy);
+		else
 		{
-		case MotionNotify:
-			drag_motion(c, ev,
-				x1, y1,
-				old_cx,
-				old_cy);
-			break;
-		case ButtonRelease:
 			drag_button_release(c);
 			return;
-		default:
-			break;
 		}
 	}
 
 }
-inline void 
+
+void
 drag(Client * c)
 {
-	int x1, y1;
-	int old_cx = c->geometry.x;
-	int old_cy = c->geometry.y;
+	Position p, old_p;
+	Window root;
 
-	if (!grab_pointer(c->screen->root, MouseMask, arwm.X.cursors.move))
+	root = c->screen->root;
+	if(!grab_pointer(root, MouseMask, arwm.X.cursor))
 		return;
-	/* XRaiseWindow(arwm.X.dpy, c->parent); */
-	get_mouse_position(&x1, &y1, c->screen->root);
-
-#ifdef SOLIDDRAG
-	if (!arwm.options.solid_drag)
-	{
-#endif /* SOLIDDRAG */
-//		XGrabServer(arwm.X.dpy);
-#ifdef WITHRESIZEBORDER
-		draw_outline(c);
-#endif	/* WITHRESIZEBORDER */
-#ifdef SOLIDDRAG
-	}
-#endif /* SOLIDDRAG */
-	drag_event_loop(c, x1, y1, old_cx, old_cy);
-}
-
-inline void 
-moveresize(Client * c)
-{
-
-	const unsigned int parent_height = c->geometry.height
-#ifdef TITLEBAR
-		+ (((c->flags & AR_CLIENT_SHADED) 
-#ifdef SHAPE
-		|| (c->flags & AR_CLIENT_SHAPED) 
-#endif /* SHAPE */
-		?  0 : TITLEBAR_HEIGHT))
-#endif	/* TITLEBAR */
-	;
-
-	LOG_DEBUG("moveresize(c);\n");
-	XMoveResizeWindow(arwm.X.dpy, c->parent, 
-		c->geometry.x - c->border, 
-		c->geometry.y - c->border
-#ifdef TITLEBAR
-		- (
-		(c->flags & AR_CLIENT_SHAPED) ? 0 :
-		TITLEBAR_HEIGHT)
-#endif /* TITLEBAR */		
-		, c->geometry.width, parent_height);
-	XMoveResizeWindow(arwm.X.dpy, c->window, 0,
-#ifdef TITLEBAR
-		(
-#ifdef SHAPED
-		(c->flags & AR_CLIENT_SHAPED) ? -TITLEBAR_HEIGHT :
-#endif /* SHAPED */
-		TITLEBAR_HEIGHT),
-#else	/* not TITLEBAR */
-		0,
-#endif	/* TITLEBAR */
-		c->geometry.width, 
-		c->geometry.height
-		+ ((c->flags & AR_CLIENT_SHAPED) ? TITLEBAR_HEIGHT : 0)
-		);
-	send_config(c);
-#ifdef TITLEBAR
-	if(c->flags & AR_CLIENT_SHAPED)
-		return;
-	LOG_DEBUG("moveresize(c)--\tw:%d\tow:%d\n", c->geometry.width,
-		c->exposed_width);
-	/* Only update the titlebar if the width has changed.  */
-	if((c->geometry.width != c->exposed_width))
-		update_info_window(c);
-	/* Store width value for above test.  */
-	c->exposed_width=c->geometry.width;
-#endif /* TITLEBAR */
-}
-
-#define ARWM_MAXIMIZE_DIR(pos_dir, siz_dir, cmd, c)\
-{\
-	if (c->old_geometry.siz_dir)\
-	{\
-		c->geometry.pos_dir = c->old_geometry.pos_dir;\
-		c->geometry.siz_dir = c->old_geometry.siz_dir;\
-		c->old_geometry.siz_dir = 0;\
-	}\
-	else\
-	{\
-		c->old_geometry.pos_dir = c->geometry.pos_dir;\
-		c->old_geometry.siz_dir = c->geometry.siz_dir;\
-		c->geometry.pos_dir = 0;\
-		c->geometry.siz_dir= cmd(arwm.X.dpy, c->screen->screen);\
-	}\
+	old_p.x=c->geometry.x;
+	old_p.y=c->geometry.y;
+	get_mouse_position((int *)&(p.x), (int *)&(p.y), root);
+	draw_outline(c);
+	drag_event_loop(c, p.x, p.y, old_p.x, old_p.y);
 }
 
 void
-maximize(Client * c, int hv)
+moveresize(Client * c)
 {
+	const Bool shaped = (c->flags & AR_CLIENT_SHAPED);
+	XRectangle * g = &(c->geometry);
+	const ubyte tb = TITLEBAR_HEIGHT;
+	const unsigned int parent_height = g->height + (((c->flags 
+		& AR_CLIENT_SHADED) || shaped ? 0 : tb));
+	const ubyte border = c->border;
+	const unsigned short width = g->width;
 
-	if (hv & MAXIMIZE_HORZ)
-		ARWM_MAXIMIZE_DIR(x, width, DisplayWidth, c);
-	if (hv & MAXIMIZE_VERT)
-		ARWM_MAXIMIZE_DIR(y, height, DisplayHeight, c);
-	recalculate_sweep(c, c->geometry.x, c->geometry.y,
-		c->geometry.x + c->geometry.width,
-		c->geometry.y + c->geometry.height);
-	moveresize(c);
-	discard_enter_events();
-#ifdef TITLEBAR
-	select_client(c);
-#endif	/* TITLEBAR */
+	XMoveResizeWindow(arwm.X.dpy, c->parent, g->x - border, g->y - border 
+		- (shaped ? 0 : tb), width, parent_height);
+	XMoveResizeWindow(arwm.X.dpy, c->window, 0, (shaped ? -tb : tb), width, 
+		g->height + (shaped ? tb : 0));
+	send_config(c);
+#ifdef USE_TBAR
+	/* Only update the titlebar if the width has changed.  */
+	if((g->width != c->exposed_width) && !shaped)
+		update_info_window(c);
+#endif
+	/* Store width value for above test.  */
+	c->exposed_width = width;
 }
 
-void 
+void
+maximize(Client * c)
+{
+	XRectangle * g;
+	XRectangle * og;
+
+	g = &(c->geometry);
+	og = &(c->old_geometry);
+	if(og->width)
+	{
+		memcpy(g, og, sizeof(XRectangle));
+		/* og->width is used as a flag here.  */
+		og->width=0;
+	}
+	else
+	{
+		ScreenInfo * s = c->screen;
+
+		memcpy(og, g, sizeof(XRectangle));
+		g->x=g->y=0;
+		g->width=s->width;
+		g->height=s->height;
+	}
+	moveresize(c);
+	XRaiseWindow(arwm.X.dpy, c->parent);
+}
+
+void
 hide(Client * c)
 {
 	/* This will generate an unmap event.  Tell event handler
 	 * to ignore it.  */
 	c->ignore_unmap++;
-	LOG_XDEBUG("screen:XUnmapWindow(parent); ");
 	XUnmapWindow(arwm.X.dpy, c->parent);
 	set_wm_state(c, IconicState);
 }
 
-void 
+void
 unhide(Client * c, int raise_win)
 {
 	raise_win ? XMapRaised(arwm.X.dpy, c->parent) 
@@ -455,147 +323,61 @@ unhide(Client * c, int raise_win)
 	set_wm_state(c, NormalState);
 }
 
-void 
+void
 next(void)
 {
 	Client *newc = current;
 
 	do
 	{
-		if (newc)
+		if(newc)
 		{
 			newc = newc->next;
-			if (!newc && !current)
+			if(!newc && !current)
 				return;
 		}
-		if (!newc)
+		if(!newc)
 			newc = head_client;
-		if (!newc)
+		if(!newc || newc == current)
 			return;
-		if (newc == current)
-			return;
-	}
+	} while(newc->vdesk != newc->screen->vdesk);
 	/*
 	 * NOTE: Checking against newc->screen->vdesk implies we can Alt+Tab
 	 * across screen boundaries.  Is this what we want?
 	 */
-	while (newc->vdesk != newc->screen->vdesk);
-	if (!newc)
-		return;
+	
 	unhide(newc, RAISE);
 	select_client(newc);
-	setmouse(newc->window, 0, 0);
-	setmouse(newc->window, newc->geometry.width + newc->border - 1,
-		newc->geometry.height + newc->border - 1);
-	discard_enter_events();
+	{
+		XRectangle * g = &(newc->geometry);
+		setmouse(newc->window, g->width, g->height);
+	}
 }
 
-void 
-switch_vdesk(ScreenInfo * s, int v)
+void
+switch_vdesk(ScreenInfo * s, const ubyte v)
 {
 	Client *c;
 
-	if (v == s->vdesk)
-          {
-            LOG_DEBUG("V==S->VDESK\n");
-		return;
-          }
-	if (current && !is_sticky(current))
-          {
-            LOG_DEBUG("CURRENT exist and isn't sticky\n");
-		select_client(NULL);
-          }
-	for (c = head_client; c; c = c->next)
-	{
-		if (c->screen != s)
-                  {
-                    LOG_DEBUG("C->SCREEN != S\n");
-			continue;
-                  }
-		if (is_sticky(c) && c->vdesk != v)
-		{
-                  LOG_DEBUG("C is sticky and C->VDESK!=V\n");
-			c->vdesk = v;
-			ARWM_UPDATE_NET_WM_DESKTOP(c);
-		}
-		if (c->vdesk == s->vdesk)
-                  {
-                    LOG_DEBUG("C->VDESK == S->VDESK\n");
-			hide(c);
-                  }
-		else if (c->vdesk == v)
-		{
-                  LOG_DEBUG("C->VDESK == V\n");
-			unhide(c, NO_RAISE);
-		}
-	}
+	/* Resort to the global ScreenInfo */
+	if(!s)
+		s=arwm.X.screens;
+
 	s->vdesk = v;
-}
-
-ScreenInfo *
-find_screen(Window root)
-{
-	int i;
-
-	for (i = 0; i < arwm.X.num_screens; i++)
-		if (arwm.X.screens[i].root == root)
-			return &arwm.X.screens[i];
-
-	return NULL;
-}
-
-ScreenInfo *
-find_current_screen(void)
-{
-	Window cur_root, dw;
-	int di;
-	unsigned int dui;
-
-	/* XQueryPointer is useful for getting the current pointer root */
-	XQueryPointer(arwm.X.dpy, arwm.X.screens[0].root, &cur_root,
-		&dw, &di, &di, &di, &di, &dui);
-
-	return find_screen(cur_root);
-}
-
-static void 
-grab_keysym(Window w, unsigned int mask, KeySym keysym)
-{
-	KeyCode keycode = XKeysymToKeycode(arwm.X.dpy, keysym);
-#define XGK(maskmod) XGrabKey(arwm.X.dpy, keycode, mask | maskmod,\
-	w, True, GrabModeAsync, GrabModeAsync)
-	XGK(0);
-	XGK(LockMask);
-	if (arwm.keymasks.numlock)
+	for(c = head_client; c; c = c->next)
 	{
-		XGK(arwm.keymasks.numlock);
-		XGK(arwm.keymasks.numlock|LockMask);
+		if(c->screen != s)
+			continue;
+		if(is_sticky(c) && c->vdesk != v)
+		{
+			c->vdesk = v;
+#ifdef USE_EWMH
+			ARWM_UPDATE_NET_WM_DESKTOP(c);
+#endif
+		}
+		c->vdesk == v ? unhide(c, NO_RAISE) : hide(c);
 	}
 }
 
-static void
-grab_keysyms(ScreenInfo *s, KeySym keys_to_grab[], unsigned int mask)
-{
-	KeySym *keysym;
 
-	for(keysym = keys_to_grab; *keysym; keysym++)
-		grab_keysym(s->root, arwm.keymasks.grab1 | mask, *keysym);
-}
-
-void 
-grab_keys_for_screen(ScreenInfo * s)
-{
-	/* The key lists are split to macros, 
-           as one may wish to define which
-	   keys to grab quickly when adding key bindings.  */
-	
-	KeySym keys_to_grab[]=ARWM_KEYS_TO_GRAB;
-	KeySym alt_keys_to_grab[]=ARWM_ALT_KEYS_TO_GRAB;
-	/* Release any previous grabs */
-	XUngrabKey(arwm.X.dpy, AnyKey, AnyModifier, s->root);
-	/* Grab key combinations we're interested in */
-	grab_keysyms(s,keys_to_grab, 0);
-	grab_keysyms(s,alt_keys_to_grab, arwm.keymasks.alt);
-	grab_keysym(s->root, arwm.keymasks.grab2, KEY_NEXT);
-}
 

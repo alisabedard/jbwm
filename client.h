@@ -21,8 +21,18 @@
 	XSendEvent(arwm.X.dpy, c->window, False, StructureNotifyMask,\
 		   (XEvent *)&(c->ce))
 
-void 
-send_wm_delete(Client * c, int kill_client);
+void send_wm_delete(Client * c, int kill_client);
+
+
+Client *find_client(Window w);
+void gravitate_client(Client * c, int sign);
+void select_client(Client * c);
+
+void fix_client(Client * c);
+
+void remove_client(Client * c);
+void send_config(Client * c);
+void set_wm_state(Client * c, int state);
+void set_shape(Client * c);
 
 #endif /* ARWM_CLIENT_H */
-

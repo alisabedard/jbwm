@@ -1,25 +1,17 @@
-/* Copyright 2007, Jeffrey E. Bedard */
+/* Copyright 2007-2011, Jeffrey E. Bedard */
 #ifndef ARWM_EWMH_H
-
-void
-arwm_setup_ewmh_hints(void);
-
-void
-arwm_handle_ewmh_hints(Client * c);
-
-void
-arwm_handle_net_wm_state_hints(Client * c);
+#ifdef USE_EWMH
+void arwm_ewmh_state(Client *c);
+void arwm_ewmh_type(Client *c);
 
 #define ARWM_VWM_CHANGE_PROPERTY(c, property, state, n)\
         XChangeProperty(arwm.X.dpy, c->window,\
-		arwm.atoms.vwm.desktop, property, 32,\
+		ARWM_ATOM_VWM_DESKTOP, property, 32,\
                 PropModeReplace, state, n);
 
 #define ARWM_UPDATE_NET_WM_DESKTOP(c)\
 	ARWM_VWM_CHANGE_PROPERTY(c, XA_CARDINAL, (unsigned char *)&c->vdesk, 1);
 
-void
-ewm_update_net_wm_state(Client * c);
-
+void ewm_update_net_wm_state(Client * c);
+#endif /* USE_EWMH */
 #endif /* ARWM_EWMH_H */
-

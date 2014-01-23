@@ -1,61 +1,30 @@
 #ifndef ARWM_GRAPHICS_H
 #define ARWM_GRAPHICS_H
 
-typedef struct _ARWMColor
-{
-	int r, g, b;
-} ARWMColor;
-
-typedef struct _ARWMButton
-{
-	Client * c;
-	Window parent;
-	GC gc;
-	XRectangle * geometry;
-	ARWMColor color;
-	char * text;
-
-	unsigned int flags;
-#define __ARWMBUTTON_ALLOCATED_GC (1<<0)
-#define __ARWMBUTTON_ALLOCATED_GEOMETRY (1<<1)
-#define ARWMBUTTON_IS_CONTAINER (1<<2)
-
-	void (*draw)(struct _ARWMButton *);
-	void (*delete)(struct _ARWMButton *);
-	void (*set_color)(struct _ARWMButton *, ARWMColor);
-
-} ARWMButton;
-
-
-ARWMButton *
-new_ARWMButton(Window parent);
-
-unsigned long
-arwm_get_pixel_for_color(const int r, const int g, const int b);
+#include "ARWMButton.h"
 
 GC
-arwm_new_gc_for_color(int fg_r, int fg_g, int fg_b, 
-	int bg_r, int bg_g, int bg_b);
+arwm_new_gc_for_XColor(XColor color);
 
-GC
-arwm_new_gc_for_ARWMColor(ARWMColor fg, ARWMColor bg);
+XColor
+arwm_get_XColor(const ubyte r, const ubyte g, const ubyte b);
 
-GC
-arwm_new_gc_for_ARWMColor_fg(ARWMColor fg);
+/*GC
+arwm_new_gc(const ubyte r, const ubyte g, const ubyte b);*/
 
-ARWMColor
-get_ARWMColor_for(int r, int g, int b);
+#define arwm_new_gc(r, g, b) arwm_new_gc_for_XColor(arwm_get_XColor(r, g, b))
 
-XImage *
-arwm_get_XImage_for_XBM(unsigned char * data, 
-	unsigned int width, unsigned int height);
+#ifdef USE_XBM
+#define arwm_get_XImage_for_XBM(data, width, height)\
+	XCreateImage(arwm.X.dpy, (Visual *) CopyFromParent, 1, XYBitmap,\
+			0, (char *) data, width, height, 8, 0)
+#endif /* USE_XBM */
 
-
-int
-arwm_draw_string(Window target, 
-		XRectangle * geometry, 
-		const char * colorname,
-		const char * string);
+#ifdef USE_GRADIENT
+void
+draw_gradient(Window win, GC gc, const int x, const int y,
+	const unsigned int w, const unsigned int h);
+#endif /* USE_GRADIENT */
 
 #endif /* ARWM_GRAPHICS_H */
 

@@ -1,70 +1,63 @@
 
 #ifndef ARWM_ENVIRONMENT_H
 #define ARWM_ENVIRONMENT_H
-#ifdef TITLEBAR
 #include "titlebar.h"
-#endif /* TITLEBAR */
 
-typedef struct
-_ARWMNetWMWindowType
+#ifdef USE_EWMH
+typedef struct _ARWMNetWMWindowType
 {
-	Atom desktop, dock, toolbar, menu, utility, splash,
-		dialog, dropdown_menu, popup_menu, tooltip,
-		notification, combo, dnd, normal;
+	Atom desktop, dock, toolbar, menu, utility, splash, dialog,
+		dropdown_menu, popup_menu, tooltip, notification,
+		combo, dnd, normal;
 } ARWMNetWMWindowType;
+#endif
 
-struct 
-ARWMEnvironment
+struct ARWMEnvironment
 {
 	volatile Window initialising;
-
+#ifdef USE_EWMH
+	ARWMNetWMWindowType netwm;
+#endif /* USE_EWMH */
 	struct
 	{
-		struct
-		{
-			/* Standard X protocol atoms */
-			Atom state, protos, delete, cmapwins;
-		} wm;
-		struct
-		{
-			Atom desktop, state, sticky, fullscreen;
-		} vwm;
-		Atom mwm_hints;
-		ARWMNetWMWindowType net_wm_window_type;
-	} atoms;
-	struct
-	{
-		unsigned int numlock, grab1, grab2, alt;
+		unsigned int numlock, grab, mod;
 	} keymasks;
 	struct
 	{
 		/* Commonly used X information */
 		Display *dpy;
-		XftFont * font;
-		int num_screens;
+#ifdef USE_XFT
+		XftFont *font;
+#else				/* ! USE_XFT */
+		XFontStruct *font;
+#endif				/* USE_XFT */
+		ubyte num_screens;
 		ScreenInfo *screens;
-
-		struct
-		{
-			Cursor move;
-			Cursor resize;
-		} cursors;
-		int have_shape, shape_event;
+		Cursor cursor;
+#ifdef USE_SHAPE
+		int shape_event;
+#endif /* USE_SHAPE */
 	} X;
+	ARWMTitlebarData titlebar;
+#define ARWM_FLAG_NEED_TIDY 1
+#define ARWM_FLAG_HAVE_SHAPE 1 << 1
+	ubyte flags;
+};
+
+typedef struct ARWMEnvironment ARWMEnvironment;
+
+typedef struct
+{
+	char *font;
 	struct
 	{
-		int bw;
-	/*	char * terminal[3];
-		const char * display=""; */
-		int snap;
-#ifdef SOLIDDRAG
-		Bool solid_drag;
-#endif /* SOLIDDRAG */
-	} options;
+		char *fg;
+		char *bg;
+		char *fc;
+	} color;
+	char *term;
+} GlobalOptions;
 
-#ifdef TITLEBAR
-	ARWMTitlebarData titlebar;
-#endif /* TITLEBAR */
-};
-typedef struct ARWMEnvironment ARWMEnvironment;
+extern GlobalOptions opt;
+
 #endif /* not ARWM_ENVIRONMENT_H */

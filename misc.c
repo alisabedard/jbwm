@@ -10,75 +10,93 @@
 #include <sys/wait.h>
 #include <unistd.h>
 #include "arwm.h"
-#include "log.h"
 
-int need_client_tidy = 0;
-
-void 
-handle_signal(int signo)
+__attribute__ ((noreturn))
+void
+arwm_exit(const int status)
 {
-	(void)signo;	/* unused */
-	XSetInputFocus(arwm.X.dpy, PointerRoot, 
-		RevertToPointerRoot, CurrentTime);
-	if (arwm.X.font)
+	if(head_client)
+	while(head_client)
+		remove_client(head_client);
+	XSetInputFocus(arwm.X.dpy, PointerRoot, RevertToPointerRoot,
+		CurrentTime);
+	if(arwm.X.font)
+#ifdef USE_XFT
 		XftFontClose(arwm.X.dpy, arwm.X.font);
+#else /* ! USE_XFT */
+		XFreeFont(arwm.X.dpy, arwm.X.font);
+#endif /* USE_XFT */
+	while(arwm.X.num_screens--)
 	{
-		int i;
-
-		for (i = 0; i < arwm.X.num_screens; i++)
-		{
-			XFreeGC(arwm.X.dpy, arwm.X.screens[i].invert_gc);
-			XInstallColormap(arwm.X.dpy, 
-					DefaultColormap(arwm.X.dpy, i));
-		}
+		XFreeGC(arwm.X.dpy, 
+			arwm.X.screens[arwm.X.num_screens].gc);
+		XInstallColormap(arwm.X.dpy, DefaultColormap(arwm.X.dpy, 
+			arwm.X.num_screens));
 	}
-#ifdef TITLEBAR
-	$((&arwm.titlebar), delete);
-#endif /* TITLEBAR */
+#ifdef USE_TBAR
+	ARWMTitlebarData_delete(&arwm.titlebar);
+#endif
 	free(arwm.X.screens);
-	exit(0);
+	XFreeCursor(arwm.X.dpy, arwm.X.cursor);
+	XCloseDisplay(arwm.X.dpy);
+
+	exit(status);
 }
 
-int 
-handle_xerror(Display * dsply, XErrorEvent * e)
+int
+handle_xerror(Display * dpy, XErrorEvent * e)
 {
-	Client *c;
-
-	(void)dsply;	/* unused */
-
-	/* Ignore set as default action for nonmatched.  */
-
-	/*
-	 * If this error actually occurred while setting up the new window,
-	 * best let make_new_client() know not to bother
-	 */
-	if (arwm.initialising != None && e->resourceid 
-		== arwm.initialising)
+	/* If this error actually occurred while setting up the new window,
+	 * best let make_new_client() know not to bother */
+	if(arwm.initialising != None
+		&& e->resourceid == arwm.initialising)
 	{
-		LOG_DEBUG("\t **SAVED?** handle_xerror() caught error %d while initialising\n", e->error_code);
 		arwm.initialising = None;
 		return 0;
 	}
-	else if (e->error_code == BadAccess
-		&& e->request_code == X_ChangeWindowAttributes)
+	switch(e->error_code)
 	{
-		LOG_ERROR("root window unavailable"
-			" (maybe another wm is running?)\n");
-		exit(1);
-	}
-	else if((c = find_client(e->resourceid)))
-	{	
-		/* This is used for nonmanaged windows that are not mapped
-		   with OverrideRedirect being set.  This is for wm-spec
-		   conformance.  */
-		if(c->flags & AR_CLIENT_DONT_MANAGE)
+	case BadAccess:
+		if(e->request_code == X_ChangeWindowAttributes)
+			LOG_ERROR("root window unavailable\n");
+		break;
+	case BadColor:
+		LOG("BadColor");
+		break;
+	case BadValue:
+		LOG("BadValue");
+		break;
+	case BadWindow:
+		LOG("BadWindow");
+		break;
+	case BadDrawable:
+		LOG("BadDrawable");
+		break;
+	default:
 		{
-			XMapWindow(arwm.X.dpy, c->window);
-			return 0;
+			Client * c;
+
+#ifdef DEBUG
+			fprintf(stderr, "Error # %d\n", e->error_code);
+#endif /* DEBUG */
+			if((c = find_client(e->resourceid)))
+			{
+			/* This is used for nonmanaged windows 
+			 * that are not mapped with OverrideRedirect 
+			 * being set.  This is for wm-spec conformance.  */
+				if(c->flags & AR_CLIENT_DONT_MANAGE)
+				{
+					XMapWindow(dpy, c->window);
+					return 0;
+				}
+				LOG("handle_xerror() : flag for removal");
+				remove_client(c);
+				arwm.flags &= ~ARWM_FLAG_NEED_TIDY;
+			}
+	
 		}
-		LOG_DEBUG("\thandle_xerror() : flagging client for removal\n");
-		c->flags &= ~AR_CLIENT_REMOVE;
-		need_client_tidy = 0;
 	}
-	return 0; /* Ignore */
+
+	return 0;	/* Ignore */
 }
+
