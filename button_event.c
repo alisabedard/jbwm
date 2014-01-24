@@ -20,6 +20,7 @@ move_client_with_vdesk(Client * c, Bool next)
 	}
 }
 
+#ifdef USE_SHADE
 static void
 shade_window(Client * c)
 {
@@ -33,7 +34,6 @@ shade_window(Client * c)
 	}
 	else
 	{
-		/* Shade.  */
 		c->shade_height = c->geometry.height;
 		XResizeWindow(arwm.X.dpy, c->parent,
 			c->geometry.width, TITLEBAR_HEIGHT);
@@ -41,6 +41,7 @@ shade_window(Client * c)
 		c->flags |= AR_CLIENT_SHADED;
 	}
 }
+#endif /* USE_SHADE */
 
 static void
 button1_event(XButtonEvent * e, Client * c)
@@ -55,8 +56,10 @@ button1_event(XButtonEvent * e, Client * c)
 		send_wm_delete(c, !(e->state & arwm.keymasks.mod));
 	if(x > width - AR_RESIZE_DELTA)
 		sweep(c);	/* Resize the window.  */
+#ifdef USE_SHADE
 	else if(x > width - AR_SHADE_DELTA && y < TITLEBAR_HEIGHT)
 		shade_window(c);
+#endif /* USE_SHADE */
 	else
 		drag(c);	/* Move the window.  */
 }

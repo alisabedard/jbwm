@@ -16,12 +16,7 @@ prefix = /usr/local/stash/arwm
 #prefix = ~/opt/stow/arwm
 
 XROOT    = /usr/X11R6
-INCLUDES += -I/usr/pkg/include/freetype2
-INCLUDES += -I/usr/X11R6/include/freetype2
-INCLUDES += -I/usr/include/freetype2
-INCLUDES += -I/usr/pkg/include
 INCLUDES += -I$(XROOT)/include
-LDPATH  += -L/usr/pkg/lib
 LDPATH  += -L$(XROOT)/lib
 
 LIBS += -lX11 
@@ -61,8 +56,9 @@ CFLAGS += -Os
 
 # Titlebar Xft support:
 # Warning, Xft impedes performance and leaks memory.
-#DEFINES += -DUSE_XFT
-#LIBS += -lXft
+DEFINES += -DUSE_XFT
+LIBS += -lXft
+INCLUDES += `pkg-config --cflags xft`
 #INCLUDES += -I/usr/pkg/include/freetype2 -I/usr/X11R6/include/freetype2
 
 
@@ -93,6 +89,9 @@ SRCS += titlebar.c
 
 # Uncomment to enable window snapping.
 DEFINES += -DUSE_SNAP
+
+# Uncomment to enable shade button (buggy)
+# DEFINES += -DUSE_SHADE
 
 # ----- You shouldn't need to change anything under this line ------ #
 

@@ -111,7 +111,9 @@ draw_titlebar(Client * c, char *name)
 	ARWMButton *handle;
 	const unsigned short width = c->geometry.width;
 	const unsigned short resize_offset = width - AR_RESIZE_DELTA;
+#ifdef USE_SHADE
 	const unsigned short shade_offset = width - AR_SHADE_DELTA;
+#endif /* USE_SHADE */
 
 	if(c->flags & AR_CLIENT_SHAPED)
 		return;
@@ -123,7 +125,9 @@ draw_titlebar(Client * c, char *name)
 #endif /* !USE_XBM */
 	arwm_draw_close_button(c);
 	draw_info_strings(c, name);
+#ifdef USE_SHADE
 	draw_button(arwm.titlebar.buttons.shade, w, shade_offset);
+#endif /* USE_SHADE */
 	draw_button(arwm.titlebar.buttons.resize, w, resize_offset);
 }
 
@@ -144,13 +148,17 @@ initialize_images(ARWMTitlebarData * titlebar)
 	XPMIMAGE(resize_button, resize);
 	XPMIMAGE(close_button, close);
 	XPMIMAGE(close_button_inactive, close_inactive);
+#ifdef USE_SHADE
 	XPMIMAGE(shade, shade);
+#endif /* USE_SHADE */
 #elif USE_XBM
 #define XBMIMAGE(i) titlebar->i = arwm_get_XImage_for_XBM(\
 	i##_bits, i##_width, i##_height)
 	XBMIMAGE(resize);
 	XBMIMAGE(close);
+#ifdef USE_SHADE
 	XBMIMAGE(shade);
+#endif /* USE_SHADE */
 #endif /* USE_XPM */
 }
 #endif /* USE_XPM || USE_XBM */
@@ -159,7 +167,6 @@ static void
 initialize_buttons(ARWMTitlebarData * titlebar, Display * dpy)
 {
 	Window root = DefaultRootWindow(dpy);
-/*	ARWMButton *close, *resize, *shade;*/
 #ifndef USE_XBM
 	ARWMButton *handle;
 #endif /* ! USE_XBM */
@@ -185,7 +192,9 @@ initialize_buttons(ARWMTitlebarData * titlebar, Display * dpy)
 #define XCOLOR_TBUTTON(item, bg) TBUTTON(item, arwm_new_gc_for_XColor(bg))
 	RGB_TBUTTON(close, TITLEBAR_CLOSE_BG);
 	RGB_TBUTTON(resize, TITLEBAR_RESIZE_BG);
+#ifdef USE_SHADE
 	RGB_TBUTTON(shade, TITLEBAR_SHADE_BG);
+#endif /* USE_SHADE */
 #ifndef USE_XBM
 	handle=XCOLOR_TBUTTON(handle, arwm.X.screens->bg);
 	handle->span_image=True;

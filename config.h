@@ -10,7 +10,8 @@
 /* Default fonts */
 #ifdef USE_XFT
 /*#define DEF_FONT "Sans Bold 10"*/
-#define DEF_FONT "Luxi Sans-11:Bold"
+/*#define DEF_FONT "Luxi Sans-11:Bold"*/
+#define DEF_FONT "Monospace 10"
 #else /* ! USE_XFT */
 /* #define DEF_FONT "-*-helvetica-*-r-*-*-*-100-*-*-*-*-*-*" */
 /*#define DEF_FONT "9x15"*/
