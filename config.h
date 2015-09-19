@@ -15,7 +15,8 @@
 #else /* ! USE_XFT */
 /* #define DEF_FONT "-*-helvetica-*-r-*-*-*-100-*-*-*-*-*-*" */
 /*#define DEF_FONT "9x15"*/
-#define DEF_FONT "fixed"
+/*#define DEF_FONT "fixed"*/
+#define DEF_FONT "9x15"
 #define FONT_Y_OFFSET 4
 #if 0
 #define DEF_FONT "8x13bold"
@@ -43,9 +44,10 @@
 #ifdef DEBIAN
 #define DEF_TERM        "x-terminal-emulator"
 #else
-#define DEF_TERM        "rxvt"
+#define DEF_TERM        "urxvt"
 #endif
 #define XLOCK_CMD	"slock"
+#define BROWSER_CMD	"firefox &"
 
 #include "macros.h"
 
@@ -56,9 +58,9 @@
 
 /* Values.  */
 #ifdef USE_XFT
-#define TITLE_FONT_HEIGHT arwm.X.font->height
+#define TITLE_FONT_HEIGHT jbwm.X.font->height
 #else /* ! USE_XFT */
-#define TITLE_FONT_HEIGHT (arwm.X.font->ascent+arwm.X.font->descent)
+#define TITLE_FONT_HEIGHT (jbwm.X.font->ascent+jbwm.X.font->descent)
 #endif /* USE_XFT */
 /* Ensure that the title text fits within the titlebar.  */
 #ifdef USE_TBAR

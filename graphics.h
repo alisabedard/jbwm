@@ -4,19 +4,19 @@
 #include "ARWMButton.h"
 
 GC
-arwm_new_gc_for_XColor(XColor color);
+jbwm_new_gc_for_XColor(XColor color);
 
 XColor
-arwm_get_XColor(const ubyte r, const ubyte g, const ubyte b);
+jbwm_get_XColor(const ubyte r, const ubyte g, const ubyte b);
 
 /*GC
-arwm_new_gc(const ubyte r, const ubyte g, const ubyte b);*/
+jbwm_new_gc(const ubyte r, const ubyte g, const ubyte b);*/
 
-#define arwm_new_gc(r, g, b) arwm_new_gc_for_XColor(arwm_get_XColor(r, g, b))
+#define jbwm_new_gc(r, g, b) jbwm_new_gc_for_XColor(jbwm_get_XColor(r, g, b))
 
 #ifdef USE_XBM
-#define arwm_get_XImage_for_XBM(data, width, height)\
-	XCreateImage(arwm.X.dpy, (Visual *) CopyFromParent, 1, XYBitmap,\
+#define jbwm_get_XImage_for_XBM(data, width, height)\
+	XCreateImage(jbwm.X.dpy, (Visual *) CopyFromParent, 1, XYBitmap,\
 			0, (char *) data, width, height, 8, 0)
 #endif /* USE_XBM */
 

@@ -1,10 +1,10 @@
 /* Copyright 2008-2011, Jeffrey Bedard <antiright@gmail.com> */
 
-/* arwm - Minimalist Window Manager for X
- * Copyright (C) 1999-2006 Ciaran Anscomb <arwm@6809.org.uk>
+/* jbwm - Minimalist Window Manager for X
+ * Copyright (C) 1999-2006 Ciaran Anscomb <jbwm@6809.org.uk>
  * see README for license and other details. */
 
-#include "arwm.h"
+#include "jbwm.h"
 
 
 static void
@@ -37,12 +37,12 @@ configure_client(Client * c, XConfigureRequestEvent * e)
 		wc.height += TITLEBAR_HEIGHT;
 		wc.y -= TITLEBAR_HEIGHT;
 	}
-	XConfigureWindow(arwm.X.dpy, c->parent, value_mask, &wc);
+	XConfigureWindow(jbwm.X.dpy, c->parent, value_mask, &wc);
 	moveresize(c);
 }
 
 void
-arwm_handle_configure_request(XConfigureRequestEvent * e)
+jbwm_handle_configure_request(XConfigureRequestEvent * e)
 {
 	XWindowChanges wc;
 	Client *c;

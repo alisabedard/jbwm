@@ -1,5 +1,5 @@
 
-#include "arwm.h"
+#include "jbwm.h"
 /* Include the title button bitmaps.  */
 #ifdef USE_XPM
 #include <X11/xpm.h>
@@ -23,7 +23,7 @@
 static void
 setup_titlebar(Client * c)
 {
-	Display *dpy = arwm.X.dpy;
+	Display *dpy = jbwm.X.dpy;
 	Window info_window;
 
 	if(c->flags & AR_CLIENT_SHAPED)
@@ -31,9 +31,9 @@ setup_titlebar(Client * c)
 
 	info_window = c->info_window = XCreateSimpleWindow(dpy, c->parent, 
 		0, 0, c->geometry.width, TITLEBAR_HEIGHT, 0, 0, 0);
-	XSelectInput(arwm.X.dpy, info_window, ExposureMask);
+	XSelectInput(jbwm.X.dpy, info_window, ExposureMask);
 	XMapRaised(dpy, info_window);
-	arwm_grab_button(info_window, 0, AnyButton);
+	jbwm_grab_button(info_window, 0, AnyButton);
 }
 
 
@@ -47,26 +47,26 @@ draw_info_strings(Client * c, char *name)
 	if(!name)
 		return 0;
 #ifdef USE_XFT
-	XftDrawChange(arwm.titlebar.xft.draw, info_window);
+	XftDrawChange(jbwm.titlebar.xft.draw, info_window);
 	{
 		/* Prevent the text from going over the resize button.  */
 		const unsigned short max_width = c->geometry.width - 3 
 			* TITLEBAR_HEIGHT;
 		XGlyphInfo e;
 
-		XftTextExtentsUtf8(arwm.X.dpy, arwm.X.font, (XftChar8 *) name, 
+		XftTextExtentsUtf8(jbwm.X.dpy, jbwm.X.font, (XftChar8 *) name, 
 				name_length, &e);
-		XftDrawChange(arwm.titlebar.xft.draw, info_window);
-		XftDrawStringUtf8(arwm.titlebar.xft.draw, 
-				&(arwm.titlebar.xft.fg), 
-				arwm.X.font, x+4, (TITLEBAR_HEIGHT-e.y) +e.y/2, 
+		XftDrawChange(jbwm.titlebar.xft.draw, info_window);
+		XftDrawStringUtf8(jbwm.titlebar.xft.draw, 
+				&(jbwm.titlebar.xft.fg), 
+				jbwm.X.font, x+4, (TITLEBAR_HEIGHT-e.y) +e.y/2, 
 				(XftChar8 *) name, e.width > max_width 
 				&& e.width > 0 ? name_length * max_width 
 				/ e.width : name_length);
 	}
 #else /* ! USE_XFT */
-	XDrawString(arwm.X.dpy, info_window, c->screen->gc, x+5, 
-			TITLE_FONT_HEIGHT*1.25-FONT_Y_OFFSET, 
+	XDrawString(jbwm.X.dpy, info_window, c->screen->gc, x+5, 
+			TITLE_FONT_HEIGHT*1.25-FONT_Y_OFFSET+2, 
 			name, name_length);
 #endif /* USE_XFT */
 	XFree(name);
@@ -84,23 +84,23 @@ draw_button(ARWMButton * button, Window w, const short x)
 
 #ifdef USE_XPM
 void
-arwm_draw_close_button(Client * c)
+jbwm_draw_close_button(Client * c)
 {
-	ARWMButton *close = arwm.titlebar.buttons.close;
+	ARWMButton *close = jbwm.titlebar.buttons.close;
 
 #ifdef TITLEBAR_DEBUG
-	LOG_DEBUG("arwm_draw_close_button(c)\n");
+	LOG_DEBUG("jbwm_draw_close_button(c)\n");
 	LOG_DEBUG("x:%d\ty:%d\tw:%d\th:%d\n", close->geometry->x,
 		close->geometry->y, close->geometry->width,
 		close->geometry->height);
 #endif /* TITLEBAR_DEBUG */
 	close->image =
-		(c->flags & AR_CLIENT_ACTIVE) ? arwm.titlebar.
-		close : arwm.titlebar.close_inactive;
+		(c->flags & AR_CLIENT_ACTIVE) ? jbwm.titlebar.
+		close : jbwm.titlebar.close_inactive;
 	draw_button(close, c->info_window, 0);
 }
 #else
-#define arwm_draw_close_button(c) draw_button(arwm.titlebar.buttons.close,\
+#define jbwm_draw_close_button(c) draw_button(jbwm.titlebar.buttons.close,\
 		c->info_window, 0);
 #endif /* USE_XPM */
 
@@ -117,18 +117,20 @@ draw_titlebar(Client * c, char *name)
 
 	if(c->flags & AR_CLIENT_SHAPED)
 		return;
-	handle = arwm.titlebar.buttons.handle;
+	handle = jbwm.titlebar.buttons.handle;
 
 #ifndef USE_XBM
 	handle->geometry.width = width;
 	draw_button(handle, w, 0);
 #endif /* !USE_XBM */
-	arwm_draw_close_button(c);
+#ifdef USE_CLOSE_BUTTON
+	jbwm_draw_close_button(c);
+#endif /* USE_CLOSE_BUTTON */
 	draw_info_strings(c, name);
 #ifdef USE_SHADE
-	draw_button(arwm.titlebar.buttons.shade, w, shade_offset);
+	draw_button(jbwm.titlebar.buttons.shade, w, shade_offset);
 #endif /* USE_SHADE */
-	draw_button(arwm.titlebar.buttons.resize, w, resize_offset);
+	draw_button(jbwm.titlebar.buttons.resize, w, resize_offset);
 }
 
 #if defined(USE_XPM) || defined(USE_XBM)
@@ -137,7 +139,7 @@ initialize_images(ARWMTitlebarData * titlebar)
 {
 
 #ifdef USE_XPM
-	Display *dpy = arwm.X.dpy;
+	Display *dpy = jbwm.X.dpy;
 
 #ifdef TITLEBAR_DEBUG
 	LOG_DEBUG("Load pixmaps...");
@@ -152,7 +154,7 @@ initialize_images(ARWMTitlebarData * titlebar)
 	XPMIMAGE(shade, shade);
 #endif /* USE_SHADE */
 #elif USE_XBM
-#define XBMIMAGE(i) titlebar->i = arwm_get_XImage_for_XBM(\
+#define XBMIMAGE(i) titlebar->i = jbwm_get_XImage_for_XBM(\
 	i##_bits, i##_width, i##_height)
 	XBMIMAGE(resize);
 	XBMIMAGE(close);
@@ -188,15 +190,15 @@ initialize_buttons(ARWMTitlebarData * titlebar, Display * dpy)
 #define TBUTTON(item, bg) titlebar->buttons.item = ARWMButton_new(\
 	root, bg, TITLEBAR_HEIGHT,\
 	TITLEBAR_HEIGHT, IMG(item)); IMGDIM(item)
-#define RGB_TBUTTON(item, bg) TBUTTON(item, arwm_new_gc(bg))
-#define XCOLOR_TBUTTON(item, bg) TBUTTON(item, arwm_new_gc_for_XColor(bg))
+#define RGB_TBUTTON(item, bg) TBUTTON(item, jbwm_new_gc(bg))
+#define XCOLOR_TBUTTON(item, bg) TBUTTON(item, jbwm_new_gc_for_XColor(bg))
 	RGB_TBUTTON(close, TITLEBAR_CLOSE_BG);
 	RGB_TBUTTON(resize, TITLEBAR_RESIZE_BG);
 #ifdef USE_SHADE
 	RGB_TBUTTON(shade, TITLEBAR_SHADE_BG);
 #endif /* USE_SHADE */
 #ifndef USE_XBM
-	handle=XCOLOR_TBUTTON(handle, arwm.X.screens->bg);
+	handle=XCOLOR_TBUTTON(handle, jbwm.X.screens->bg);
 	handle->span_image=True;
 #endif /* ! USE_XBM */
 }
@@ -218,9 +220,9 @@ initialize_font_data(ARWMTitlebarData * titlebar, Display * dpy)
 #endif /* USE_XFT */
 
 void
-arwm_ARWMTitlebarData_init(ARWMTitlebarData * titlebar)
+jbwm_ARWMTitlebarData_init(ARWMTitlebarData * titlebar)
 {
-	Display *dpy = arwm.X.dpy;
+	Display *dpy = jbwm.X.dpy;
 
 	if(titlebar->initialized)
 		return;
@@ -264,7 +266,7 @@ free_Xft_data(ARWMTitlebarData * titlebar)
 {
 	XftDraw *draw = titlebar->xft.draw;
 
-	XftColorFree(arwm.X.dpy, XftDrawVisual(draw),
+	XftColorFree(jbwm.X.dpy, XftDrawVisual(draw),
 		XftDrawColormap(draw), &(titlebar->xft.fg));
 	XftDrawDestroy(draw);
 }
@@ -302,15 +304,15 @@ update_info_window(Client * c)
 	}
 
 	/* Client specific data.  */
-	XMoveResizeWindow(arwm.X.dpy, iw, 0, 0, 
+	XMoveResizeWindow(jbwm.X.dpy, iw, 0, 0, 
 			c->geometry.width, TITLEBAR_HEIGHT);
-	XClearWindow(arwm.X.dpy, iw);
+	XClearWindow(jbwm.X.dpy, iw);
 	/* Depending on common data.  */
-	arwm_ARWMTitlebarData_init(&(arwm.titlebar));
+	jbwm_ARWMTitlebarData_init(&(jbwm.titlebar));
 	{
 		char *name;
 
-		XFetchName(arwm.X.dpy, c->window, &name);
+		XFetchName(jbwm.X.dpy, c->window, &name);
 		draw_titlebar(c, name);
 	}
 }
@@ -319,6 +321,6 @@ void
 remove_info_window(Client * c)
 {
 	if(c && c->info_window)
-		XDestroyWindow(arwm.X.dpy, c->info_window);
+		XDestroyWindow(jbwm.X.dpy, c->info_window);
 	c->info_window = None;
 }

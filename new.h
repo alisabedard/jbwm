@@ -3,7 +3,7 @@
 #ifndef ARWM_NEW_H
 #define ARWM_NEW_H
 
-void *arwm_get_property(Window w, Atom property, Atom req_type,
+void *jbwm_get_property(Window w, Atom property, Atom req_type,
 	unsigned long *nitems_return);
 
 #ifdef DEBUG

@@ -1,9 +1,9 @@
 /* Copyright 2008-2011, Jeffrey E. Bedard <antiright@gmail.com> */
 
-#include "arwm.h"
+#include "jbwm.h"
 
 XColor
-arwm_get_XColor(const ubyte r, const ubyte g, const ubyte b)
+jbwm_get_XColor(const ubyte r, const ubyte g, const ubyte b)
 {
 	XColor color;
 
@@ -11,20 +11,20 @@ arwm_get_XColor(const ubyte r, const ubyte g, const ubyte b)
 	color.green = g << 8;
 	color.blue = b << 8;
 
-	XAllocColor(arwm.X.dpy, DefaultColormap(arwm.X.dpy, 
-		DefaultScreen(arwm.X.dpy)), &color);
+	XAllocColor(jbwm.X.dpy, DefaultColormap(jbwm.X.dpy, 
+		DefaultScreen(jbwm.X.dpy)), &color);
 
 	return color;
 }
 
 GC
-arwm_new_gc_for_XColor(XColor color)
+jbwm_new_gc_for_XColor(XColor color)
 {
 	XGCValues values;
 
 	values.foreground = color.pixel;
 
-	return XCreateGC(arwm.X.dpy, arwm.X.screens->root, 
+	return XCreateGC(jbwm.X.dpy, jbwm.X.screens->root, 
 			GCForeground, &values);
 }
 
@@ -34,7 +34,7 @@ draw_gradient(Window win, GC gc, const int x, const int y,
 	const unsigned int w, const unsigned int h)
 {
 	unsigned int i;
-	Display *dpy = arwm.X.dpy;
+	Display *dpy = jbwm.X.dpy;
 	XGCValues gv;
 
 	XGetGCValues(dpy, gc, GCForeground, &gv);

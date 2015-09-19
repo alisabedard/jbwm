@@ -1,32 +1,32 @@
 /*
- * arwm - Restructuring, optimization, and feature fork
+ * jbwm - Restructuring, optimization, and feature fork
  *        Copyright 2007-2012, Jeffrey E. Bedard <jefbed@gmail.com>
  * evilwm - Minimalist Window Manager for X Copyright (C) 1999-2006 Ciaran
- * Anscomb <arwm@6809.org.uk> see README for license and other details.
+ * Anscomb <jbwm@6809.org.uk> see README for license and other details.
  */
 
 #include <signal.h>
 #include <X11/cursorfont.h>
 #include <unistd.h>
-#include "arwm.h"
+#include "jbwm.h"
 
 /* Main application data structure.  */
-ARWMEnvironment arwm;
+ARWMEnvironment jbwm;
 
 static void
 initialize_ARWMEnvironment_keymasks(void)
 {
-	arwm.keymasks.numlock = LOCK_MASK;
-	arwm.keymasks.grab = GRAB_MASK;
-	arwm.keymasks.mod = MOD_MASK;
+	jbwm.keymasks.numlock = LOCK_MASK;
+	jbwm.keymasks.grab = GRAB_MASK;
+	jbwm.keymasks.mod = MOD_MASK;
 }
 
 static void
 initialize_ARWMEnvironment(void)
 {
-	arwm.initialising = None;
+	jbwm.initialising = None;
 	initialize_ARWMEnvironment_keymasks();
-	arwm.titlebar.initialized = False;
+	jbwm.titlebar.initialized = False;
 }
 
 /* These are difficult to consolidate in
@@ -155,17 +155,17 @@ parse_command_line_args(int argc, char **argv)
 			parse_geometry(ARG);
 			break;
 		case '1':
-			arwm.keymasks.grab = parse_modifiers(ARG);
+			jbwm.keymasks.grab = parse_modifiers(ARG);
 			break;
 		case '2':
-			arwm.keymasks.mod = parse_modifiers(ARG);
+			jbwm.keymasks.mod = parse_modifiers(ARG);
 			break;
 		case 'V':
-			LOG_INFO("arwm version " VERSION "\n");
+			LOG_INFO("jbwm version " VERSION "\n");
 			exit(0);
 		default:
 			fprintf(stderr,
-				"arwm -[d:F:f:b:v:T:w:s:A:g:Vv:S1:2:]\n");
+				"jbwm -[d:F:f:b:v:T:w:s:A:g:Vv:S1:2:]\n");
 			exit(0);
 		}
 	}
@@ -189,14 +189,14 @@ static void
 setup_fonts(void)
 {
 #ifdef USE_XFT
-#define FONTOPEN(f) XftFontOpenName(arwm.X.dpy, DefaultScreen(arwm.X.dpy), f)
+#define FONTOPEN(f) XftFontOpenName(jbwm.X.dpy, DefaultScreen(jbwm.X.dpy), f)
 #else /* !USE_XFT */
-#define FONTOPEN(f) XLoadQueryFont(arwm.X.dpy, f)
+#define FONTOPEN(f) XLoadQueryFont(jbwm.X.dpy, f)
 #endif /* USE_XFT */
 
-	arwm.X.font = opt.font ? FONTOPEN(opt.font) 
+	jbwm.X.font = opt.font ? FONTOPEN(opt.font) 
 		: FONTOPEN(DEF_FONT);
-	if(!arwm.X.font)
+	if(!jbwm.X.font)
 		LOG_ERROR("couldn't find a font to use: "
 #ifdef USE_ARGV
 				"try starting with -f fontname\n"
@@ -207,11 +207,11 @@ setup_fonts(void)
 }
 
 void
-arwm_grab_button(Window w, unsigned int mask, unsigned int button)
+jbwm_grab_button(Window w, unsigned int mask, unsigned int button)
 {
 	do
 	{
-#define GRAB(mod) XGrabButton(arwm.X.dpy, button, mask | mod, w, False,\
+#define GRAB(mod) XGrabButton(jbwm.X.dpy, button, mask | mod, w, False,\
 	ButtonMask, GrabModeAsync, GrabModeSync, None, None)
 		GRAB(0);
 		GRAB(LockMask);
@@ -232,7 +232,7 @@ setup_event_listeners(const ubyte i)
 	attr.event_mask = ChildMask | EnterWindowMask
 		| ColormapChangeMask | PropertyChangeMask;
 
-	XChangeWindowAttributes(arwm.X.dpy, arwm.X.screens[i].root,
+	XChangeWindowAttributes(jbwm.X.dpy, jbwm.X.screens[i].root,
 		CWEventMask, &attr);
 }
 
@@ -242,8 +242,8 @@ allocate_colors(const ubyte i)
 	XColor dummy;
 
 #define COLORALLOC(item)\
-	XAllocNamedColor(arwm.X.dpy, DefaultColormap(arwm.X.dpy, i),\
-		opt.color.item, &arwm.X.screens[i].item, &dummy);
+	XAllocNamedColor(jbwm.X.dpy, DefaultColormap(jbwm.X.dpy, i),\
+		opt.color.item, &jbwm.X.screens[i].item, &dummy);
 	COLORALLOC(fg);
 	COLORALLOC(bg);
 	COLORALLOC(fc);
@@ -253,14 +253,14 @@ static void
 setup_gc_parameters(XGCValues * gv, const ubyte i)
 {
 	allocate_colors(i);
-	gv->foreground=arwm.X.screens[i].fg.pixel;
-	gv->background=arwm.X.screens[i].bg.pixel;
+	gv->foreground=jbwm.X.screens[i].fg.pixel;
+	gv->background=jbwm.X.screens[i].bg.pixel;
 	/* set up GC parameters - same for each screen */
 	gv->function = GXinvert;
 	gv->subwindow_mode = IncludeInferiors;
 	gv->line_width = ARWM_BORDER_WIDTH;
 #ifndef USE_XFT
-	gv->font = arwm.X.font->fid;
+	gv->font = jbwm.X.font->fid;
 #endif /* ! USE_XFT */
 }
 
@@ -270,8 +270,8 @@ setup_gc(const ubyte i)
 	XGCValues gv;
 
 	setup_gc_parameters(&gv, i);
-	arwm.X.screens[i].gc=
-		XCreateGC(arwm.X.dpy, arwm.X.screens[i].root,
+	jbwm.X.screens[i].gc=
+		XCreateGC(jbwm.X.dpy, jbwm.X.screens[i].root,
 		GCFunction | GCSubwindowMode | GCLineWidth
 #ifndef USE_XFT
 		| GCFont
@@ -286,10 +286,10 @@ setup_each_client(int i, int j, Window * wins)
 
 	if(!wins)
 		return;
-	XGetWindowAttributes(arwm.X.dpy, wins[j], &winattr);
+	XGetWindowAttributes(jbwm.X.dpy, wins[j], &winattr);
 	if(!winattr.override_redirect
 		&& winattr.map_state == IsViewable)
-		make_new_client(wins[j], &arwm.X.screens[i]);
+		make_new_client(wins[j], &jbwm.X.screens[i]);
 }
 
 static void
@@ -298,7 +298,7 @@ setup_clients(const ubyte i)
 	Window dw1, dw2, *wins;
 	unsigned int j, nwins;
 
-	XQueryTree(arwm.X.dpy, arwm.X.screens[i].root, &dw1, &dw2,
+	XQueryTree(jbwm.X.dpy, jbwm.X.screens[i].root, &dw1, &dw2,
 		&wins, &nwins);
 	for(j = 0; j < nwins; j++)
 		setup_each_client(i, j, wins);
@@ -308,11 +308,11 @@ setup_clients(const ubyte i)
 static void
 setup_screen_elements(const ubyte i)
 {
-	arwm.X.screens[i].screen = i;
-	arwm.X.screens[i].root = RootWindow(arwm.X.dpy, i);
-	arwm.X.screens[i].vdesk = KEY_TO_VDESK(XK_1);
-	arwm.X.screens[i].width=DisplayWidth(arwm.X.dpy, i);
-	arwm.X.screens[i].height=DisplayHeight(arwm.X.dpy, i);
+	jbwm.X.screens[i].screen = i;
+	jbwm.X.screens[i].root = RootWindow(jbwm.X.dpy, i);
+	jbwm.X.screens[i].vdesk = KEY_TO_VDESK(XK_1);
+	jbwm.X.screens[i].width=DisplayWidth(jbwm.X.dpy, i);
+	jbwm.X.screens[i].height=DisplayHeight(jbwm.X.dpy, i);
 }
 
 static void
@@ -321,7 +321,7 @@ setup_display_per_screen(int i)
 	setup_screen_elements(i);
 	setup_gc(i);
 	setup_event_listeners(i);
-	grab_keys_for_screen(&arwm.X.screens[i]);
+	grab_keys_for_screen(&jbwm.X.screens[i]);
 	/* scan all the windows on this screen */
 	setup_clients(i);
 }
@@ -332,8 +332,8 @@ setup_shape(void)
 {
 	int e_dummy;
 
-	arwm.X.have_shape = XShapeQueryExtension(arwm.X.dpy, 
-		&arwm.X.shape_event, &e_dummy);
+	jbwm.X.have_shape = XShapeQueryExtension(jbwm.X.dpy, 
+		&jbwm.X.shape_event, &e_dummy);
 }
 #endif /* USE_SHAPE */
 
@@ -341,11 +341,11 @@ static void
 setup_screens(void)
 {
 	/* now set up each screen in turn */
-	arwm.X.num_screens = ScreenCount(arwm.X.dpy);
-	arwm.X.screens = malloc(arwm.X.num_screens * sizeof(ScreenInfo));
+	jbwm.X.num_screens = ScreenCount(jbwm.X.dpy);
+	jbwm.X.screens = malloc(jbwm.X.num_screens * sizeof(ScreenInfo));
 	{
 		/* used in scanning windows (XQueryTree) */
-		ubyte i = arwm.X.num_screens;
+		ubyte i = jbwm.X.num_screens;
 
 		while(i--)
 			setup_display_per_screen(i);
@@ -356,11 +356,11 @@ static void
 setup_display(void)
 {
 	const char * dpy_env = getenv("DISPLAY");
-	if(!(arwm.X.dpy = XOpenDisplay(dpy_env?dpy_env:":0")))
+	if(!(jbwm.X.dpy = XOpenDisplay(dpy_env?dpy_env:":0")))
 		exit(1);
 	XSetErrorHandler(handle_xerror);
 	setup_fonts();
-	arwm.X.cursor = XCreateFontCursor(arwm.X.dpy, XC_fleur);
+	jbwm.X.cursor = XCreateFontCursor(jbwm.X.dpy, XC_fleur);
 #ifdef USE_SHAPE
 	setup_shape();
 #endif /* USE_SHAPE */

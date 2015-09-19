@@ -1,6 +1,6 @@
 /*
- * arwm - Minimalist Window Manager for X Copyright (C) 1999-2006 Ciaran
- * Anscomb <arwm@6809.org.uk> see README for license and other details.
+ * jbwm - Minimalist Window Manager for X Copyright (C) 1999-2006 Ciaran
+ * Anscomb <jbwm@6809.org.uk> see README for license and other details.
  */
 
 #ifndef ARWM__LOG_H__

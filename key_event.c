@@ -1,9 +1,9 @@
 /* Copyright 2008-2011, Jeffrey Bedard <jefbed@gmail.com> */
-/* arwm - Minimalist Window Manager for X
- * Copyright (C) 1999-2006 Ciaran Anscomb <arwm@6809.org.uk>
+/* jbwm - Minimalist Window Manager for X
+ * Copyright (C) 1999-2006 Ciaran Anscomb <jbwm@6809.org.uk>
  * see README for license and other details. */
 
-#include "arwm.h"
+#include "jbwm.h"
 
 static void
 key_moveresize(Client * c)
@@ -11,7 +11,7 @@ key_moveresize(Client * c)
 	const ubyte in = c->border;
 	
 	moveresize(c);
-	XRaiseWindow(arwm.X.dpy, c->parent);
+	XRaiseWindow(jbwm.X.dpy, c->parent);
 	setmouse(c->window, c->geometry.width - in, c->geometry.height - in);
 }
 
@@ -22,7 +22,7 @@ moveresize_dir(Client * c, XKeyEvent * e, short * xy,
 	const ubyte inc = ARWM_RESIZE_INCREMENT;
 	const byte mod = sign*inc;
 
-	if ((e->state & arwm.keymasks.mod) && (*wh > inc))
+	if ((e->state & jbwm.keymasks.mod) && (*wh > inc))
 		*wh += mod;
 	else
 		*xy += mod;
@@ -53,29 +53,29 @@ handle_client_key_event(XKeyEvent * e, Client * c, KeySym key)
 		key_moveresize(c);
 		break;
 	case KEY_TOPRIGHT:
-		g->x = arwm.X.screens->width - g->width - c->border;
+		g->x = jbwm.X.screens->width - g->width - c->border;
 		g->y = c->border;
 		key_moveresize(c);
 		break;
 	case KEY_BOTTOMLEFT:
 		g->x = c->border;
-		g->y = arwm.X.screens->height - g->height - c->border;
+		g->y = jbwm.X.screens->height - g->height - c->border;
 		key_moveresize(c);
 		break;
 	case KEY_BOTTOMRIGHT:
-		g->x = arwm.X.screens->width - g->width - c->border;
-		g->y = arwm.X.screens->height - g->height - c->border;
+		g->x = jbwm.X.screens->width - g->width - c->border;
+		g->y = jbwm.X.screens->height - g->height - c->border;
 		key_moveresize(c);
 		break;
 	case KEY_KILL:
-		send_wm_delete(c, !(e->state & arwm.keymasks.mod));
+		send_wm_delete(c, !(e->state & jbwm.keymasks.mod));
 		break;
 	case KEY_LOWER:
 	case KEY_ALTLOWER:
-		XLowerWindow(arwm.X.dpy, c->parent);
+		XLowerWindow(jbwm.X.dpy, c->parent);
 		break;
 	case KEY_RAISE:
-		XRaiseWindow(arwm.X.dpy, c->parent);
+		XRaiseWindow(jbwm.X.dpy, c->parent);
 		break;
 	case KEY_MAX:
 		maximize(c);
@@ -98,7 +98,7 @@ bg_cmd(const char *command)
 }
 
 static void
-arwm_system(const char *exec)
+jbwm_system(const char *exec)
 {
 	char *command;
 
@@ -109,16 +109,16 @@ arwm_system(const char *exec)
 	free(command);
 }
 
-#define spawn_terminal() arwm_system(opt.term)
+#define spawn_terminal() jbwm_system(opt.term)
 
 void
-arwm_handle_key_event(XKeyEvent * e)
+jbwm_handle_key_event(XKeyEvent * e)
 {
-	//KeySym key = XKeycodeToKeysym(arwm.X.dpy, e->keycode, 0);
+	//KeySym key = XKeycodeToKeysym(jbwm.X.dpy, e->keycode, 0);
 	KeySym key = XLookupKeysym(e, 0);
 	
 	Client * c = find_client(e->window);
-	ScreenInfo * screen = c?c->screen:arwm.X.screens;
+	ScreenInfo * screen = c?c->screen:jbwm.X.screens;
 
 	switch (key)
 	{
@@ -126,11 +126,14 @@ arwm_handle_key_event(XKeyEvent * e)
 		spawn_terminal();
 		break;
 	case KEY_QUIT:
-		arwm_exit(0);
+		jbwm_exit(0);
 	case KEY_LOCK:
 		if(system(XLOCK_CMD))
 			perror(XLOCK_CMD);
 		break;
+	case KEY_BROWSER:
+		if(system(BROWSER_CMD))
+			perror(BROWSER_CMD);
 	case KEY_NEXT:
 		next();
 		break;

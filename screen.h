@@ -18,10 +18,10 @@ void switch_vdesk(ScreenInfo * s, const ubyte v);
 void grab_keys_for_screen(ScreenInfo * s);
 void maximize(Client * c);
 
-#define get_mouse_position(x, y, root) XQueryPointer(arwm.X.dpy, \
+#define get_mouse_position(x, y, root) XQueryPointer(jbwm.X.dpy, \
 		root, &root, &root, x, y, (int *)&root, (int *)&root, \
 		(unsigned int *)&root);
 
-#define setmouse(w, x, y) XWarpPointer(arwm.X.dpy, None, w, 0, 0, 0, 0, x, y)
+#define setmouse(w, x, y) XWarpPointer(jbwm.X.dpy, None, w, 0, 0, 0, 0, x, y)
 
 #endif /* ARWM_SCREEN_H */

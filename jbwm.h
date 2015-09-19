@@ -53,22 +53,22 @@ typedef struct
 #define MouseMask       (ButtonMask|PointerMotionMask)
 
 void 
-arwm_grab_button(Window w, unsigned int mask, unsigned int button);
+jbwm_grab_button(Window w, unsigned int mask, unsigned int button);
 
 #include "ScreenInfo.h"
 #include "client_t.h"
 #include "application_t.h"
-#include "arwmenv.h"
+#include "jbwmenv.h"
 
 /* Main environment structure, to replace evilwm's
    large collection of global variables.  */
-extern ARWMEnvironment arwm;
+extern ARWMEnvironment jbwm;
 
 /* Things that affect user interaction */
 extern const char *opt_term[3];
 extern Application *head_app;
 
-/* These will take some time to integrate into arwm structure.  */
+/* These will take some time to integrate into jbwm structure.  */
 /* Client tracking information */
 extern Client *head_client;
 extern Client *current;
@@ -81,7 +81,7 @@ void make_new_client(Window w, ScreenInfo * s);
 long get_wm_normal_hints(Client * c);
 
 #include "screen.h"
-#include "arwmmod.h"
+#include "jbwmmod.h"
 #include "atoms.h"
 
 #endif /* not ARWM_ARWM_H */

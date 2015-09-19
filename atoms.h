@@ -1,7 +1,7 @@
 #ifndef ATOMS_H
 #define ATOMS_H
 
-#define GETATOM(atom) XInternAtom(arwm.X.dpy, atom, False)
+#define GETATOM(atom) XInternAtom(jbwm.X.dpy, atom, False)
 
 #define ARWM_ATOM_VWM_STATE 	GETATOM("_NET_WM_STATE")
 #define ARWM_ATOM_VWM_DESKTOP	GETATOM("_NET_WM_DESKTOP")

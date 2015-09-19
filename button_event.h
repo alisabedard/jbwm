@@ -3,6 +3,6 @@
 #ifndef ARWM_BTN_EVT_H
 #define ARWM_BTN_EVT_H
 
-void arwm_handle_button_event(XButtonEvent * e);
+void jbwm_handle_button_event(XButtonEvent * e);
 
 #endif /* ARWM_BTN_EVT_H */

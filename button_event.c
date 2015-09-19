@@ -1,10 +1,10 @@
 /* Copyright 2008, Jeffrey Bedard <antiright@gmail.com> */
 
-/* arwm - Minimalist Window Manager for X
- * Copyright (C) 1999-2006 Ciaran Anscomb <arwm@6809.org.uk>
+/* jbwm - Minimalist Window Manager for X
+ * Copyright (C) 1999-2006 Ciaran Anscomb <jbwm@6809.org.uk>
  * see README for license and other details. */
 
-#include "arwm.h"
+#include "jbwm.h"
 
 static void
 move_client_with_vdesk(Client * c, Bool next)
@@ -16,7 +16,7 @@ move_client_with_vdesk(Client * c, Bool next)
 	if(next ? (target_vdesk < 10) : (target_vdesk >= 0))
 	{
 		switch_vdesk(current_screen, c->vdesk = target_vdesk);
-		XRaiseWindow(arwm.X.dpy, c->window);
+		XRaiseWindow(jbwm.X.dpy, c->window);
 	}
 }
 
@@ -35,7 +35,7 @@ shade_window(Client * c)
 	else
 	{
 		c->shade_height = c->geometry.height;
-		XResizeWindow(arwm.X.dpy, c->parent,
+		XResizeWindow(jbwm.X.dpy, c->parent,
 			c->geometry.width, TITLEBAR_HEIGHT);
 		c->geometry.height = TITLEBAR_HEIGHT;
 		c->flags |= AR_CLIENT_SHADED;
@@ -47,13 +47,17 @@ static void
 button1_event(XButtonEvent * e, Client * c)
 {
 	const int x = e->x;
+#ifdef USE_CLOSE_BUTTON
 	const int y = e->y;
+#endif
 	const int width = c->geometry.width;
 
-	XRaiseWindow(arwm.X.dpy, c->parent);
+	XRaiseWindow(jbwm.X.dpy, c->parent);
 	/* Text for close button press.  */
+#ifdef USE_CLOSE_BUTTON
 	if((x < AR_BUTTON_WIDTH) && (y < TITLEBAR_HEIGHT))
-		send_wm_delete(c, !(e->state & arwm.keymasks.mod));
+		send_wm_delete(c, !(e->state & jbwm.keymasks.mod));
+#endif
 	if(x > width - AR_RESIZE_DELTA)
 		sweep(c);	/* Resize the window.  */
 #ifdef USE_SHADE
@@ -65,7 +69,7 @@ button1_event(XButtonEvent * e, Client * c)
 }
 
 void
-arwm_handle_button_event(XButtonEvent * e)
+jbwm_handle_button_event(XButtonEvent * e)
 {
 	Client *c;
 
@@ -77,7 +81,7 @@ arwm_handle_button_event(XButtonEvent * e)
 		button1_event(e, c);
 		break;
 	case Button2:
-		XLowerWindow(arwm.X.dpy, c->parent);
+		XLowerWindow(jbwm.X.dpy, c->parent);
 		break;
 	case Button3:
 		/* Resize operations more useful here,

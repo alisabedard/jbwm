@@ -3,17 +3,17 @@
 #CC = clang
 #CFLAGS=-O4
 
-# Edit this line if you don't want arwm to install under /usr.
+# Edit this line if you don't want jbwm to install under /usr.
 # Note that $(DESTDIR) is used by the Debian build process.
 #prefix = $(DESTDIR)/usr
 # For typical manually built package:
-#prefix = /usr/local
+prefix = /usr/local
 # For custom stash script
-prefix = /usr/local/stash/arwm
+#prefix = /usr/local/stash/jbwm
 # For use with NetBSD linkfarm or GNU stow.
-#prefix = /usr/local/packages/arwm
+#prefix = /usr/local/packages/jbwm
 # For local home install, managed by GNU stow.
-#prefix = ~/opt/stow/arwm
+#prefix = ~/opt/stow/jbwm
 
 XROOT    = /usr/X11R6
 INCLUDES += -I$(XROOT)/include
@@ -24,7 +24,7 @@ LIBS += -lX11
 
 DEFINES  = $(EXTRA_DEFINES) 
 
-# Configure arwm by editing the following DEFINES lines.  You can also
+# Configure jbwm by editing the following DEFINES lines.  You can also
 # add options by setting EXTRA_DEFINES on the make(1) command line,
 # e.g., make EXTRA_DEFINfES="-DDEBUG".
 
@@ -56,10 +56,14 @@ CFLAGS += -Os
 
 # Titlebar Xft support:
 # Warning, Xft impedes performance and leaks memory.
-DEFINES += -DUSE_XFT
-LIBS += -lXft
-INCLUDES += `pkg-config --cflags xft`
+#DEFINES += -DUSE_XFT
+#LIBS += -lXft
+#INCLUDES += `pkg-config --cflags xft`
+# Not necessary except on old NetBSD:
 #INCLUDES += -I/usr/pkg/include/freetype2 -I/usr/X11R6/include/freetype2
+
+# Titlebar close button support:
+DEFINES += -DUSE_CLOSE_BUTTON
 
 
 # Uncomment to enable colormap support
@@ -97,7 +101,7 @@ DEFINES += -DUSE_SNAP
 
 version = 1.29
 
-distname = arwm-$(version)
+distname = jbwm-$(version)
 
 DEFINES += -DVERSION=\"$(version)\" $(DEBIAN)
 CFLAGS  += $(INCLUDES) $(DEFINES) 
@@ -109,26 +113,26 @@ LDFLAGS += $(LDPATH) $(LIBS)
 # Uncomment for static linking of binary:
 #LDFLAGS += -static 
 
-HEADERS  = arwm.h log.h
-SRCS += client.c events.c arwm.c misc.c new.c screen.c ARWMButton.c
+HEADERS  = jbwm.h log.h
+SRCS += client.c events.c jbwm.c misc.c new.c screen.c ARWMButton.c
 SRCS += graphics.c key_event.c configure_event.c button_event.c keymap.c
 OBJS     = $(SRCS:.c=.o)
 
 .PHONY: all install dist debuild clean
 
-all: arwm
+all: jbwm
 
-# Uncomment this target and comment out the other arwm target
+# Uncomment this target and comment out the other jbwm target
 # if you want to save ~400 more bytes
 
-#arwm: $(SRCS) $(HEADERS)
+#jbwm: $(SRCS) $(HEADERS)
 #	rm -f all.c
 #	cat *.h *.c > all.c
 #	$(CC) $(CFLAGS) all.c -o $@ $(LDFLAGS)
 #	rm -f all.c
 
 
-arwm: $(OBJS) 
+jbwm: $(OBJS) 
 	$(CC) $(CFLAGS) $(OBJS) -o $@ $(LDFLAGS)
 
 %.o: %.c $(HEADERS)
@@ -138,11 +142,11 @@ INSTALL=install -c
 INSTALL_PROG=$(INSTALL) -s
 INSTALL_DIR=install -d
 
-install: arwm
-	if [ -f arwm.exe ]; then mv arwm.exe arwm; fi
+install: jbwm
+	if [ -f jbwm.exe ]; then mv jbwm.exe jbwm; fi
 	$(INSTALL_DIR) $(prefix)/bin $(prefix)/share/man/man1
-	$(INSTALL_PROG) arwm $(prefix)/bin
-	$(INSTALL) arwm.1 $(prefix)/share/man/man1
+	$(INSTALL_PROG) jbwm $(prefix)/bin
+	$(INSTALL) jbwm.1 $(prefix)/share/man/man1
 
 dist:
 	darcs dist --dist-name $(distname)
@@ -150,19 +154,19 @@ dist:
 
 debuild: dist
 	-cd ..; rm -rf $(distname)/ $(distname).orig/
-	cd ..; mv $(distname).tar.gz arwm_$(version).orig.tar.gz
-	cd ..; tar xfz arwm_$(version).orig.tar.gz
+	cd ..; mv $(distname).tar.gz jbwm_$(version).orig.tar.gz
+	cd ..; tar xfz jbwm_$(version).orig.tar.gz
 	cp -a debian ../$(distname)/
 	rm -rf ../$(distname)/debian/_darcs/
 	cd ../$(distname); debuild
 
 clean:
-	rm -f arwm arwm.exe $(OBJS) *.core
+	rm -f jbwm jbwm.exe $(OBJS) *.core
 
 distclean: clean
 	rm -f *~ *.out .*.swp .*.swn
 
 archive:
-	cd ..;  tar cjf arwm-$(version).tar.bz2 arwm
+	cd ..;  tar cjf jbwm-$(version).tar.bz2 jbwm
 
 # DO NOT DELETE

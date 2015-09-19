@@ -31,13 +31,13 @@ typedef struct _ARWMTitlebarData
 void
 ARWMTitlebarData_delete(ARWMTitlebarData * titlebar);
 
-void arwm_ARWMTitlebarData_init(ARWMTitlebarData * titlebar);
+void jbwm_ARWMTitlebarData_init(ARWMTitlebarData * titlebar);
 
 void update_info_window(Client * c);
 
 void remove_info_window(Client * c);
 
-void arwm_draw_close_button(Client * c);
+void jbwm_draw_close_button(Client * c);
 
 #define AR_BUTTON_WIDTH TITLEBAR_HEIGHT
 #define AR_BUTTON_HEIGHT TITLEBAR_HEIGHT

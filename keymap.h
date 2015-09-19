@@ -8,6 +8,7 @@
 #define KEY_NEW		XK_Return
 #endif /* !KEY_NEW */
 #define KEY_LOCK	XK_F1
+#define KEY_BROWSER	XK_F2
 #define KEY_SLEEP	XK_F3
 #define KEY_QUIT	XK_Escape
 #define KEY_TOPLEFT	XK_KP_Home

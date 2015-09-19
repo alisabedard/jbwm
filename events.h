@@ -3,6 +3,6 @@
 
 void event_main_loop(void);
 
-void arwm_current_to_head(void);
+void jbwm_current_to_head(void);
 
 #endif /* ! ARWM_EVENTS_H */

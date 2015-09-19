@@ -1,9 +1,9 @@
 /*
- * arwm - Minimalist Window Manager for X Copyright (C) 1999-2006 Ciaran
- * Anscomb <arwm@6809.org.uk> see README for license and other details.
+ * jbwm - Minimalist Window Manager for X Copyright (C) 1999-2006 Ciaran
+ * Anscomb <jbwm@6809.org.uk> see README for license and other details.
  */
 
-#include "arwm.h"
+#include "jbwm.h"
 
 /*
  * used all over the place.  return the client that has specified window as
@@ -42,7 +42,7 @@ set_wm_state(Client * c, int state)
 	const Atom state_atom = ARWM_ATOM_WM_STATE;
 
 	data[0]=state;
-	XChangeProperty(arwm.X.dpy, c->window, state_atom, state_atom, 
+	XChangeProperty(jbwm.X.dpy, c->window, state_atom, state_atom, 
 		32, PropModeReplace, (unsigned char *)data, 2);
 }
 
@@ -69,11 +69,11 @@ select_client(Client * c)
 	/* Set inactive window border for CURRENT.  */
 	if(current)
 	{
-		XSetWindowBorder(arwm.X.dpy, current->parent,
+		XSetWindowBorder(jbwm.X.dpy, current->parent,
 			current->screen->bg.pixel);
 		current->flags &= ~AR_CLIENT_ACTIVE;
 #ifdef USE_XPM
-		arwm_draw_close_button(current);
+		jbwm_draw_close_button(current);
 #endif
 	}
 
@@ -82,17 +82,17 @@ select_client(Client * c)
 		ScreenInfo * s = c->screen;
 
 		c->flags |= AR_CLIENT_ACTIVE;
-		XSetWindowBorder(arwm.X.dpy, c->parent, (c->flags 
-			& AR_CLIENT_BLACK_BORDER) ?  BlackPixel(arwm.X.dpy,
+		XSetWindowBorder(jbwm.X.dpy, c->parent, (c->flags 
+			& AR_CLIENT_BLACK_BORDER) ?  BlackPixel(jbwm.X.dpy,
 			s->screen) : (is_sticky(c) ? s->fc.pixel 
 			: s->fg.pixel));
 #ifdef USE_CMAP
-		XInstallColormap(arwm.X.dpy, c->cmap);
+		XInstallColormap(jbwm.X.dpy, c->cmap);
 #endif /* USE_CMAP */
-		XSetInputFocus(arwm.X.dpy, c->window,
+		XSetInputFocus(jbwm.X.dpy, c->window,
 			RevertToPointerRoot, CurrentTime);
 #ifdef USE_XPM
-		arwm_draw_close_button(c);
+		jbwm_draw_close_button(c);
 #endif
 	}
 	current = c;
@@ -111,12 +111,12 @@ fix_client(Client * c)
 static void
 kill_parent_window(Client * c)
 {
-	XReparentWindow(arwm.X.dpy, c->window, c->screen->root,
+	XReparentWindow(jbwm.X.dpy, c->window, c->screen->root,
 		c->geometry.x, c->geometry.y);
-	XSetWindowBorderWidth(arwm.X.dpy, c->window, c->old_border);
-	XRemoveFromSaveSet(arwm.X.dpy, c->window);
+	XSetWindowBorderWidth(jbwm.X.dpy, c->window, c->old_border);
+	XRemoveFromSaveSet(jbwm.X.dpy, c->window);
 	if(c->parent)
-		XDestroyWindow(arwm.X.dpy, c->parent);
+		XDestroyWindow(jbwm.X.dpy, c->parent);
 }
 static void
 relink_window_list(Client * c)
@@ -137,7 +137,7 @@ void
 remove_client(Client * c)
 {
 #if 0
-	XUnmapWindow(arwm.X.dpy, c->parent);
+	XUnmapWindow(jbwm.X.dpy, c->parent);
 #endif
 #ifdef USE_TBAR
 	remove_info_window(c);
@@ -161,18 +161,18 @@ send_xmessage(Window w, Atom a, long x)
 	ev.xclient.data.l[0] = x;
 	ev.xclient.data.l[1] = CurrentTime;
 
-	return XSendEvent(arwm.X.dpy, w, False, NoEventMask, &ev);
+	return XSendEvent(jbwm.X.dpy, w, False, NoEventMask, &ev);
 }
 
 void
 send_wm_delete(Client * c, int kill_client)
 {
-	XUnmapWindow(arwm.X.dpy, c->parent);
+	XUnmapWindow(jbwm.X.dpy, c->parent);
 	if(kill_client)
 		send_xmessage(c->window, ARWM_ATOM_WM_PROTOS,
 			ARWM_ATOM_WM_DELETE);
 	else
-		XKillClient(arwm.X.dpy, c->window);
+		XKillClient(jbwm.X.dpy, c->window);
 }
 
 #ifdef USE_SHAPE
@@ -187,20 +187,20 @@ set_shape(Client * c)
 
 	/* Validate inputs:  Make sure that the SHAPE extension is
 	   available, and make sure that C is initialized.  */
-	if(!arwm.X.have_shape || !c)
+	if(!jbwm.X.have_shape || !c)
 		return;
 	/*
 	 * Logic to decide if we have a shaped window cribbed from
 	 * fvwm-2.5.10. Previous method (more than one rectangle returned
 	 * from XShapeGetRectangles) worked _most_ of the time.
 	 */
-	XShapeSelectInput(arwm.X.dpy, c->window, ShapeNotifyMask);
-	if(XShapeQueryExtents(arwm.X.dpy, c->window, &bounding_shaped,
+	XShapeSelectInput(jbwm.X.dpy, c->window, ShapeNotifyMask);
+	if(XShapeQueryExtents(jbwm.X.dpy, c->window, &bounding_shaped,
 		&i, &i, &u, &u, &b, &i, &i, &u, &u)
 		&& bounding_shaped)
 	{
 		c->flags |= AR_CLIENT_SHAPED | AR_CLIENT_DONT_USE_TITLEBAR;
-		XShapeCombineShape(arwm.X.dpy, c->parent, ShapeBounding, 0, 
+		XShapeCombineShape(jbwm.X.dpy, c->parent, ShapeBounding, 0, 
 			TITLEBAR_HEIGHT + 0, c->window, ShapeBounding, 
 			ShapeSet);
 

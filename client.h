@@ -18,7 +18,7 @@
  * XConfigureEvent data.
  */
 #define SEND_CONFIG(c)\
-	XSendEvent(arwm.X.dpy, c->window, False, StructureNotifyMask,\
+	XSendEvent(jbwm.X.dpy, c->window, False, StructureNotifyMask,\
 		   (XEvent *)&(c->ce))
 
 void send_wm_delete(Client * c, int kill_client);

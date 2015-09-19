@@ -1,11 +1,11 @@
 /* Copyright 2007-2011, Jeffrey E. Bedard */
 #ifndef ARWM_EWMH_H
 #ifdef USE_EWMH
-void arwm_ewmh_state(Client *c);
-void arwm_ewmh_type(Client *c);
+void jbwm_ewmh_state(Client *c);
+void jbwm_ewmh_type(Client *c);
 
 #define ARWM_VWM_CHANGE_PROPERTY(c, property, state, n)\
-        XChangeProperty(arwm.X.dpy, c->window,\
+        XChangeProperty(jbwm.X.dpy, c->window,\
 		ARWM_ATOM_VWM_DESKTOP, property, 32,\
                 PropModeReplace, state, n);
 

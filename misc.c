@@ -1,6 +1,6 @@
 /*
- * arwm - Minimalist Window Manager for X Copyright (C) 1999-2006 Ciaran
- * Anscomb <arwm@6809.org.uk> see README for license and other details.
+ * jbwm - Minimalist Window Manager for X Copyright (C) 1999-2006 Ciaran
+ * Anscomb <jbwm@6809.org.uk> see README for license and other details.
  */
 
 #include <X11/Xproto.h>
@@ -9,36 +9,38 @@
 #include <signal.h>
 #include <sys/wait.h>
 #include <unistd.h>
-#include "arwm.h"
+#include "jbwm.h"
 
 __attribute__ ((noreturn))
 void
-arwm_exit(const int status)
+jbwm_exit(const int status)
 {
+#if 0
 	if(head_client)
 	while(head_client)
 		remove_client(head_client);
-	XSetInputFocus(arwm.X.dpy, PointerRoot, RevertToPointerRoot,
+	XSetInputFocus(jbwm.X.dpy, PointerRoot, RevertToPointerRoot,
 		CurrentTime);
-	if(arwm.X.font)
+	if(jbwm.X.font)
 #ifdef USE_XFT
-		XftFontClose(arwm.X.dpy, arwm.X.font);
+		XftFontClose(jbwm.X.dpy, jbwm.X.font);
 #else /* ! USE_XFT */
-		XFreeFont(arwm.X.dpy, arwm.X.font);
+		XFreeFont(jbwm.X.dpy, jbwm.X.font);
 #endif /* USE_XFT */
-	while(arwm.X.num_screens--)
+	while(jbwm.X.num_screens--)
 	{
-		XFreeGC(arwm.X.dpy, 
-			arwm.X.screens[arwm.X.num_screens].gc);
-		XInstallColormap(arwm.X.dpy, DefaultColormap(arwm.X.dpy, 
-			arwm.X.num_screens));
+		XFreeGC(jbwm.X.dpy, 
+			jbwm.X.screens[jbwm.X.num_screens].gc);
+		XInstallColormap(jbwm.X.dpy, DefaultColormap(jbwm.X.dpy, 
+			jbwm.X.num_screens));
 	}
 #ifdef USE_TBAR
-	ARWMTitlebarData_delete(&arwm.titlebar);
+	ARWMTitlebarData_delete(&jbwm.titlebar);
 #endif
-	free(arwm.X.screens);
-	XFreeCursor(arwm.X.dpy, arwm.X.cursor);
-	XCloseDisplay(arwm.X.dpy);
+	free(jbwm.X.screens);
+	XFreeCursor(jbwm.X.dpy, jbwm.X.cursor);
+	XCloseDisplay(jbwm.X.dpy);
+#endif /* 0 */
 
 	exit(status);
 }
@@ -48,10 +50,10 @@ handle_xerror(Display * dpy, XErrorEvent * e)
 {
 	/* If this error actually occurred while setting up the new window,
 	 * best let make_new_client() know not to bother */
-	if(arwm.initialising != None
-		&& e->resourceid == arwm.initialising)
+	if(jbwm.initialising != None
+		&& e->resourceid == jbwm.initialising)
 	{
-		arwm.initialising = None;
+		jbwm.initialising = None;
 		return 0;
 	}
 	switch(e->error_code)
@@ -91,7 +93,7 @@ handle_xerror(Display * dpy, XErrorEvent * e)
 				}
 				LOG("handle_xerror() : flag for removal");
 				remove_client(c);
-				arwm.flags &= ~ARWM_FLAG_NEED_TIDY;
+				jbwm.flags &= ~ARWM_FLAG_NEED_TIDY;
 			}
 	
 		}

@@ -1,10 +1,10 @@
 /*
- * arwm - Restructuring, optimization, and feature fork
+ * jbwm - Restructuring, optimization, and feature fork
  *        Copyright 2007-2012, Jeffrey E. Bedard <jefbed@gmail.com>
  * evilwm - Minimalist Window Manager for X Copyright (C) 1999-2006 Ciaran
- * Anscomb <arwm@6809.org.uk> see README for license and other details.
+ * Anscomb <jbwm@6809.org.uk> see README for license and other details.
  */
-#include "arwm.h"
+#include "jbwm.h"
 #include <string.h>
 #include "screen.h"
 
@@ -18,7 +18,7 @@ draw_outline_information(Client * c)
 
 	snprintf(buf, sizeof(buf), "%dx%d+%d+%d", 
 		g->x, g->y, g->width, g->height);
-	XDrawString(arwm.X.dpy, s->root, s->gc, 
+	XDrawString(jbwm.X.dpy, s->root, s->gc, 
 		g->x, g->y, buf, strlen(buf));
 }
 #endif /* INFORMATION_ON_OUTLINE */
@@ -37,7 +37,7 @@ draw_outline(Client * c)
 	box.y=g->y-TITLEBAR_HEIGHT;
 	box.width=g->width+border;
 	box.height=g->height+(c->flags & AR_CLIENT_SHADED?0:TITLEBAR_HEIGHT);
-	XDrawRectangle(arwm.X.dpy, c->screen->root, c->screen->gc, 
+	XDrawRectangle(jbwm.X.dpy, c->screen->root, c->screen->gc, 
 		box.x, box.y, box.width, box.height);
 
 #ifdef INFORMATION_ON_OUTLINE
@@ -83,7 +83,7 @@ recalculate_sweep(Client * c, Position p1, Position p2)
 }
 
 #define grab_pointer(w, mask, curs) \
-	(XGrabPointer(arwm.X.dpy, w, False, mask, GrabModeAsync,\
+	(XGrabPointer(jbwm.X.dpy, w, False, mask, GrabModeAsync,\
 	GrabModeAsync, None, curs, CurrentTime) == GrabSuccess)
 
 static void
@@ -106,19 +106,19 @@ sweep(Client * c)
 	XEvent ev;
 	XRectangle * g = &(c->geometry);
 
-	if(!grab_pointer(c->screen->root, MouseMask, arwm.X.cursor))
+	if(!grab_pointer(c->screen->root, MouseMask, jbwm.X.cursor))
 		return;
 	setmouse(c->window, g->width, g->height);
 	for(;;)
 	{
-		XMaskEvent(arwm.X.dpy, MouseMask, &ev);
+		XMaskEvent(jbwm.X.dpy, MouseMask, &ev);
 		switch (ev.type)
 		{
 		case MotionNotify:
 			handle_motion_notify(c, g, &(ev.xmotion));
 						break;
 		case ButtonRelease:
-			XUngrabPointer(arwm.X.dpy, CurrentTime);
+			XUngrabPointer(jbwm.X.dpy, CurrentTime);
 			moveresize(c);
 			return;
 		}
@@ -214,7 +214,7 @@ static void
 drag_button_release(Client * c)
 {
 	draw_outline(c);	/* clear */
-	XUngrabPointer(arwm.X.dpy, CurrentTime);
+	XUngrabPointer(jbwm.X.dpy, CurrentTime);
 	moveresize(c);
 }
 
@@ -225,7 +225,7 @@ drag_event_loop(Client * c, int x1, int y1, int old_cx, int old_cy)
 
 	for(;;)
 	{
-		XMaskEvent(arwm.X.dpy, MouseMask, &ev);
+		XMaskEvent(jbwm.X.dpy, MouseMask, &ev);
 		if(ev.type==MotionNotify)
 			drag_motion(c, ev, x1, y1, old_cx, old_cy);
 		else
@@ -244,7 +244,7 @@ drag(Client * c)
 	Window root;
 
 	root = c->screen->root;
-	if(!grab_pointer(root, MouseMask, arwm.X.cursor))
+	if(!grab_pointer(root, MouseMask, jbwm.X.cursor))
 		return;
 	old_p.x=c->geometry.x;
 	old_p.y=c->geometry.y;
@@ -264,9 +264,9 @@ moveresize(Client * c)
 	const ubyte border = c->border;
 	const unsigned short width = g->width;
 
-	XMoveResizeWindow(arwm.X.dpy, c->parent, g->x - border, g->y - border 
+	XMoveResizeWindow(jbwm.X.dpy, c->parent, g->x - border, g->y - border 
 		- (shaped ? 0 : tb), width, parent_height);
-	XMoveResizeWindow(arwm.X.dpy, c->window, 0, (shaped ? -tb : tb), width, 
+	XMoveResizeWindow(jbwm.X.dpy, c->window, 0, (shaped ? -tb : tb), width, 
 		g->height + (shaped ? tb : 0));
 	send_config(c);
 #ifdef USE_TBAR
@@ -302,7 +302,7 @@ maximize(Client * c)
 		g->height=s->height;
 	}
 	moveresize(c);
-	XRaiseWindow(arwm.X.dpy, c->parent);
+	XRaiseWindow(jbwm.X.dpy, c->parent);
 }
 
 void
@@ -311,15 +311,15 @@ hide(Client * c)
 	/* This will generate an unmap event.  Tell event handler
 	 * to ignore it.  */
 	c->ignore_unmap++;
-	XUnmapWindow(arwm.X.dpy, c->parent);
+	XUnmapWindow(jbwm.X.dpy, c->parent);
 	set_wm_state(c, IconicState);
 }
 
 void
 unhide(Client * c, int raise_win)
 {
-	raise_win ? XMapRaised(arwm.X.dpy, c->parent) 
-		: XMapWindow(arwm.X.dpy, c->parent);
+	raise_win ? XMapRaised(jbwm.X.dpy, c->parent) 
+		: XMapWindow(jbwm.X.dpy, c->parent);
 	set_wm_state(c, NormalState);
 }
 
@@ -361,7 +361,7 @@ switch_vdesk(ScreenInfo * s, const ubyte v)
 
 	/* Resort to the global ScreenInfo */
 	if(!s)
-		s=arwm.X.screens;
+		s=jbwm.X.screens;
 
 	s->vdesk = v;
 	for(c = head_client; c; c = c->next)

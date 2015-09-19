@@ -1,12 +1,12 @@
 /*
- * arwm - Minimalist Window Manager for X Copyright (C) 1999-2006 Ciaran
- * Anscomb <arwm@6809.org.uk> see README for license and other details.
+ * jbwm - Minimalist Window Manager for X Copyright (C) 1999-2006 Ciaran
+ * Anscomb <jbwm@6809.org.uk> see README for license and other details.
  */
 
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
-#include "arwm.h"
+#include "jbwm.h"
 
 #define MAXIMUM_PROPERTY_LENGTH 4096
 
@@ -66,7 +66,7 @@ set_class_attributes(Client * c, Window w)
 	{
 		Application *a;
 
-		XGetClassHint(arwm.X.dpy, w, class);
+		XGetClassHint(jbwm.X.dpy, w, class);
 		for(a = head_app; a; a = a->next)
 			set_class_geometry_attribute(c, a);
 			/*test_set_class_attribute(c, a, class);*/
@@ -135,20 +135,20 @@ make_new_client(Window w, ScreenInfo * s)
 	 * resets the variable indicating the window has already disappeared,
 	 * so we stop trying to manage it.
 	 */
-	arwm.initialising = w;
-	XSync(arwm.X.dpy, False);
+	jbwm.initialising = w;
+	XSync(jbwm.X.dpy, False);
 	/*
 	 * If 'initialising' is now set to None, that means doing the
 	 * XFetchName raised BadWindow - the window has been removed before
 	 * we got a chance to grab the server.
 	 */
-	if(arwm.initialising == None)
+	if(jbwm.initialising == None)
 		return;
-	arwm.initialising = None;
+	jbwm.initialising = None;
 	c = Client_new(w, s);
 	if(c->flags & AR_CLIENT_DONT_MANAGE)
 		return;
-	XSelectInput(arwm.X.dpy, c->window, EnterWindowMask
+	XSelectInput(jbwm.X.dpy, c->window, EnterWindowMask
 		| PropertyChangeMask  | ColormapChangeMask);
 #ifdef USE_SHAPE
 	set_shape(c);
@@ -157,7 +157,7 @@ make_new_client(Window w, ScreenInfo * s)
 	set_class_attributes(c, w);
 	map_client(c, s);
 	/* Enable alt-dragging within window */
-	arwm_grab_button(w, arwm.keymasks.grab, AnyButton);
+	jbwm_grab_button(w, jbwm.keymasks.grab, AnyButton);
 }
 
 /*
@@ -175,7 +175,7 @@ handle_mwm_hints(Client * c)
 	const Atom mwm_hints = GETATOM("_XA_MWM_HINTS");
 
 	if((mprop =
-		arwm_get_property(c->window, mwm_hints, mwm_hints,
+		jbwm_get_property(c->window, mwm_hints, mwm_hints,
 		&nitems)))
 	{
 		if(nitems >= PROP_MWM_HINTS_ELEMENTS
@@ -188,7 +188,7 @@ handle_mwm_hints(Client * c)
 		XFree(mprop);
 	}
 #ifdef USE_EWMH
-	arwm_ewmh_type(c);
+	jbwm_ewmh_type(c);
 #endif
 
 	return nitems;
@@ -201,7 +201,7 @@ print_size_hints(Window w)
 	XSizeHints *sizes;
 
 	sizes = XAllocSizeHints();
-	XGetWMSizeHints(arwm.X.dpy, w, sizes, NULL, XA_WM_SIZE_HINTS);
+	XGetWMSizeHints(jbwm.X.dpy, w, sizes, NULL, XA_WM_SIZE_HINTS);
 	printf("%s:%d:\twidth:  %d\theight:  %d\n", __FILE__,
 		__LINE__, sizes->width, sizes->height);
 	fflush(stdout);
@@ -271,7 +271,7 @@ init_long_properties(Client * c, unsigned long * nitems)
 {
 	unsigned long * lprop;
 	
-	if((lprop = arwm_get_property(c->window, ARWM_ATOM_VWM_DESKTOP,
+	if((lprop = jbwm_get_property(c->window, ARWM_ATOM_VWM_DESKTOP,
 		XA_CARDINAL, nitems)))
 	{
 		if(*nitems && valid_vdesk(lprop[0]))
@@ -285,7 +285,7 @@ init_atom_properties(Client * c, unsigned long * nitems)
 {
 	Atom * aprop;
 
-	if((aprop = arwm_get_property(c->window, 
+	if((aprop = jbwm_get_property(c->window, 
 		ARWM_ATOM_WM_STATE, XA_ATOM, nitems)))
 	{
 		unsigned long i;
@@ -322,7 +322,7 @@ init_geometry(Client * c)
 	initialize_client_ce(c);
 	init_geometry_properties(c);
 
-	XGetWindowAttributes(arwm.X.dpy, c->window, &attr);
+	XGetWindowAttributes(jbwm.X.dpy, c->window, &attr);
 	c->old_border = attr.border_width;
 	c->old_geometry.width = c->old_geometry.height = 0;
 #ifdef USE_CMAP
@@ -359,24 +359,24 @@ reparent(Client * c)
 	if(!(c->flags & AR_CLIENT_SHAPED))
 		p_attr.background_pixel = c->screen->bg.pixel;
 	c->parent =
-		XCreateWindow(arwm.X.dpy, c->screen->root, x, y, g->width,
-			g->height + y_mod, c->border, DefaultDepth(arwm.X.dpy, 
+		XCreateWindow(jbwm.X.dpy, c->screen->root, x, y, g->width,
+			g->height + y_mod, c->border, DefaultDepth(jbwm.X.dpy, 
 			c->screen->screen), CopyFromParent, 
-			DefaultVisual(arwm.X.dpy, c->screen->screen), 
+			DefaultVisual(jbwm.X.dpy, c->screen->screen), 
 			valuemask, &p_attr);
-	XAddToSaveSet(arwm.X.dpy, c->window);
-	XSetWindowBorderWidth(arwm.X.dpy, c->window, 0);
+	XAddToSaveSet(jbwm.X.dpy, c->window);
+	XSetWindowBorderWidth(jbwm.X.dpy, c->window, 0);
 #ifdef USE_EWMH
-	arwm_ewmh_type(c);
+	jbwm_ewmh_type(c);
 #endif
 #ifdef USE_TBAR
 	if(!(c->flags & AR_CLIENT_DONT_USE_TITLEBAR))
 		update_info_window(c);
 #endif
-	XReparentWindow(arwm.X.dpy, c->window, c->parent, 0, 
+	XReparentWindow(jbwm.X.dpy, c->window, c->parent, 0, 
 		((c->flags & AR_CLIENT_SHAPED) ? 0 : TITLEBAR_HEIGHT));
-	XMapWindow(arwm.X.dpy, c->window);
-	XUngrabPointer(arwm.X.dpy, CurrentTime);
+	XMapWindow(jbwm.X.dpy, c->window);
+	XUngrabPointer(jbwm.X.dpy, CurrentTime);
 }
 
 /* Get WM_NORMAL_HINTS property */
@@ -388,7 +388,7 @@ get_wm_normal_hints(Client * c)
 	long dummy;
 
 	size = XAllocSizeHints();
-	XGetWMNormalHints(arwm.X.dpy, c->window, size, &dummy);
+	XGetWMNormalHints(jbwm.X.dpy, c->window, size, &dummy);
 	debug_wm_normal_hints(size);
 	flags = size->flags;
 #define SIZE_TYPE_ASSIGN(type)\
@@ -431,7 +431,7 @@ get_wm_normal_hints(Client * c)
 	return flags;
 }
 void *
-arwm_get_property(Window w, Atom property, Atom req_type,
+jbwm_get_property(Window w, Atom property, Atom req_type,
 	unsigned long *nitems_return)
 {
 	Atom actual_type;
@@ -439,7 +439,7 @@ arwm_get_property(Window w, Atom property, Atom req_type,
 	unsigned long bytes_after;
 	unsigned char *prop;
 
-	if(XGetWindowProperty(arwm.X.dpy, w, property, 0L,
+	if(XGetWindowProperty(jbwm.X.dpy, w, property, 0L,
 		MAXIMUM_PROPERTY_LENGTH / 4, False, req_type,
 		&actual_type, &actual_format, nitems_return,
 		&bytes_after, &prop) == Success)

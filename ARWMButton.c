@@ -1,9 +1,9 @@
-#include "arwm.h"
+#include "jbwm.h"
 
 void
 ARWMButton_delete(ARWMButton * button)
 {
-	XFreeGC(arwm.X.dpy, button->gc);
+	XFreeGC(jbwm.X.dpy, button->gc);
 	free(button);
 }
 
@@ -23,7 +23,7 @@ ARWMButton_draw(ARWMButton * button)
 		g->width, g->height);
 #else /* !USE_GRADIENT */
 #ifndef USE_XBM
-	XFillRectangle(arwm.X.dpy, button->parent, button->gc, 
+	XFillRectangle(jbwm.X.dpy, button->parent, button->gc, 
 		g->x, g->y, g->width, g->height);
 #endif
 #endif /* USE_GRADIENT */
@@ -52,14 +52,14 @@ ARWMButton_draw(ARWMButton * button)
 
 			const ubyte inc = 24;
 
-			XGetWindowAttributes(arwm.X.dpy, w, &wa);
+			XGetWindowAttributes(jbwm.X.dpy, w, &wa);
 			for(i=0; i <(unsigned int)wa.width; i+=inc)
 			{
 #ifdef DEBUG
 				printf("i:%d\t<\t", i);
 				printf("wa.width:%d\t\n", width);
 #endif /* DEBUG */
-				XPutImage(arwm.X.dpy, w, button->gc, 
+				XPutImage(jbwm.X.dpy, w, button->gc, 
 						button->image, 0, 0, image_x+i
 #ifdef USE_XBM
 					+1
@@ -74,7 +74,7 @@ ARWMButton_draw(ARWMButton * button)
 			}
 		}
 		else
-XPutImage(arwm.X.dpy, w, button->gc, 
+XPutImage(jbwm.X.dpy, w, button->gc, 
 						button->image, 0, 0, image_x
 #ifdef USE_XBM
 					+1

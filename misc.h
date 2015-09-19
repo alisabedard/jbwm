@@ -3,7 +3,7 @@
 
 __attribute__ ((noreturn))
 void
-arwm_exit(const int status);
+jbwm_exit(const int status);
 
 int
 handle_xerror(Display * dpy, XErrorEvent * e);

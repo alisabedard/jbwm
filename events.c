@@ -1,12 +1,12 @@
-/* arwm - Minimalist Window Manager for X
- * Copyright (C) 1999-2006 Ciaran Anscomb <arwm@6809.org.uk>
+/* jbwm - Minimalist Window Manager for X
+ * Copyright (C) 1999-2006 Ciaran Anscomb <jbwm@6809.org.uk>
  * see README for license and other details. */
 
 #include <stdlib.h>
-#include "arwm.h"
+#include "jbwm.h"
 
 void
-arwm_current_to_head(void)
+jbwm_current_to_head(void)
 {
 	if(current && (current != head_client))
 	{
@@ -30,9 +30,9 @@ find_screen(Window root)
 {
 	ubyte i;
 
-	for(i = 0; i < arwm.X.num_screens; i++)
-		if(arwm.X.screens[i].root == root)
-			return &arwm.X.screens[i];
+	for(i = 0; i < jbwm.X.num_screens; i++)
+		if(jbwm.X.screens[i].root == root)
+			return &jbwm.X.screens[i];
 
 	return NULL;
 }
@@ -53,7 +53,7 @@ handle_map_request(XMapRequestEvent * e)
 	{
 		XWindowAttributes attr;
 
-		XGetWindowAttributes(arwm.X.dpy, e->window, &attr);
+		XGetWindowAttributes(jbwm.X.dpy, e->window, &attr);
 		make_new_client(e->window, find_screen(attr.root));
 	}
 }
@@ -68,7 +68,7 @@ handle_unmap_event(XUnmapEvent * e)
 		else
 		{
 			c->flags |= AR_CLIENT_REMOVE;
-			arwm.flags |= ARWM_FLAG_NEED_TIDY;
+			jbwm.flags |= ARWM_FLAG_NEED_TIDY;
 		}
 	}
 }
@@ -82,7 +82,7 @@ handle_colormap_change(XColormapEvent * e)
 	if(c && e->new)
 	{
 		c->cmap = e->colormap;
-		XInstallColormap(arwm.X.dpy, c->cmap);
+		XInstallColormap(jbwm.X.dpy, c->cmap);
 	}
 }
 #endif /* USE_CMAP */
@@ -123,10 +123,10 @@ handle_enter_event(XCrossingEvent * e)
 			|| (e->window != c->window))
 			return;
 		select_client(c);
-		arwm_current_to_head();
+		jbwm_current_to_head();
 	}
 	else
-		XUnmapWindow(arwm.X.dpy, e->window);
+		XUnmapWindow(jbwm.X.dpy, e->window);
 }
 
 #if 0
@@ -139,8 +139,8 @@ handle_mappingnotify_event(XMappingEvent * e)
 	{
 		unsigned short i;
 
-		for(i = 0; i < arwm.X.num_screens; i++)
-			grab_keys_for_screen(&arwm.X.screens[i]);
+		for(i = 0; i < jbwm.X.num_screens; i++)
+			grab_keys_for_screen(&jbwm.X.screens[i]);
 	}
 }
 #endif
@@ -164,7 +164,7 @@ static void
 do_client_tidy()
 {
 
-	if(arwm.flags & ARWM_FLAG_NEED_TIDY)
+	if(jbwm.flags & ARWM_FLAG_NEED_TIDY)
 	{
 		Client *c;
 		Client *nc;
@@ -180,11 +180,11 @@ do_client_tidy()
 
 
 static void
-arwm_process_events(void)
+jbwm_process_events(void)
 {
 	XEvent ev;
 
-	XNextEvent(arwm.X.dpy, &ev);
+	XNextEvent(jbwm.X.dpy, &ev);
 	switch (ev.type)
 	{
 	case EnterNotify:
@@ -205,7 +205,7 @@ arwm_process_events(void)
 		break;
 	case KeyPress:
 		LOG("KeyPress");
-		arwm_handle_key_event(&ev.xkey);
+		jbwm_handle_key_event(&ev.xkey);
 		break;
 #ifdef USE_TBAR
 	case Expose:
@@ -215,11 +215,11 @@ arwm_process_events(void)
 #endif
 	case ButtonPress:
 		LOG("ButtonPress");
-		arwm_handle_button_event(&ev.xbutton);
+		jbwm_handle_button_event(&ev.xbutton);
 		break;
 	case ConfigureRequest:
 		LOG("ConfigureRequest");
-		arwm_handle_configure_request(&ev.xconfigurerequest);
+		jbwm_handle_configure_request(&ev.xconfigurerequest);
 		break;
 #ifdef USE_CMAP
 	case ColormapNotify:
@@ -248,7 +248,7 @@ event_main_loop(void)
 	/* main event loop here */
 	for(;;)
 	{
-		arwm_process_events();
+		jbwm_process_events();
 		do_client_tidy();
 	}
 }
