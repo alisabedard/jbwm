@@ -37,10 +37,10 @@
 #define KEY_RIGHT	XK_l
 #endif
 
-#define KEY_ALTLOWER	XK_KP_Insert
+#define KEY_ALTLOWER	XK_minus
 #define KEY_INFO	XK_F5
 #define KEY_MAX		XK_space
-#define KEY_FIX		XK_F2
+#define KEY_FIX		XK_f
 #define KEY_MOVE	XK_m
 /*
  * Mixtures of Ctrl, Alt an Escape are used for things like VMWare and
