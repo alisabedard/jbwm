@@ -5,16 +5,16 @@
 XColor
 jbwm_get_XColor(const ubyte r, const ubyte g, const ubyte b)
 {
-	XColor color;
+	XColor c;
 
-	color.red = r << 8;
-	color.green = g << 8;
-	color.blue = b << 8;
+	c.red = r << 8;
+	c.green = g << 8;
+	c.blue = b << 8;
 
 	XAllocColor(jbwm.X.dpy, DefaultColormap(jbwm.X.dpy, 
-		DefaultScreen(jbwm.X.dpy)), &color);
+		DefaultScreen(jbwm.X.dpy)), &c);
 
-	return color;
+	return c;
 }
 
 GC

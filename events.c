@@ -163,9 +163,10 @@ handle_expose_event(XEvent * ev)
 static void
 do_client_tidy()
 {
-
+#if 0
 	if(jbwm.flags & ARWM_FLAG_NEED_TIDY)
 	{
+#endif 
 		Client *c;
 		Client *nc;
 
@@ -175,7 +176,9 @@ do_client_tidy()
 			if(c->flags & AR_CLIENT_REMOVE)
 				remove_client(c);
 		}
+#if 0
 	}		
+#endif
 }
 
 
