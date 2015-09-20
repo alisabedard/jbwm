@@ -90,7 +90,7 @@ jbwm_handle_button_event(XButtonEvent * e)
 		   to register a middle button press, even
 		   with X Emulate3Buttons enabled.  */
 		sweep(c);
-		drag(c);
+		/*drag(c);*/
 		break;
 	case Button4:
 		move_client_with_vdesk(c, True);
