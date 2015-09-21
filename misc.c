@@ -93,7 +93,6 @@ handle_xerror(Display * dpy, XErrorEvent * e)
 				}
 				LOG("handle_xerror() : flag for removal");
 				remove_client(c);
-				jbwm.flags &= ~ARWM_FLAG_NEED_TIDY;
 			}
 	
 		}

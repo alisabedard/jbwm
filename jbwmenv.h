@@ -35,13 +35,11 @@ struct ARWMEnvironment
 		ScreenInfo *screens;
 		Cursor cursor;
 #ifdef USE_SHAPE
+		ubyte have_shape;
 		int shape_event;
 #endif /* USE_SHAPE */
 	} X;
 	ARWMTitlebarData titlebar;
-#define ARWM_FLAG_NEED_TIDY 1
-#define ARWM_FLAG_HAVE_SHAPE 1 << 1
-	ubyte flags;
 };
 
 typedef struct ARWMEnvironment ARWMEnvironment;

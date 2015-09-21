@@ -8,41 +8,24 @@
 #include <string.h>
 #include "screen.h"
 
-#ifdef INFORMATION_ON_OUTLINE
-static void
-draw_outline_information(Client * c)
-{
-	ScreenInfo * s = c->screen;
-	XRectangle * g = &(c->geometry);
-	char buf[27];
-
-	snprintf(buf, sizeof(buf), "%dx%d+%d+%d", 
-		g->x, g->y, g->width, g->height);
-	XDrawString(jbwm.X.dpy, s->root, s->gc, 
-		g->x, g->y, buf, strlen(buf));
-}
-#endif /* INFORMATION_ON_OUTLINE */
-
 static void
 draw_outline(Client * c)
 {
 	XRectangle * g;
 	XRectangle box;
 	const ubyte border = c->border;
+	const ubyte th = c->flags & AR_CLIENT_SHAPED ? 0 : TITLEBAR_HEIGHT;
 
 	if(!c->screen)
 		return;
 	g=&(c->geometry);
 	box.x=g->x-border;
-	box.y=g->y-TITLEBAR_HEIGHT;
+	box.y=g->y-th;
 	box.width=g->width+border;
-	box.height=g->height+(c->flags & AR_CLIENT_SHADED?0:TITLEBAR_HEIGHT);
+	box.height=g->height+(c->flags & AR_CLIENT_SHADED?0:th);
 	XDrawRectangle(jbwm.X.dpy, c->screen->root, c->screen->gc, 
 		box.x, box.y, box.width, box.height);
 
-#ifdef INFORMATION_ON_OUTLINE
-	draw_outline_information(c);
-#endif /* INFORMATION_ON_OUTLINE */
 }
 
 static void
@@ -258,7 +241,7 @@ moveresize(Client * c)
 {
 	const Bool shaped = (c->flags & AR_CLIENT_SHAPED);
 	XRectangle * g = &(c->geometry);
-	const ubyte tb = TITLEBAR_HEIGHT;
+	const ubyte tb = shaped ? 0 : TITLEBAR_HEIGHT;
 	const unsigned int parent_height = g->height + (((c->flags 
 		& AR_CLIENT_SHADED) || shaped ? 0 : tb));
 	const ubyte border = c->border;

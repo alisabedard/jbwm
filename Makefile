@@ -69,17 +69,6 @@ DEFINES += -DUSE_CLOSE_BUTTON
 # Uncomment to enable colormap support
 #DEFINES += -DUSE_CMAP
 
-# Uncomment to enable display of window geometry properties on resize.
-# Disabling this information should shorten the execution time of DRAW_OUTLINE,
-# which is often at the top of the profiled function count.  
-
-# DEFINES += -DINFORMATION_ON_OUTLINE
-
-# Uncomment the following line if you want to use Ctrl+Alt+q to kill windows
-# instead of Ctrl+Alt+Escape (or just set it to what you want).  This is
-# useful under XFree86/Cygwin and VMware (probably)
-#DEFINES += -DKEY_KILL=XK_q
-
 # Uncomment to enable EWMH support.  Currently buggy and incomplete
 #DEFINES += -DUSE_EWMH
 #SRCS+= ewmh.c 

@@ -109,15 +109,13 @@ fix_client(Client * c)
 }
 
 static void
-kill_parent_window(Client * c)
+unparent_window(Client * c)
 {
 	XReparentWindow(jbwm.X.dpy, c->window, c->screen->root,
 		c->geometry.x, c->geometry.y);
-	XSetWindowBorderWidth(jbwm.X.dpy, c->window, c->old_border);
 	XRemoveFromSaveSet(jbwm.X.dpy, c->window);
-	if(c->parent)
-		XDestroyWindow(jbwm.X.dpy, c->parent);
 }
+
 static void
 relink_window_list(Client * c)
 {
@@ -136,16 +134,13 @@ relink_window_list(Client * c)
 void
 remove_client(Client * c)
 {
-#if 0
-	XUnmapWindow(jbwm.X.dpy, c->parent);
-#endif
-#ifdef USE_TBAR
+#ifdef USE_TBAR	
 	remove_info_window(c);
-#endif
-	kill_parent_window(c);
+#endif /* USE_TBAR */
+	unparent_window(c);
 	relink_window_list(c);
-	if(current == c)
-		current = NULL;	/* an enter event should set this up again */
+	if(current==c)
+		current=NULL;
 	free(c);
 }
 
@@ -183,8 +178,6 @@ set_shape(Client * c)
 	int i, b;
 	unsigned int u;		/* dummies */
 
-	LOG_DEBUG("set_shape(c)\n");
-
 	/* Validate inputs:  Make sure that the SHAPE extension is
 	   available, and make sure that C is initialized.  */
 	if(!jbwm.X.have_shape || !c)
@@ -201,10 +194,8 @@ set_shape(Client * c)
 	{
 		c->flags |= AR_CLIENT_SHAPED | AR_CLIENT_DONT_USE_TITLEBAR;
 		XShapeCombineShape(jbwm.X.dpy, c->parent, ShapeBounding, 0, 
-			TITLEBAR_HEIGHT + 0, c->window, ShapeBounding, 
+			0, c->window, ShapeBounding, 
 			ShapeSet);
-
-		LOG_DEBUG("\t c is SHAPED\n");
 	}
 }
 #endif

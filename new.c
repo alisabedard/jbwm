@@ -355,15 +355,15 @@ reparent(Client * c)
 	p_attr.override_redirect = True;
 	p_attr.event_mask =
 		ChildMask | ButtonPressMask | EnterWindowMask;
-
-	if(!(c->flags & AR_CLIENT_SHAPED))
-		p_attr.background_pixel = c->screen->bg.pixel;
-	c->parent =
-		XCreateWindow(jbwm.X.dpy, c->screen->root, x, y, g->width,
-			g->height + y_mod, c->border, DefaultDepth(jbwm.X.dpy, 
-			c->screen->screen), CopyFromParent, 
-			DefaultVisual(jbwm.X.dpy, c->screen->screen), 
-			valuemask, &p_attr);
+	if (c->flags & AR_CLIENT_SHAPED)
+		c->parent=c->screen->root;
+	else
+		c->parent =
+			XCreateWindow(jbwm.X.dpy, c->screen->root, x, y, g->width,
+				g->height + y_mod, c->border, DefaultDepth(jbwm.X.dpy, 
+				c->screen->screen), CopyFromParent, 
+				DefaultVisual(jbwm.X.dpy, c->screen->screen), 
+				valuemask, &p_attr);
 	XAddToSaveSet(jbwm.X.dpy, c->window);
 	XSetWindowBorderWidth(jbwm.X.dpy, c->window, 0);
 #ifdef USE_EWMH
@@ -373,10 +373,8 @@ reparent(Client * c)
 	if(!(c->flags & AR_CLIENT_DONT_USE_TITLEBAR))
 		update_info_window(c);
 #endif
-	XReparentWindow(jbwm.X.dpy, c->window, c->parent, 0, 
-		((c->flags & AR_CLIENT_SHAPED) ? 0 : TITLEBAR_HEIGHT));
+	XReparentWindow(jbwm.X.dpy, c->window, c->parent, 0, 0);
 	XMapWindow(jbwm.X.dpy, c->window);
-	XUngrabPointer(jbwm.X.dpy, CurrentTime);
 }
 
 /* Get WM_NORMAL_HINTS property */

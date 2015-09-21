@@ -68,7 +68,6 @@ handle_unmap_event(XUnmapEvent * e)
 		else
 		{
 			c->flags |= AR_CLIENT_REMOVE;
-			jbwm.flags |= ARWM_FLAG_NEED_TIDY;
 		}
 	}
 }
@@ -129,21 +128,6 @@ handle_enter_event(XCrossingEvent * e)
 		XUnmapWindow(jbwm.X.dpy, e->window);
 }
 
-#if 0
-static void
-handle_mappingnotify_event(XMappingEvent * e)
-{
-	LOG("handle_mappingnotify_event\n");
-	XRefreshKeyboardMapping(e);
-	if(e->request == MappingKeyboard)
-	{
-		unsigned short i;
-
-		for(i = 0; i < jbwm.X.num_screens; i++)
-			grab_keys_for_screen(&jbwm.X.screens[i]);
-	}
-}
-#endif
 #ifdef USE_TBAR
 static void
 handle_expose_event(XEvent * ev)
@@ -163,10 +147,6 @@ handle_expose_event(XEvent * ev)
 static void
 do_client_tidy()
 {
-#if 0
-	if(jbwm.flags & ARWM_FLAG_NEED_TIDY)
-	{
-#endif 
 		Client *c;
 		Client *nc;
 
@@ -176,9 +156,6 @@ do_client_tidy()
 			if(c->flags & AR_CLIENT_REMOVE)
 				remove_client(c);
 		}
-#if 0
-	}		
-#endif
 }
 
 
@@ -197,6 +174,7 @@ jbwm_process_events(void)
 	case UnmapNotify:
 		LOG("UnmapNotify");
 		handle_unmap_event(&ev.xunmap);
+		do_client_tidy();
 		break;
 	case PropertyNotify:
 		LOG("PropertyNotify");
@@ -230,12 +208,6 @@ jbwm_process_events(void)
 		handle_colormap_change(&ev.xcolormap);
 		break;
 #endif /* USE_CMAP */
-#if 0
-	case MappingNotify:
-		LOG("MappingNotify");
-		handle_mappingnotify_event(&ev.xmapping);
-		break;
-#endif
 #ifdef USE_SHAPE
 	case ShapeNotify:
 		LOG("ShapeNotify");
@@ -250,9 +222,6 @@ event_main_loop(void)
 {
 	/* main event loop here */
 	for(;;)
-	{
 		jbwm_process_events();
-		do_client_tidy();
-	}
 }
 
