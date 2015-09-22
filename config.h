@@ -9,18 +9,9 @@
 
 /* Default fonts */
 #ifdef USE_XFT
-/*#define DEF_FONT "Sans Bold 10"*/
-/*#define DEF_FONT "Luxi Sans-11:Bold"*/
 #define DEF_FONT "Monospace 10"
 #else /* ! USE_XFT */
-/* #define DEF_FONT "-*-helvetica-*-r-*-*-*-100-*-*-*-*-*-*" */
-/*#define DEF_FONT "9x15"*/
-/*#define DEF_FONT "fixed"*/
 #define DEF_FONT "9x15"
-#define FONT_Y_OFFSET 4
-#if 0
-#define DEF_FONT "8x13bold"
-#endif /* 0 */
 #endif /* USE_XFT */
 
 /* Default colors */
@@ -56,6 +47,7 @@
 #undef USE_XBM /* Prefer USE_XPM */
 #endif /* USE_XPM && USE_XBM */
 
+#define FONT_Y_OFFSET jbwm.X.font->descent
 /* Values.  */
 #ifdef USE_XFT
 #define TITLE_FONT_HEIGHT jbwm.X.font->height
@@ -64,7 +56,7 @@
 #endif /* USE_XFT */
 /* Ensure that the title text fits within the titlebar.  */
 #ifdef USE_TBAR
-#define TITLEBAR_HEIGHT MAX(22,(TITLE_FONT_HEIGHT+ARWM_BORDER_WIDTH))
+#define TITLEBAR_HEIGHT MAX(16,(TITLE_FONT_HEIGHT+ARWM_BORDER_WIDTH))
 #else
 #define TITLEBAR_HEIGHT 8
 #endif

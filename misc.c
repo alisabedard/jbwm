@@ -11,40 +11,6 @@
 #include <unistd.h>
 #include "jbwm.h"
 
-__attribute__ ((noreturn))
-void
-jbwm_exit(const int status)
-{
-#if 0
-	if(head_client)
-	while(head_client)
-		remove_client(head_client);
-	XSetInputFocus(jbwm.X.dpy, PointerRoot, RevertToPointerRoot,
-		CurrentTime);
-	if(jbwm.X.font)
-#ifdef USE_XFT
-		XftFontClose(jbwm.X.dpy, jbwm.X.font);
-#else /* ! USE_XFT */
-		XFreeFont(jbwm.X.dpy, jbwm.X.font);
-#endif /* USE_XFT */
-	while(jbwm.X.num_screens--)
-	{
-		XFreeGC(jbwm.X.dpy, 
-			jbwm.X.screens[jbwm.X.num_screens].gc);
-		XInstallColormap(jbwm.X.dpy, DefaultColormap(jbwm.X.dpy, 
-			jbwm.X.num_screens));
-	}
-#ifdef USE_TBAR
-	ARWMTitlebarData_delete(&jbwm.titlebar);
-#endif
-	free(jbwm.X.screens);
-	XFreeCursor(jbwm.X.dpy, jbwm.X.cursor);
-	XCloseDisplay(jbwm.X.dpy);
-#endif /* 0 */
-
-	exit(status);
-}
-
 int
 handle_xerror(Display * dpy, XErrorEvent * e)
 {

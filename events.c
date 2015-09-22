@@ -174,7 +174,7 @@ jbwm_process_events(void)
 	case UnmapNotify:
 		LOG("UnmapNotify");
 		handle_unmap_event(&ev.xunmap);
-		do_client_tidy();
+		do_client_tidy(); 
 		break;
 	case PropertyNotify:
 		LOG("PropertyNotify");
@@ -223,5 +223,6 @@ event_main_loop(void)
 	/* main event loop here */
 	for(;;)
 		jbwm_process_events();
+		do_client_tidy(); 
 }
 

@@ -126,7 +126,7 @@ jbwm_handle_key_event(XKeyEvent * e)
 		spawn_terminal();
 		break;
 	case KEY_QUIT:
-		jbwm_exit(0);
+		exit(0);
 	case KEY_LOCK:
 		if(system(XLOCK_CMD))
 			perror(XLOCK_CMD);

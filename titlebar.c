@@ -66,7 +66,7 @@ draw_info_strings(Client * c, char *name)
 	}
 #else /* ! USE_XFT */
 	XDrawString(jbwm.X.dpy, info_window, c->screen->gc, x+5, 
-			TITLE_FONT_HEIGHT*1.25-FONT_Y_OFFSET+2, 
+			TITLE_FONT_HEIGHT-FONT_Y_OFFSET,
 			name, name_length);
 #endif /* USE_XFT */
 	XFree(name);

@@ -1,6 +1,6 @@
 /*
  * jbwm - Restructuring, optimization, and feature fork
- *        Copyright 2007-2012, Jeffrey E. Bedard <jefbed@gmail.com>
+ *        Copyright 2007-2015, Jeffrey E. Bedard <jefbed@gmail.com>
  * evilwm - Minimalist Window Manager for X Copyright (C) 1999-2006 Ciaran
  * Anscomb <jbwm@6809.org.uk> see README for license and other details.
  */
@@ -35,10 +35,13 @@ recalculate_size(Client * c, Position p1, Position p2)
 
 	g->width = abs(p1.x - p2.x);
 	g->height = abs(p1.y - p2.y);
-	g->width -= (g->width - c->base_width) % c->width_inc;
-	g->height -= (g->height - c->base_height) % c->height_inc;
-#define setwh(wh, mm, gtlt) if(c->mm##_##wh && g->wh gtlt c->mm##_##wh)\
-	g->wh = c->mm##_##wh;
+	g->width -= (g->width - c->size->base_width) 
+		% c->size->width_inc;
+	g->height -= (g->height - c->size->base_height) 
+		% c->size->height_inc;
+#define setwh(wh, mm, gtlt) if(c->size->mm##_##wh && g->wh gtlt \
+		c->size->mm##_##wh)\
+			g->wh = c->size->mm##_##wh;
 	setwh(width, min, <);
 	setwh(height, min, <);
 	setwh(width, max, >);
@@ -56,9 +59,6 @@ recalculate_position(Client * c, Position p1, Position p2)
 static void
 recalculate_sweep(Client * c, Position p1, Position p2)
 {
-	/* This is a quick hack for gshterm.  */
-	c->min_height = c->min_width = 0;
-
 	recalculate_size(c, p1, p2);
 	recalculate_position(c, p1, p2);
 

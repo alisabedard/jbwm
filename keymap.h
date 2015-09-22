@@ -16,14 +16,10 @@
 #define KEY_BOTTOMLEFT	XK_KP_End
 #define KEY_BOTTOMRIGHT	XK_KP_Page_Down
 
-#define KEY_RAISE	XK_KP_Up
-#define KEY_LOWER	XK_KP_Down
-#if 0
-#define KEY_PREVDESK	XK_KP_Left
-#define KEY_NEXTDESK	XK_KP_Right
-#endif
-#define KEY_PREVDESK	XK_grave
-#define KEY_NEXTDESK	XK_minus
+#define KEY_RAISE	XK_Up
+#define KEY_LOWER	XK_Down
+#define KEY_PREVDESK	XK_Left
+#define KEY_NEXTDESK	XK_Right
 
 #ifdef AVOID_ALPHA
 #define KEY_UP		XK_Up

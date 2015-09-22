@@ -78,7 +78,6 @@ extern Client *current;
 /* new.c */
 
 void make_new_client(Window w, ScreenInfo * s);
-long get_wm_normal_hints(Client * c);
 
 #include "screen.h"
 #include "jbwmmod.h"

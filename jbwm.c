@@ -171,19 +171,6 @@ parse_command_line_args(int argc, char **argv)
 	}
 }
 #endif /* USE_ARGV */
-#if 0
-#include <signal.h>
-
-static void
-setup_signal_handlers(void)
-{
-	struct sigaction act;
-
-	act.sa_handler = handle_signal;
-	sigemptyset(&act.sa_mask);
-	act.sa_flags = 0;
-}
-#endif
 
 static void
 setup_fonts(void)
@@ -383,9 +370,6 @@ __attribute__ ((unused))
 	parse_command_line_args(argc, argv);
 #endif /* USE_ARGV */
 	setup_display();
-#if 0
-	setup_signal_handlers();
-#endif 
 	event_main_loop();
 
 	return 1;

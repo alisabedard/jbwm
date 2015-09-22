@@ -20,12 +20,9 @@ struct Client
 	XRectangle old_geometry;	/* used when maximising */
 
 	unsigned int exposed_width;
+	
+	XSizeHints *size;
 
-	unsigned int min_width, min_height;
-	unsigned int max_width, max_height;
-	int width_inc, height_inc;
-	int base_width, base_height;
-	ubyte old_border;
 	byte vdesk;
 	int shade_height;
 
