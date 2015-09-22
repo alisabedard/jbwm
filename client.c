@@ -141,6 +141,8 @@ remove_client(Client * c)
 	relink_window_list(c);
 	if(current==c)
 		current=NULL;
+	if(c->size)
+		XFree(c->size);
 	free(c);
 }
 

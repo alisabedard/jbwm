@@ -15,12 +15,16 @@
 #endif /* USE_XFT */
 
 /* Default colors */
-#define DEF_FG          "#eef"
-#define DEF_BG          "#444"
-#define TITLEBAR_BG		0x40, 0x40, 0x40
-#define TITLEBAR_RESIZE_BG	0x70, 0x70, 0xA0
-#define TITLEBAR_CLOSE_BG	0xA0, 0x70, 0x80
-#define TITLEBAR_SHADE_BG	0x70, 0xA0, 0x80
+#define DEF_FG          "#ffffff"
+#define DEF_BG          "#202020"
+#if 0
+#define TITLEBAR_CLOSE_BG	0x80, 0x79, 0x70
+#define TITLEBAR_SHADE_BG	0x79, 0x79, 0x79
+#define TITLEBAR_RESIZE_BG	0x70, 0x80, 0x79
+#endif
+#define TITLEBAR_CLOSE_BG	0x70, 0x79, 0x70
+#define TITLEBAR_SHADE_BG	0x70, 0x79, 0x70
+#define TITLEBAR_RESIZE_BG	0x70, 0x79, 0x70
 
 /* #define GRAB_MASK Mod1Mask */
 #define GRAB_MASK Mod4Mask
