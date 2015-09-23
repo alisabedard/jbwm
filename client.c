@@ -109,14 +109,6 @@ fix_client(Client * c)
 }
 
 static void
-unparent_window(Client * c)
-{
-	XReparentWindow(jbwm.X.dpy, c->window, c->screen->root,
-		c->geometry.x, c->geometry.y);
-	XRemoveFromSaveSet(jbwm.X.dpy, c->window);
-}
-
-static void
 relink_window_list(Client * c)
 {
 	if(head_client == c)
@@ -131,6 +123,15 @@ relink_window_list(Client * c)
 	}
 }
 
+static void
+unparent_window(Client * c)
+{
+	XReparentWindow(jbwm.X.dpy, c->window, c->screen->root,
+		c->geometry.x, c->geometry.y);
+	XRemoveFromSaveSet(jbwm.X.dpy, c->window);
+	
+}
+
 void
 remove_client(Client * c)
 {
@@ -139,8 +140,10 @@ remove_client(Client * c)
 #endif /* USE_TBAR */
 	unparent_window(c);
 	relink_window_list(c);
+	/* Set current to head_client instead of NULL 
+		to exorcise ghost windows.  */
 	if(current==c)
-		current=NULL;
+		current=head_client;
 	if(c->size)
 		XFree(c->size);
 	free(c);

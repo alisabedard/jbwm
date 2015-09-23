@@ -28,18 +28,16 @@ DEFINES  = $(EXTRA_DEFINES)
 # add options by setting EXTRA_DEFINES on the make(1) command line,
 # e.g., make EXTRA_DEFINfES="-DDEBUG".
 
-
+CFLAGS += -Os -Wall -W 
 #CFLAGS += -Wall -W -pedantic -std=c89
 # Optimization:
 #CFLAGS += -Os -ffast-math -fomit-frame-pointer 
 # Machine-specific:
 #CFLAGS += -mfpmath=both -mpc64 -floop-parallelize-all
-CFLAGS += -Os 
+#CFLAGS += -Os 
 # Debugging:
 #CFLAGS = -ggdb -pg
 #DEFINES += -DDEBUG
-
-#DEFINES += -D__USE_GNU
 
 # Uncomment to enable SHAPE extension support
 #DEFINES += -DUSE_SHAPE
