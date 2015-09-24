@@ -124,23 +124,6 @@ handle_enter_event(XCrossingEvent * e)
 		select_client(c);
 		jbwm_current_to_head();
 	}
-#if 0
-#if 0
-		if((c->vdesk != c->screen->vdesk)
-			|| (e->window != c->window))
-			return;
-		select_client(c);
-		jbwm_current_to_head();
-#endif
-		if(!is_sticky(c) && c->vdesk != c->screen->vdesk)
-			return
-		select_client(c);
-	}
-#if 0
-	else
-		XUnmapWindow(jbwm.X.dpy, e->window);
-#endif
-#endif
 }
 
 #ifdef USE_TBAR

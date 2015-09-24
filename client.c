@@ -86,38 +86,6 @@ select_client(Client * c)
 
 	}
 	current=c;
-#if 0
-	/* Set inactive window border for CURRENT.  */
-	if(current)
-	{
-		XSetWindowBorder(jbwm.X.dpy, current->parent,
-			current->screen->bg.pixel);
-		current->flags &= ~AR_CLIENT_ACTIVE;
-#ifdef USE_XPM
-		jbwm_draw_close_button(current);
-#endif
-	}
-
-	if(c)
-	{
-		ScreenInfo * s = c->screen;
-
-		c->flags |= AR_CLIENT_ACTIVE;
-		XSetWindowBorder(jbwm.X.dpy, c->parent, (c->flags 
-			& AR_CLIENT_BLACK_BORDER) ?  BlackPixel(jbwm.X.dpy,
-			s->screen) : (is_sticky(c) ? s->fc.pixel 
-			: s->fg.pixel));
-#ifdef USE_CMAP
-		XInstallColormap(jbwm.X.dpy, c->cmap);
-#endif /* USE_CMAP */
-		XSetInputFocus(jbwm.X.dpy, c->window,
-			RevertToPointerRoot, CurrentTime);
-#ifdef USE_XPM
-		jbwm_draw_close_button(c);
-#endif
-	}
-	current = c;
-#endif
 }
 
 void

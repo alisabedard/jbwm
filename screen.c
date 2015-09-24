@@ -11,20 +11,30 @@
 static void
 draw_outline(Client * c)
 {
-	XRectangle * g;
-	XRectangle box;
-	const ubyte border = c->border;
-	const ubyte th = c->flags & AR_CLIENT_SHAPED ? 0 : TITLEBAR_HEIGHT;
 
 	if(!c->screen)
 		return;
-	g=&(c->geometry);
-	box.x=g->x-border;
-	box.y=g->y-th;
-	box.width=g->width+border;
-	box.height=g->height+(c->flags & AR_CLIENT_SHADED?0:th);
-	XDrawRectangle(jbwm.X.dpy, c->screen->root, c->screen->gc, 
-		box.x, box.y, box.width, box.height);
+	{
+		XRectangle * g;
+		XRectangle box;
+		const ubyte border = c->border;
+
+		g=&(c->geometry);
+		box.x=g->x-border;
+		box.width=g->width+border;
+		{
+			const ubyte th = 
+#ifdef USE_SHAPE
+				c->flags & AR_CLIENT_SHAPED ? 0 :
+#endif /* USE_SHAPE */
+				TITLEBAR_HEIGHT;
+			
+			box.y=g->y - th;
+			box.height=g->height+(c->flags & AR_CLIENT_SHADED?0:th);
+		}
+		XDrawRectangle(jbwm.X.dpy, c->screen->root, c->screen->gc, 
+			box.x, box.y, box.width, box.height);
+	}
 
 }
 
