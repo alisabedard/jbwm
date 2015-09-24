@@ -66,6 +66,27 @@ send_config(Client * c)
 void
 select_client(Client * c)
 {
+	if(current)
+	{
+		XSetWindowBorder(jbwm.X.dpy, current->parent, 
+			current->screen->bg.pixel);
+		current->flags &= ~AR_CLIENT_ACTIVE;
+	}
+	if(c)
+	{
+		c->flags |= AR_CLIENT_ACTIVE;
+		XSetWindowBorder(jbwm.X.dpy, c->parent, !is_sticky(c)
+			? c->screen->fg.pixel : c->screen->fc.pixel);
+
+#ifdef USE_CMAP
+		XInstallColormap(jbwm.X.dpy, c->cmap);
+#endif /* USE_CMAP */
+		XSetInputFocus(jbwm.X.dpy, c->window, RevertToPointerRoot, 
+			CurrentTime);
+
+	}
+	current=c;
+#if 0
 	/* Set inactive window border for CURRENT.  */
 	if(current)
 	{
@@ -96,6 +117,7 @@ select_client(Client * c)
 #endif
 	}
 	current = c;
+#endif
 }
 
 void
@@ -129,24 +151,26 @@ unparent_window(Client * c)
 	XReparentWindow(jbwm.X.dpy, c->window, c->screen->root,
 		c->geometry.x, c->geometry.y);
 	XRemoveFromSaveSet(jbwm.X.dpy, c->window);
-	
+	if (c->parent)
+		XDestroyWindow(jbwm.X.dpy, c->parent);
 }
 
 void
 remove_client(Client * c)
 {
+	XGrabServer(jbwm.X.dpy);
 #ifdef USE_TBAR	
 	remove_info_window(c);
 #endif /* USE_TBAR */
 	unparent_window(c);
 	relink_window_list(c);
-	/* Set current to head_client instead of NULL 
-		to exorcise ghost windows.  */
 	if(current==c)
-		current=head_client;
+		current=NULL;
 	if(c->size)
 		XFree(c->size);
 	free(c);
+	XUngrabServer(jbwm.X.dpy);
+	XSync(jbwm.X.dpy, False);
 }
 
 static int
