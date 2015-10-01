@@ -45,10 +45,13 @@ recalculate_size(Client * c, Position p1, Position p2)
 
 	g->width = abs(p1.x - p2.x);
 	g->height = abs(p1.y - p2.y);
-	g->width -= (g->width - c->size->base_width) 
-		% c->size->width_inc;
-	g->height -= (g->height - c->size->base_height) 
-		% c->size->height_inc;
+	if(c->size->flags & PBaseSize)
+	{
+		g->width -= (g->width - c->size->base_width) 
+			% c->size->width_inc;
+		g->height -= (g->height - c->size->base_height) 
+			% c->size->height_inc;
+	}
 #define setwh(wh, mm, gtlt) if(c->size->mm##_##wh && g->wh gtlt \
 		c->size->mm##_##wh)\
 			g->wh = c->size->mm##_##wh;

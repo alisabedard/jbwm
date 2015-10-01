@@ -1,7 +1,7 @@
 # If you don't use CC 
 #CC       = gcc
 #CC = clang
-#CFLAGS=-O4
+CFLAGS=-Os -ggdb -W -Wall -Werror
 
 # Edit this line if you don't want jbwm to install under /usr.
 # Note that $(DESTDIR) is used by the Debian build process.
@@ -28,7 +28,6 @@ DEFINES  = $(EXTRA_DEFINES)
 # add options by setting EXTRA_DEFINES on the make(1) command line,
 # e.g., make EXTRA_DEFINfES="-DDEBUG".
 
-CFLAGS += -Os -Wall -W 
 #CFLAGS += -Wall -W -pedantic -std=c89
 # Optimization:
 #CFLAGS += -Os -ffast-math -fomit-frame-pointer 
@@ -94,8 +93,6 @@ DEFINES += -DVERSION=\"$(version)\" $(DEBIAN)
 CFLAGS  += $(INCLUDES) $(DEFINES) 
 # Profiling flag.
 #CFLAGS += -pg -O0
-# Maximize warnings.
-CFLAGS += -Wall -Wextra -Werror 
 LDFLAGS += $(LDPATH) $(LIBS)
 # Uncomment for static linking of binary:
 #LDFLAGS += -static 

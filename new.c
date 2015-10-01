@@ -28,9 +28,11 @@ set_class_geometry_attribute(Client *c, Application * a)
 	XRectangle * ag = &(a->geometry);
 
 	if(gm & WidthValue)
-		g->width = ag->width * c->size->width_inc;
+		g->width = ag->width * (c->size->flags & PResizeInc 
+			? c->size->width_inc : 1);
 	if(gm & HeightValue)
-		g->height = ag->height * c->size->height_inc;
+		g->height = ag->height * (c->size->flags & PResizeInc 
+			? c->size->height_inc : 1);
 	if(gm & XValue)
 		g->x = (gm & XNegative) ? ag->x + c->screen->width
 			- g->width - c->border : ag->x + c->border;
