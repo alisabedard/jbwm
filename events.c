@@ -60,15 +60,14 @@ handle_map_request(XMapRequestEvent * e)
 static void
 handle_unmap_event(XUnmapEvent * e)
 {
-	Client *c = find_client(e->window);
-	if(c)
+	Client *c;
+
+	if((c=find_client(e->window)))
 	{
 		if(c->ignore_unmap>0)
 			c->ignore_unmap--;
 		else
-		{
-			c->flags |= AR_CLIENT_REMOVE;
-		}
+			remove_client(c);
 	}
 }
 
@@ -143,21 +142,6 @@ handle_expose_event(XEvent * ev)
 #endif
 
 static void
-do_client_tidy()
-{
-		Client *c;
-		Client *nc;
-
-		for(c=head_client; c; c=nc)
-		{
-			nc=c->next;
-			if(c->flags & AR_CLIENT_REMOVE)
-				remove_client(c);
-		}
-}
-
-
-static void
 jbwm_process_events(void)
 {
 	XEvent ev;
@@ -172,7 +156,6 @@ jbwm_process_events(void)
 	case UnmapNotify:
 		LOG("UnmapNotify");
 		handle_unmap_event(&ev.xunmap);
-		do_client_tidy(); 
 		break;
 	case PropertyNotify:
 		LOG("PropertyNotify");
@@ -221,6 +204,5 @@ event_main_loop(void)
 	/* main event loop here */
 	for(;;)
 		jbwm_process_events();
-		do_client_tidy(); 
 }
 

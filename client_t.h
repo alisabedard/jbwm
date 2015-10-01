@@ -30,15 +30,14 @@ struct Client
 
 #define AR_CLIENT_IS_STICKY 		(1<<0)
 /* Set when client needs to be removed: */
-#define AR_CLIENT_REMOVE 		(1<<1)
+#define AR_CLIENT_SHAPED		(1<<1)
 #define AR_CLIENT_ACTIVE 		(1<<2)
 #define AR_CLIENT_SHADED 		(1<<3)
 #define AR_CLIENT_DONT_MANAGE 		(1<<4)
 #define AR_CLIENT_DONT_USE_TITLEBAR 	(1<<5)
 #define AR_CLIENT_BLACK_BORDER 		(1<<6)
-#define AR_CLIENT_SHAPED 		(1<<7)
 
-	unsigned int flags;
+	ubyte flags;
 
 	/*
 	 * This is stored within the structure to allow for one-time

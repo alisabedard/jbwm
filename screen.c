@@ -329,7 +329,7 @@ next(void)
 			if(!newc && !current)
 				return;
 		}
-		if(!newc)
+		else
 			newc = head_client;
 		if(!newc || newc == current)
 			return;

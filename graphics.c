@@ -38,14 +38,19 @@ draw_gradient(Window win, GC gc, const int x, const int y,
 	XGCValues gv;
 
 	XGetGCValues(dpy, gc, GCForeground, &gv);
-
+	if(gv.foreground)
+		gv.foreground=gv.foreground/2;
 	for(i = 0; i <= h; i++)
 	{
 		GC lgc;
-		const ubyte d = 7;
+		const ubyte d = 8;
 
 		gv.foreground += (i<=h/2)?d:-d;
 		lgc=XCreateGC(dpy, win, GCForeground, &gv);
+#ifdef DEBUG
+		printf("fg: %d line: %d\n", (int)gv.foreground, i);
+		fflush(stdout);
+#endif /* DEBUG */
 		XDrawLine(dpy, win, lgc, x, y + i, x + w, y + i);
 		XFreeGC(dpy, lgc);
 	}

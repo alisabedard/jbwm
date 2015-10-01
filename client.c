@@ -91,6 +91,8 @@ select_client(Client * c)
 void
 fix_client(Client * c)
 {
+	if(c->vdesk != c->screen->vdesk)
+		return;
 	toggle_sticky(c);
 	select_client(c);
 #ifdef USE_EWMH

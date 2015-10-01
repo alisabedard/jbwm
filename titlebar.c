@@ -3,15 +3,19 @@
 /* Include the title button bitmaps.  */
 #ifdef USE_XPM
 #include <X11/xpm.h>
-#include "close_button.xpm"
-#include "close_button_inactive.xpm"
-#include "resize_button.xpm"
-#include "gradient.xpm"
-#include "shade.xpm"
+#include "images/close_button.xpm"
+#include "images/close_button_inactive.xpm"
+#include "images/resize_button.xpm"
+#include "images/gradient.xpm"
+
+#ifdef USE_SHADE
+#include "images/shade.xpm"
+#endif /* USE_SHADE */
+
 #elif USE_XBM
-#include "close.xbm"
-#include "resize.xbm"
-#include "shade.xbm"
+#include "images/close.xbm"
+#include "images/resize.xbm"
+#include "images/shade.xbm"
 #endif /* USE_XPM */
 
 #ifdef USE_XFT

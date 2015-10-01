@@ -43,14 +43,14 @@ CFLAGS += -Os -Wall -W
 #DEFINES += -DUSE_SHAPE
 #LIBS += -lXext # Required for SHAPE extension
 
-# Titlebar xbm/xpm support:  
+# Titlebar xbm/xpm support:  No longer compiles!
 #DEFINES += -DUSE_XBM
 # XPM support is beautiful but substantially increases binary size.
 #DEFINES += -DUSE_XPM
 #LIBS	+= -lXpm
 
-# Titlebar gradient support:
-#DEFINES += -DUSE_GRADIENT
+# Titlebar gradient support: WIP!
+# DEFINES += -DUSE_GRADIENT
 
 # Titlebar Xft support:
 # Warning, Xft impedes performance and leaks memory.
@@ -79,7 +79,7 @@ DEFINES += -DUSE_TBAR
 SRCS += titlebar.c
 
 # Uncomment to enable window snapping.
-DEFINES += -DUSE_SNAP
+#DEFINES += -DUSE_SNAP
 
 # Uncomment to enable shade button (buggy)
 # DEFINES += -DUSE_SHADE

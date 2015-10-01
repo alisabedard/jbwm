@@ -51,13 +51,22 @@
 #ifdef USE_XFT
 #define TITLE_FONT_HEIGHT jbwm.X.font->height
 #else /* ! USE_XFT */
+#ifndef USE_XPM
 #define TITLE_FONT_HEIGHT (jbwm.X.font->ascent+jbwm.X.font->descent)
+#else /* USE_XPM */
+#define TITLE_FONT_HEIGHT (jbwm.X.font->ascent+jbwm.X.font->descent+4)
+#endif /* !USE_XPM */
 #endif /* USE_XFT */
+
 /* Ensure that the title text fits within the titlebar.  */
 #ifdef USE_TBAR
 #define TITLEBAR_HEIGHT MAX(16,(TITLE_FONT_HEIGHT+ARWM_BORDER_WIDTH))
 #else
 #define TITLEBAR_HEIGHT 8
+#endif
+#ifdef USE_XPM
+#undef TITLEBAR_HEIGHT
+#define TITLEBAR_HEIGHT 24
 #endif
 
 #define BUTTON_WIDTH (TITLEBAR_HEIGHT-ARWM_BORDER_WIDTH)
