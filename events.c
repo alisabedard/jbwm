@@ -57,6 +57,21 @@ handle_map_request(XMapRequestEvent * e)
 		make_new_client(e->window, find_screen(attr.root));
 	}
 }
+
+static void
+cleanup()
+{
+	Client *c, *i;
+
+	for(c=head_client; c; c=i)
+	{
+		i=c->next;
+		if(c->flags & AR_CLIENT_REMOVE)
+			remove_client(c);
+	}
+}
+
+
 static void
 handle_unmap_event(XUnmapEvent * e)
 {
@@ -64,10 +79,15 @@ handle_unmap_event(XUnmapEvent * e)
 
 	if((c=find_client(e->window)))
 	{
-		if(c->ignore_unmap>0)
+		if(c->ignore_unmap)
+		{
 			c->ignore_unmap--;
+		}
 		else
-			remove_client(c);
+		{
+			c->flags |= AR_CLIENT_REMOVE;
+			cleanup();
+		}
 	}
 }
 
@@ -141,6 +161,7 @@ handle_expose_event(XEvent * ev)
 }
 #endif
 
+
 static void
 jbwm_process_events(void)
 {
@@ -196,6 +217,7 @@ jbwm_process_events(void)
 		break;
 #endif /* USE_SHAPE */
 	}
+	cleanup();
 }
 
 void

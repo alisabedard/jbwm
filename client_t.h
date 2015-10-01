@@ -35,7 +35,7 @@ struct Client
 #define AR_CLIENT_SHADED 		(1<<3)
 #define AR_CLIENT_DONT_MANAGE 		(1<<4)
 #define AR_CLIENT_DONT_USE_TITLEBAR 	(1<<5)
-#define AR_CLIENT_BLACK_BORDER 		(1<<6)
+#define AR_CLIENT_REMOVE		(1<<6)
 
 	ubyte flags;
 
