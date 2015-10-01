@@ -1,7 +1,9 @@
-No help.
+Problems and ideas follow:
+
+Would love others to test this and help out.
 Sometimes closed windows stick around, and keep appearing.
 	This is probably an off-by-one error in the client linked list.  
-	Possible fix, make all applications close themselves, remove window kill commands.
+	Believed to be fixed, fingers crossed.  
 Too much preprocessor goop.
 Too many choices for compile time.
 Too many globals.
