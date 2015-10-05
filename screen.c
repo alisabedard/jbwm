@@ -37,14 +37,18 @@ draw_outline(Client * c)
 	}
 
 }
-
+#if 0
 static void
 recalculate_size(Client * c, Position p1, Position p2)
 {
 	XRectangle * g = &(c->geometry);
+	unit v;
 
+	v=abs(p1.x - p2.y);
+	
 	g->width = abs(p1.x - p2.x);
 	g->height = abs(p1.y - p2.y);
+#if 0
 	if(c->size->flags & PBaseSize)
 	{
 		g->width -= (g->width - c->size->base_width) 
@@ -52,6 +56,7 @@ recalculate_size(Client * c, Position p1, Position p2)
 		g->height -= (g->height - c->size->base_height) 
 			% c->size->height_inc;
 	}
+#endif
 #define setwh(wh, mm, gtlt) if(c->size->mm##_##wh && g->wh gtlt \
 		c->size->mm##_##wh)\
 			g->wh = c->size->mm##_##wh;
@@ -60,20 +65,23 @@ recalculate_size(Client * c, Position p1, Position p2)
 	setwh(width, max, >);
 	setwh(height, max, >);
 }
-
+#endif
 static void
-recalculate_position(Client * c, Position p1, Position p2)
+recalculate_size(Client *c, Position p1, Position p2)
 {
-	XRectangle * g = &(c->geometry);
+	XRectangle *g = &(c->geometry);
 
-	g->x = (p1.x <= p2.x) ? p1.x : p1.x - g->width;
-	g->y = (p1.y <= p2.y) ? p1.y : p1.y - g->height;
+	g->width = abs(p1.x - p2.x);
+	g->height = abs(p1.y - p2.y);
 }
+
 static void
 recalculate_sweep(Client * c, Position p1, Position p2)
 {
+	puts("recalculate_sweep()");
 	recalculate_size(c, p1, p2);
-	recalculate_position(c, p1, p2);
+	c->geometry.x=p1.x;
+	c->geometry.y=p1.y;
 
 	SET_CLIENT_CE(c);
 }
@@ -372,6 +380,8 @@ switch_vdesk(ScreenInfo * s, const ubyte v)
 #endif
 		}
 		c->vdesk == v ? unhide(c, NO_RAISE) : hide(c);
+		if(c->flags & AR_CLIENT_REMOVE)
+			hide(c);
 	}
 }
 

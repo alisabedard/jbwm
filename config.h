@@ -17,7 +17,7 @@
 /* Default colors */
 #define DEF_FG          "#ffffff"
 #define DEF_BG          "#202020"
-#define TITLEBAR_CLOSE_BG	0x70, 0x79, 0x70
+#define TITLEBAR_CLOSE_BG	0x80, 0x79, 0x70
 #define TITLEBAR_SHADE_BG	0x70, 0x79, 0x70
 #define TITLEBAR_RESIZE_BG	0x70, 0x79, 0x70
 

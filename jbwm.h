@@ -12,7 +12,9 @@
 #include <X11/Xmd.h>
 #include <X11/Xutil.h>
 #include <X11/keysym.h>
+#ifdef USE_SHAPE
 #include <X11/extensions/shape.h>
+#endif /* USE_SHAPE */
 
 #ifdef USE_XFT
 #include <X11/Xft/Xft.h>
