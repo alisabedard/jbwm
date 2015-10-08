@@ -48,6 +48,8 @@ handle_map_request(XMapRequestEvent * e)
 			switch_vdesk(c->screen, c->vdesk);
 		if(!(c->flags & AR_CLIENT_REMOVE))
 			unhide(c, RAISE);
+		else
+			hide(c);
 		c->ignore_unmap++;
 	}
 	else
