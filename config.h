@@ -43,7 +43,7 @@
 
 /* Sanity checks: */
 #if defined(USE_XPM) && defined(USE_XBM)
-#undef USE_XBM /* Prefer USE_XPM */
+#undef USE_XBM	/* Prefer USE_XPM */
 #endif /* USE_XPM && USE_XBM */
 
 #define FONT_Y_OFFSET jbwm.X.font->descent

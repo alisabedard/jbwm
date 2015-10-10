@@ -33,8 +33,7 @@ initialize_ARWMEnvironment(void)
    ARWMEnvironment structure, as memory would
    have to be manually allocated for each.  */
 /* Things that affect user interaction */
-GlobalOptions opt = 
-{
+GlobalOptions opt = {
 	DEF_FONT,
 	{DEF_FG, DEF_BG, DEF_FC},
 	DEF_TERM
@@ -51,7 +50,7 @@ static void
 process_app_class_options(const char *name)
 {
 	char *tmp;
-	Application * new = calloc(1, sizeof(Application));
+	Application *new = calloc(1, sizeof(Application));
 
 	if((tmp = strchr(name, '/')))
 	{
@@ -83,16 +82,32 @@ parse_modifiers(char *s)
 	{
 		const char *name;
 		unsigned int mask;
-	} modifiers[9] = { { "shift", ShiftMask}, { "lock", LockMask}, 
-		{ "control", ControlMask}, { "mod", Mod1Mask}, 
-		{ "mod1", Mod1Mask}, { "mod2", Mod2Mask}, { "mod3", Mod3Mask},
-		{ "mod4", Mod4Mask}, { "mod5", Mod5Mask}};
-	const char * delim = ",+";
+	} modifiers[9] =
+	{
+		{
+		"shift", ShiftMask},
+		{
+		"lock", LockMask},
+		{
+		"control", ControlMask},
+		{
+		"mod", Mod1Mask},
+		{
+		"mod1", Mod1Mask},
+		{
+		"mod2", Mod2Mask},
+		{
+		"mod3", Mod3Mask},
+		{
+		"mod4", Mod4Mask},
+		{
+	"mod5", Mod5Mask}};
+	const char *delim = ",+";
 	char *tmp;
 	unsigned int ret = 0;
-	for(tmp=strtok(s, delim); tmp; tmp=strtok(NULL, delim))
+	for(tmp = strtok(s, delim); tmp; tmp = strtok(NULL, delim))
 	{
-		ubyte i=0;
+		ubyte i = 0;
 
 		while(i++ < 8)
 			if(!strcmp(modifiers[i].name, tmp))
@@ -103,16 +118,15 @@ parse_modifiers(char *s)
 }
 
 static void
-parse_geometry(const char * arg)
+parse_geometry(const char *arg)
 {
 	XRectangle g;
 
 	if(!head_app)
 		return;
-	head_app->geometry_mask = XParseGeometry(arg, 
-		(int *)&g.x, (int *)&g.y, 
-		(unsigned int *)&g.width, 
-		(unsigned int *)&g.height);
+	head_app->geometry_mask =
+		XParseGeometry(arg, (int *)&g.x, (int *)&g.y,
+		(unsigned int *)&g.width, (unsigned int *)&g.height);
 	head_app->geometry = g;
 }
 
@@ -181,16 +195,16 @@ setup_fonts(void)
 #define FONTOPEN(f) XLoadQueryFont(jbwm.X.dpy, f)
 #endif /* USE_XFT */
 
-	jbwm.X.font = opt.font ? FONTOPEN(opt.font) 
-		: FONTOPEN(DEF_FONT);
+	jbwm.X.font =
+		opt.font ? FONTOPEN(opt.font) : FONTOPEN(DEF_FONT);
 	if(!jbwm.X.font)
 		LOG_ERROR("couldn't find a font to use: "
 #ifdef USE_ARGV
-				"try starting with -f fontname\n"
+			"try starting with -f fontname\n"
 #else
-				"set available font in config.h and rebuild"
+			"set available font in config.h and rebuild"
 #endif /* USE_ARGV */
-				);
+			);
 }
 
 void
@@ -202,12 +216,10 @@ jbwm_grab_button(Window w, unsigned int mask, unsigned int button)
 	ButtonMask, GrabModeAsync, GrabModeSync, None, None)
 		GRAB(0);
 		GRAB(LockMask);
-		GRAB(Mod2Mask); /* Grab for ALT in client window */
+		GRAB(Mod2Mask);	/* Grab for ALT in client window */
 	}
 	while(0);
 }
-
-
 
 static void
 setup_event_listeners(const ubyte i)
@@ -216,8 +228,9 @@ setup_event_listeners(const ubyte i)
 
 	/* set up root window attributes 
 	   - same for each screen */
-	attr.event_mask = ChildMask | EnterWindowMask
-		| ColormapChangeMask | PropertyChangeMask;
+	attr.event_mask =
+		ChildMask | EnterWindowMask | ColormapChangeMask |
+		PropertyChangeMask;
 
 	XChangeWindowAttributes(jbwm.X.dpy, jbwm.X.screens[i].root,
 		CWEventMask, &attr);
@@ -240,8 +253,8 @@ static void
 setup_gc_parameters(XGCValues * gv, const ubyte i)
 {
 	allocate_colors(i);
-	gv->foreground=jbwm.X.screens[i].fg.pixel;
-	gv->background=jbwm.X.screens[i].bg.pixel;
+	gv->foreground = jbwm.X.screens[i].fg.pixel;
+	gv->background = jbwm.X.screens[i].bg.pixel;
 	/* set up GC parameters - same for each screen */
 	gv->function = GXinvert;
 	gv->subwindow_mode = IncludeInferiors;
@@ -257,7 +270,7 @@ setup_gc(const ubyte i)
 	XGCValues gv;
 
 	setup_gc_parameters(&gv, i);
-	jbwm.X.screens[i].gc=
+	jbwm.X.screens[i].gc =
 		XCreateGC(jbwm.X.dpy, jbwm.X.screens[i].root,
 		GCFunction | GCSubwindowMode | GCLineWidth
 #ifndef USE_XFT
@@ -298,8 +311,8 @@ setup_screen_elements(const ubyte i)
 	jbwm.X.screens[i].screen = i;
 	jbwm.X.screens[i].root = RootWindow(jbwm.X.dpy, i);
 	jbwm.X.screens[i].vdesk = KEY_TO_VDESK(XK_1);
-	jbwm.X.screens[i].width=DisplayWidth(jbwm.X.dpy, i);
-	jbwm.X.screens[i].height=DisplayHeight(jbwm.X.dpy, i);
+	jbwm.X.screens[i].width = DisplayWidth(jbwm.X.dpy, i);
+	jbwm.X.screens[i].height = DisplayHeight(jbwm.X.dpy, i);
 }
 
 static void
@@ -319,8 +332,9 @@ setup_shape(void)
 {
 	int e_dummy;
 
-	jbwm.X.have_shape = XShapeQueryExtension(jbwm.X.dpy, 
-		&jbwm.X.shape_event, &e_dummy);
+	jbwm.X.have_shape =
+		XShapeQueryExtension(jbwm.X.dpy, &jbwm.X.shape_event,
+		&e_dummy);
 }
 #endif /* USE_SHAPE */
 
@@ -329,7 +343,8 @@ setup_screens(void)
 {
 	/* now set up each screen in turn */
 	jbwm.X.num_screens = ScreenCount(jbwm.X.dpy);
-	jbwm.X.screens = malloc(jbwm.X.num_screens * sizeof(ScreenInfo));
+	jbwm.X.screens =
+		malloc(jbwm.X.num_screens * sizeof(ScreenInfo));
 	{
 		/* used in scanning windows (XQueryTree) */
 		ubyte i = jbwm.X.num_screens;
@@ -342,8 +357,8 @@ setup_screens(void)
 static void
 setup_display(void)
 {
-	const char * dpy_env = getenv("DISPLAY");
-	if(!(jbwm.X.dpy = XOpenDisplay(dpy_env?dpy_env:":0")))
+	const char *dpy_env = getenv("DISPLAY");
+	if(!(jbwm.X.dpy = XOpenDisplay(dpy_env ? dpy_env : ":0")))
 		exit(1);
 	XSetErrorHandler(handle_xerror);
 	setup_fonts();
@@ -357,13 +372,13 @@ setup_display(void)
 int
 main(int argc
 #ifndef USE_ARGV
-__attribute__ ((unused))
+	__attribute__ ((unused))
 #endif /* not USE_ARGV */
-, char **argv
+	, char **argv
 #ifndef USE_ARGV
-__attribute__ ((unused))
+	__attribute__ ((unused))
 #endif /* not USE_ARGV */
-)
+	)
 {
 	initialize_ARWMEnvironment();
 #ifdef USE_ARGV

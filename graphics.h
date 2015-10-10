@@ -3,11 +3,9 @@
 
 #include "ARWMButton.h"
 
-GC
-jbwm_new_gc_for_XColor(XColor color);
+GC jbwm_new_gc_for_XColor(XColor color);
 
-XColor
-jbwm_get_XColor(const ubyte r, const ubyte g, const ubyte b);
+XColor jbwm_get_XColor(const ubyte r, const ubyte g, const ubyte b);
 
 /*GC
 jbwm_new_gc(const ubyte r, const ubyte g, const ubyte b);*/
@@ -21,10 +19,8 @@ jbwm_new_gc(const ubyte r, const ubyte g, const ubyte b);*/
 #endif /* USE_XBM */
 
 #ifdef USE_GRADIENT
-void
-draw_gradient(Window win, GC gc, const int x, const int y,
+void draw_gradient(Window win, GC gc, const int x, const int y,
 	const unsigned int w, const unsigned int h);
 #endif /* USE_GRADIENT */
 
 #endif /* ARWM_GRAPHICS_H */
-

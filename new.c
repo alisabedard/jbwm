@@ -21,24 +21,28 @@ static void debug_wm_normal_hints(XSizeHints * size);
 #endif
 
 static void
-set_class_geometry_attribute(Client *c, Application * a)
+set_class_geometry_attribute(Client * c, Application * a)
 {
 	const ubyte gm = a->geometry_mask;
-	XRectangle * g = &(c->geometry);
-	XRectangle * ag = &(a->geometry);
+	XRectangle *g = &(c->geometry);
+	XRectangle *ag = &(a->geometry);
 
 	if(gm & WidthValue)
-		g->width = ag->width * (c->size->flags & PResizeInc 
-			? c->size->width_inc : 1);
+		g->width =
+			ag->width *
+			(c->size->flags & PResizeInc ? c->size->
+			width_inc : 1);
 	if(gm & HeightValue)
-		g->height = ag->height * (c->size->flags & PResizeInc 
-			? c->size->height_inc : 1);
+		g->height =
+			ag->height *
+			(c->size->flags & PResizeInc ? c->size->
+			height_inc : 1);
 	if(gm & XValue)
-		g->x = (gm & XNegative) ? ag->x + c->screen->width
-			- g->width - c->border : ag->x + c->border;
+		g->x = (gm & XNegative) ? ag->x + c->screen->width -
+			g->width - c->border : ag->x + c->border;
 	if(gm & YValue)
-		g->y = (gm & YNegative) ? ag->y + c->screen->height
-			- g->height - c->border : ag->y + c->border;
+		g->y = (gm & YNegative) ? ag->y + c->screen->height -
+			g->height - c->border : ag->y + c->border;
 	moveresize(c);
 }
 
@@ -60,7 +64,7 @@ set_class_attributes(Client * c, Window w)
 		XGetClassHint(jbwm.X.dpy, w, class);
 		for(a = head_app; a; a = a->next)
 			set_class_geometry_attribute(c, a);
-			/*test_set_class_attribute(c, a, class);*/
+		/*test_set_class_attribute(c, a, class); */
 		XFree(class->res_name);
 		XFree(class->res_class);
 		XFree(class);
@@ -139,8 +143,9 @@ make_new_client(Window w, ScreenInfo * s)
 	c = Client_new(w, s);
 	if(c->flags & AR_CLIENT_DONT_MANAGE)
 		return;
-	XSelectInput(jbwm.X.dpy, c->window, EnterWindowMask
-		| PropertyChangeMask  | ColormapChangeMask);
+	XSelectInput(jbwm.X.dpy, c->window,
+		EnterWindowMask | PropertyChangeMask |
+		ColormapChangeMask);
 #ifdef USE_SHAPE
 	set_shape(c);
 #endif /* USE_SHAPE */
@@ -201,20 +206,21 @@ print_size_hints(Window w)
 #endif /* DEBUG */
 
 static void
-set_size(Client * c, const unsigned int width, const unsigned int height)
+set_size(Client * c, const unsigned int width,
+	const unsigned int height)
 {
-	c->geometry.width=width;
-	c->geometry.height=height;
+	c->geometry.width = width;
+	c->geometry.height = height;
 	send_config(c);
 }
 
 static void
-init_geometry_size(Client *c, XWindowAttributes * attr)
-{	
+init_geometry_size(Client * c, XWindowAttributes * attr)
+{
 	const int awidth = attr->width;
 	const int aheight = attr->height;
 
-	if((awidth >= c->size->min_width) 
+	if((awidth >= c->size->min_width)
 		&& (aheight >= c->size->min_height))
 		set_size(c, awidth, aheight);
 	else
@@ -224,48 +230,50 @@ init_geometry_size(Client *c, XWindowAttributes * attr)
 static void
 set_position(Client * c, const int x, const int y)
 {
-	c->geometry.x=x;
-	c->geometry.y=y;
+	c->geometry.x = x;
+	c->geometry.y = y;
 	send_config(c);
 }
 
 static void
-init_geometry_position(Client *c, XWindowAttributes * attr)
+init_geometry_position(Client * c, XWindowAttributes * attr)
 {
 	if(!c->size)
 		return;
-	if((attr->map_state == IsViewable) || c->size->flags & USPosition)
+	if((attr->map_state == IsViewable)
+		|| c->size->flags & USPosition)
 		set_position(c, attr->x, attr->y);
 	else
 	{
-		const ScreenInfo * s = c->screen;
+		const ScreenInfo *s = c->screen;
 
 		if(!s)
 			return;
 		{
 			const short mx = s->width;
 			const short my = s->height;
-			const XRectangle * g = &(c->geometry);
+			const XRectangle *g = &(c->geometry);
 			const ubyte b = c->border;
 
 			Window root = s->root;
 			Position p;
-			
 
-			get_mouse_position((int*)&p.x, (int*)&p.y, root);
-			set_position(c, (p.x * (mx - b - g->width)) 
-					/ mx, (p.y * (my - b 
-					- g->height)) / my);
+			get_mouse_position((int *)&p.x, (int *)&p.y,
+				root);
+			set_position(c,
+				(p.x * (mx - b - g->width)) / mx,
+				(p.y * (my - b - g->height)) / my);
 		}
 	}
 }
 
 static void
-init_long_properties(Client * c, unsigned long * nitems)
+init_long_properties(Client * c, unsigned long *nitems)
 {
-	unsigned long * lprop;
-	
-	if((lprop = jbwm_get_property(c->window, ARWM_ATOM_VWM_DESKTOP,
+	unsigned long *lprop;
+
+	if((lprop =
+		jbwm_get_property(c->window, ARWM_ATOM_VWM_DESKTOP,
 		XA_CARDINAL, nitems)))
 	{
 		if(*nitems && valid_vdesk(lprop[0]))
@@ -275,12 +283,13 @@ init_long_properties(Client * c, unsigned long * nitems)
 }
 
 static void
-init_atom_properties(Client * c, unsigned long * nitems)
+init_atom_properties(Client * c, unsigned long *nitems)
 {
-	Atom * aprop;
+	Atom *aprop;
 
-	if((aprop = jbwm_get_property(c->window, 
-		ARWM_ATOM_WM_STATE, XA_ATOM, nitems)))
+	if((aprop =
+		jbwm_get_property(c->window, ARWM_ATOM_WM_STATE,
+		XA_ATOM, nitems)))
 	{
 		unsigned long i;
 
@@ -290,7 +299,6 @@ init_atom_properties(Client * c, unsigned long * nitems)
 		XFree(aprop);
 	}
 }
-
 
 static void
 init_geometry_properties(Client * c)
@@ -304,7 +312,7 @@ init_geometry_properties(Client * c)
 	init_long_properties(c, &nitems);
 	remove_sticky(c);
 	init_atom_properties(c, &nitems);
-	
+
 }
 
 static void
@@ -332,11 +340,13 @@ static void
 reparent(Client * c)
 {
 	XSetWindowAttributes p_attr;
-	const unsigned long valuemask = CWOverrideRedirect | CWBorderPixel 
-		| CWBackPixel | CWEventMask;
-	const XRectangle * g = &(c->geometry);
+	const unsigned long valuemask =
+		CWOverrideRedirect | CWBorderPixel | CWBackPixel |
+		CWEventMask;
+	const XRectangle *g = &(c->geometry);
 	const int x = g->x - c->border;
-	const int y_mod = c->flags & AR_CLIENT_SHAPED ? 0 : TITLEBAR_HEIGHT;
+	const int y_mod =
+		c->flags & AR_CLIENT_SHAPED ? 0 : TITLEBAR_HEIGHT;
 	const int y = g->y - c->border - y_mod;
 
 	if(!c->screen)
@@ -347,16 +357,16 @@ reparent(Client * c)
 	p_attr.event_mask =
 		ChildMask | ButtonPressMask | EnterWindowMask;
 #ifdef USE_SHAPE
-	if (c->flags & AR_CLIENT_SHAPED)
-		c->parent=c->screen->root;
+	if(c->flags & AR_CLIENT_SHAPED)
+		c->parent = c->screen->root;
 	else
 #endif /* USE_SHAPE */
 		c->parent =
-			XCreateWindow(jbwm.X.dpy, c->screen->root, x, y, g->width,
-				g->height + y_mod, c->border, DefaultDepth(jbwm.X.dpy, 
-				c->screen->screen), CopyFromParent, 
-				DefaultVisual(jbwm.X.dpy, c->screen->screen), 
-				valuemask, &p_attr);
+			XCreateWindow(jbwm.X.dpy, c->screen->root, x,
+			y, g->width, g->height + y_mod, c->border,
+			DefaultDepth(jbwm.X.dpy, c->screen->screen),
+			CopyFromParent, DefaultVisual(jbwm.X.dpy,
+			c->screen->screen), valuemask, &p_attr);
 	XAddToSaveSet(jbwm.X.dpy, c->window);
 	XSetWindowBorderWidth(jbwm.X.dpy, c->window, 0);
 #ifdef USE_EWMH
@@ -376,13 +386,13 @@ get_wm_normal_hints(Client * c)
 {
 	if(c->size)
 		XFree(c->size);
-	c->size=XAllocSizeHints();
-	if(!c->size) /* If memory could not be allocated */
+	c->size = XAllocSizeHints();
+	if(!c->size)	/* If memory could not be allocated */
 		return;
 	{
 		long supplied_return;
 
-		XGetWMNormalHints(jbwm.X.dpy, c->window, c->size, 
+		XGetWMNormalHints(jbwm.X.dpy, c->window, c->size,
 			&supplied_return);
 	}
 }
@@ -408,4 +418,3 @@ jbwm_get_property(Window w, Atom property, Atom req_type,
 	}
 	return NULL;
 }
-

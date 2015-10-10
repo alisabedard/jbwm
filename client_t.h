@@ -12,7 +12,7 @@ struct Client
 	ScreenInfo *screen;
 #ifdef USE_CMAP
 	Colormap cmap;
-#endif /* USE_CMAP */
+#endif				/* USE_CMAP */
 	int ignore_unmap;
 
 	XRectangle geometry;
@@ -20,7 +20,7 @@ struct Client
 	XRectangle old_geometry;	/* used when maximising */
 
 	unsigned int exposed_width;
-	
+
 	XSizeHints *size;
 
 	byte vdesk;

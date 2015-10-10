@@ -6,12 +6,11 @@
 
 #include "jbwm.h"
 
-
 static void
 configure_client(Client * c, XConfigureRequestEvent * e)
 {
 	XWindowChanges wc;
-	XRectangle * g = &(c->geometry);
+	XRectangle *g = &(c->geometry);
 	unsigned int value_mask = e->value_mask;
 	const ubyte border = c->border;
 
@@ -58,15 +57,15 @@ jbwm_handle_configure_request(XConfigureRequestEvent * e)
 	{
 		wc.x = e->x;
 		wc.y = e->y;
-		wc.width=e->width;
-		wc.height=e->height;
+		wc.width = e->width;
+		wc.height = e->height;
 #ifdef DEBUG
-		fprintf(stderr, "wx:%d\twy:%d\tww:%d\twh:%d\n",
-			wc.x, wc.y, wc.width, wc.height);
+		fprintf(stderr, "wx:%d\twy:%d\tww:%d\twh:%d\n", wc.x,
+			wc.y, wc.width, wc.height);
 #endif /* DEBUG */
-		if(wc.width==wc.height)
+		if(wc.width == wc.height)
 			return;
-		XConfigureWindow(e->display, e->window, e->value_mask, &wc);
+		XConfigureWindow(e->display, e->window, e->value_mask,
+			&wc);
 	}
 }
-

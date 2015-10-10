@@ -13,5 +13,4 @@ typedef struct ScreenInfo
 	unsigned short width, height;
 } ScreenInfo;
 
-
 #endif /* not SCREENINFO_H */

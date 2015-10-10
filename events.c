@@ -41,7 +41,7 @@ static void
 handle_map_request(XMapRequestEvent * e)
 {
 	Client *c = find_client(e->window);
-	
+
 	if(c)
 	{
 		if(c->vdesk != c->screen->vdesk)
@@ -74,21 +74,20 @@ cleanup()
 {
 	Client *c, *i;
 
-	for(c=head_client; c; c=i)
+	for(c = head_client; c; c = i)
 	{
-		i=c->next;
+		i = c->next;
 		if(c->flags & AR_CLIENT_REMOVE)
 			remove_client(c);
 	}
 }
-
 
 static void
 handle_unmap_event(XUnmapEvent * e)
 {
 	Client *c;
 
-	if((c=find_client(e->window)))
+	if((c = find_client(e->window)))
 	{
 		if(c->ignore_unmap)
 		{
@@ -172,7 +171,6 @@ handle_expose_event(XEvent * ev)
 }
 #endif
 
-
 static void
 jbwm_process_events(void)
 {
@@ -238,4 +236,3 @@ event_main_loop(void)
 	for(;;)
 		jbwm_process_events();
 }
-

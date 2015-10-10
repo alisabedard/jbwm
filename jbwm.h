@@ -55,8 +55,8 @@ typedef struct
 #define ButtonMask      (ButtonPressMask|ButtonReleaseMask)
 #define MouseMask       (ButtonMask|PointerMotionMask)
 
-void 
-jbwm_grab_button(Window w, unsigned int mask, unsigned int button);
+void jbwm_grab_button(Window w, unsigned int mask,
+	unsigned int button);
 
 #include "ScreenInfo.h"
 #include "client_t.h"

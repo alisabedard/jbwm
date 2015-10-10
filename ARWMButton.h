@@ -15,18 +15,16 @@ typedef struct _ARWMButton
 #endif				/* USE_XPM || USE_XBM */
 } ARWMButton;
 
-ARWMButton *
-ARWMButton_new(Window parent, GC gc, const unsigned short width,
-	const unsigned short height , void *image
+ARWMButton *ARWMButton_new(Window parent, GC gc,
+	const unsigned short width, const unsigned short height,
+	void *image
 #if !defined(USE_XPM) || !defined(USE_XBM)
 	__attribute((unused))
 #endif
-);
+	);
 
-void
-ARWMButton_delete(ARWMButton * button);
+void ARWMButton_delete(ARWMButton * button);
 
-void
-ARWMButton_draw(ARWMButton * button);
+void ARWMButton_draw(ARWMButton * button);
 
 #endif /* ARWMBUTTON_H */

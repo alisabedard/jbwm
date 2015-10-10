@@ -7,18 +7,17 @@
  *
  */
 
-
 #include "jbwm.h"
 
 static void
 grabkey(Window w, KeyCode kc, const unsigned int mask)
 {
-	XGrabKey(jbwm.X.dpy, kc, mask, w, True, 
-		GrabModeAsync, GrabModeAsync);
-	XGrabKey(jbwm.X.dpy, kc, mask|LockMask, w, True, 
+	XGrabKey(jbwm.X.dpy, kc, mask, w, True, GrabModeAsync,
+		GrabModeAsync);
+	XGrabKey(jbwm.X.dpy, kc, mask | LockMask, w, True,
 		GrabModeAsync, GrabModeAsync);
 	/* Mod2Mask is NumLock */
-	XGrabKey(jbwm.X.dpy, kc, mask|Mod2Mask, w, True, 
+	XGrabKey(jbwm.X.dpy, kc, mask | Mod2Mask, w, True,
 		GrabModeAsync, GrabModeAsync);
 }
 
@@ -30,7 +29,7 @@ grab_keysym(Window w, const unsigned int mask, KeySym keysym)
 	kc = XKeysymToKeycode(jbwm.X.dpy, keysym);
 	grabkey(w, kc, mask);
 	if(jbwm.keymasks.numlock)
-		grabkey(w, kc, mask|jbwm.keymasks.numlock);
+		grabkey(w, kc, mask | jbwm.keymasks.numlock);
 }
 
 static void
@@ -42,7 +41,7 @@ grab_keys_for_mask(ScreenInfo * s, KeySym * ks,
 }
 
 static void
-grab_mod_keys_for_screen(ScreenInfo *s)
+grab_mod_keys_for_screen(ScreenInfo * s)
 {
 	KeySym mod_keys[] = ARWM_ALT_KEYS_TO_GRAB;
 
@@ -57,5 +56,3 @@ grab_keys_for_screen(ScreenInfo * s)
 	grab_keys_for_mask(s, keys, 0);
 	grab_mod_keys_for_screen(s);
 }
-
-

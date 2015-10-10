@@ -3,7 +3,6 @@
  * Anscomb <jbwm@6809.org.uk> see README for license and other details.
  */
 
-
 #ifdef USE_EWMH
 #include <stdlib.h>
 #include "jbwm.h"
@@ -30,12 +29,10 @@ jbwm_setup_ewmh_hints(void)
 	LOG_DEBUG("jbwm_setup_ewmh_hints()\n");
 	jbwm.atoms.netwm.desktop =
 		GETATOM("_NET_WM_WINDOW_TYPE_DESKTOP");
-	jbwm.atoms.netwm.dock =
-		GETATOM("_NET_WM_WINDOW_TYPE_DOCK");
+	jbwm.atoms.netwm.dock = GETATOM("_NET_WM_WINDOW_TYPE_DOCK");
 	jbwm.atoms.netwm.toolbar =
 		GETATOM("_NET_WM_WINDOW_TYPE_TOOLBAR");
-	jbwm.atoms.netwm.menu =
-		GETATOM("_NET_WM_WINDOW_TYPE_MENU");
+	jbwm.atoms.netwm.menu = GETATOM("_NET_WM_WINDOW_TYPE_MENU");
 	jbwm.atoms.netwm.utility =
 		GETATOM("_NET_WM_WINDOW_TYPE_UTILITY");
 	jbwm.atoms.netwm.splash =
@@ -50,10 +47,8 @@ jbwm_setup_ewmh_hints(void)
 		GETATOM("_NET_WM_WINDOW_TYPE_TOOLTIP");
 	jbwm.atoms.netwm.notification =
 		GETATOM("_NET_WM_WINDOW_TYPE_NOTIFICATION");
-	jbwm.atoms.netwm.combo =
-		GETATOM("_NET_WM_WINDOW_TYPE_COMBO");
-	jbwm.atoms.netwm.dnd =
-		GETATOM("_NET_WM_WINDOW_TYPE_DND");
+	jbwm.atoms.netwm.combo = GETATOM("_NET_WM_WINDOW_TYPE_COMBO");
+	jbwm.atoms.netwm.dnd = GETATOM("_NET_WM_WINDOW_TYPE_DND");
 	jbwm.atoms.netwm.normal =
 		GETATOM("_NET_WM_WINDOW_TYPE_NORMAL");
 }
@@ -66,10 +61,10 @@ get_prop(Window w, Atom prop)
 	int format;
 	unsigned long nitems;
 	unsigned long bytes_after_return;
-	unsigned char * data;
+	unsigned char *data;
 
-	XGetWindowProperty(jbwm.X.dpy, w, prop, 0L, 1024,
-		False, AnyPropertyType, &type, &format, &nitems,
+	XGetWindowProperty(jbwm.X.dpy, w, prop, 0L, 1024, False,
+		AnyPropertyType, &type, &format, &nitems,
 		&bytes_after_return, &data);
 
 	return data;
@@ -86,17 +81,16 @@ setup_dock(Client * c)
 	remove_info_window(c);
 	c->flags |= AR_CLIENT_DONT_MANAGE;
 	XGetWindowAttributes(jbwm.X.dpy, c->window, &attributes);
- 	XReparentWindow(jbwm.X.dpy, c->window, c->screen->root, 
+	XReparentWindow(jbwm.X.dpy, c->window, c->screen->root,
 		attributes.x, attributes.y);
 	XDestroyWindow(jbwm.X.dpy, c->parent);
 	c->border = 0;
 	changes.override_redirect = True;
 	changes.event_mask = None;
-  	XChangeWindowAttributes(jbwm.X.dpy, c->window, 
+	XChangeWindowAttributes(jbwm.X.dpy, c->window,
 		CWOverrideRedirect | CWEventMask, &changes);
 	c->ignore_unmap--;
 }
-
 
 void
 jbwm_ewmh_type(Client * c)
@@ -105,18 +99,19 @@ jbwm_ewmh_type(Client * c)
 	Atom type;
 	//ARWMNetWMWindowType *types = &(jbwm.atoms.netwm);
 	unsigned long nitems;
-	int ntypes=0;
-	Atom * atypes;
+	int ntypes = 0;
+	Atom *atypes;
 
-	LOG_DEBUG("jbwm_ewmh_type()\n")
-	type_prop = get_prop(c->window, 331);
-	atypes=XListProperties(jbwm.X.dpy, c->window, &ntypes);
+	LOG_DEBUG("jbwm_ewmh_type()\n") type_prop =
+		get_prop(c->window, 331);
+	atypes = XListProperties(jbwm.X.dpy, c->window, &ntypes);
 	if(!atypes)
 		return;
-	for(;ntypes>=0;ntypes--)
+	for(; ntypes >= 0; ntypes--)
 	{
-		LOG_DEBUG("TYPES[%d]: %d\t", ntypes, (int)atypes[ntypes]);
-		switch((int)atypes[ntypes])
+		LOG_DEBUG("TYPES[%d]: %d\t", ntypes,
+			(int)atypes[ntypes]);
+		switch ((int)atypes[ntypes])
 		{
 		case 321:
 			setup_dock(c);
@@ -127,10 +122,10 @@ jbwm_ewmh_type(Client * c)
 		default:
 			break;
 		}
-		if((Atom)atypes[ntypes]
-			==GETATOM("_NET_WM_WINDOW_TYPE_DOCK"))
+		if((Atom) atypes[ntypes] ==
+			GETATOM("_NET_WM_WINDOW_TYPE_DOCK"))
 			puts("MATCH\t\t\t*********");
-		
+
 	}
 	if(!type_prop)
 	{
@@ -186,11 +181,11 @@ jbwm_ewmh_type(Client * c)
 void
 jbwm_ewmh_state(Client * c)
 {
-	XWMHints * hints;
+	XWMHints *hints;
 	Window w = c->window;
 
 	jbwm_ewmh_type(c);
-	hints=XGetWMHints(jbwm.X.dpy, w);
+	hints = XGetWMHints(jbwm.X.dpy, w);
 	if(hints)
 	{
 		const long flags = hints->flags;

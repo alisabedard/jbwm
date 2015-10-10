@@ -17,7 +17,7 @@ struct ARWMEnvironment
 	volatile Window initialising;
 #ifdef USE_EWMH
 	ARWMNetWMWindowType netwm;
-#endif /* USE_EWMH */
+#endif				/* USE_EWMH */
 	struct
 	{
 		unsigned int numlock, grab, mod;
@@ -37,7 +37,7 @@ struct ARWMEnvironment
 #ifdef USE_SHAPE
 		ubyte have_shape;
 		int shape_event;
-#endif /* USE_SHAPE */
+#endif				/* USE_SHAPE */
 	} X;
 	ARWMTitlebarData titlebar;
 };

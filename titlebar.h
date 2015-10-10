@@ -14,7 +14,7 @@ typedef struct _ARWMTitlebarData
 		ARWMButton *shade;
 #endif
 	} buttons;
-	
+
 #ifdef USE_XFT
 	struct
 	{
@@ -27,13 +27,11 @@ typedef struct _ARWMTitlebarData
 	XImage *close_inactive, *handle;
 #ifdef USE_SHADE
 	XImage *shade;
-#endif /* USE_SHADE */
-#endif /* USE_XPM */
+#endif				/* USE_SHADE */
+#endif				/* USE_XPM */
 } ARWMTitlebarData;
 
-
-void
-ARWMTitlebarData_delete(ARWMTitlebarData * titlebar);
+void ARWMTitlebarData_delete(ARWMTitlebarData * titlebar);
 
 void jbwm_ARWMTitlebarData_init(ARWMTitlebarData * titlebar);
 

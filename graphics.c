@@ -11,7 +11,7 @@ jbwm_get_XColor(const ubyte r, const ubyte g, const ubyte b)
 	c.green = g << 8;
 	c.blue = b << 8;
 
-	XAllocColor(jbwm.X.dpy, DefaultColormap(jbwm.X.dpy, 
+	XAllocColor(jbwm.X.dpy, DefaultColormap(jbwm.X.dpy,
 		DefaultScreen(jbwm.X.dpy)), &c);
 
 	return c;
@@ -24,8 +24,8 @@ jbwm_new_gc_for_XColor(XColor color)
 
 	values.foreground = color.pixel;
 
-	return XCreateGC(jbwm.X.dpy, jbwm.X.screens->root, 
-			GCForeground, &values);
+	return XCreateGC(jbwm.X.dpy, jbwm.X.screens->root,
+		GCForeground, &values);
 }
 
 #ifdef USE_GRADIENT
@@ -39,14 +39,14 @@ draw_gradient(Window win, GC gc, const int x, const int y,
 
 	XGetGCValues(dpy, gc, GCForeground, &gv);
 	if(gv.foreground)
-		gv.foreground=gv.foreground/2;
+		gv.foreground = gv.foreground / 2;
 	for(i = 0; i <= h; i++)
 	{
 		GC lgc;
 		const ubyte d = 8;
 
-		gv.foreground += (i<=h/2)?d:-d;
-		lgc=XCreateGC(dpy, win, GCForeground, &gv);
+		gv.foreground += (i <= h / 2) ? d : -d;
+		lgc = XCreateGC(dpy, win, GCForeground, &gv);
 #ifdef DEBUG
 		printf("fg: %d line: %d\n", (int)gv.foreground, i);
 		fflush(stdout);
@@ -56,5 +56,3 @@ draw_gradient(Window win, GC gc, const int x, const int y,
 	}
 }
 #endif /* USE_GRADIENT */
-
-

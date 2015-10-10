@@ -22,7 +22,7 @@ handle_xerror(Display * dpy, XErrorEvent * e)
 		jbwm.initialising = None;
 		return 0;
 	}
-	switch(e->error_code)
+	switch (e->error_code)
 	{
 	case BadAccess:
 		if(e->request_code == X_ChangeWindowAttributes)
@@ -41,29 +41,28 @@ handle_xerror(Display * dpy, XErrorEvent * e)
 		LOG("BadDrawable");
 		break;
 	default:
-		{
-			Client * c;
+	{
+		Client *c;
 
 #ifdef DEBUG
-			fprintf(stderr, "Error # %d\n", e->error_code);
+		fprintf(stderr, "Error # %d\n", e->error_code);
 #endif /* DEBUG */
-			if((c = find_client(e->resourceid)))
-			{
+		if((c = find_client(e->resourceid)))
+		{
 			/* This is used for nonmanaged windows 
 			 * that are not mapped with OverrideRedirect 
 			 * being set.  This is for wm-spec conformance.  */
-				if(c->flags & AR_CLIENT_DONT_MANAGE)
-				{
-					XMapWindow(dpy, c->window);
-					return 0;
-				}
-				LOG("handle_xerror() : flag for removal");
-				remove_client(c);
+			if(c->flags & AR_CLIENT_DONT_MANAGE)
+			{
+				XMapWindow(dpy, c->window);
+				return 0;
 			}
-	
+			LOG("handle_xerror() : flag for removal");
+			remove_client(c);
 		}
+
+	}
 	}
 
 	return 0;	/* Ignore */
 }
-

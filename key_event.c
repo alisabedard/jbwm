@@ -9,20 +9,21 @@ static void
 key_moveresize(Client * c)
 {
 	const ubyte in = c->border;
-	
+
 	moveresize(c);
 	XRaiseWindow(jbwm.X.dpy, c->parent);
-	setmouse(c->window, c->geometry.width - in, c->geometry.height - in);
+	setmouse(c->window, c->geometry.width - in,
+		c->geometry.height - in);
 }
 
 static void
-moveresize_dir(Client * c, XKeyEvent * e, short * xy, 
-	unsigned short * wh, const byte sign)
+moveresize_dir(Client * c, XKeyEvent * e, short *xy,
+	unsigned short *wh, const byte sign)
 {
 	const ubyte inc = ARWM_RESIZE_INCREMENT;
-	const byte mod = sign*inc;
+	const byte mod = sign * inc;
 
-	if ((e->state & jbwm.keymasks.mod) && (*wh > inc))
+	if((e->state & jbwm.keymasks.mod) && (*wh > inc))
 		*wh += mod;
 	else
 		*xy += mod;
@@ -32,7 +33,7 @@ moveresize_dir(Client * c, XKeyEvent * e, short * xy,
 static void
 handle_client_key_event(XKeyEvent * e, Client * c, KeySym key)
 {
-	XRectangle * g = &(c->geometry);
+	XRectangle *g = &(c->geometry);
 
 	switch (key)
 	{
@@ -90,7 +91,7 @@ handle_client_key_event(XKeyEvent * e, Client * c, KeySym key)
 static char *
 bg_cmd(const char *command)
 {
-	char *buf = malloc(strlen(command)+ 1);
+	char *buf = malloc(strlen(command) + 1);
 
 	sprintf(buf, "%s&", command);
 
@@ -116,9 +117,9 @@ jbwm_handle_key_event(XKeyEvent * e)
 {
 	//KeySym key = XKeycodeToKeysym(jbwm.X.dpy, e->keycode, 0);
 	KeySym key = XLookupKeysym(e, 0);
-	
-	Client * c = find_client(e->window);
-	ScreenInfo * screen = c?c->screen:jbwm.X.screens;
+
+	Client *c = find_client(e->window);
+	ScreenInfo *screen = c ? c->screen : jbwm.X.screens;
 
 	switch (key)
 	{

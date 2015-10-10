@@ -29,4 +29,4 @@
 #define LOG_XDEBUG(...)
 #endif
 
-#endif	/* ARWM__LOG_H__ */
+#endif /* ARWM__LOG_H__ */

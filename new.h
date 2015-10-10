@@ -3,8 +3,7 @@
 #ifndef ARWM_NEW_H
 #define ARWM_NEW_H
 
-void
-get_wm_normal_hints(Client * c);
+void get_wm_normal_hints(Client * c);
 
 void *jbwm_get_property(Window w, Atom property, Atom req_type,
 	unsigned long *nitems_return);

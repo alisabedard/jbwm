@@ -23,7 +23,6 @@
 
 void send_wm_delete(Client * c, int kill_client);
 
-
 Client *find_client(Window w);
 void gravitate_client(Client * c, int sign);
 void select_client(Client * c);

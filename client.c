@@ -37,12 +37,12 @@ set_wm_state(Client * c, int state)
 	 * people in the X Consortium defined it this way (even on 64-bit
 	 * machines).
 	 */
-	long data[2];/* = { state, None };*/
+	long data[2];		/* = { state, None }; */
 
 	const Atom state_atom = ARWM_ATOM_WM_STATE;
 
-	data[0]=state;
-	XChangeProperty(jbwm.X.dpy, c->window, state_atom, state_atom, 
+	data[0] = state;
+	XChangeProperty(jbwm.X.dpy, c->window, state_atom, state_atom,
 		32, PropModeReplace, (unsigned char *)data, 2);
 }
 
@@ -68,24 +68,25 @@ select_client(Client * c)
 {
 	if(current)
 	{
-		XSetWindowBorder(jbwm.X.dpy, current->parent, 
+		XSetWindowBorder(jbwm.X.dpy, current->parent,
 			current->screen->bg.pixel);
 		current->flags &= ~AR_CLIENT_ACTIVE;
 	}
 	if(c)
 	{
 		c->flags |= AR_CLIENT_ACTIVE;
-		XSetWindowBorder(jbwm.X.dpy, c->parent, !is_sticky(c)
-			? c->screen->fg.pixel : c->screen->fc.pixel);
+		XSetWindowBorder(jbwm.X.dpy, c->parent,
+			!is_sticky(c) ? c->screen->fg.pixel : c->
+			screen->fc.pixel);
 
 #ifdef USE_CMAP
 		XInstallColormap(jbwm.X.dpy, c->cmap);
 #endif /* USE_CMAP */
-		XSetInputFocus(jbwm.X.dpy, c->window, RevertToPointerRoot, 
-			CurrentTime);
+		XSetInputFocus(jbwm.X.dpy, c->window,
+			RevertToPointerRoot, CurrentTime);
 
 	}
-	current=c;
+	current = c;
 }
 
 void
@@ -123,7 +124,7 @@ unparent_window(Client * c)
 	XRemoveFromSaveSet(jbwm.X.dpy, c->window);
 	XDestroyWindow(jbwm.X.dpy, c->parent);
 #if 0
-	if (c->parent)
+	if(c->parent)
 		XDestroyWindow(jbwm.X.dpy, c->parent);
 #endif
 }
@@ -132,13 +133,13 @@ void
 remove_client(Client * c)
 {
 	XGrabServer(jbwm.X.dpy);
-#ifdef USE_TBAR	
+#ifdef USE_TBAR
 	remove_info_window(c);
 #endif /* USE_TBAR */
 	unparent_window(c);
 	relink_window_list(c);
-	if(current==c)
-		current=NULL;
+	if(current == c)
+		current = NULL;
 	if(c->size)
 		XFree(c->size);
 	free(c);
@@ -194,13 +195,12 @@ set_shape(Client * c)
 		&i, &i, &u, &u, &b, &i, &i, &u, &u)
 		&& bounding_shaped)
 	{
-		c->flags |= AR_CLIENT_SHAPED | AR_CLIENT_DONT_USE_TITLEBAR;
-		XShapeCombineShape(jbwm.X.dpy, c->parent, ShapeBounding, 0, 
-			0, c->window, ShapeBounding, 
+		c->flags |=
+			AR_CLIENT_SHAPED |
+			AR_CLIENT_DONT_USE_TITLEBAR;
+		XShapeCombineShape(jbwm.X.dpy, c->parent,
+			ShapeBounding, 0, 0, c->window, ShapeBounding,
 			ShapeSet);
 	}
 }
 #endif
-
-
-

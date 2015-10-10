@@ -1,8 +1,6 @@
 #ifndef _KEYMAP_H
 #define _KEYMAP_H
 
-
-
 #define KEY_NEXT	XK_Tab
 #ifndef KEY_NEW
 #define KEY_NEW		XK_Return
@@ -64,7 +62,6 @@
 	KEY_KILL, KEY_LEFT, KEY_RIGHT, KEY_DOWN, KEY_UP, 0\
 };
 
-void
-grab_keys_for_screen(ScreenInfo * s);
+void grab_keys_for_screen(ScreenInfo * s);
 
 #endif /* _KEYMAP_H */
