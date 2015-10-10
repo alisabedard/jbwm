@@ -121,8 +121,11 @@ unparent_window(Client * c)
 	XReparentWindow(jbwm.X.dpy, c->window, c->screen->root,
 		c->geometry.x, c->geometry.y);
 	XRemoveFromSaveSet(jbwm.X.dpy, c->window);
+	XDestroyWindow(jbwm.X.dpy, c->parent);
+#if 0
 	if (c->parent)
 		XDestroyWindow(jbwm.X.dpy, c->parent);
+#endif
 }
 
 void

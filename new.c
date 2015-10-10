@@ -75,7 +75,7 @@ map_client(Client * c, ScreenInfo * s)
 	 * to be visible on this virtual desktop.
 	 */
 	if(s->vdesk == c->vdesk)
-		unhide(c, RAISE);
+		unhide(c);
 	else
 		set_wm_state(c, IconicState);
 #ifdef USE_EWMH

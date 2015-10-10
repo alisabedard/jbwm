@@ -46,10 +46,18 @@ handle_map_request(XMapRequestEvent * e)
 	{
 		if(c->vdesk != c->screen->vdesk)
 			switch_vdesk(c->screen, c->vdesk);
+#if 0
 		if(!(c->flags & AR_CLIENT_REMOVE))
+		{
 			unhide(c, RAISE);
+		}
 		else
-			hide(c);
+		{
+			XDestroyWindow(jbwm.X.dpy, c->window);
+		}
+#endif
+		if(c->window)
+			XMapWindow(jbwm.X.dpy, c->parent);
 		c->ignore_unmap++;
 	}
 	else

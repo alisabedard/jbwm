@@ -319,11 +319,19 @@ hide(Client * c)
 	set_wm_state(c, IconicState);
 }
 
+#if 0
 void
 unhide(Client * c, int raise_win)
 {
 	raise_win ? XMapRaised(jbwm.X.dpy, c->parent) 
 		: XMapWindow(jbwm.X.dpy, c->parent);
+	set_wm_state(c, NormalState);
+}
+#endif
+void
+unhide(Client *c)
+{
+	XMapWindow(jbwm.X.dpy, c->parent);
 	set_wm_state(c, NormalState);
 }
 
@@ -350,7 +358,7 @@ next(void)
 	 * across screen boundaries.  Is this what we want?
 	 */
 	
-	unhide(newc, RAISE);
+	unhide(newc);
 	select_client(newc);
 	{
 		XRectangle * g = &(newc->geometry);
@@ -379,8 +387,14 @@ switch_vdesk(ScreenInfo * s, const ubyte v)
 			ARWM_UPDATE_NET_WM_DESKTOP(c);
 #endif
 		}
+#if 0
 		c->vdesk == v ? unhide(c, NO_RAISE) : hide(c);
 		if(c->flags & AR_CLIENT_REMOVE)
+			hide(c);
+#endif
+		if(c->vdesk == v)
+			unhide(c);
+		else
 			hide(c);
 	}
 }
