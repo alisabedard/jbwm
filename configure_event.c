@@ -30,7 +30,7 @@ configure_client(Client * c, XConfigureRequestEvent * e)
 	wc.x = g->x - border;
 	wc.y = g->y - border;
 	wc.border_width = border;
-	if(!(c->flags & AR_CLIENT_SHAPED))
+	if(!(c->flags & JB_CLIENT_SHAPED))
 	{
 		value_mask |= CWHeight | CWY;
 		wc.height += TITLEBAR_HEIGHT;

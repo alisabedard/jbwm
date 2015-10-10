@@ -1,22 +1,22 @@
 
-#ifndef ARWM_ENVIRONMENT_H
-#define ARWM_ENVIRONMENT_H
+#ifndef JBWM_ENVIRONMENT_H
+#define JBWM_ENVIRONMENT_H
 #include "titlebar.h"
 
 #ifdef USE_EWMH
-typedef struct _ARWMNetWMWindowType
+typedef struct _JBWMNetWMWindowType
 {
 	Atom desktop, dock, toolbar, menu, utility, splash, dialog,
 		dropdown_menu, popup_menu, tooltip, notification,
 		combo, dnd, normal;
-} ARWMNetWMWindowType;
+} JBWMNetWMWindowType;
 #endif
 
-struct ARWMEnvironment
+struct JBWMEnvironment
 {
 	volatile Window initialising;
 #ifdef USE_EWMH
-	ARWMNetWMWindowType netwm;
+	JBWMNetWMWindowType netwm;
 #endif				/* USE_EWMH */
 	struct
 	{
@@ -39,10 +39,10 @@ struct ARWMEnvironment
 		int shape_event;
 #endif				/* USE_SHAPE */
 	} X;
-	ARWMTitlebarData titlebar;
+	JBWMTitlebarData titlebar;
 };
 
-typedef struct ARWMEnvironment ARWMEnvironment;
+typedef struct JBWMEnvironment JBWMEnvironment;
 
 typedef struct
 {
@@ -58,4 +58,4 @@ typedef struct
 
 extern GlobalOptions opt;
 
-#endif /* not ARWM_ENVIRONMENT_H */
+#endif /* not JBWM_ENVIRONMENT_H */

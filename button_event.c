@@ -25,11 +25,30 @@ static void
 shade_window(Client * c)
 {
 	/* This implements window shading, a substitute for iconification.  */
+	if(c->flags & JB_CLIENT_SHADED)
+	{
+		c->geometry.height=c->shade_height;
+		c->flags &= ~JB_CLIENT_SHADED;
+		XMapWindow(jbwm.X.dpy, c->window);
+		moveresize(c);
+	}
+	else
+	{
+		const ubyte h=TITLEBAR_HEIGHT+1;
+
+		c->shade_height = c->geometry.height;
+		c->ignore_unmap++;
+		XUnmapWindow(jbwm.X.dpy, c->window);
+		XResizeWindow(jbwm.X.dpy, c->parent, c->geometry.width, h);
+		c->geometry.height = h;
+		c->flags |= JB_CLIENT_SHADED;
+	}
+#if 0
 	if(c->geometry.height == TITLEBAR_HEIGHT)
 	{
 		/* Unshade.  */
 		c->geometry.height = c->shade_height;
-		c->flags &= ~AR_CLIENT_SHADED;
+		c->flags &= ~JB_CLIENT_SHADED;
 		moveresize(c);
 	}
 	else
@@ -38,8 +57,9 @@ shade_window(Client * c)
 		XResizeWindow(jbwm.X.dpy, c->parent,
 			c->geometry.width, TITLEBAR_HEIGHT);
 		c->geometry.height = TITLEBAR_HEIGHT;
-		c->flags |= AR_CLIENT_SHADED;
+		c->flags |= JB_CLIENT_SHADED;
 	}
+#endif
 }
 #endif /* USE_SHADE */
 
@@ -55,13 +75,13 @@ button1_event(XButtonEvent * e, Client * c)
 	XRaiseWindow(jbwm.X.dpy, c->parent);
 	/* Text for close button press.  */
 #ifdef USE_CLOSE_BUTTON
-	if((x < AR_BUTTON_WIDTH) && (y < TITLEBAR_HEIGHT))
+	if((x < JB_BUTTON_WIDTH) && (y < TITLEBAR_HEIGHT))
 		send_wm_delete(c, !(e->state & jbwm.keymasks.mod));
 #endif
-	if(x > width - AR_RESIZE_DELTA)
+	if(x > width - JB_RESIZE_DELTA)
 		sweep(c);	/* Resize the window.  */
 #ifdef USE_SHADE
-	else if(x > width - AR_SHADE_DELTA && y < TITLEBAR_HEIGHT)
+	else if(x > width - JB_SHADE_DELTA && y < TITLEBAR_HEIGHT)
 		shade_window(c);
 #endif /* USE_SHADE */
 	else
@@ -89,8 +109,8 @@ jbwm_handle_button_event(XButtonEvent * e)
 		   users especially, where it is difficult
 		   to register a middle button press, even
 		   with X Emulate3Buttons enabled.  */
-		sweep(c);
-		/*drag(c); */
+		if(!(c->flags & JB_CLIENT_SHADED))
+			sweep(c);
 		break;
 	case Button4:
 		move_client_with_vdesk(c, True);

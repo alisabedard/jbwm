@@ -1,7 +1,7 @@
-/*  ARWM Copyright 2008, Jeffrey E. Bedard <antiright@gmail.com> */
+/*  JBWM Copyright 2008, Jeffrey E. Bedard <antiright@gmail.com> */
 
-#ifndef ARWM_NEW_H
-#define ARWM_NEW_H
+#ifndef JBWM_NEW_H
+#define JBWM_NEW_H
 
 void get_wm_normal_hints(Client * c);
 
@@ -12,4 +12,4 @@ void *jbwm_get_property(Window w, Atom property, Atom req_type,
 void print_size_hints(Window w);
 #endif /* DEBUG */
 
-#endif /* ARWM_NEW_H */
+#endif /* JBWM_NEW_H */

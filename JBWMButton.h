@@ -1,7 +1,7 @@
-#ifndef ARWMBUTTON_H
-#define ARWMBUTTON_H
+#ifndef JBWMBUTTON_H
+#define JBWMBUTTON_H
 
-typedef struct _ARWMButton
+typedef struct _JBWMButton
 {
 	Window parent;
 	XColor color;
@@ -13,9 +13,9 @@ typedef struct _ARWMButton
 	XImage *image;
 	unsigned int image_width, image_height;
 #endif				/* USE_XPM || USE_XBM */
-} ARWMButton;
+} JBWMButton;
 
-ARWMButton *ARWMButton_new(Window parent, GC gc,
+JBWMButton *JBWMButton_new(Window parent, GC gc,
 	const unsigned short width, const unsigned short height,
 	void *image
 #if !defined(USE_XPM) || !defined(USE_XBM)
@@ -23,8 +23,8 @@ ARWMButton *ARWMButton_new(Window parent, GC gc,
 #endif
 	);
 
-void ARWMButton_delete(ARWMButton * button);
+void JBWMButton_delete(JBWMButton * button);
 
-void ARWMButton_draw(ARWMButton * button);
+void JBWMButton_draw(JBWMButton * button);
 
-#endif /* ARWMBUTTON_H */
+#endif /* JBWMBUTTON_H */

@@ -1,7 +1,7 @@
-#ifndef ARWM_GRAPHICS_H
-#define ARWM_GRAPHICS_H
+#ifndef JBWM_GRAPHICS_H
+#define JBWM_GRAPHICS_H
 
-#include "ARWMButton.h"
+#include "JBWMButton.h"
 
 GC jbwm_new_gc_for_XColor(XColor color);
 
@@ -23,4 +23,4 @@ void draw_gradient(Window win, GC gc, const int x, const int y,
 	const unsigned int w, const unsigned int h);
 #endif /* USE_GRADIENT */
 
-#endif /* ARWM_GRAPHICS_H */
+#endif /* JBWM_GRAPHICS_H */

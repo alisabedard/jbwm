@@ -1,6 +1,6 @@
 
-#ifndef ARWM_CLIENT_STRUCT_H
-#define ARWM_CLIENT_STRUCT_H
+#ifndef JBWM_CLIENT_STRUCT_H
+#define JBWM_CLIENT_STRUCT_H
 
 /* client structure */
 
@@ -28,14 +28,14 @@ struct Client
 
 	Atom window_type;
 
-#define AR_CLIENT_IS_STICKY 		(1<<0)
+#define JB_CLIENT_IS_STICKY 		(1<<0)
 /* Set when client needs to be removed: */
-#define AR_CLIENT_SHAPED		(1<<1)
-#define AR_CLIENT_ACTIVE 		(1<<2)
-#define AR_CLIENT_SHADED 		(1<<3)
-#define AR_CLIENT_DONT_MANAGE 		(1<<4)
-#define AR_CLIENT_DONT_USE_TITLEBAR 	(1<<5)
-#define AR_CLIENT_REMOVE		(1<<6)
+#define JB_CLIENT_SHAPED		(1<<1)
+#define JB_CLIENT_ACTIVE 		(1<<2)
+#define JB_CLIENT_SHADED 		(1<<3)
+#define JB_CLIENT_DONT_MANAGE 		(1<<4)
+#define JB_CLIENT_DONT_USE_TITLEBAR 	(1<<5)
+#define JB_CLIENT_REMOVE		(1<<6)
 
 	ubyte flags;
 
@@ -46,7 +46,7 @@ struct Client
 	XConfigureEvent ce;
 	Client *next;
 
-#ifdef USE_TBAR
+#ifdef USE_TBJB
 	Window info_window;
 #endif
 	Window close_button;
@@ -56,9 +56,9 @@ struct Client
 /* This is to initialize the above CE.  */
 void initialize_client_ce(Client * c);
 
-#define is_sticky(c) (c->flags & AR_CLIENT_IS_STICKY)
-#define add_sticky(c) c->flags |= AR_CLIENT_IS_STICKY
-#define remove_sticky(c) c->flags &= ~AR_CLIENT_IS_STICKY
-#define toggle_sticky(c) c->flags ^= AR_CLIENT_IS_STICKY
+#define is_sticky(c) (c->flags & JB_CLIENT_IS_STICKY)
+#define add_sticky(c) c->flags |= JB_CLIENT_IS_STICKY
+#define remove_sticky(c) c->flags &= ~JB_CLIENT_IS_STICKY
+#define toggle_sticky(c) c->flags ^= JB_CLIENT_IS_STICKY
 
-#endif /* ARWM_CLIENT_STRUCT_H */
+#endif /* JBWM_CLIENT_STRUCT_H */

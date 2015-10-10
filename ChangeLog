@@ -26,7 +26,7 @@ Thu Aug 16 09:54:22 EDT 2007  Jeffrey Bedard <antiright@gmail.com>
 Sat Aug 11 20:07:34 EST 2007  Jeffrey Bedard <antiright@gmail.com>
   * Decided to fork, considering code base has changed significantly,
     thus preventing seamless integration of evilwm changes.  This
-    fork/branch will be called arwm, the antiright window manager.
+    fork/branch will be called jbwm, the antiright window manager.
     It is intended for general use, but some features may be added
     with special consideration of the antiright scripting environment.  
     This fork so far adds titlebar support (optional), fixes keyboard

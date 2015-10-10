@@ -83,7 +83,7 @@ map_client(Client * c, ScreenInfo * s)
 	else
 		set_wm_state(c, IconicState);
 #ifdef USE_EWMH
-	ARWM_UPDATE_NET_WM_DESKTOP(c);
+	JBWM_UPDATE_NET_WM_DESKTOP(c);
 #endif
 }
 
@@ -96,7 +96,7 @@ initialize_client_fields(Client * c, ScreenInfo * s, Window w)
 	c->screen = s;
 	c->window = w;
 	c->ignore_unmap = 0;
-#ifdef USE_TBAR
+#ifdef USE_TBJB
 	c->info_window = 0;
 #endif
 	c->flags = 0;
@@ -110,7 +110,7 @@ Client_new(Window w, ScreenInfo * s)
 
 	c = calloc(1, sizeof(Client));
 	initialize_client_fields(c, s, w);
-	c->border = ARWM_BORDER_WIDTH;
+	c->border = JBWM_BORDER_WIDTH;
 	init_geometry(c);
 
 	return c;
@@ -141,7 +141,7 @@ make_new_client(Window w, ScreenInfo * s)
 		return;
 	jbwm.initialising = None;
 	c = Client_new(w, s);
-	if(c->flags & AR_CLIENT_DONT_MANAGE)
+	if(c->flags & JB_CLIENT_DONT_MANAGE)
 		return;
 	XSelectInput(jbwm.X.dpy, c->window,
 		EnterWindowMask | PropertyChangeMask |
@@ -273,7 +273,7 @@ init_long_properties(Client * c, unsigned long *nitems)
 	unsigned long *lprop;
 
 	if((lprop =
-		jbwm_get_property(c->window, ARWM_ATOM_VWM_DESKTOP,
+		jbwm_get_property(c->window, JBWM_ATOM_VWM_DESKTOP,
 		XA_CARDINAL, nitems)))
 	{
 		if(*nitems && valid_vdesk(lprop[0]))
@@ -288,13 +288,13 @@ init_atom_properties(Client * c, unsigned long *nitems)
 	Atom *aprop;
 
 	if((aprop =
-		jbwm_get_property(c->window, ARWM_ATOM_WM_STATE,
+		jbwm_get_property(c->window, JBWM_ATOM_WM_STATE,
 		XA_ATOM, nitems)))
 	{
 		unsigned long i;
 
 		for(i = 0; i < *nitems; i++)
-			if(aprop[i] == ARWM_ATOM_VWM_STICKY)
+			if(aprop[i] == JBWM_ATOM_VWM_STICKY)
 				add_sticky(c);
 		XFree(aprop);
 	}
@@ -346,7 +346,7 @@ reparent(Client * c)
 	const XRectangle *g = &(c->geometry);
 	const int x = g->x - c->border;
 	const int y_mod =
-		c->flags & AR_CLIENT_SHAPED ? 0 : TITLEBAR_HEIGHT;
+		c->flags & JB_CLIENT_SHAPED ? 0 : TITLEBAR_HEIGHT;
 	const int y = g->y - c->border - y_mod;
 
 	if(!c->screen)
@@ -357,7 +357,7 @@ reparent(Client * c)
 	p_attr.event_mask =
 		ChildMask | ButtonPressMask | EnterWindowMask;
 #ifdef USE_SHAPE
-	if(c->flags & AR_CLIENT_SHAPED)
+	if(c->flags & JB_CLIENT_SHAPED)
 		c->parent = c->screen->root;
 	else
 #endif /* USE_SHAPE */
@@ -372,8 +372,8 @@ reparent(Client * c)
 #ifdef USE_EWMH
 	jbwm_ewmh_type(c);
 #endif
-#ifdef USE_TBAR
-	if(!(c->flags & AR_CLIENT_DONT_USE_TITLEBAR))
+#ifdef USE_TBJB
+	if(!(c->flags & JB_CLIENT_DONT_USE_TITLEBAR))
 		update_info_window(c);
 #endif
 	XReparentWindow(jbwm.X.dpy, c->window, c->parent, 0, 0);

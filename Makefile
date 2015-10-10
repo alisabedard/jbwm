@@ -1,7 +1,9 @@
 # If you don't use CC 
 #CC       = gcc
 #CC = clang
-CFLAGS=-Os -ggdb -W -Wall -Werror
+#CFLAGS=-Os -ggdb -W -Wall -Werror
+# profiling flag.
+CFLAGS = -pg -O0 -W -Wall -Werror
 
 # Edit this line if you don't want jbwm to install under /usr.
 # Note that $(DESTDIR) is used by the Debian build process.
@@ -68,34 +70,32 @@ DEFINES += -DUSE_CLOSE_BUTTON
 #SRCS+= ewmh.c 
 
 # Uncomment to enable parsing command line arguments.
-#DEFINES += -DUSE_ARGV
+#DEFINES += -DUSE_JBGV
 
 # Uncomment to enable titlebars
-DEFINES += -DUSE_TBAR
+DEFINES += -DUSE_TBJB
 SRCS += titlebar.c
 
 # Uncomment to enable window snapping.
 #DEFINES += -DUSE_SNAP
 
 # Uncomment to enable shade button (buggy)
-# DEFINES += -DUSE_SHADE
+DEFINES += -DUSE_SHADE
 
 # ----- You shouldn't need to change anything under this line ------ #
 
-version = 1.29
+version = 1.30
 
 distname = jbwm-$(version)
 
 DEFINES += -DVERSION=\"$(version)\" $(DEBIAN)
 CFLAGS  += $(INCLUDES) $(DEFINES) 
-# Profiling flag.
-#CFLAGS += -pg -O0
 LDFLAGS += $(LDPATH) $(LIBS)
 # Uncomment for static linking of binary:
 #LDFLAGS += -static 
 
 HEADERS  = jbwm.h log.h
-SRCS += client.c events.c jbwm.c misc.c new.c screen.c ARWMButton.c
+SRCS += client.c events.c jbwm.c misc.c new.c screen.c JBWMButton.c
 SRCS += graphics.c key_event.c configure_event.c button_event.c keymap.c
 OBJS     = $(SRCS:.c=.o)
 

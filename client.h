@@ -1,6 +1,6 @@
 
-#ifndef ARWM_CLIENT_H
-#define ARWM_CLIENT_H
+#ifndef JBWM_CLIENT_H
+#define JBWM_CLIENT_H
 
 /*
  * This is a macro version of set_client_ce, the function that is
@@ -34,4 +34,4 @@ void send_config(Client * c);
 void set_wm_state(Client * c, int state);
 void set_shape(Client * c);
 
-#endif /* ARWM_CLIENT_H */
+#endif /* JBWM_CLIENT_H */

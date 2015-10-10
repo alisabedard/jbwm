@@ -47,7 +47,7 @@ handle_map_request(XMapRequestEvent * e)
 		if(c->vdesk != c->screen->vdesk)
 			switch_vdesk(c->screen, c->vdesk);
 #if 0
-		if(!(c->flags & AR_CLIENT_REMOVE))
+		if(!(c->flags & JB_CLIENT_REMOVE))
 		{
 			unhide(c, RAISE);
 		}
@@ -77,7 +77,7 @@ cleanup()
 	for(c = head_client; c; c = i)
 	{
 		i = c->next;
-		if(c->flags & AR_CLIENT_REMOVE)
+		if(c->flags & JB_CLIENT_REMOVE)
 			remove_client(c);
 	}
 }
@@ -95,7 +95,7 @@ handle_unmap_event(XUnmapEvent * e)
 		}
 		else
 		{
-			c->flags |= AR_CLIENT_REMOVE;
+			c->flags |= JB_CLIENT_REMOVE;
 			cleanup();
 		}
 	}
@@ -128,7 +128,7 @@ handle_property_change(XPropertyEvent * e)
 		moveresize(c);
 		if(atom == XA_WM_NORMAL_HINTS)
 			get_wm_normal_hints(c);
-#ifdef USE_TBAR
+#ifdef USE_TBJB
 		else if(atom == XA_WM_NAME)
 			update_info_window(c);
 #endif
@@ -155,7 +155,7 @@ handle_enter_event(XCrossingEvent * e)
 	}
 }
 
-#ifdef USE_TBAR
+#ifdef USE_TBJB
 static void
 handle_expose_event(XEvent * ev)
 {
@@ -199,7 +199,7 @@ jbwm_process_events(void)
 		LOG("KeyPress");
 		jbwm_handle_key_event(&ev.xkey);
 		break;
-#ifdef USE_TBAR
+#ifdef USE_TBJB
 	case Expose:
 		LOG("Expose");
 		handle_expose_event(&ev);

@@ -1,8 +1,8 @@
 /* Copyright 2008, Jeffrey Bedard <antiright@gmail.com> */
 
-#ifndef ARWM_KEY_EVENT_H
-#define ARWM_KEY_EVENT_H
+#ifndef JBWM_KEY_EVENT_H
+#define JBWM_KEY_EVENT_H
 
 void jbwm_handle_key_event(XKeyEvent * e);
 
-#endif /* ARWM_KEY_EVENT_H */
+#endif /* JBWM_KEY_EVENT_H */

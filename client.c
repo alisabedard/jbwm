@@ -19,7 +19,7 @@ find_client(Window w)
 		/* This allows the info_window member, which is the 
 		 * titlebar parent, to match events.  Particularaly, 
 		 * it allows the titlebar to be used as a drag handle.  */
-#ifdef USE_TBAR
+#ifdef USE_TBJB
 		&& (w != c->info_window)
 #endif
 		; c = c->next)
@@ -39,7 +39,7 @@ set_wm_state(Client * c, int state)
 	 */
 	long data[2];		/* = { state, None }; */
 
-	const Atom state_atom = ARWM_ATOM_WM_STATE;
+	const Atom state_atom = JBWM_ATOM_WM_STATE;
 
 	data[0] = state;
 	XChangeProperty(jbwm.X.dpy, c->window, state_atom, state_atom,
@@ -70,11 +70,11 @@ select_client(Client * c)
 	{
 		XSetWindowBorder(jbwm.X.dpy, current->parent,
 			current->screen->bg.pixel);
-		current->flags &= ~AR_CLIENT_ACTIVE;
+		current->flags &= ~JB_CLIENT_ACTIVE;
 	}
 	if(c)
 	{
-		c->flags |= AR_CLIENT_ACTIVE;
+		c->flags |= JB_CLIENT_ACTIVE;
 		XSetWindowBorder(jbwm.X.dpy, c->parent,
 			!is_sticky(c) ? c->screen->fg.pixel : c->
 			screen->fc.pixel);
@@ -133,9 +133,9 @@ void
 remove_client(Client * c)
 {
 	XGrabServer(jbwm.X.dpy);
-#ifdef USE_TBAR
+#ifdef USE_TBJB
 	remove_info_window(c);
-#endif /* USE_TBAR */
+#endif /* USE_TBJB */
 	unparent_window(c);
 	relink_window_list(c);
 	if(current == c)
@@ -167,8 +167,8 @@ send_wm_delete(Client * c, int kill_client)
 {
 	XUnmapWindow(jbwm.X.dpy, c->parent);
 	if(kill_client)
-		send_xmessage(c->window, ARWM_ATOM_WM_PROTOS,
-			ARWM_ATOM_WM_DELETE);
+		send_xmessage(c->window, JBWM_ATOM_WM_PROTOS,
+			JBWM_ATOM_WM_DELETE);
 	else
 		XKillClient(jbwm.X.dpy, c->window);
 }
@@ -196,8 +196,8 @@ set_shape(Client * c)
 		&& bounding_shaped)
 	{
 		c->flags |=
-			AR_CLIENT_SHAPED |
-			AR_CLIENT_DONT_USE_TITLEBAR;
+			JB_CLIENT_SHAPED |
+			JB_CLIENT_DONT_USE_TITLEBAR;
 		XShapeCombineShape(jbwm.X.dpy, c->parent,
 			ShapeBounding, 0, 0, c->window, ShapeBounding,
 			ShapeSet);

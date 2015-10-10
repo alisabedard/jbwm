@@ -1,6 +1,6 @@
 /* Copyright 2007-2011, Jeffrey E. Bedard */
-#ifndef ARWM_SCREEN_H
-#define ARWM_SCREEN_H
+#ifndef JBWM_SCREEN_H
+#define JBWM_SCREEN_H
 
 typedef struct
 {
@@ -24,4 +24,4 @@ void maximize(Client * c);
 
 #define setmouse(w, x, y) XWarpPointer(jbwm.X.dpy, None, w, 0, 0, 0, 0, x, y)
 
-#endif /* ARWM_SCREEN_H */
+#endif /* JBWM_SCREEN_H */

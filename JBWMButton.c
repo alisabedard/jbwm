@@ -1,19 +1,19 @@
 #include "jbwm.h"
 
 void
-ARWMButton_delete(ARWMButton * button)
+JBWMButton_delete(JBWMButton * button)
 {
 	XFreeGC(jbwm.X.dpy, button->gc);
 	free(button);
 }
 
 void
-ARWMButton_draw(ARWMButton * button)
+JBWMButton_draw(JBWMButton * button)
 {
 	XRectangle *g = &(button->geometry);
 
 #ifdef GRAPHICS_DEBUG
-	LOG_DEBUG("ARWMButton_draw()\n");
+	LOG_DEBUG("JBWMButton_draw()\n");
 #endif /* GRAPHICS_DEBUG */
 
 #ifndef USE_XPM
@@ -91,21 +91,21 @@ ARWMButton_draw(ARWMButton * button)
 #endif /* USE_XPM || USE_XBM */
 }
 
-ARWMButton *
-ARWMButton_new(Window parent, GC gc, const unsigned short width,
+JBWMButton *
+JBWMButton_new(Window parent, GC gc, const unsigned short width,
 	const unsigned short height, void *image
 #if !defined(USE_XPM) || !defined(USE_XBM)
 	__attribute((unused))
 #endif
 	)
 {
-	ARWMButton *button;
+	JBWMButton *button;
 
 #ifdef GRAPHICS_DEBUG
-	LOG_DEBUG("new_ARWMButton()\n");
+	LOG_DEBUG("new_JBWMButton()\n");
 #endif /* GRAPHICS_DEBUG */
 
-	button = calloc(1, sizeof(ARWMButton));
+	button = calloc(1, sizeof(JBWMButton));
 	button->parent = parent;
 	button->gc = gc;
 	button->geometry.width = width;

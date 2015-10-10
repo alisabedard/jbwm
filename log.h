@@ -3,30 +3,30 @@
  * Anscomb <jbwm@6809.org.uk> see README for license and other details.
  */
 
-#ifndef ARWM__LOG_H__
-#define ARWM__LOG_H__
+#ifndef JBWM__LOG_H__
+#define JBWM__LOG_H__
 
 #include <stdio.h>
 
-#define LOG_INFO(...) printf(__VA_ARGS__);
-#define LOG_ERROR(...) fprintf(stderr, __VA_ARGS__);
+#define LOG_INFO(...) printf(__VA_JBGS__);
+#define LOG_ERROR(...) fprintf(stderr, __VA_JBGS__);
 
 #ifdef DEBUG
 #define LOG_DEBUG(...) \
 {\
 	fprintf(stderr, "%s:%d:  ", __FILE__, __LINE__);\
-	fprintf(stderr, __VA_ARGS__);\
+	fprintf(stderr, __VA_JBGS__);\
 }
-#define MARK fprintf(stderr, "%s:  %d\n", __FILE__, __LINE__);
+#define MJBK fprintf(stderr, "%s:  %d\n", __FILE__, __LINE__);
 #else
 #define LOG_DEBUG(...)
-#define MARK
+#define MJBK
 #endif
 
 #ifdef XDEBUG
-#define LOG_XDEBUG(...) fprintf(stderr, __VA_ARGS__);
+#define LOG_XDEBUG(...) fprintf(stderr, __VA_JBGS__);
 #else
 #define LOG_XDEBUG(...)
 #endif
 
-#endif /* ARWM__LOG_H__ */
+#endif /* JBWM__LOG_H__ */

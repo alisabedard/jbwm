@@ -17,8 +17,8 @@ ewm_update_net_wm_state(Client * c)
 	int i = 0;
 
 	if(is_sticky(c))
-		state[i++] = ARWM_ATOM_VWM_STICKY;
-	ARWM_VWM_CHANGE_PROPERTY(c, XA_ATOM, (unsigned char *)&state,
+		state[i++] = JBWM_ATOM_VWM_STICKY;
+	JBWM_VWM_CHANGE_PROPERTY(c, XA_ATOM, (unsigned char *)&state,
 		i);
 }
 
@@ -31,7 +31,7 @@ jbwm_setup_ewmh_hints(void)
 		GETATOM("_NET_WM_WINDOW_TYPE_DESKTOP");
 	jbwm.atoms.netwm.dock = GETATOM("_NET_WM_WINDOW_TYPE_DOCK");
 	jbwm.atoms.netwm.toolbar =
-		GETATOM("_NET_WM_WINDOW_TYPE_TOOLBAR");
+		GETATOM("_NET_WM_WINDOW_TYPE_TOOLBJB");
 	jbwm.atoms.netwm.menu = GETATOM("_NET_WM_WINDOW_TYPE_MENU");
 	jbwm.atoms.netwm.utility =
 		GETATOM("_NET_WM_WINDOW_TYPE_UTILITY");
@@ -79,7 +79,7 @@ setup_dock(Client * c)
 	/* Raise the window, per the wm-spec.  */
 	XRaiseWindow(jbwm.X.dpy, c->window);
 	remove_info_window(c);
-	c->flags |= AR_CLIENT_DONT_MANAGE;
+	c->flags |= JB_CLIENT_DONT_MANAGE;
 	XGetWindowAttributes(jbwm.X.dpy, c->window, &attributes);
 	XReparentWindow(jbwm.X.dpy, c->window, c->screen->root,
 		attributes.x, attributes.y);
@@ -97,7 +97,7 @@ jbwm_ewmh_type(Client * c)
 {
 	unsigned char *type_prop;
 	Atom type;
-	//ARWMNetWMWindowType *types = &(jbwm.atoms.netwm);
+	//JBWMNetWMWindowType *types = &(jbwm.atoms.netwm);
 	unsigned long nitems;
 	int ntypes = 0;
 	Atom *atypes;
@@ -149,7 +149,7 @@ jbwm_ewmh_type(Client * c)
 		LOG_DEBUG("type==dialog\n");
 	      is_dialog:
 		c->border = 4;
-		c->flags |= AR_CLIENT_BLACK_BORDER;
+		c->flags |= JB_CLIENT_BLACK_BORDER;
 	}
 	else if(type == GETATOM("_NET_WM_WINDOW_TYPE_SPLASH"))
 	{
@@ -157,8 +157,8 @@ jbwm_ewmh_type(Client * c)
 		/* FIXME:  Remove area that would have been consumed
 		   by the titlebar.  */
 		c->flags |=
-			AR_CLIENT_DONT_USE_TITLEBAR |
-			AR_CLIENT_SHAPED;
+			JB_CLIENT_DONT_USE_TITLEBAR |
+			JB_CLIENT_SHAPED;
 		c->border = 0;
 	}
 	else if(type == GETATOM("_NET_WM_WINDOW_TYPE_SPLASH"))

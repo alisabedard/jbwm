@@ -52,7 +52,7 @@ handle_xerror(Display * dpy, XErrorEvent * e)
 			/* This is used for nonmanaged windows 
 			 * that are not mapped with OverrideRedirect 
 			 * being set.  This is for wm-spec conformance.  */
-			if(c->flags & AR_CLIENT_DONT_MANAGE)
+			if(c->flags & JB_CLIENT_DONT_MANAGE)
 			{
 				XMapWindow(dpy, c->window);
 				return 0;

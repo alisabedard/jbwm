@@ -11,10 +11,10 @@
 #include "jbwm.h"
 
 /* Main application data structure.  */
-ARWMEnvironment jbwm;
+JBWMEnvironment jbwm;
 
 static void
-initialize_ARWMEnvironment_keymasks(void)
+initialize_JBWMEnvironment_keymasks(void)
 {
 	jbwm.keymasks.numlock = LOCK_MASK;
 	jbwm.keymasks.grab = GRAB_MASK;
@@ -22,15 +22,15 @@ initialize_ARWMEnvironment_keymasks(void)
 }
 
 static void
-initialize_ARWMEnvironment(void)
+initialize_JBWMEnvironment(void)
 {
 	jbwm.initialising = None;
-	initialize_ARWMEnvironment_keymasks();
+	initialize_JBWMEnvironment_keymasks();
 	jbwm.titlebar.initialized = False;
 }
 
 /* These are difficult to consolidate in
-   ARWMEnvironment structure, as memory would
+   JBWMEnvironment structure, as memory would
    have to be manually allocated for each.  */
 /* Things that affect user interaction */
 GlobalOptions opt = {
@@ -45,7 +45,7 @@ Application *head_app = NULL;
 Client *head_client = NULL;
 Client *current = NULL;
 
-#ifdef USE_ARGV
+#ifdef USE_JBGV
 static void
 process_app_class_options(const char *name)
 {
@@ -141,38 +141,38 @@ parse_command_line_args(int argc, char **argv)
 			continue;
 		switch (argv[i][1])
 		{
-#define ARG argv[++i]
-#define SETARG(arg) arg = ARG
-#define SETNARG(arg) arg = atoi(ARG)
+#define JBG argv[++i]
+#define SETJBG(arg) arg = ARG
+#define SETNJBG(arg) arg = atoi(ARG)
 		case 'd':
-			setenv("DISPLAY", ARG, 1);
+			setenv("DISPLAY", JBG, 1);
 			break;
 		case 'F':
-			SETARG(opt.font);
+			SETJBG(opt.font);
 			break;
 		case 'f':
-			SETARG(opt.color.fg);
+			SETJBG(opt.color.fg);
 			break;
 		case 'b':
-			SETARG(opt.color.bg);
+			SETJBG(opt.color.bg);
 			break;
 		case 'c':
-			SETARG(opt.color.fc);
+			SETJBG(opt.color.fc);
 			break;
 		case 'T':
-			SETARG(opt.term);
+			SETJBG(opt.term);
 			break;
 		case 'A':
-			process_app_class_options(ARG);
+			process_app_class_options(JBG);
 			break;
 		case 'g':
-			parse_geometry(ARG);
+			parse_geometry(JBG);
 			break;
 		case '1':
-			jbwm.keymasks.grab = parse_modifiers(ARG);
+			jbwm.keymasks.grab = parse_modifiers(JBG);
 			break;
 		case '2':
-			jbwm.keymasks.mod = parse_modifiers(ARG);
+			jbwm.keymasks.mod = parse_modifiers(JBG);
 			break;
 		case 'V':
 			LOG_INFO("jbwm version " VERSION "\n");
@@ -184,7 +184,7 @@ parse_command_line_args(int argc, char **argv)
 		}
 	}
 }
-#endif /* USE_ARGV */
+#endif /* USE_JBGV */
 
 static void
 setup_fonts(void)
@@ -199,11 +199,11 @@ setup_fonts(void)
 		opt.font ? FONTOPEN(opt.font) : FONTOPEN(DEF_FONT);
 	if(!jbwm.X.font)
 		LOG_ERROR("couldn't find a font to use: "
-#ifdef USE_ARGV
+#ifdef USE_JBGV
 			"try starting with -f fontname\n"
 #else
 			"set available font in config.h and rebuild"
-#endif /* USE_ARGV */
+#endif /* USE_JBGV */
 			);
 }
 
@@ -258,7 +258,7 @@ setup_gc_parameters(XGCValues * gv, const ubyte i)
 	/* set up GC parameters - same for each screen */
 	gv->function = GXinvert;
 	gv->subwindow_mode = IncludeInferiors;
-	gv->line_width = ARWM_BORDER_WIDTH;
+	gv->line_width = JBWM_BORDER_WIDTH;
 #ifndef USE_XFT
 	gv->font = jbwm.X.font->fid;
 #endif /* ! USE_XFT */
@@ -371,19 +371,19 @@ setup_display(void)
 
 int
 main(int argc
-#ifndef USE_ARGV
+#ifndef USE_JBGV
 	__attribute__ ((unused))
-#endif /* not USE_ARGV */
+#endif /* not USE_JBGV */
 	, char **argv
-#ifndef USE_ARGV
+#ifndef USE_JBGV
 	__attribute__ ((unused))
-#endif /* not USE_ARGV */
+#endif /* not USE_JBGV */
 	)
 {
-	initialize_ARWMEnvironment();
-#ifdef USE_ARGV
+	initialize_JBWMEnvironment();
+#ifdef USE_JBGV
 	parse_command_line_args(argc, argv);
-#endif /* USE_ARGV */
+#endif /* USE_JBGV */
 	setup_display();
 	event_main_loop();
 

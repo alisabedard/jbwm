@@ -20,7 +20,7 @@ static void
 moveresize_dir(Client * c, XKeyEvent * e, short *xy,
 	unsigned short *wh, const byte sign)
 {
-	const ubyte inc = ARWM_RESIZE_INCREMENT;
+	const ubyte inc = JBWM_RESIZE_INCREMENT;
 	const byte mod = sign * inc;
 
 	if((e->state & jbwm.keymasks.mod) && (*wh > inc))

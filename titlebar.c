@@ -17,7 +17,7 @@
 #include <X11/Xft/Xft.h>
 #endif /* USE_XFT */
 
-#include "ARWMButton.h"
+#include "JBWMButton.h"
 
 static void
 setup_titlebar(Client * c)
@@ -25,7 +25,7 @@ setup_titlebar(Client * c)
 	Display *dpy = jbwm.X.dpy;
 	Window info_window;
 
-	if(c->flags & AR_CLIENT_SHAPED)
+	if(c->flags & JB_CLIENT_SHAPED)
 		return;
 
 	info_window = c->info_window =
@@ -40,7 +40,7 @@ static unsigned int
 draw_info_strings(Client * c, char *name)
 {
 	const size_t name_length = name ? strlen(name) : 0;
-	const int x = BUTTON_WIDTH + 2 * ARWM_BORDER_WIDTH;
+	const int x = BUTTON_WIDTH + 2 * JBWM_BORDER_WIDTH;
 	Window info_window = c->info_window;
 
 	if(!name)
@@ -74,18 +74,18 @@ draw_info_strings(Client * c, char *name)
 }
 
 static void
-draw_button(ARWMButton * button, Window w, const short x)
+draw_button(JBWMButton * button, Window w, const short x)
 {
 	button->parent = w;
 	button->geometry.x = x;
-	ARWMButton_draw(button);
+	JBWMButton_draw(button);
 }
 
 #ifdef USE_XPM
 void
 jbwm_draw_close_button(Client * c)
 {
-	ARWMButton *close = jbwm.titlebar.buttons.close;
+	JBWMButton *close = jbwm.titlebar.buttons.close;
 
 #ifdef TITLEBAR_DEBUG
 	LOG_DEBUG("jbwm_draw_close_button(c)\n");
@@ -94,7 +94,7 @@ jbwm_draw_close_button(Client * c)
 		close->geometry->height);
 #endif /* TITLEBAR_DEBUG */
 	close->image =
-		(c->flags & AR_CLIENT_ACTIVE) ? jbwm.
+		(c->flags & JB_CLIENT_ACTIVE) ? jbwm.
 		titlebar.close : jbwm.titlebar.close_inactive;
 	draw_button(close, c->info_window, 0);
 }
@@ -107,14 +107,14 @@ static void
 draw_titlebar(Client * c, char *name)
 {
 	Window w = c->info_window;
-	ARWMButton *handle;
+	JBWMButton *handle;
 	const unsigned short width = c->geometry.width;
-	const unsigned short resize_offset = width - AR_RESIZE_DELTA;
+	const unsigned short resize_offset = width - JB_RESIZE_DELTA;
 #ifdef USE_SHADE
-	const unsigned short shade_offset = width - AR_SHADE_DELTA;
+	const unsigned short shade_offset = width - JB_SHADE_DELTA;
 #endif /* USE_SHADE */
 
-	if(c->flags & AR_CLIENT_SHAPED)
+	if(c->flags & JB_CLIENT_SHAPED)
 		return;
 	handle = jbwm.titlebar.buttons.handle;
 
@@ -132,7 +132,7 @@ draw_titlebar(Client * c, char *name)
 
 #ifdef USE_XPM
 static void
-initialize_images(ARWMTitlebarData * titlebar)
+initialize_images(JBWMTitlebarData * titlebar)
 {
 	Display *dpy = jbwm.X.dpy;
 
@@ -149,10 +149,10 @@ initialize_images(ARWMTitlebarData * titlebar)
 #endif /* USE_XPM */
 
 static void
-initialize_buttons(ARWMTitlebarData * titlebar, Display * dpy)
+initialize_buttons(JBWMTitlebarData * titlebar, Display * dpy)
 {
 	Window root = DefaultRootWindow(dpy);
-	ARWMButton *handle;
+	JBWMButton *handle;
 
 #ifdef USE_XPM
 #define IMG(item) titlebar->item
@@ -160,13 +160,13 @@ initialize_buttons(ARWMTitlebarData * titlebar, Display * dpy)
 #define IMG(item) NULL
 #endif /* USE_XPM */
 
-#define TBUTTON(item, bg) titlebar->buttons.item = ARWMButton_new(\
+#define TBUTTON(item, bg) titlebar->buttons.item = JBWMButton_new(\
 	root, bg, TITLEBAR_HEIGHT,\
 	TITLEBAR_HEIGHT, IMG(item));
 #define RGB_TBUTTON(item, bg) TBUTTON(item, jbwm_new_gc(bg))
 #define XCOLOR_TBUTTON(item, bg) TBUTTON(item, jbwm_new_gc_for_XColor(bg))
 	RGB_TBUTTON(close, TITLEBAR_CLOSE_BG);
-	RGB_TBUTTON(resize, TITLEBAR_RESIZE_BG);
+	RGB_TBUTTON(resize, TITLEBJB_RESIZE_BG);
 #ifdef USE_SHADE
 	RGB_TBUTTON(shade, TITLEBAR_SHADE_BG);
 #endif /* USE_SHADE */
@@ -176,7 +176,7 @@ initialize_buttons(ARWMTitlebarData * titlebar, Display * dpy)
 
 #ifdef USE_XFT
 static void
-initialize_font_data(ARWMTitlebarData * titlebar, Display * dpy)
+initialize_font_data(JBWMTitlebarData * titlebar, Display * dpy)
 {
 	const int scr = DefaultScreen(dpy);
 	Visual *visual = DefaultVisual(dpy, scr);
@@ -191,7 +191,7 @@ initialize_font_data(ARWMTitlebarData * titlebar, Display * dpy)
 #endif /* USE_XFT */
 
 void
-jbwm_ARWMTitlebarData_init(ARWMTitlebarData * titlebar)
+jbwm_JBWMTitlebarData_init(JBWMTitlebarData * titlebar)
 {
 	Display *dpy = jbwm.X.dpy;
 
@@ -209,21 +209,21 @@ jbwm_ARWMTitlebarData_init(ARWMTitlebarData * titlebar)
 }
 
 static void
-delete_buttons(ARWMTitlebarData * titlebar)
+delete_buttons(JBWMTitlebarData * titlebar)
 {
-	ARWMButton_delete(titlebar->buttons.close);
-	ARWMButton_delete(titlebar->buttons.resize);
+	JBWMButton_delete(titlebar->buttons.close);
+	JBWMButton_delete(titlebar->buttons.resize);
 #ifdef USE_SHADE
-	ARWMButton_delete(titlebar->buttons.shade);
+	JBWMButton_delete(titlebar->buttons.shade);
 #endif /* USE_SHADE */
 #ifdef USE_XPM
-	ARWMButton_delete(titlebar->buttons.handle);
+	JBWMButton_delete(titlebar->buttons.handle);
 #endif /* USE_XPM */
 }
 
 #ifdef USE_XPM
 static void
-free_XImage(ARWMTitlebarData * t)
+free_XImage(JBWMTitlebarData * t)
 {
 #define XDI(i) XDestroyImage(t->i)
 	XDI(close);
@@ -243,7 +243,7 @@ free_XImage(ARWMTitlebarData * t)
 
 #ifdef USE_XFT
 static void
-free_Xft_data(ARWMTitlebarData * titlebar)
+free_Xft_data(JBWMTitlebarData * titlebar)
 {
 	XftDraw *draw = titlebar->xft.draw;
 
@@ -253,10 +253,10 @@ free_Xft_data(ARWMTitlebarData * titlebar)
 }
 #endif /* USE_XFT */
 
-/* This assumes that the memory of the ARWMTitlebarData instance
+/* This assumes that the memory of the JBWMTitlebarData instance
    passed is managed externally.  */
 void
-ARWMTitlebarData_delete(ARWMTitlebarData * titlebar)
+JBWMTitlebarData_delete(JBWMTitlebarData * titlebar)
 {
 	if(!titlebar->initialized)
 		return;
@@ -289,7 +289,7 @@ update_info_window(Client * c)
 		TITLEBAR_HEIGHT);
 	XClearWindow(jbwm.X.dpy, iw);
 	/* Depending on common data.  */
-	jbwm_ARWMTitlebarData_init(&(jbwm.titlebar));
+	jbwm_JBWMTitlebarData_init(&(jbwm.titlebar));
 	{
 		char *name;
 

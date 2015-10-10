@@ -12,8 +12,7 @@ static void
 draw_outline(Client * c)
 {
 
-	if(!c->screen)
-		return;
+	if(c->screen)
 	{
 		XRectangle *g;
 		XRectangle box;
@@ -25,15 +24,19 @@ draw_outline(Client * c)
 		{
 			const ubyte th =
 #ifdef USE_SHAPE
-				c->flags & AR_CLIENT_SHAPED ? 0 :
+				c->flags & JB_CLIENT_SHAPED ? 0 :
 #endif /* USE_SHAPE */
 				TITLEBAR_HEIGHT;
 
 			box.y = g->y - th;
 			box.height =
 				g->height +
+#ifdef USE_SHADE
 				(c->
-				flags & AR_CLIENT_SHADED ? 0 : th);
+				flags & JB_CLIENT_SHADED ? 0 : th);
+#else
+				th;
+#endif /* USE_SHADE */
 		}
 		XDrawRectangle(jbwm.X.dpy, c->screen->root,
 			c->screen->gc, box.x, box.y, box.width,
@@ -42,37 +45,6 @@ draw_outline(Client * c)
 
 }
 
-#if 0
-static void
-recalculate_size(Client * c, Position p1, Position p2)
-{
-	XRectangle *g = &(c->geometry);
-	unit v;
-
-	v = abs(p1.x - p2.y);
-
-	g->width = abs(p1.x - p2.x);
-	g->height = abs(p1.y - p2.y);
-#if 0
-	if(c->size->flags & PBaseSize)
-	{
-		g->width -=
-			(g->width -
-			c->size->base_width) % c->size->width_inc;
-		g->height -=
-			(g->height -
-			c->size->base_height) % c->size->height_inc;
-	}
-#endif
-#define setwh(wh, mm, gtlt) if(c->size->mm##_##wh && g->wh gtlt \
-		c->size->mm##_##wh)\
-			g->wh = c->size->mm##_##wh;
-	setwh(width, min, <);
-	setwh(height, min, <);
-	setwh(width, max, >);
-	setwh(height, max, >);
-}
-#endif
 static void
 recalculate_size(Client * c, Position p1, Position p2)
 {
@@ -85,7 +57,6 @@ recalculate_size(Client * c, Position p1, Position p2)
 static void
 recalculate_sweep(Client * c, Position p1, Position p2)
 {
-	puts("recalculate_sweep()");
 	recalculate_size(c, p1, p2);
 	c->geometry.x = p1.x;
 	c->geometry.y = p1.y;
@@ -106,7 +77,9 @@ handle_motion_notify(Client * c, XRectangle * g, XMotionEvent * mev)
 	p1.y = g->y;
 	p2.x = mev->x;
 	p2.y = mev->y;
+#if 0
 	draw_outline(c);
+#endif
 	recalculate_sweep(c, p1, p2);
 	draw_outline(c);
 }
@@ -143,7 +116,7 @@ snap_client_to_screen_border(Client * c)
 	XRectangle *g;
 	const unsigned short dw = c->screen->width;
 	const unsigned short dh = c->screen->height;
-	const ubyte snap = ARWM_SNAP_DISTANCE;
+	const ubyte snap = JBWM_SNAP_DISTANCE;
 	const ubyte b = c->border;
 
 	g = &(c->geometry);
@@ -176,7 +149,7 @@ snap_client(Client * c)
 	int dx, dy;
 	Client *ci;
 	XRectangle *g = &(c->geometry);
-	const ubyte snap = ARWM_SNAP_DISTANCE;
+	const ubyte snap = JBWM_SNAP_DISTANCE;
 
 	snap_client_to_screen_border(c);
 	/* snap to other windows */
@@ -269,11 +242,11 @@ drag(Client * c)
 void
 moveresize(Client * c)
 {
-	const Bool shaped = (c->flags & AR_CLIENT_SHAPED);
+	const Bool shaped = (c->flags & JB_CLIENT_SHAPED);
 	XRectangle *g = &(c->geometry);
 	const ubyte tb = shaped ? 0 : TITLEBAR_HEIGHT;
 	const unsigned int parent_height =
-		g->height + (((c->flags & AR_CLIENT_SHADED)
+		g->height + (((c->flags & JB_CLIENT_SHADED)
 		|| shaped ? 0 : tb));
 	const ubyte border = c->border;
 	const unsigned short width = g->width;
@@ -285,7 +258,7 @@ moveresize(Client * c)
 		(shaped ? -tb : tb), width,
 		g->height + (shaped ? tb : 0));
 	send_config(c);
-#ifdef USE_TBAR
+#ifdef USE_TBJB
 	/* Only update the titlebar if the width has changed.  */
 	if((g->width != c->exposed_width) && !shaped)
 		update_info_window(c);
@@ -397,12 +370,12 @@ switch_vdesk(ScreenInfo * s, const ubyte v)
 		{
 			c->vdesk = v;
 #ifdef USE_EWMH
-			ARWM_UPDATE_NET_WM_DESKTOP(c);
+			JBWM_UPDATE_NET_WM_DESKTOP(c);
 #endif
 		}
 #if 0
 		c->vdesk == v ? unhide(c, NO_RAISE) : hide(c);
-		if(c->flags & AR_CLIENT_REMOVE)
+		if(c->flags & JB_CLIENT_REMOVE)
 			hide(c);
 #endif
 		if(c->vdesk == v)

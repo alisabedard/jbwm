@@ -43,7 +43,7 @@ grab_keys_for_mask(ScreenInfo * s, KeySym * ks,
 static void
 grab_mod_keys_for_screen(ScreenInfo * s)
 {
-	KeySym mod_keys[] = ARWM_ALT_KEYS_TO_GRAB;
+	KeySym mod_keys[] = JBWM_ALT_KEYS_TO_GRAB;
 
 	grab_keys_for_mask(s, mod_keys, jbwm.keymasks.mod);
 }
@@ -51,7 +51,7 @@ grab_mod_keys_for_screen(ScreenInfo * s)
 void
 grab_keys_for_screen(ScreenInfo * s)
 {
-	KeySym keys[] = ARWM_KEYS_TO_GRAB;
+	KeySym keys[] = JBWM_KEYS_TO_GRAB;
 
 	grab_keys_for_mask(s, keys, 0);
 	grab_mod_keys_for_screen(s);

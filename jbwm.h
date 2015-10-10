@@ -1,6 +1,6 @@
 
-#ifndef ARWM_H
-#define ARWM_H
+#ifndef JBWM_H
+#define JBWM_H
 
 #include <string.h>
 #include <stdlib.h>
@@ -65,7 +65,7 @@ void jbwm_grab_button(Window w, unsigned int mask,
 
 /* Main environment structure, to replace evilwm's
    large collection of global variables.  */
-extern ARWMEnvironment jbwm;
+extern JBWMEnvironment jbwm;
 
 /* Things that affect user interaction */
 extern const char *opt_term[3];
@@ -86,4 +86,4 @@ void make_new_client(Window w, ScreenInfo * s);
 #include "jbwmmod.h"
 #include "atoms.h"
 
-#endif /* not ARWM_ARWM_H */
+#endif /* not JBWM_JBWM_H */
