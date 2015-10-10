@@ -11,11 +11,6 @@
 #ifdef USE_SHADE
 #include "images/shade.xpm"
 #endif /* USE_SHADE */
-
-#elif USE_XBM
-#include "images/close.xbm"
-#include "images/resize.xbm"
-#include "images/shade.xbm"
 #endif /* USE_XPM */
 
 #ifdef USE_XFT
@@ -123,10 +118,8 @@ draw_titlebar(Client * c, char *name)
 		return;
 	handle = jbwm.titlebar.buttons.handle;
 
-#ifndef USE_XBM
 	handle->geometry.width = width;
 	draw_button(handle, w, 0);
-#endif /* !USE_XBM */
 #ifdef USE_CLOSE_BUTTON
 	jbwm_draw_close_button(c);
 #endif /* USE_CLOSE_BUTTON */
@@ -137,17 +130,12 @@ draw_titlebar(Client * c, char *name)
 	draw_button(jbwm.titlebar.buttons.resize, w, resize_offset);
 }
 
-#if defined(USE_XPM) || defined(USE_XBM)
+#ifdef USE_XPM
 static void
 initialize_images(ARWMTitlebarData * titlebar)
 {
-
-#ifdef USE_XPM
 	Display *dpy = jbwm.X.dpy;
 
-#ifdef TITLEBAR_DEBUG
-	LOG_DEBUG("Load pixmaps...");
-#endif /* TITLEBAR_DEBUG */
 #define XPMIMAGE(xpm, dest) XpmCreateImageFromData(dpy, xpm##_xpm,\
 	&(titlebar->dest), NULL, NULL)
 	XPMIMAGE(gradient, handle);
@@ -157,43 +145,24 @@ initialize_images(ARWMTitlebarData * titlebar)
 #ifdef USE_SHADE
 	XPMIMAGE(shade, shade);
 #endif /* USE_SHADE */
-#elif USE_XBM
-#define XBMIMAGE(i) titlebar->i = jbwm_get_XImage_for_XBM(\
-	i##_bits, i##_width, i##_height)
-	XBMIMAGE(resize);
-	XBMIMAGE(close);
-#ifdef USE_SHADE
-	XBMIMAGE(shade);
-#endif /* USE_SHADE */
-#endif /* USE_XPM */
 }
-#endif /* USE_XPM || USE_XBM */
+#endif /* USE_XPM */
 
 static void
 initialize_buttons(ARWMTitlebarData * titlebar, Display * dpy)
 {
 	Window root = DefaultRootWindow(dpy);
-#ifndef USE_XBM
 	ARWMButton *handle;
-#endif /* ! USE_XBM */
 
-#if defined(USE_XPM) || defined(USE_XBM)
+#ifdef USE_XPM
 #define IMG(item) titlebar->item
-#ifdef USE_XBM
-#define IMGDIM(item)\
-	item->image_height = item##_height;\
-	item->image_width= item##_width;
-#else /* !USE_XBM */
-#define IMGDIM(item)
-#endif /* USE_XBM */
-#else /* USE_XBM || USE_XPM */
+#else
 #define IMG(item) NULL
-#define IMGDIM(item)
-#endif /* USE_XBM */
+#endif /* USE_XPM */
 
 #define TBUTTON(item, bg) titlebar->buttons.item = ARWMButton_new(\
 	root, bg, TITLEBAR_HEIGHT,\
-	TITLEBAR_HEIGHT, IMG(item)); IMGDIM(item)
+	TITLEBAR_HEIGHT, IMG(item)); 
 #define RGB_TBUTTON(item, bg) TBUTTON(item, jbwm_new_gc(bg))
 #define XCOLOR_TBUTTON(item, bg) TBUTTON(item, jbwm_new_gc_for_XColor(bg))
 	RGB_TBUTTON(close, TITLEBAR_CLOSE_BG);
@@ -201,10 +170,8 @@ initialize_buttons(ARWMTitlebarData * titlebar, Display * dpy)
 #ifdef USE_SHADE
 	RGB_TBUTTON(shade, TITLEBAR_SHADE_BG);
 #endif /* USE_SHADE */
-#ifndef USE_XBM
 	handle=XCOLOR_TBUTTON(handle, jbwm.X.screens->bg);
 	handle->span_image=True;
-#endif /* ! USE_XBM */
 }
 
 #ifdef USE_XFT
@@ -246,7 +213,9 @@ delete_buttons(ARWMTitlebarData * titlebar)
 {
 	ARWMButton_delete(titlebar->buttons.close);
 	ARWMButton_delete(titlebar->buttons.resize);
+#ifdef USE_SHADE
 	ARWMButton_delete(titlebar->buttons.shade);
+#endif /* USE_SHADE */
 #ifdef USE_XPM
 	ARWMButton_delete(titlebar->buttons.handle);
 #endif /* USE_XPM */
@@ -256,6 +225,14 @@ delete_buttons(ARWMTitlebarData * titlebar)
 static void
 free_XImage(ARWMTitlebarData * t)
 {
+#define XDI(i) XDestroyImage(t->i)
+	XDI(close); 
+	XDI(resize); 
+#ifdef USE_SHADE
+	XDI(shade);
+#endif /* USE_SHADE */
+	XDI(handle);
+	XDI(close_inactive);
 	XDestroyImage(t->close);
 	XDestroyImage(t->resize);
 	XDestroyImage(t->shade);

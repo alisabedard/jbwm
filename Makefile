@@ -42,8 +42,6 @@ DEFINES  = $(EXTRA_DEFINES)
 #DEFINES += -DUSE_SHAPE
 #LIBS += -lXext # Required for SHAPE extension
 
-# Titlebar xbm/xpm support:  No longer compiles!
-#DEFINES += -DUSE_XBM
 # XPM support is beautiful but substantially increases binary size.
 #DEFINES += -DUSE_XPM
 #LIBS	+= -lXpm
@@ -61,7 +59,6 @@ DEFINES  = $(EXTRA_DEFINES)
 
 # Titlebar close button support:
 DEFINES += -DUSE_CLOSE_BUTTON
-
 
 # Uncomment to enable colormap support
 #DEFINES += -DUSE_CMAP

@@ -9,7 +9,10 @@ typedef struct _ARWMTitlebarData
 
 	struct
 	{
-		ARWMButton *close, *resize, *shade, *handle;
+		ARWMButton *close, *resize, *handle;
+#ifdef USE_SHADE
+		ARWMButton *shade;
+#endif
 	} buttons;
 	
 #ifdef USE_XFT
@@ -19,12 +22,13 @@ typedef struct _ARWMTitlebarData
 		XftColor fg;
 	} xft;
 #endif				/* USE_XFT */
-#if defined(USE_XPM) || defined(USE_XBM)
-	XImage *close, *resize, *shade;
 #ifdef USE_XPM
+	XImage *close, *resize;
 	XImage *close_inactive, *handle;
+#ifdef USE_SHADE
+	XImage *shade;
+#endif /* USE_SHADE */
 #endif /* USE_XPM */
-#endif /* USE_XPM || USE_XBM */
 } ARWMTitlebarData;
 
 
