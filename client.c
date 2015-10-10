@@ -19,7 +19,7 @@ find_client(Window w)
 		/* This allows the info_window member, which is the 
 		 * titlebar parent, to match events.  Particularaly, 
 		 * it allows the titlebar to be used as a drag handle.  */
-#ifdef USE_TBJB
+#ifdef USE_TBAR
 		&& (w != c->info_window)
 #endif
 		; c = c->next)
@@ -133,9 +133,9 @@ void
 remove_client(Client * c)
 {
 	XGrabServer(jbwm.X.dpy);
-#ifdef USE_TBJB
+#ifdef USE_TBAR
 	remove_info_window(c);
-#endif /* USE_TBJB */
+#endif /* USE_TBAR */
 	unparent_window(c);
 	relink_window_list(c);
 	if(current == c)

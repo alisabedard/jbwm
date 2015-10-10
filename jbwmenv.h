@@ -40,6 +40,7 @@ struct JBWMEnvironment
 #endif				/* USE_SHAPE */
 	} X;
 	JBWMTitlebarData titlebar;
+	ubyte need_cleanup;
 };
 
 typedef struct JBWMEnvironment JBWMEnvironment;

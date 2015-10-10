@@ -46,7 +46,7 @@ struct Client
 	XConfigureEvent ce;
 	Client *next;
 
-#ifdef USE_TBJB
+#ifdef USE_TBAR
 	Window info_window;
 #endif
 	Window close_button;

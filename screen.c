@@ -8,41 +8,14 @@
 #include <string.h>
 #include "screen.h"
 
-static void
+static inline void
 draw_outline(Client * c)
 {
-
-	if(c->screen)
-	{
-		XRectangle *g;
-		XRectangle box;
-		const ubyte border = c->border;
-
-		g = &(c->geometry);
-		box.x = g->x - border;
-		box.width = g->width + border;
-		{
-			const ubyte th =
-#ifdef USE_SHAPE
-				c->flags & JB_CLIENT_SHAPED ? 0 :
-#endif /* USE_SHAPE */
-				TITLEBAR_HEIGHT;
-
-			box.y = g->y - th;
-			box.height =
-				g->height +
-#ifdef USE_SHADE
-				(c->
-				flags & JB_CLIENT_SHADED ? 0 : th);
-#else
-				th;
-#endif /* USE_SHADE */
-		}
-		XDrawRectangle(jbwm.X.dpy, c->screen->root,
-			c->screen->gc, box.x, box.y, box.width,
-			box.height);
-	}
-
+	const ubyte h=TITLEBAR_HEIGHT;
+#define CG c->geometry
+	XDrawRectangle(jbwm.X.dpy, c->screen->root, c->screen->gc, 
+		CG.x, CG.y-h, CG.width, CG.height 
+		+ ((c->flags & JB_CLIENT_SHADED) ? 0 : h));
 }
 
 static void
@@ -77,9 +50,7 @@ handle_motion_notify(Client * c, XRectangle * g, XMotionEvent * mev)
 	p1.y = g->y;
 	p2.x = mev->x;
 	p2.y = mev->y;
-#if 0
 	draw_outline(c);
-#endif
 	recalculate_sweep(c, p1, p2);
 	draw_outline(c);
 }
@@ -88,7 +59,13 @@ void
 sweep(Client * c)
 {
 	XEvent ev;
-	XRectangle *g = &(c->geometry);
+	XRectangle *g;
+
+	/* Resizing shaded windows yields undefined behavior.  */
+	if(c->flags & JB_CLIENT_SHADED)
+		return;
+
+	g = &(c->geometry);
 
 	if(!grab_pointer(c->screen->root, MouseMask, jbwm.X.cursor))
 		return;
@@ -182,7 +159,7 @@ snap_client(Client * c)
 }
 #endif /* USE_SNAP */
 
-static void
+static inline void
 drag_motion(Client * c, XEvent ev, int x1, int y1, int old_cx,
 	int old_cy)
 {
@@ -199,7 +176,6 @@ drag_motion(Client * c, XEvent ev, int x1, int y1, int old_cx,
 static void
 drag_button_release(Client * c)
 {
-	draw_outline(c);	/* clear */
 	XUngrabPointer(jbwm.X.dpy, CurrentTime);
 	moveresize(c);
 }
@@ -235,7 +211,6 @@ drag(Client * c)
 	old_p.x = c->geometry.x;
 	old_p.y = c->geometry.y;
 	get_mouse_position((int *)&(p.x), (int *)&(p.y), root);
-	draw_outline(c);
 	drag_event_loop(c, p.x, p.y, old_p.x, old_p.y);
 }
 
@@ -258,7 +233,7 @@ moveresize(Client * c)
 		(shaped ? -tb : tb), width,
 		g->height + (shaped ? tb : 0));
 	send_config(c);
-#ifdef USE_TBJB
+#ifdef USE_TBAR
 	/* Only update the titlebar if the width has changed.  */
 	if((g->width != c->exposed_width) && !shaped)
 		update_info_window(c);

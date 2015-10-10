@@ -44,20 +44,15 @@ handle_map_request(XMapRequestEvent * e)
 
 	if(c)
 	{
-		if(c->vdesk != c->screen->vdesk)
+		/* Avoid mapping any ghost windows.  */
+		if(c->flags & JB_CLIENT_REMOVE)
+			return;
+		if(!(c->flags & JB_CLIENT_IS_STICKY) && 
+			(c->vdesk != c->screen->vdesk))
+		{
 			switch_vdesk(c->screen, c->vdesk);
-#if 0
-		if(!(c->flags & JB_CLIENT_REMOVE))
-		{
-			unhide(c, RAISE);
 		}
-		else
-		{
-			XDestroyWindow(jbwm.X.dpy, c->window);
-		}
-#endif
-		if(c->window)
-			XMapWindow(jbwm.X.dpy, c->parent);
+		unhide(c);
 		c->ignore_unmap++;
 	}
 	else
@@ -74,11 +69,14 @@ cleanup()
 {
 	Client *c, *i;
 
+	jbwm.need_cleanup=0;
 	for(c = head_client; c; c = i)
 	{
 		i = c->next;
 		if(c->flags & JB_CLIENT_REMOVE)
 			remove_client(c);
+		if(!i)
+			return;
 	}
 }
 
@@ -96,7 +94,7 @@ handle_unmap_event(XUnmapEvent * e)
 		else
 		{
 			c->flags |= JB_CLIENT_REMOVE;
-			cleanup();
+			jbwm.need_cleanup=1;
 		}
 	}
 }
@@ -128,7 +126,7 @@ handle_property_change(XPropertyEvent * e)
 		moveresize(c);
 		if(atom == XA_WM_NORMAL_HINTS)
 			get_wm_normal_hints(c);
-#ifdef USE_TBJB
+#ifdef USE_TBAR
 		else if(atom == XA_WM_NAME)
 			update_info_window(c);
 #endif
@@ -155,7 +153,7 @@ handle_enter_event(XCrossingEvent * e)
 	}
 }
 
-#ifdef USE_TBJB
+#ifdef USE_TBAR
 static void
 handle_expose_event(XEvent * ev)
 {
@@ -171,11 +169,11 @@ handle_expose_event(XEvent * ev)
 }
 #endif
 
-static void
-jbwm_process_events(void)
+void
+main_event_loop(void)
 {
 	XEvent ev;
-
+head:
 	XNextEvent(jbwm.X.dpy, &ev);
 	switch (ev.type)
 	{
@@ -199,7 +197,7 @@ jbwm_process_events(void)
 		LOG("KeyPress");
 		jbwm_handle_key_event(&ev.xkey);
 		break;
-#ifdef USE_TBJB
+#ifdef USE_TBAR
 	case Expose:
 		LOG("Expose");
 		handle_expose_event(&ev);
@@ -226,13 +224,8 @@ jbwm_process_events(void)
 		break;
 #endif /* USE_SHAPE */
 	}
-	cleanup();
+	if(jbwm.need_cleanup)
+		cleanup();
+	goto head;
 }
 
-void
-event_main_loop(void)
-{
-	/* main event loop here */
-	for(;;)
-		jbwm_process_events();
-}

@@ -17,9 +17,9 @@
 /* Default colors */
 #define DEF_FG          "#ffffff"
 #define DEF_BG          "#202020"
-#define TITLEBAR_CLOSE_BG	0x80, 0x79, 0x70
-#define TITLEBAR_SHADE_BG	0x70, 0x79, 0x70
-#define TITLEBJB_RESIZE_BG	0x70, 0x79, 0x70
+#define TITLEBAR_CLOSE_BG	0x70, 0x60, 0x60
+#define TITLEBAR_SHADE_BG	0x60, 0x70, 0x60
+#define TITLEBJB_RESIZE_BG	0x60, 0x60, 0x70
 
 /* #define GRAB_MASK Mod1Mask */
 #define GRAB_MASK Mod4Mask
@@ -59,7 +59,7 @@
 #endif /* USE_XFT */
 
 /* Ensure that the title text fits within the titlebar.  */
-#ifdef USE_TBJB
+#ifdef USE_TBAR
 #define TITLEBAR_HEIGHT MAX(16,(TITLE_FONT_HEIGHT+JBWM_BORDER_WIDTH))
 #else
 #define TITLEBAR_HEIGHT 8

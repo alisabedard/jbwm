@@ -385,7 +385,7 @@ main(int argc
 	parse_command_line_args(argc, argv);
 #endif /* USE_JBGV */
 	setup_display();
-	event_main_loop();
+	main_event_loop();
 
 	return 1;
 }

@@ -96,7 +96,7 @@ initialize_client_fields(Client * c, ScreenInfo * s, Window w)
 	c->screen = s;
 	c->window = w;
 	c->ignore_unmap = 0;
-#ifdef USE_TBJB
+#ifdef USE_TBAR
 	c->info_window = 0;
 #endif
 	c->flags = 0;
@@ -121,6 +121,7 @@ make_new_client(Window w, ScreenInfo * s)
 {
 	Client *c;
 
+	XGrabServer(jbwm.X.dpy);
 	/*
 	 * First a bit of interaction with the error handler due to X's
 	 * tendency to batch event notifications.  We set a global variable
@@ -138,11 +139,11 @@ make_new_client(Window w, ScreenInfo * s)
 	 * we got a chance to grab the server.
 	 */
 	if(jbwm.initialising == None)
-		return;
+		goto end;
 	jbwm.initialising = None;
 	c = Client_new(w, s);
 	if(c->flags & JB_CLIENT_DONT_MANAGE)
-		return;
+		goto end;
 	XSelectInput(jbwm.X.dpy, c->window,
 		EnterWindowMask | PropertyChangeMask |
 		ColormapChangeMask);
@@ -154,6 +155,8 @@ make_new_client(Window w, ScreenInfo * s)
 	map_client(c, s);
 	/* Enable alt-dragging within window */
 	jbwm_grab_button(w, jbwm.keymasks.grab, AnyButton);
+end:
+	XUngrabServer(jbwm.X.dpy);
 }
 
 /*
@@ -372,7 +375,7 @@ reparent(Client * c)
 #ifdef USE_EWMH
 	jbwm_ewmh_type(c);
 #endif
-#ifdef USE_TBJB
+#ifdef USE_TBAR
 	if(!(c->flags & JB_CLIENT_DONT_USE_TITLEBAR))
 		update_info_window(c);
 #endif

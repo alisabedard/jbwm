@@ -1,9 +1,10 @@
 # If you don't use CC 
 #CC       = gcc
 #CC = clang
-#CFLAGS=-Os -ggdb -W -Wall -Werror
+CFLAGS=-Os -W -Wall -Werror
+#CFLAGS+=-ggdb
 # profiling flag.
-CFLAGS = -pg -O0 -W -Wall -Werror
+#CFLAGS = -pg -O0 -W -Wall -Werror
 
 # Edit this line if you don't want jbwm to install under /usr.
 # Note that $(DESTDIR) is used by the Debian build process.
@@ -73,7 +74,7 @@ DEFINES += -DUSE_CLOSE_BUTTON
 #DEFINES += -DUSE_JBGV
 
 # Uncomment to enable titlebars
-DEFINES += -DUSE_TBJB
+DEFINES += -DUSE_TBAR
 SRCS += titlebar.c
 
 # Uncomment to enable window snapping.
