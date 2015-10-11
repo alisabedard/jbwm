@@ -267,16 +267,19 @@ reparent(Client * c)
 	XSetWindowAttributes p_attr;
 	const unsigned long valuemask =
 		CWOverrideRedirect | CWBorderPixel | CWBackPixel |
-		CWEventMask;
+		CWEventMask | CWBackPixel;
 	const XRectangle *g = &(c->geometry);
-	const int x = g->x - c->border;
+	const ubyte b = c->border;
+	const int x = g->x - b;
 	const int y_mod =
 		c->flags & JB_CLIENT_SHAPED ? 0 : TITLEBAR_HEIGHT;
-	const int y = g->y - c->border - y_mod;
+	const int y = g->y - b - y_mod;
+	const Window w = c->window;
 
 	if(!c->screen)
 		return;
 
+	p_attr.background_pixel = BlackPixel(jbwm.X.dpy, c->screen->screen);
 	p_attr.border_pixel = c->screen->bg.pixel;
 	p_attr.override_redirect = True;
 	p_attr.event_mask =
@@ -288,18 +291,18 @@ reparent(Client * c)
 #endif /* USE_SHAPE */
 		c->parent =
 			XCreateWindow(jbwm.X.dpy, c->screen->root, x,
-			y, g->width, g->height + y_mod, c->border,
+			y, g->width, g->height + y_mod, b,
 			DefaultDepth(jbwm.X.dpy, c->screen->screen),
 			CopyFromParent, DefaultVisual(jbwm.X.dpy,
 			c->screen->screen), valuemask, &p_attr);
-	XAddToSaveSet(jbwm.X.dpy, c->window);
-	XSetWindowBorderWidth(jbwm.X.dpy, c->window, 0);
+	XAddToSaveSet(jbwm.X.dpy, w);
+	XSetWindowBorderWidth(jbwm.X.dpy, w, 0);
 #ifdef USE_TBAR
 	if(!(c->flags & JB_CLIENT_DONT_USE_TITLEBAR))
 		update_info_window(c);
 #endif
-	XReparentWindow(jbwm.X.dpy, c->window, c->parent, 0, 0);
-	XMapWindow(jbwm.X.dpy, c->window);
+	XReparentWindow(jbwm.X.dpy, w, c->parent, 0, 0);
+	XMapWindow(jbwm.X.dpy, w);
 }
 
 /* Get WM_NORMAL_HINTS property */
