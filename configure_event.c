@@ -6,6 +6,7 @@
 
 #include "jbwm.h"
 
+#if 0
 static void
 configure_client(Client * c, XConfigureRequestEvent * e)
 {
@@ -30,19 +31,50 @@ configure_client(Client * c, XConfigureRequestEvent * e)
 	wc.x = g->x - border;
 	wc.y = g->y - border;
 	wc.border_width = border;
+#if 0
 	if(!(c->flags & JB_CLIENT_SHAPED))
 	{
+
 		value_mask |= CWHeight | CWY;
 		wc.height += TITLEBAR_HEIGHT;
 		wc.y -= TITLEBAR_HEIGHT;
-	}
+#endif
+	//}
 	XConfigureWindow(jbwm.X.dpy, c->parent, value_mask, &wc);
 	moveresize(c);
 }
+#endif
 
 void
 jbwm_handle_configure_request(XConfigureRequestEvent * e)
 {
+	Client *c;
+	XWindowChanges wc;
+
+	c=find_client(e->window);
+	wc.x=e->x;
+	wc.y=e->y;
+	wc.width=e->width;
+	wc.height=e->height;
+	wc.border_width=0;
+	wc.sibling=e->above;
+	wc.stack_mode=e->detail;
+	if(c)
+	{
+		if(e->value_mask & CWStackMode && e->value_mask & CWSibling)
+		{
+			Client *s;
+
+			s = find_client(e->above);
+			if(s)
+				wc.sibling=s->parent;
+		}
+	}
+	else
+	{
+		XConfigureWindow(jbwm.X.dpy, e->window, e->value_mask, &wc);
+	}
+#if 0
 	XWindowChanges wc;
 	Client *c;
 
@@ -68,4 +100,5 @@ jbwm_handle_configure_request(XConfigureRequestEvent * e)
 		XConfigureWindow(e->display, e->window, e->value_mask,
 			&wc);
 	}
+#endif
 }

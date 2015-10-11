@@ -26,7 +26,7 @@ initialize_JBWMEnvironment(void)
 {
 	jbwm.initialising = None;
 	initialize_JBWMEnvironment_keymasks();
-	jbwm.titlebar.initialized = False;
+	jbwm.titlebar.initialized = false;
 }
 
 /* These are difficult to consolidate in
@@ -212,7 +212,7 @@ jbwm_grab_button(Window w, unsigned int mask, unsigned int button)
 {
 	do
 	{
-#define GRAB(mod) XGrabButton(jbwm.X.dpy, button, mask | mod, w, False,\
+#define GRAB(mod) XGrabButton(jbwm.X.dpy, button, mask | mod, w, false,\
 	ButtonMask, GrabModeAsync, GrabModeSync, None, None)
 		GRAB(0);
 		GRAB(LockMask);

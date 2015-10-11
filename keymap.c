@@ -12,12 +12,12 @@
 static void
 grabkey(Window w, KeyCode kc, const unsigned int mask)
 {
-	XGrabKey(jbwm.X.dpy, kc, mask, w, True, GrabModeAsync,
+	XGrabKey(jbwm.X.dpy, kc, mask, w, true, GrabModeAsync,
 		GrabModeAsync);
-	XGrabKey(jbwm.X.dpy, kc, mask | LockMask, w, True,
+	XGrabKey(jbwm.X.dpy, kc, mask | LockMask, w, true,
 		GrabModeAsync, GrabModeAsync);
 	/* Mod2Mask is NumLock */
-	XGrabKey(jbwm.X.dpy, kc, mask | Mod2Mask, w, True,
+	XGrabKey(jbwm.X.dpy, kc, mask | Mod2Mask, w, true,
 		GrabModeAsync, GrabModeAsync);
 }
 

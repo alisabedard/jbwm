@@ -25,8 +25,10 @@ setup_titlebar(Client * c)
 	Display *dpy = jbwm.X.dpy;
 	Window info_window;
 
-	if(c->flags & JB_CLIENT_SHAPED)
+#ifdef USE_SHAPE
+	if(is_shaped(c))
 		return;
+#endif /* USE_SHAPE */
 
 	info_window = c->info_window =
 		XCreateSimpleWindow(dpy, c->parent, 0, 0,
@@ -114,7 +116,7 @@ draw_titlebar(Client * c, char *name)
 	const unsigned short shade_offset = width - JB_SHADE_DELTA;
 #endif /* USE_SHADE */
 
-	if(c->flags & JB_CLIENT_SHAPED)
+	if(is_shaped(c))
 		return;
 	handle = jbwm.titlebar.buttons.handle;
 
@@ -171,7 +173,7 @@ initialize_buttons(JBWMTitlebarData * titlebar, Display * dpy)
 	RGB_TBUTTON(shade, TITLEBAR_SHADE_BG);
 #endif /* USE_SHADE */
 	handle = XCOLOR_TBUTTON(handle, jbwm.X.screens->bg);
-	handle->span_image = True;
+	handle->span_image = true;
 }
 
 #ifdef USE_XFT
@@ -205,7 +207,7 @@ jbwm_JBWMTitlebarData_init(JBWMTitlebarData * titlebar)
 #ifdef USE_XFT
 	initialize_font_data(titlebar, dpy);
 #endif /* USE_XFT */
-	titlebar->initialized = True;
+	titlebar->initialized = true;
 }
 
 static void

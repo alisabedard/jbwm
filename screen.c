@@ -12,6 +12,10 @@ static inline void
 draw_outline(Client * c)
 {
 	const ubyte h=TITLEBAR_HEIGHT;
+#ifdef USE_SHAPE
+	if(is_shaped(c))
+		return;
+#endif /* USE_SHAPE */
 #define CG c->geometry
 	XDrawRectangle(jbwm.X.dpy, c->screen->root, c->screen->gc, 
 		CG.x, CG.y-h, CG.width, CG.height 
@@ -21,7 +25,7 @@ draw_outline(Client * c)
 static void
 recalculate_size(Client * c, Position p1, Position p2)
 {
-	XRectangle *g = &(c->geometry);
+	XRectangle *g = &(CG);
 
 	g->width = abs(p1.x - p2.x);
 	g->height = abs(p1.y - p2.y);
@@ -31,14 +35,14 @@ static void
 recalculate_sweep(Client * c, Position p1, Position p2)
 {
 	recalculate_size(c, p1, p2);
-	c->geometry.x = p1.x;
-	c->geometry.y = p1.y;
+	CG.x = p1.x;
+	CG.y = p1.y;
 
 	SET_CLIENT_CE(c);
 }
 
 #define grab_pointer(w, mask, curs) \
-	(XGrabPointer(jbwm.X.dpy, w, False, mask, GrabModeAsync,\
+	(XGrabPointer(jbwm.X.dpy, w, false, mask, GrabModeAsync,\
 	GrabModeAsync, None, curs, CurrentTime) == GrabSuccess)
 
 static void
@@ -217,25 +221,22 @@ drag(Client * c)
 void
 moveresize(Client * c)
 {
-	const Bool shaped = (c->flags & JB_CLIENT_SHAPED);
+#define TB TITLEBAR_HEIGHT
 	XRectangle *g = &(c->geometry);
-	const ubyte tb = shaped ? 0 : TITLEBAR_HEIGHT;
-	const unsigned int parent_height =
-		g->height + (((c->flags & JB_CLIENT_SHADED)
-		|| shaped ? 0 : tb));
-	const ubyte border = c->border;
+	const unsigned int parent_height = g->height + TB;
+	const ubyte b = c->border;
 	const unsigned short width = g->width;
 
-	XMoveResizeWindow(jbwm.X.dpy, c->parent, g->x - border,
-		g->y - border - (shaped ? 0 : tb), width,
-		parent_height);
-	XMoveResizeWindow(jbwm.X.dpy, c->window, 0,
-		(shaped ? -tb : tb), width,
-		g->height + (shaped ? tb : 0));
+	XMoveResizeWindow(jbwm.X.dpy, c->parent, g->x - b, g->y - b - TB, 
+		width, parent_height);
+	/* Offset the child window within the parent window
+		to display titlebar */
+	XMoveResizeWindow(jbwm.X.dpy, c->window, 0, TB, width, 
+		g->height + TB);
 	send_config(c);
 #ifdef USE_TBAR
 	/* Only update the titlebar if the width has changed.  */
-	if((g->width != c->exposed_width) && !shaped)
+	if(g->width != c->exposed_width)
 		update_info_window(c);
 #endif
 	/* Store width value for above test.  */
@@ -250,10 +251,11 @@ maximize(Client * c)
 
 	g = &(c->geometry);
 	og = &(c->old_geometry);
-	if(og->width)
+	if(c->flags & JB_CLIENT_MAXIMIZED)
 	{
 		memcpy(g, og, sizeof(XRectangle));
 		/* og->width is used as a flag here.  */
+		c->flags &= ~ JB_CLIENT_MAXIMIZED;
 		og->width = 0;
 	}
 	else
@@ -261,9 +263,16 @@ maximize(Client * c)
 		ScreenInfo *s = c->screen;
 
 		memcpy(og, g, sizeof(XRectangle));
+		g->x = 0;
+		g->y=TITLEBAR_HEIGHT;
+		g->width = s->width;
+		g->height = s->height-TITLEBAR_HEIGHT;
+		c->flags |= JB_CLIENT_MAXIMIZED;
+#if 0
 		g->x = g->y = 0;
 		g->width = s->width;
 		g->height = s->height;
+#endif
 	}
 	moveresize(c);
 	XRaiseWindow(jbwm.X.dpy, c->parent);

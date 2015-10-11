@@ -18,7 +18,7 @@
  * XConfigureEvent data.
  */
 #define SEND_CONFIG(c)\
-	XSendEvent(jbwm.X.dpy, c->window, False, StructureNotifyMask,\
+	XSendEvent(jbwm.X.dpy, c->window, false, StructureNotifyMask,\
 		   (XEvent *)&(c->ce))
 
 void send_wm_delete(Client * c, int kill_client);
@@ -32,6 +32,7 @@ void fix_client(Client * c);
 void remove_client(Client * c);
 void send_config(Client * c);
 void set_wm_state(Client * c, int state);
+bool is_shaped(Client * c);
 void set_shape(Client * c);
 
 #endif /* JBWM_CLIENT_H */

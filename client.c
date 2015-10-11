@@ -52,7 +52,7 @@ initialize_client_ce(Client * c)
 	c->ce.type = ConfigureNotify;
 	c->ce.border_width = 0;
 	c->ce.above = None;
-	c->ce.override_redirect = False;
+	c->ce.override_redirect = false;
 	c->ce.window = c->window;
 }
 
@@ -137,7 +137,7 @@ remove_client(Client * c)
 		XFree(c->size);
 	free(c);
 	XUngrabServer(jbwm.X.dpy);
-	XSync(jbwm.X.dpy, False);
+	XSync(jbwm.X.dpy, false);
 }
 
 static int
@@ -152,7 +152,7 @@ send_xmessage(Window w, Atom a, long x)
 	ev.xclient.data.l[0] = x;
 	ev.xclient.data.l[1] = CurrentTime;
 
-	return XSendEvent(jbwm.X.dpy, w, False, NoEventMask, &ev);
+	return XSendEvent(jbwm.X.dpy, w, false, NoEventMask, &ev);
 }
 
 void
@@ -167,13 +167,20 @@ send_wm_delete(Client * c, int kill_client)
 }
 
 #ifdef USE_SHAPE
+bool
+is_shaped(Client * c)
+{
+	int bounding_shaped;
+	int i;
+	unsigned int u;
+	return XShapeQueryExtents(jbwm.X.dpy, c->window, &bounding_shaped,
+		&i, &i, &u, &u, &i, &i, &i, &u, &u)
+		&& bounding_shaped;
+}
+
 void
 set_shape(Client * c)
 {
-	int bounding_shaped;
-	int i, b;
-	unsigned int u;		/* dummies */
-
 	/* Validate inputs:  Make sure that the SHAPE extension is
 	   available, and make sure that C is initialized.  */
 	if(!jbwm.X.have_shape || !c)
@@ -183,17 +190,11 @@ set_shape(Client * c)
 	 * fvwm-2.5.10. Previous method (more than one rectangle returned
 	 * from XShapeGetRectangles) worked _most_ of the time.
 	 */
-	XShapeSelectInput(jbwm.X.dpy, c->window, ShapeNotifyMask);
-	if(XShapeQueryExtents(jbwm.X.dpy, c->window, &bounding_shaped,
-		&i, &i, &u, &u, &b, &i, &i, &u, &u)
-		&& bounding_shaped)
+	if(is_shaped(c))
 	{
-		c->flags |=
-			JB_CLIENT_SHAPED |
-			JB_CLIENT_DONT_USE_TITLEBAR;
 		XShapeCombineShape(jbwm.X.dpy, c->parent,
-			ShapeBounding, 0, 0, c->window, ShapeBounding,
-			ShapeSet);
+			ShapeBounding, 0, TITLEBAR_HEIGHT, c->window, 
+			ShapeBounding, ShapeSet);
 	}
 }
 #endif

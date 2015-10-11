@@ -47,11 +47,6 @@ handle_map_request(XMapRequestEvent * e)
 		/* Avoid mapping any ghost windows.  */
 		if(c->flags & JB_CLIENT_REMOVE)
 			return;
-		if(!(c->flags & JB_CLIENT_IS_STICKY) && 
-			(c->vdesk != c->screen->vdesk))
-		{
-			switch_vdesk(c->screen, c->vdesk);
-		}
 		unhide(c);
 		c->ignore_unmap++;
 	}

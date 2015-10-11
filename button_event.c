@@ -95,10 +95,10 @@ jbwm_handle_button_event(XButtonEvent * e)
 		sweep(c);
 		break;
 	case Button4:
-		move_client_with_vdesk(c, True);
+		move_client_with_vdesk(c, true);
 		break;
 	case Button5:
-		move_client_with_vdesk(c, False);
+		move_client_with_vdesk(c, false);
 		break;
 	}
 }

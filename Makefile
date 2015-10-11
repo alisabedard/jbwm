@@ -32,6 +32,7 @@ DEFINES  = $(EXTRA_DEFINES)
 # e.g., make EXTRA_DEFINfES="-DDEBUG".
 
 #CFLAGS += -Wall -W -pedantic -std=c89
+CFLAGS += -std=c11
 # Optimization:
 #CFLAGS += -Os -ffast-math -fomit-frame-pointer 
 # Machine-specific:
@@ -42,8 +43,8 @@ DEFINES  = $(EXTRA_DEFINES)
 #DEFINES += -DDEBUG
 
 # Uncomment to enable SHAPE extension support
-#DEFINES += -DUSE_SHAPE
-#LIBS += -lXext # Required for SHAPE extension
+DEFINES += -DUSE_SHAPE
+LIBS += -lXext # Required for SHAPE extension
 
 # XPM support is beautiful but substantially increases binary size.
 #DEFINES += -DUSE_XPM

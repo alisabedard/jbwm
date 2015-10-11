@@ -8,12 +8,9 @@
 static void
 key_moveresize(Client * c)
 {
-	const ubyte in = c->border;
-
 	moveresize(c);
 	XRaiseWindow(jbwm.X.dpy, c->parent);
-	setmouse(c->window, c->geometry.width - in,
-		c->geometry.height - in);
+	setmouse(c->window, JBWM_RESIZE_INCREMENT, JBWM_RESIZE_INCREMENT);
 }
 
 static void
@@ -24,7 +21,13 @@ moveresize_dir(Client * c, XKeyEvent * e, short *xy,
 	const byte mod = sign * inc;
 
 	if((e->state & jbwm.keymasks.mod) && (*wh > inc))
+	{
+#ifdef USE_SHAPE
+		if(is_shaped(c))
+			return;
+#endif /* USE_SHAPE */
 		*wh += mod;
+	}
 	else
 		*xy += mod;
 	key_moveresize(c);
@@ -80,6 +83,7 @@ handle_client_key_event(XKeyEvent * e, Client * c, KeySym key)
 		break;
 	case KEY_MAX:
 		maximize(c);
+		break;
 	case KEY_FIX:
 		fix_client(c);
 		break;

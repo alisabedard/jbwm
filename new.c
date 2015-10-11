@@ -73,7 +73,7 @@ make_new_client(Window w, ScreenInfo * s)
 	 * so we stop trying to manage it.
 	 */
 	jbwm.initialising = w;
-	XSync(jbwm.X.dpy, False);
+	XSync(jbwm.X.dpy, false);
 	/*
 	 * If 'initialising' is now set to None, that means doing the
 	 * XFetchName raised BadWindow - the window has been removed before
@@ -265,40 +265,32 @@ static void
 reparent(Client * c)
 {
 	XSetWindowAttributes p_attr;
-	const unsigned long valuemask =
+	unsigned long valuemask =
 		CWOverrideRedirect | CWBorderPixel | CWBackPixel |
-		CWEventMask | CWBackPixel;
+		CWEventMask;
 	const XRectangle *g = &(c->geometry);
 	const ubyte b = c->border;
 	const int x = g->x - b;
-	const int y_mod =
-		c->flags & JB_CLIENT_SHAPED ? 0 : TITLEBAR_HEIGHT;
-	const int y = g->y - b - y_mod;
+	const int y = g->y - b; //- y_mod;
 	const Window w = c->window;
 
 	if(!c->screen)
 		return;
-
+#ifndef USE_SHAPE
 	p_attr.background_pixel = BlackPixel(jbwm.X.dpy, c->screen->screen);
+	valuemask |= CWBackPixel;
+#endif /* !USE_SHAPE */
 	p_attr.border_pixel = c->screen->bg.pixel;
-	p_attr.override_redirect = True;
-	p_attr.event_mask =
-		ChildMask | ButtonPressMask | EnterWindowMask;
-#ifdef USE_SHAPE
-	if(c->flags & JB_CLIENT_SHAPED)
-		c->parent = c->screen->root;
-	else
-#endif /* USE_SHAPE */
-		c->parent =
-			XCreateWindow(jbwm.X.dpy, c->screen->root, x,
-			y, g->width, g->height + y_mod, b,
-			DefaultDepth(jbwm.X.dpy, c->screen->screen),
-			CopyFromParent, DefaultVisual(jbwm.X.dpy,
-			c->screen->screen), valuemask, &p_attr);
+	p_attr.override_redirect = true;
+	p_attr.event_mask = ChildMask | ButtonPressMask | EnterWindowMask;
+	c->parent = XCreateWindow(jbwm.X.dpy, c->screen->root, x, y, 
+		g->width, g->height, b, DefaultDepth(jbwm.X.dpy, 
+		c->screen->screen), CopyFromParent, DefaultVisual(jbwm.X.dpy,
+		c->screen->screen), valuemask, &p_attr);
 	XAddToSaveSet(jbwm.X.dpy, w);
 	XSetWindowBorderWidth(jbwm.X.dpy, w, 0);
 #ifdef USE_TBAR
-	if(!(c->flags & JB_CLIENT_DONT_USE_TITLEBAR))
+	if(!(c->flags & JB_CLIENT_NO_TB))
 		update_info_window(c);
 #endif
 	XReparentWindow(jbwm.X.dpy, w, c->parent, 0, 0);
@@ -332,7 +324,7 @@ jbwm_get_property(Window w, Atom property, Atom req_type,
 	unsigned char *prop;
 
 	if(XGetWindowProperty(jbwm.X.dpy, w, property, 0L,
-		MAXIMUM_PROPERTY_LENGTH / 4, False, req_type,
+		MAXIMUM_PROPERTY_LENGTH / 4, false, req_type,
 		&actual_type, &actual_format, nitems_return,
 		&bytes_after, &prop) == Success)
 	{

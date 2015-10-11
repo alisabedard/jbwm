@@ -28,14 +28,14 @@ struct Client
 
 	Atom window_type;
 
-#define JB_CLIENT_IS_STICKY 		(1<<0)
+#define JB_CLIENT_IS_STICKY 		1
 /* Set when client needs to be removed: */
-#define JB_CLIENT_SHAPED		(1<<1)
+#define JB_CLIENT_REMOVE		(1<<1)
 #define JB_CLIENT_ACTIVE 		(1<<2)
 #define JB_CLIENT_SHADED 		(1<<3)
 #define JB_CLIENT_DONT_MANAGE 		(1<<4)
-#define JB_CLIENT_DONT_USE_TITLEBAR 	(1<<5)
-#define JB_CLIENT_REMOVE		(1<<6)
+#define JB_CLIENT_NO_TB 		(1<<5)
+#define JB_CLIENT_MAXIMIZED		(1<<6)
 
 	ubyte flags;
 
