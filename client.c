@@ -96,9 +96,6 @@ fix_client(Client * c)
 		return;
 	toggle_sticky(c);
 	select_client(c);
-#ifdef USE_EWMH
-	ewm_update_net_wm_state(c);
-#endif
 }
 
 static void
@@ -123,10 +120,6 @@ unparent_window(Client * c)
 		c->geometry.x, c->geometry.y);
 	XRemoveFromSaveSet(jbwm.X.dpy, c->window);
 	XDestroyWindow(jbwm.X.dpy, c->parent);
-#if 0
-	if(c->parent)
-		XDestroyWindow(jbwm.X.dpy, c->parent);
-#endif
 }
 
 void

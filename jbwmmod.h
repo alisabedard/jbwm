@@ -5,7 +5,6 @@
 
 #include "config.h"
 #include "keymap.h"
-#include "ewmh.h"
 #include "screen.h"
 #include "client.h"
 #include "titlebar.h"

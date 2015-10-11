@@ -279,15 +279,6 @@ hide(Client * c)
 	set_wm_state(c, IconicState);
 }
 
-#if 0
-void
-unhide(Client * c, int raise_win)
-{
-	raise_win ? XMapRaised(jbwm.X.dpy,
-		c->parent) : XMapWindow(jbwm.X.dpy, c->parent);
-	set_wm_state(c, NormalState);
-}
-#endif
 void
 unhide(Client * c)
 {
@@ -344,15 +335,7 @@ switch_vdesk(ScreenInfo * s, const ubyte v)
 		if(is_sticky(c) && c->vdesk != v)
 		{
 			c->vdesk = v;
-#ifdef USE_EWMH
-			JBWM_UPDATE_NET_WM_DESKTOP(c);
-#endif
 		}
-#if 0
-		c->vdesk == v ? unhide(c, NO_RAISE) : hide(c);
-		if(c->flags & JB_CLIENT_REMOVE)
-			hide(c);
-#endif
 		if(c->vdesk == v)
 			unhide(c);
 		else

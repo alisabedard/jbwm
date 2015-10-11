@@ -45,7 +45,7 @@ Application *head_app = NULL;
 Client *head_client = NULL;
 Client *current = NULL;
 
-#ifdef USE_JBGV
+#ifdef USE_ARGV
 static void
 process_app_class_options(const char *name)
 {
@@ -184,7 +184,7 @@ parse_command_line_args(int argc, char **argv)
 		}
 	}
 }
-#endif /* USE_JBGV */
+#endif /* USE_ARGV */
 
 static void
 setup_fonts(void)
@@ -199,11 +199,11 @@ setup_fonts(void)
 		opt.font ? FONTOPEN(opt.font) : FONTOPEN(DEF_FONT);
 	if(!jbwm.X.font)
 		LOG_ERROR("couldn't find a font to use: "
-#ifdef USE_JBGV
+#ifdef USE_ARGV
 			"try starting with -f fontname\n"
 #else
 			"set available font in config.h and rebuild"
-#endif /* USE_JBGV */
+#endif /* USE_ARGV */
 			);
 }
 
@@ -371,19 +371,19 @@ setup_display(void)
 
 int
 main(int argc
-#ifndef USE_JBGV
+#ifndef USE_ARGV
 	__attribute__ ((unused))
-#endif /* not USE_JBGV */
+#endif /* not USE_ARGV */
 	, char **argv
-#ifndef USE_JBGV
+#ifndef USE_ARGV
 	__attribute__ ((unused))
-#endif /* not USE_JBGV */
+#endif /* not USE_ARGV */
 	)
 {
 	initialize_JBWMEnvironment();
-#ifdef USE_JBGV
+#ifdef USE_ARGV
 	parse_command_line_args(argc, argv);
-#endif /* USE_JBGV */
+#endif /* USE_ARGV */
 	setup_display();
 	main_event_loop();
 

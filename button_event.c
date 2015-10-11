@@ -43,23 +43,6 @@ shade_window(Client * c)
 		c->geometry.height = h;
 		c->flags |= JB_CLIENT_SHADED;
 	}
-#if 0
-	if(c->geometry.height == TITLEBAR_HEIGHT)
-	{
-		/* Unshade.  */
-		c->geometry.height = c->shade_height;
-		c->flags &= ~JB_CLIENT_SHADED;
-		moveresize(c);
-	}
-	else
-	{
-		c->shade_height = c->geometry.height;
-		XResizeWindow(jbwm.X.dpy, c->parent,
-			c->geometry.width, TITLEBAR_HEIGHT);
-		c->geometry.height = TITLEBAR_HEIGHT;
-		c->flags |= JB_CLIENT_SHADED;
-	}
-#endif
 }
 #endif /* USE_SHADE */
 

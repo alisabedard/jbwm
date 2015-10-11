@@ -3,21 +3,9 @@
 #define JBWM_ENVIRONMENT_H
 #include "titlebar.h"
 
-#ifdef USE_EWMH
-typedef struct _JBWMNetWMWindowType
-{
-	Atom desktop, dock, toolbar, menu, utility, splash, dialog,
-		dropdown_menu, popup_menu, tooltip, notification,
-		combo, dnd, normal;
-} JBWMNetWMWindowType;
-#endif
-
 struct JBWMEnvironment
 {
 	volatile Window initialising;
-#ifdef USE_EWMH
-	JBWMNetWMWindowType netwm;
-#endif				/* USE_EWMH */
 	struct
 	{
 		unsigned int numlock, grab, mod;

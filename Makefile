@@ -66,12 +66,8 @@ DEFINES += -DUSE_CLOSE_BUTTON
 # Uncomment to enable colormap support
 #DEFINES += -DUSE_CMAP
 
-# Uncomment to enable EWMH support.  Currently buggy and incomplete
-#DEFINES += -DUSE_EWMH
-#SRCS+= ewmh.c 
-
 # Uncomment to enable parsing command line arguments.
-#DEFINES += -DUSE_JBGV
+#DEFINES += -DUSE_ARGV
 
 # Uncomment to enable titlebars
 DEFINES += -DUSE_TBAR

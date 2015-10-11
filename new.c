@@ -21,57 +21,6 @@ static void debug_wm_normal_hints(XSizeHints * size);
 #endif
 
 static void
-set_class_geometry_attribute(Client * c, Application * a)
-{
-	const ubyte gm = a->geometry_mask;
-	XRectangle *g = &(c->geometry);
-	XRectangle *ag = &(a->geometry);
-
-	if(gm & WidthValue)
-		g->width =
-			ag->width *
-			(c->size->flags & PResizeInc ? c->size->
-			width_inc : 1);
-	if(gm & HeightValue)
-		g->height =
-			ag->height *
-			(c->size->flags & PResizeInc ? c->size->
-			height_inc : 1);
-	if(gm & XValue)
-		g->x = (gm & XNegative) ? ag->x + c->screen->width -
-			g->width - c->border : ag->x + c->border;
-	if(gm & YValue)
-		g->y = (gm & YNegative) ? ag->y + c->screen->height -
-			g->height - c->border : ag->y + c->border;
-	moveresize(c);
-}
-
-static void
-set_class_attributes(Client * c, Window w)
-{
-	XClassHint *class;
-
-	/*
-	 * Read instance/class information for client and check against list
-	 * built with -app options
-	 */
-	if(!w)
-		LOG_ERROR("Window uninitialized\n");
-	if((class = XAllocClassHint()))
-	{
-		Application *a;
-
-		XGetClassHint(jbwm.X.dpy, w, class);
-		for(a = head_app; a; a = a->next)
-			set_class_geometry_attribute(c, a);
-		/*test_set_class_attribute(c, a, class); */
-		XFree(class->res_name);
-		XFree(class->res_class);
-		XFree(class);
-	}
-}
-
-static void
 map_client(Client * c, ScreenInfo * s)
 {
 	/*
@@ -82,9 +31,6 @@ map_client(Client * c, ScreenInfo * s)
 		unhide(c);
 	else
 		set_wm_state(c, IconicState);
-#ifdef USE_EWMH
-	JBWM_UPDATE_NET_WM_DESKTOP(c);
-#endif
 }
 
 static void
@@ -95,11 +41,6 @@ initialize_client_fields(Client * c, ScreenInfo * s, Window w)
 
 	c->screen = s;
 	c->window = w;
-	c->ignore_unmap = 0;
-#ifdef USE_TBAR
-	c->info_window = 0;
-#endif
-	c->flags = 0;
 	c->window_type = None;
 }
 
@@ -151,7 +92,6 @@ make_new_client(Window w, ScreenInfo * s)
 	set_shape(c);
 #endif /* USE_SHAPE */
 	reparent(c);
-	set_class_attributes(c, w);
 	map_client(c, s);
 	/* Enable alt-dragging within window */
 	jbwm_grab_button(w, jbwm.keymasks.grab, AnyButton);
@@ -186,27 +126,9 @@ handle_mwm_hints(Client * c)
 		}
 		XFree(mprop);
 	}
-#ifdef USE_EWMH
-	jbwm_ewmh_type(c);
-#endif
 
 	return nitems;
 }
-
-#ifdef DEBUG
-void
-print_size_hints(Window w)
-{
-	XSizeHints *sizes;
-
-	sizes = XAllocSizeHints();
-	XGetWMSizeHints(jbwm.X.dpy, w, sizes, NULL, XA_WM_SIZE_HINTS);
-	printf("%s:%d:\twidth:  %d\theight:  %d\n", __FILE__,
-		__LINE__, sizes->width, sizes->height);
-	fflush(stdout);
-	XFree(sizes);
-}
-#endif /* DEBUG */
 
 static void
 set_size(Client * c, const unsigned int width,
@@ -372,9 +294,6 @@ reparent(Client * c)
 			c->screen->screen), valuemask, &p_attr);
 	XAddToSaveSet(jbwm.X.dpy, c->window);
 	XSetWindowBorderWidth(jbwm.X.dpy, c->window, 0);
-#ifdef USE_EWMH
-	jbwm_ewmh_type(c);
-#endif
 #ifdef USE_TBAR
 	if(!(c->flags & JB_CLIENT_DONT_USE_TITLEBAR))
 		update_info_window(c);
