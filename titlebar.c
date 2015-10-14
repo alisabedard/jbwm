@@ -116,8 +116,10 @@ draw_titlebar(Client * c, char *name)
 	const unsigned short shade_offset = width - JB_SHADE_DELTA;
 #endif /* USE_SHADE */
 
+#ifdef USE_SHAPE
 	if(is_shaped(c))
 		return;
+#endif /* USE_SHAPE */
 	handle = jbwm.titlebar.buttons.handle;
 
 	handle->geometry.width = width;

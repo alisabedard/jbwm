@@ -164,6 +164,35 @@ handle_expose_event(XEvent * ev)
 }
 #endif
 
+static void
+jbwm_handle_configure_request(XConfigureRequestEvent * e)
+{
+	Client *c;
+	XWindowChanges wc;
+
+	c=find_client(e->window);
+	wc.x=e->x;
+	wc.y=e->y;
+	wc.width=e->width;
+	wc.height=e->height;
+	wc.border_width=0;
+	wc.sibling=e->above;
+	wc.stack_mode=e->detail;
+	if(c)
+	{
+		if(e->value_mask & CWStackMode && e->value_mask & CWSibling)
+		{
+			Client *s;
+
+			s = find_client(e->above);
+			if(s)
+				wc.sibling=s->parent;
+		}
+	}
+	else
+		XConfigureWindow(jbwm.X.dpy, e->window, e->value_mask, &wc);
+}
+
 void
 main_event_loop(void)
 {

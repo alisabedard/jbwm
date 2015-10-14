@@ -331,23 +331,20 @@ void
 switch_vdesk(ScreenInfo * s, const ubyte v)
 {
 	Client *c;
-
-	/* Resort to the global ScreenInfo */
-	if(!s)
-		s = jbwm.X.screens;
-
-	s->vdesk = v;
-	for(c = head_client; c; c = c->next)
+	
+	if(v==s->vdesk)
+		return;
+	if(current && !is_sticky(current))
+		select_client(NULL);
+	for(c=head_client; c; c=c->next)
 	{
-		if(c->screen != s)
+		if(c->screen!=s)
 			continue;
-		if(is_sticky(c) && c->vdesk != v)
-		{
-			c->vdesk = v;
-		}
-		if(c->vdesk == v)
-			unhide(c);
-		else
+		if(c->vdesk == s->vdesk)
 			hide(c);
+		else if(c->vdesk == v)
+			unhide(c);
+			
 	}
+	s->vdesk=v;
 }

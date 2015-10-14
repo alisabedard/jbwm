@@ -13,6 +13,5 @@
 #include "graphics.h"
 #include "key_event.h"
 #include "button_event.h"
-#include "configure_event.h"
 
 #endif /* not JBWM_JBWM_INCLUDES_H */

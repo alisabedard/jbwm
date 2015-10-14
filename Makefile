@@ -43,8 +43,8 @@ CFLAGS += -std=c11
 #DEFINES += -DDEBUG
 
 # Uncomment to enable SHAPE extension support
-DEFINES += -DUSE_SHAPE
-LIBS += -lXext # Required for SHAPE extension
+#DEFINES += -DUSE_SHAPE
+#LIBS += -lXext # Required for SHAPE extension
 
 # XPM support is beautiful but substantially increases binary size.
 #DEFINES += -DUSE_XPM
@@ -94,7 +94,7 @@ LDFLAGS += $(LDPATH) $(LIBS)
 
 HEADERS  = jbwm.h log.h
 SRCS += client.c events.c jbwm.c misc.c new.c screen.c JBWMButton.c
-SRCS += graphics.c key_event.c configure_event.c button_event.c keymap.c
+SRCS += graphics.c key_event.c button_event.c keymap.c
 OBJS     = $(SRCS:.c=.o)
 
 .PHONY: all install dist debuild clean
