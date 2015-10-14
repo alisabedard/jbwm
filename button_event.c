@@ -20,7 +20,6 @@ move_client_with_vdesk(Client * c, Bool next)
 	}
 }
 
-#ifdef USE_SHADE
 static void
 shade_window(Client * c)
 {
@@ -44,29 +43,22 @@ shade_window(Client * c)
 		c->flags |= JB_CLIENT_SHADED;
 	}
 }
-#endif /* USE_SHADE */
 
 static void
 button1_event(XButtonEvent * e, Client * c)
 {
 	const int x = e->x;
-#ifdef USE_CLOSE_BUTTON
 	const int y = e->y;
-#endif
 	const int width = c->geometry.width;
 
 	XRaiseWindow(jbwm.X.dpy, c->parent);
 	/* Text for close button press.  */
-#ifdef USE_CLOSE_BUTTON
 	if((x < JB_BUTTON_WIDTH) && (y < TITLEBAR_HEIGHT))
 		send_wm_delete(c, !(e->state & jbwm.keymasks.mod));
-#endif
 	if(x > width - JB_RESIZE_DELTA)
 		sweep(c);	/* Resize the window.  */
-#ifdef USE_SHADE
 	else if(x > width - JB_SHADE_DELTA && y < TITLEBAR_HEIGHT)
 		shade_window(c);
-#endif /* USE_SHADE */
 	else
 		drag(c);	/* Move the window.  */
 }

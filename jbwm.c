@@ -8,6 +8,7 @@
 #include <signal.h>
 #include <X11/cursorfont.h>
 #include <unistd.h>
+#include <stdlib.h>
 #include "jbwm.h"
 
 /* Main application data structure.  */
@@ -141,41 +142,41 @@ parse_command_line_args(int argc, char **argv)
 			continue;
 		switch (argv[i][1])
 		{
-#define JBG argv[++i]
-#define SETJBG(arg) arg = ARG
-#define SETNJBG(arg) arg = atoi(ARG)
+#define ARG argv[++i]
+#define SETARG(arg) arg = ARG
+#define SETNARG(arg) arg = atoi(ARG)
 		case 'd':
-			setenv("DISPLAY", JBG, 1);
+			setenv("DISPLAY", ARG, 1);
 			break;
 		case 'F':
-			SETJBG(opt.font);
+			SETARG(opt.font);
 			break;
 		case 'f':
-			SETJBG(opt.color.fg);
+			SETARG(opt.color.fg);
 			break;
 		case 'b':
-			SETJBG(opt.color.bg);
+			SETARG(opt.color.bg);
 			break;
 		case 'c':
-			SETJBG(opt.color.fc);
+			SETARG(opt.color.fc);
 			break;
 		case 'T':
-			SETJBG(opt.term);
+			SETARG(opt.term);
 			break;
 		case 'A':
-			process_app_class_options(JBG);
+			process_app_class_options(ARG);
 			break;
 		case 'g':
-			parse_geometry(JBG);
+			parse_geometry(ARG);
 			break;
 		case '1':
-			jbwm.keymasks.grab = parse_modifiers(JBG);
+			jbwm.keymasks.grab = parse_modifiers(ARG);
 			break;
 		case '2':
-			jbwm.keymasks.mod = parse_modifiers(JBG);
+			jbwm.keymasks.mod = parse_modifiers(ARG);
 			break;
 		case 'V':
-			LOG_INFO("jbwm version " VERSION "\n");
+			printf("jbwm version %s\n", VERSION);
 			exit(0);
 		default:
 			fprintf(stderr,

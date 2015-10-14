@@ -9,10 +9,7 @@ typedef struct _JBWMTitlebarData
 
 	struct
 	{
-		JBWMButton *close, *resize, *handle;
-#ifdef USE_SHADE
-		JBWMButton *shade;
-#endif
+		JBWMButton *close, *resize, *handle, *shade;
 	} buttons;
 
 #ifdef USE_XFT
@@ -23,11 +20,7 @@ typedef struct _JBWMTitlebarData
 	} xft;
 #endif				/* USE_XFT */
 #ifdef USE_XPM
-	XImage *close, *resize;
-	XImage *close_inactive, *handle;
-#ifdef USE_SHADE
-	XImage *shade;
-#endif				/* USE_SHADE */
+	XImage *close, *resize, *close_inactive, *handle, *shade;
 #endif				/* USE_XPM */
 } JBWMTitlebarData;
 

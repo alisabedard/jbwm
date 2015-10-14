@@ -28,7 +28,7 @@
 #define MOD_MASK ControlMask
 
 #define JBWM_BORDER_WIDTH 1
-#define JBWM_SNAP_DISTANCE 4
+#define JBWM_SNAP_DISTANCE 12
 
 #define SPACE           3
 #ifdef DEBIAN

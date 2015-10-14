@@ -135,14 +135,6 @@ handle_enter_event(XCrossingEvent * e)
 
 	if((c = find_client(e->window)))
 	{
-		/* The first check insures that the window which
-		   received the enter event is on the current virtual
-		   desktop.  The second check isolates the event to
-		   only the application window in order to avoid
-		   extraneous enter event processing.  */
-		if((c->vdesk != c->screen->vdesk)
-			|| (e->window != c->window))
-			return;
 		select_client(c);
 		jbwm_current_to_head();
 	}

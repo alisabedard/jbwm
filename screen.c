@@ -130,11 +130,11 @@ snap_client(Client * c)
 	int dx, dy;
 	Client *ci;
 	XRectangle *g = &(c->geometry);
-	const ubyte snap = JBWM_SNAP_DISTANCE;
+#define S JBWM_SNAP_DISTANCE
 
 	snap_client_to_screen_border(c);
 	/* snap to other windows */
-	dx = dy = snap;
+	dx = dy = S;
 	for(ci = head_client; ci; ci = ci->next)
 	{
 		XRectangle *gi = &(ci->geometry);
@@ -144,21 +144,21 @@ snap_client(Client * c)
 		{
 			const ubyte border = c->border;
 
-			if(gi->y - g->height - g->y <= snap
-				&& g->y - gi->height - gi->y <= snap)
+			if(gi->y - g->height - g->y <= S
+				&& g->y - gi->height - gi->y <= S)
 				dx = snap_dim(&(g->x), &(g->width),
 					&(gi->x), &(gi->width),
-					border, snap);
-			if(gi->x - g->width - g->x <= snap
-				&& g->x - gi->width - gi->x <= snap)
+					border, S);
+			if(gi->x - g->width - g->x <= S
+				&& g->x - gi->width - gi->x <= S)
 				dy = snap_dim(&(g->y), &(g->height),
 					&(gi->y), &(gi->height),
-					border, snap);
+					border, S);
 		}
 	}
-	if(abs(dx) < snap)
+	if(abs(dx) < S)
 		g->x += dx;
-	if(abs(dy) < snap)
+	if(abs(dy) < S)
 		g->y += dy;
 }
 #endif /* USE_SNAP */
@@ -340,23 +340,19 @@ switch_vdesk(ScreenInfo * s, const ubyte v)
 	
 	if(v==s->vdesk)
 		return;
-#if 0
-	if(current && !is_sticky(current))
-		select_client(NULL);
-#endif
 	for(c=head_client; c; c=c->next)
 	{
+		if(is_sticky(c))
+		{
+			unhide(c);
+			continue;
+		}
 		if(c->screen!=s)
 			continue;
 		if(c->vdesk == s->vdesk)
 			hide(c);
 		else if(c->vdesk == v)
 			unhide(c);
-		if(is_sticky(c))
-		{
-			unhide(c);
-			continue;
-		}
 			
 	}
 	s->vdesk=v;

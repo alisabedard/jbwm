@@ -29,8 +29,10 @@ map_client(Client * c, ScreenInfo * s)
 	 */
 	if(s->vdesk == c->vdesk)
 		unhide(c);
+#if 0
 	else
 		set_wm_state(c, IconicState);
+#endif
 }
 
 static void

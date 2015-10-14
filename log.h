@@ -8,14 +8,14 @@
 
 #include <stdio.h>
 
-#define LOG_INFO(...) printf(__VA_JBGS__);
-#define LOG_ERROR(...) fprintf(stderr, __VA_JBGS__);
+#define LOG_INFO(...) printf(__VA_ARGS__);
+#define LOG_ERROR(...) fprintf(stderr, __VA_ARGS__);
 
 #ifdef DEBUG
 #define LOG_DEBUG(...) \
 {\
 	fprintf(stderr, "%s:%d:  ", __FILE__, __LINE__);\
-	fprintf(stderr, __VA_JBGS__);\
+	fprintf(stderr, __VA_ARGS__);\
 }
 #define MJBK fprintf(stderr, "%s:  %d\n", __FILE__, __LINE__);
 #else
@@ -24,7 +24,7 @@
 #endif
 
 #ifdef XDEBUG
-#define LOG_XDEBUG(...) fprintf(stderr, __VA_JBGS__);
+#define LOG_XDEBUG(...) fprintf(stderr, __VA_ARGS__);
 #else
 #define LOG_XDEBUG(...)
 #endif

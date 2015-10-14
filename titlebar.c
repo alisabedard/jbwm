@@ -7,10 +7,7 @@
 #include "images/close_button_inactive.xpm"
 #include "images/resize_button.xpm"
 #include "images/gradient.xpm"
-
-#ifdef USE_SHADE
 #include "images/shade.xpm"
-#endif /* USE_SHADE */
 #endif /* USE_XPM */
 
 #ifdef USE_XFT
@@ -112,9 +109,7 @@ draw_titlebar(Client * c, char *name)
 	JBWMButton *handle;
 	const unsigned short width = c->geometry.width;
 	const unsigned short resize_offset = width - JB_RESIZE_DELTA;
-#ifdef USE_SHADE
 	const unsigned short shade_offset = width - JB_SHADE_DELTA;
-#endif /* USE_SHADE */
 
 #ifdef USE_SHAPE
 	if(is_shaped(c))
@@ -124,13 +119,9 @@ draw_titlebar(Client * c, char *name)
 
 	handle->geometry.width = width;
 	draw_button(handle, w, 0);
-#ifdef USE_CLOSE_BUTTON
 	jbwm_draw_close_button(c);
-#endif /* USE_CLOSE_BUTTON */
 	draw_info_strings(c, name);
-#ifdef USE_SHADE
 	draw_button(jbwm.titlebar.buttons.shade, w, shade_offset);
-#endif /* USE_SHADE */
 	draw_button(jbwm.titlebar.buttons.resize, w, resize_offset);
 }
 
@@ -146,9 +137,7 @@ initialize_images(JBWMTitlebarData * titlebar)
 	XPMIMAGE(resize_button, resize);
 	XPMIMAGE(close_button, close);
 	XPMIMAGE(close_button_inactive, close_inactive);
-#ifdef USE_SHADE
 	XPMIMAGE(shade, shade);
-#endif /* USE_SHADE */
 }
 #endif /* USE_XPM */
 
@@ -171,9 +160,7 @@ initialize_buttons(JBWMTitlebarData * titlebar, Display * dpy)
 #define XCOLOR_TBUTTON(item, bg) TBUTTON(item, jbwm_new_gc_for_XColor(bg))
 	RGB_TBUTTON(close, TITLEBAR_CLOSE_BG);
 	RGB_TBUTTON(resize, TITLEBJB_RESIZE_BG);
-#ifdef USE_SHADE
 	RGB_TBUTTON(shade, TITLEBAR_SHADE_BG);
-#endif /* USE_SHADE */
 	handle = XCOLOR_TBUTTON(handle, jbwm.X.screens->bg);
 	handle->span_image = true;
 }
@@ -217,9 +204,7 @@ delete_buttons(JBWMTitlebarData * titlebar)
 {
 	JBWMButton_delete(titlebar->buttons.close);
 	JBWMButton_delete(titlebar->buttons.resize);
-#ifdef USE_SHADE
 	JBWMButton_delete(titlebar->buttons.shade);
-#endif /* USE_SHADE */
 #ifdef USE_XPM
 	JBWMButton_delete(titlebar->buttons.handle);
 #endif /* USE_XPM */
@@ -232,9 +217,7 @@ free_XImage(JBWMTitlebarData * t)
 #define XDI(i) XDestroyImage(t->i)
 	XDI(close);
 	XDI(resize);
-#ifdef USE_SHADE
 	XDI(shade);
-#endif /* USE_SHADE */
 	XDI(handle);
 	XDI(close_inactive);
 	XDestroyImage(t->close);

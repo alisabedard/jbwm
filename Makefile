@@ -37,7 +37,6 @@ CFLAGS += -std=c11
 #CFLAGS += -Os -ffast-math -fomit-frame-pointer 
 # Machine-specific:
 #CFLAGS += -mfpmath=both -mpc64 -floop-parallelize-all
-#CFLAGS += -Os 
 # Debugging:
 #CFLAGS = -ggdb -pg
 #DEFINES += -DDEBUG
@@ -62,7 +61,7 @@ CFLAGS += -std=c11
 #INCLUDES += -I/usr/pkg/include/freetype2 -I/usr/X11R6/include/freetype2
 
 # Titlebar close button support:
-DEFINES += -DUSE_CLOSE_BUTTON
+#DEFINES += -DUSE_CLOSE_BUTTON
 
 # Uncomment to enable colormap support
 #DEFINES += -DUSE_CMAP
@@ -77,17 +76,15 @@ SRCS += titlebar.c
 # Uncomment to enable window snapping.
 #DEFINES += -DUSE_SNAP
 
-# Uncomment to enable shade button (buggy)
-DEFINES += -DUSE_SHADE
-
 # ----- You shouldn't need to change anything under this line ------ #
 
-version = 1.30
+version = 1.31
 
 distname = jbwm-$(version)
 
 DEFINES += -DVERSION=\"$(version)\" $(DEBIAN)
 CFLAGS  += $(INCLUDES) $(DEFINES) 
+CFLAGS += -D_XOPEN_SOURCE=700
 LDFLAGS += $(LDPATH) $(LIBS)
 # Uncomment for static linking of binary:
 #LDFLAGS += -static 
