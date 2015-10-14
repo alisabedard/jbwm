@@ -16,6 +16,7 @@
 
 /* Default colors */
 #define DEF_FG          "#ffffff"
+#define DEF_FC          "#00a000"
 #define DEF_BG          "#202020"
 #define TITLEBAR_CLOSE_BG	0x70, 0x60, 0x60
 #define TITLEBAR_SHADE_BG	0x60, 0x70, 0x60
@@ -29,7 +30,6 @@
 #define JBWM_BORDER_WIDTH 1
 #define JBWM_SNAP_DISTANCE 4
 
-#define DEF_FC          "#ccf"
 #define SPACE           3
 #ifdef DEBIAN
 #define DEF_TERM        "x-terminal-emulator"

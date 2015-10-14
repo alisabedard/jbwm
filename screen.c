@@ -11,15 +11,15 @@
 static inline void
 draw_outline(Client * c)
 {
-	const ubyte h=TITLEBAR_HEIGHT;
+	const bool s=c->flags & JB_CLIENT_SHADED; 
+	const ubyte h=s?0:TITLEBAR_HEIGHT; 
 #ifdef USE_SHAPE
 	if(is_shaped(c))
 		return;
 #endif /* USE_SHAPE */
 #define CG c->geometry
 	XDrawRectangle(jbwm.X.dpy, c->screen->root, c->screen->gc, 
-		CG.x, CG.y-h, CG.width, CG.height 
-		+ ((c->flags & JB_CLIENT_SHADED) ? 0 : h));
+		CG.x, CG.y-h, CG.width, CG.height + h);
 }
 
 static void
@@ -227,12 +227,18 @@ moveresize(Client * c)
 	const ubyte b = c->border;
 	const unsigned short width = g->width;
 
+	if(c->flags & JB_CLIENT_SHADED)
+	{
+		XMoveWindow(jbwm.X.dpy, c->parent, g->x, g->y);
+		return;
+	}
+		
 	XMoveResizeWindow(jbwm.X.dpy, c->parent, g->x - b, g->y - b - TB, 
 		width, parent_height);
 	/* Offset the child window within the parent window
 		to display titlebar */
 	XMoveResizeWindow(jbwm.X.dpy, c->window, 0, TB, width, 
-		g->height + TB);
+		g->height);
 	send_config(c);
 #ifdef USE_TBAR
 	/* Only update the titlebar if the width has changed.  */
@@ -334,8 +340,10 @@ switch_vdesk(ScreenInfo * s, const ubyte v)
 	
 	if(v==s->vdesk)
 		return;
+#if 0
 	if(current && !is_sticky(current))
 		select_client(NULL);
+#endif
 	for(c=head_client; c; c=c->next)
 	{
 		if(c->screen!=s)
@@ -344,6 +352,11 @@ switch_vdesk(ScreenInfo * s, const ubyte v)
 			hide(c);
 		else if(c->vdesk == v)
 			unhide(c);
+		if(is_sticky(c))
+		{
+			unhide(c);
+			continue;
+		}
 			
 	}
 	s->vdesk=v;
