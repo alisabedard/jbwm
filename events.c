@@ -135,6 +135,14 @@ handle_enter_event(XCrossingEvent * e)
 
 	if((c = find_client(e->window)))
 	{
+		/* Make sure event is on current desktop and only process
+			event on the application window.  */
+		jbwm_current_to_head();
+		if(is_sticky(c))
+			goto skip;
+		if((c->vdesk != c->screen->vdesk) || (e->window != c->window))
+			return;
+skip:
 		select_client(c);
 		jbwm_current_to_head();
 	}

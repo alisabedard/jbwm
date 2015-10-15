@@ -18,8 +18,12 @@ draw_outline(Client * c)
 		return;
 #endif /* USE_SHAPE */
 #define CG c->geometry
+#if 0
 	XDrawRectangle(jbwm.X.dpy, c->screen->root, c->screen->gc, 
 		CG.x, CG.y-h, CG.width, CG.height + h);
+#endif
+	XDrawRectangle(jbwm.X.dpy, c->screen->root, c->screen->gc, 
+		CG.x, CG.y-TITLEBAR_HEIGHT, CG.width, CG.height + h);
 }
 
 static void
@@ -226,15 +230,16 @@ moveresize(Client * c)
 	const unsigned int parent_height = g->height + TB;
 	const ubyte b = c->border;
 	const unsigned short width = g->width;
+	const short x = g->x-b;
+	const short y = g->y-b-TB;
 
 	if(c->flags & JB_CLIENT_SHADED)
 	{
-		XMoveWindow(jbwm.X.dpy, c->parent, g->x, g->y);
+		XMoveWindow(jbwm.X.dpy, c->parent, x, y);
 		return;
 	}
 		
-	XMoveResizeWindow(jbwm.X.dpy, c->parent, g->x - b, g->y - b - TB, 
-		width, parent_height);
+	XMoveResizeWindow(jbwm.X.dpy, c->parent, x, y, width, parent_height);
 	/* Offset the child window within the parent window
 		to display titlebar */
 	XMoveResizeWindow(jbwm.X.dpy, c->window, 0, TB, width, 
@@ -353,7 +358,7 @@ switch_vdesk(ScreenInfo * s, const ubyte v)
 			hide(c);
 		else if(c->vdesk == v)
 			unhide(c);
-			
 	}
 	s->vdesk=v;
 }
+

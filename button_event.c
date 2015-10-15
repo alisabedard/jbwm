@@ -30,6 +30,7 @@ shade_window(Client * c)
 		c->flags &= ~JB_CLIENT_SHADED;
 		XMapWindow(jbwm.X.dpy, c->window);
 		moveresize(c);
+		select_client(c);
 	}
 	else
 	{
@@ -41,6 +42,7 @@ shade_window(Client * c)
 		XResizeWindow(jbwm.X.dpy, c->parent, c->geometry.width, h);
 		c->geometry.height = h;
 		c->flags |= JB_CLIENT_SHADED;
+		XSetWindowBorder(jbwm.X.dpy, c->parent, c->screen->bg.pixel);
 	}
 }
 
