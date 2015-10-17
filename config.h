@@ -39,8 +39,6 @@
 #define XLOCK_CMD	"slock"
 #define BROWSER_CMD	"firefox &"
 
-#include "macros.h"
-
 /* Sanity checks: */
 #if defined(USE_XPM) && defined(USE_XBM)
 #undef USE_XBM	/* Prefer USE_XPM */
@@ -60,7 +58,7 @@
 
 /* Ensure that the title text fits within the titlebar.  */
 #ifdef USE_TBAR
-#define TITLEBAR_HEIGHT MAX(16,(TITLE_FONT_HEIGHT+JBWM_BORDER_WIDTH))
+#define TITLEBAR_HEIGHT (TITLE_FONT_HEIGHT+JBWM_BORDER_WIDTH)
 #else
 #define TITLEBAR_HEIGHT 8
 #endif

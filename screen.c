@@ -18,10 +18,6 @@ draw_outline(Client * c)
 		return;
 #endif /* USE_SHAPE */
 #define CG c->geometry
-#if 0
-	XDrawRectangle(jbwm.X.dpy, c->screen->root, c->screen->gc, 
-		CG.x, CG.y-h, CG.width, CG.height + h);
-#endif
 	XDrawRectangle(jbwm.X.dpy, c->screen->root, c->screen->gc, 
 		CG.x, CG.y-TITLEBAR_HEIGHT, CG.width, CG.height + h);
 }
@@ -45,9 +41,12 @@ recalculate_sweep(Client * c, Position p1, Position p2)
 	SET_CLIENT_CE(c);
 }
 
-#define grab_pointer(w, mask, curs) \
-	(XGrabPointer(jbwm.X.dpy, w, false, mask, GrabModeAsync,\
-	GrabModeAsync, None, curs, CurrentTime) == GrabSuccess)
+static inline bool
+grab_pointer(Window w, int mask, Cursor cursor)
+{
+	return XGrabPointer(jbwm.X.dpy, w, false, mask, GrabModeAsync,
+		GrabModeAsync, None, cursor, CurrentTime) == GrabSuccess;
+}
 
 static void
 handle_motion_notify(Client * c, XRectangle * g, XMotionEvent * mev)
@@ -95,25 +94,34 @@ sweep(Client * c)
 }
 
 #ifdef USE_SNAP
+
+static inline void sborder(short *xy, const ubyte border)
+{
+	if(abs(*xy+border)<JBWM_SNAP_DISTANCE)
+		*xy=-border;	
+}
+
 static void
 snap_client_to_screen_border(Client * c)
 {
 	XRectangle *g;
 	const unsigned short dw = c->screen->width;
 	const unsigned short dh = c->screen->height;
-	const ubyte snap = JBWM_SNAP_DISTANCE;
 	const ubyte b = c->border;
 
 	g = &(c->geometry);
 	/* snap to screen border */
-#define SBORDER(xy, b) if(abs(g->xy+b)<snap) g->xy=-(b);
-	SBORDER(x, -b);
-	SBORDER(x, g->width + b - dw);
-	SBORDER(y, -b);
-	SBORDER(y, g->height + b - dh);
+	sborder(&g->x, -b);
+	sborder(&g->x, g->width + b - dw);
+	sborder(&g->y, -b);
+	sborder(&g->y, g->height + b - dh);
 }
 
-#define absmin(a, b) (abs(a)<abs(b)?a:b)
+static inline int absmin(const int a, const int b)
+{
+	return abs(a)<abs(b)?a:b;
+}
+
 static int
 snap_dim(short *cxy, unsigned short *cwh, short *cixy,
 	unsigned short *ciwh, const ubyte border, const ubyte snap)

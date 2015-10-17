@@ -21,10 +21,18 @@
 #include <X11/Xft/Xft.h>
 #endif
 
-#include "macros.h"
-
 typedef char byte;
 typedef unsigned char ubyte;
+
+#include "ScreenInfo.h"
+#include "client_t.h"
+#include "application_t.h"
+#include "jbwmenv.h"
+#include "misc.h"
+#include "screen.h"
+#include "jbwmmod.h"
+#include "atoms.h"
+#include "log.h"
 
 /* Required for interpreting MWM hints: */
 #define _XA_MWM_HINTS           "_MOTIF_WM_HINTS"
@@ -59,10 +67,6 @@ typedef struct
 void jbwm_grab_button(Window w, unsigned int mask,
 	unsigned int button);
 
-#include "ScreenInfo.h"
-#include "client_t.h"
-#include "application_t.h"
-#include "jbwmenv.h"
 
 /* Main environment structure, to replace evilwm's
    large collection of global variables.  */
@@ -77,14 +81,10 @@ extern Application *head_app;
 extern Client *head_client;
 extern Client *current;
 
-#include "misc.h"
-
-/* new.c */
-
-void make_new_client(Window w, ScreenInfo * s);
-
-#include "screen.h"
-#include "jbwmmod.h"
-#include "atoms.h"
+#ifdef DEBUG
+#define LOG(msg) fprintf(stderr, "%s:%d - %s\n", __FILE__, __LINE__, msg)
+#else /* !DEBUG */
+#define LOG(msg)
+#endif /* DEBUG */
 
 #endif /* not JBWM_JBWM_H */
