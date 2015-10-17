@@ -233,13 +233,13 @@ drag(Client * c)
 void
 moveresize(Client * c)
 {
-#define TB TITLEBAR_HEIGHT
 	XRectangle *g = &(c->geometry);
-	const unsigned int parent_height = g->height + TB;
+	const ubyte tb = TITLEBAR_HEIGHT;
+	const unsigned int parent_height = g->height + tb;
 	const ubyte b = c->border;
 	const unsigned short width = g->width;
 	const short x = g->x-b;
-	const short y = g->y-b-TB;
+	const short y = g->y-b-tb;
 
 	if(c->flags & JB_CLIENT_SHADED)
 	{
@@ -250,7 +250,7 @@ moveresize(Client * c)
 	XMoveResizeWindow(jbwm.X.dpy, c->parent, x, y, width, parent_height);
 	/* Offset the child window within the parent window
 		to display titlebar */
-	XMoveResizeWindow(jbwm.X.dpy, c->window, 0, TB, width, 
+	XMoveResizeWindow(jbwm.X.dpy, c->window, 0, tb, width, 
 		g->height);
 	send_config(c);
 #ifdef USE_TBAR
@@ -287,11 +287,6 @@ maximize(Client * c)
 		g->width = s->width;
 		g->height = s->height-TITLEBAR_HEIGHT;
 		c->flags |= JB_CLIENT_MAXIMIZED;
-#if 0
-		g->x = g->y = 0;
-		g->width = s->width;
-		g->height = s->height;
-#endif
 	}
 	moveresize(c);
 	XRaiseWindow(jbwm.X.dpy, c->parent);
