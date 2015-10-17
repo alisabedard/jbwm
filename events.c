@@ -92,6 +92,12 @@ handle_unmap_event(XUnmapEvent * e)
 			jbwm.need_cleanup=1;
 		}
 	}
+#ifdef DEBUG
+	else
+	{
+		puts("Cannot find client to unmap.");
+	}
+#endif
 }
 
 #ifdef USE_CMAP
@@ -119,13 +125,32 @@ handle_property_change(XPropertyEvent * e)
 	if(c)
 	{
 		moveresize(c);
-		if(atom == XA_WM_NORMAL_HINTS)
-			get_wm_normal_hints(c);
-#ifdef USE_TBAR
-		else if(atom == XA_WM_NAME)
-			update_info_window(c);
+#ifdef DEBUG
+		printf("ATOM: %u\n", (unsigned int)atom);
+		fflush(stdout);
 #endif
+		switch(atom)
+		{
+		case XA_WM_NORMAL_HINTS:
+			get_wm_normal_hints(c);
+			break;
+#ifdef USE_TBAR
+		case XA_WM_NAME:
+			update_info_window(c);
+			break;
+#endif /* USE_TBAR */
+		/* The following atom is issued when Motif dialogs close.  */
+		case 321:
+		case 402:
+		case 456:
+			remove_client(c);
+			break;
+		}
+
 	}
+#ifdef DEBUG
+	else {puts("Cannot find client for which property changed.");}
+#endif
 }
 
 static void
@@ -137,7 +162,7 @@ handle_enter_event(XCrossingEvent * e)
 	{
 		/* Make sure event is on current desktop and only process
 			event on the application window.  */
-		jbwm_current_to_head();
+		//jbwm_current_to_head();
 		if(is_sticky(c))
 			goto skip;
 		if((c->vdesk != c->screen->vdesk) || (e->window != c->window))

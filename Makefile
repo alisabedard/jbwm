@@ -2,7 +2,7 @@
 #CC       = gcc
 #CC = clang
 CFLAGS=-Os -W -Wall -Werror
-#CFLAGS+=-ggdb
+#CFLAGS+=-ggdb -DDEBUG
 # profiling flag.
 #CFLAGS = -pg -O0 -W -Wall -Werror
 
