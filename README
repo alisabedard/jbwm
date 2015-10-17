@@ -1,3 +1,12 @@
+FEATURES of JBWM
+* 22K binary size
+* Titlebar support if wanted
+* Xft support if wanted
+* Xpm support if wanted
+* Window shading with titlebar
+* Code cleanups, simpler UI and key bindings
+
+
 evilwm 1.0 by Ciaran Anscomb <evilwm@6809.org.uk>
 
 evilwm is a minimalist window manager for the X Window System.

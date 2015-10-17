@@ -32,9 +32,9 @@
 
 #define SPACE           3
 #ifdef DEBIAN
-#define DEF_TERM        "x-terminal-emulator"
+#define DEF_TERM        "x-terminal-emulator &"
 #else
-#define DEF_TERM        "urxvt"
+#define DEF_TERM        "urxvt &"
 #endif
 #define XLOCK_CMD	"slock"
 #define BROWSER_CMD	"firefox &"

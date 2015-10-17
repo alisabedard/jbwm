@@ -92,34 +92,9 @@ handle_client_key_event(XKeyEvent * e, Client * c, KeySym key)
 	}
 }
 
-static char *
-bg_cmd(const char *command)
-{
-	char *buf = malloc(strlen(command) + 1);
-
-	sprintf(buf, "%s&", command);
-
-	return buf;
-}
-
-static void
-jbwm_system(const char *exec)
-{
-	char *command;
-
-	command = bg_cmd(exec);
-	if(system(command))
-		fprintf(stderr, "Failed to execute command: %s\n",
-			exec);
-	free(command);
-}
-
-#define spawn_terminal() jbwm_system(opt.term)
-
 void
 jbwm_handle_key_event(XKeyEvent * e)
 {
-	//KeySym key = XKeycodeToKeysym(jbwm.X.dpy, e->keycode, 0);
 	KeySym key = XLookupKeysym(e, 0);
 
 	Client *c = find_client(e->window);
@@ -128,17 +103,16 @@ jbwm_handle_key_event(XKeyEvent * e)
 	switch (key)
 	{
 	case KEY_NEW:
-		spawn_terminal();
+		system(opt.term);
 		break;
 	case KEY_QUIT:
 		exit(0);
 	case KEY_LOCK:
-		if(system(XLOCK_CMD))
-			perror(XLOCK_CMD);
+		system(XLOCK_CMD);
 		break;
 	case KEY_BROWSER:
-		if(system(BROWSER_CMD))
-			perror(BROWSER_CMD);
+		system(BROWSER_CMD);
+		break;
 	case KEY_NEXT:
 		next();
 		break;

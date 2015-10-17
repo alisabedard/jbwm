@@ -20,22 +20,7 @@ static void debug_wm_normal_hints(XSizeHints * size);
 #define debug_wm_normal_hints(s)
 #endif
 
-static void
-map_client(Client * c, ScreenInfo * s)
-{
-	/*
-	 * Only map the window frame (and thus the window) if it's supposed
-	 * to be visible on this virtual desktop.
-	 */
-	if(s->vdesk == c->vdesk)
-		unhide(c);
-#if 0
-	else
-		set_wm_state(c, IconicState);
-#endif
-}
-
-static void
+static inline void
 initialize_client_fields(Client * c, ScreenInfo * s, Window w)
 {
 	c->next = head_client;
@@ -94,7 +79,9 @@ make_new_client(Window w, ScreenInfo * s)
 	set_shape(c);
 #endif /* USE_SHAPE */
 	reparent(c);
-	map_client(c, s);
+	/* Map the client. */
+	if(s->vdesk == c->vdesk)
+		unhide(c);
 	/* Enable alt-dragging within window */
 	jbwm_grab_button(w, jbwm.keymasks.grab, AnyButton);
 end:

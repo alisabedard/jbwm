@@ -64,10 +64,12 @@ CFLAGS += -std=c11
 #DEFINES += -DUSE_CLOSE_BUTTON
 
 # Uncomment to enable colormap support
+# Saves 600 bytes
 #DEFINES += -DUSE_CMAP
 
 # Uncomment to enable parsing command line arguments.
-#DEFINES += -DUSE_ARGV
+# Saves 2030 bytes
+# DEFINES += -DUSE_ARGV
 
 # Uncomment to enable titlebars
 DEFINES += -DUSE_TBAR
