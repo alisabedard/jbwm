@@ -84,7 +84,6 @@ select_client(Client * c)
 #endif /* USE_CMAP */
 		XSetInputFocus(jbwm.X.dpy, c->window,
 			RevertToPointerRoot, CurrentTime);
-
 	}
 	current = c;
 }
@@ -98,7 +97,7 @@ fix_client(Client * c)
 	select_client(c);
 }
 
-static void
+static inline void
 relink_window_list(Client * c)
 {
 	if(head_client == c)
@@ -108,8 +107,13 @@ relink_window_list(Client * c)
 		Client *p;
 
 		for(p = head_client; p && p->next; p = p->next)
+		{
 			if(p->next == c)
+			{
 				p->next = c->next;
+				return;
+			}
+		}
 	}
 }
 

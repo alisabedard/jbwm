@@ -92,6 +92,33 @@ handle_client_key_event(XKeyEvent * e, Client * c, KeySym key)
 	}
 }
 
+static inline void
+next(void)
+{
+	Client *n=current;
+	do
+	{
+		if(n)
+		{
+			n=n->next;
+			if(!n&&!current)
+				return;
+		}
+		if(!n)
+			n=head_client;
+		if(!n)
+			return;
+		if(n==current)
+			return;
+	} while(n->vdesk != n->screen->vdesk);
+	XRaiseWindow(jbwm.X.dpy, n->parent);
+	select_client(n);
+	{
+		XRectangle *g = &(n->geometry);
+		setmouse(n->window, g->width, g->height);
+	}
+}
+
 void
 jbwm_handle_key_event(XKeyEvent * e)
 {

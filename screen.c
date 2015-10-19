@@ -310,38 +310,6 @@ unhide(Client * c)
 }
 
 void
-next(void)
-{
-	Client *newc = current;
-
-	do
-	{
-		if(newc)
-		{
-			newc = newc->next;
-			if(!newc && !current)
-				return;
-		}
-		else
-			newc = head_client;
-		if(!newc || newc == current)
-			return;
-	}
-	while(newc->vdesk != newc->screen->vdesk);
-	/*
-	 * NOTE: Checking against newc->screen->vdesk implies we can Alt+Tab
-	 * across screen boundaries.  Is this what we want?
-	 */
-
-	unhide(newc);
-	select_client(newc);
-	{
-		XRectangle *g = &(newc->geometry);
-		setmouse(newc->window, g->width, g->height);
-	}
-}
-
-void
 switch_vdesk(ScreenInfo * s, const ubyte v)
 {
 	Client *c;

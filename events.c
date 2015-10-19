@@ -5,6 +5,7 @@
 #include <stdlib.h>
 #include "jbwm.h"
 
+#if 0
 void
 jbwm_current_to_head(void)
 {
@@ -24,6 +25,7 @@ jbwm_current_to_head(void)
 		}
 	}
 }
+#endif
 
 static ScreenInfo *
 find_screen(Window root)
@@ -162,14 +164,13 @@ handle_enter_event(XCrossingEvent * e)
 	{
 		/* Make sure event is on current desktop and only process
 			event on the application window.  */
-		//jbwm_current_to_head();
 		if(is_sticky(c))
 			goto skip;
 		if((c->vdesk != c->screen->vdesk) || (e->window != c->window))
 			return;
 skip:
 		select_client(c);
-		jbwm_current_to_head();
+		//jbwm_current_to_head();
 	}
 }
 

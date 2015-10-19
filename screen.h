@@ -11,7 +11,6 @@ void drag(Client * c);
 void moveresize(Client * c);
 void show_info(Client * c, KeySym key);
 void sweep(Client * c);
-void next(void);
 void hide(Client * c);
 void unhide(Client * c);
 void switch_vdesk(ScreenInfo * s, const ubyte v);
