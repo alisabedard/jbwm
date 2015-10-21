@@ -91,8 +91,11 @@ select_client(Client * c)
 void
 fix_client(Client * c)
 {
+#if 0
 	if(c->vdesk != c->screen->vdesk)
 		return;
+#endif
+	c->vdesk=c->screen->vdesk;
 	toggle_sticky(c);
 	select_client(c);
 }
