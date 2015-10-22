@@ -25,7 +25,6 @@ initialize_JBWMEnvironment_keymasks(void)
 static void
 initialize_JBWMEnvironment(void)
 {
-	jbwm.initialising = None;
 	initialize_JBWMEnvironment_keymasks();
 	jbwm.titlebar.initialized = false;
 }

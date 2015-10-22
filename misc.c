@@ -14,14 +14,6 @@
 int
 handle_xerror(Display * dpy, XErrorEvent * e)
 {
-	/* If this error actually occurred while setting up the new window,
-	 * best let make_new_client() know not to bother */
-	if(jbwm.initialising != None
-		&& e->resourceid == jbwm.initialising)
-	{
-		jbwm.initialising = None;
-		return 0;
-	}
 	switch (e->error_code)
 	{
 	case BadAccess:

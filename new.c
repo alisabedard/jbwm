@@ -47,45 +47,17 @@ Client_new(Window w, ScreenInfo * s)
 void
 make_new_client(Window w, ScreenInfo * s)
 {
-	Client *c;
-
-	XGrabServer(jbwm.X.dpy);
-	/*
-	 * First a bit of interaction with the error handler due to X's
-	 * tendency to batch event notifications.  We set a global variable
-	 * to the id of the window we're initialising then do simple X call
-	 * on that window.  If an error is raised by this (and nothing else
-	 * should do so as we've grabbed the server), the error handler
-	 * resets the variable indicating the window has already disappeared,
-	 * so we stop trying to manage it.
-	 */
-	jbwm.initialising = w;
-	XSync(jbwm.X.dpy, false);
-	/*
-	 * If 'initialising' is now set to None, that means doing the
-	 * XFetchName raised BadWindow - the window has been removed before
-	 * we got a chance to grab the server.
-	 */
-	if(jbwm.initialising == None)
-		goto end;
-	jbwm.initialising = None;
-	c = Client_new(w, s);
+	Client *c=Client_new(w, s);
 	if(c->flags & JB_CLIENT_DONT_MANAGE)
-		goto end;
-	XSelectInput(jbwm.X.dpy, c->window,
-		EnterWindowMask | PropertyChangeMask |
-		ColormapChangeMask);
+		return;
+	XSelectInput(jbwm.X.dpy, c->window, EnterWindowMask | PropertyChangeMask
+		| ColormapChangeMask);
 #ifdef USE_SHAPE
 	set_shape(c);
 #endif /* USE_SHAPE */
 	reparent(c);
-	/* Map the client. */
-	if(s->vdesk == c->vdesk)
-		unhide(c);
-	/* Enable alt-dragging within window */
+	unhide(c);
 	jbwm_grab_button(w, jbwm.keymasks.grab, AnyButton);
-end:
-	XUngrabServer(jbwm.X.dpy);
 }
 
 /*
@@ -218,7 +190,6 @@ static void
 init_geometry_properties(Client * c)
 {
 	unsigned long nitems;
-
 	nitems = handle_mwm_hints(c);
 	if(!c->screen)
 		return;

@@ -142,8 +142,10 @@ handle_property_change(XPropertyEvent * e)
 			break;
 #endif /* USE_TBAR */
 		/* The following atom is issued when Motif dialogs close.  */
+		case 319:
 		case 321:
 		case 402:
+		case 406:
 		case 456:
 			remove_client(c);
 			break;

@@ -5,7 +5,6 @@
 
 struct JBWMEnvironment
 {
-	volatile Window initialising;
 	struct
 	{
 		unsigned int numlock, grab, mod;
