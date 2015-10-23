@@ -3,6 +3,7 @@
 #CC = clang
 CFLAGS=-Os -W -Wall -Werror
 #CFLAGS+=-ggdb -DDEBUG
+#CFLAGS+=-DXDEBUG
 # profiling flag.
 #CFLAGS = -pg -O0 -W -Wall -Werror
 

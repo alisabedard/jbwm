@@ -143,7 +143,7 @@ handle_property_change(XPropertyEvent * e)
 #endif /* USE_TBAR */
 		/* The following atom is issued when Motif dialogs close.  */
 		case 319:
-		case 321:
+//		case 321:
 		case 402:
 		case 406:
 		case 456:
@@ -230,7 +230,9 @@ head:
 	switch (ev.type)
 	{
 	case EnterNotify:
+#ifdef XDEBUG
 		LOG("EnterNotify");
+#endif
 		handle_enter_event(&ev.xcrossing);
 		break;
 	case UnmapNotify:
