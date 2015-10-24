@@ -33,7 +33,7 @@ DEFINES  = $(EXTRA_DEFINES)
 # e.g., make EXTRA_DEFINfES="-DDEBUG".
 
 #CFLAGS += -Wall -W -pedantic -std=c89
-CFLAGS += -std=c11
+CFLAGS += -std=c99
 # Optimization:
 #CFLAGS += -Os -ffast-math -fomit-frame-pointer 
 # Machine-specific:
