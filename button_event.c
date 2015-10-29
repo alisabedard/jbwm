@@ -11,7 +11,7 @@ move_client_with_vdesk(Client * c, Bool next)
 {
 	ScreenInfo *current_screen = current->screen;
 	const int target_vdesk =
-		current_screen->vdesk + next ? 1 : -1;
+		(current_screen->vdesk + next) ? 1 : -1;
 
 	if(next ? (target_vdesk < 10) : (target_vdesk >= 0))
 	{
