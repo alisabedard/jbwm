@@ -81,7 +81,7 @@ SRCS += titlebar.c
 
 # ----- You shouldn't need to change anything under this line ------ #
 
-version = 1.31
+version = 1.32
 
 distname = jbwm-$(version)
 
