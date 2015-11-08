@@ -11,7 +11,7 @@ CFLAGS=-Os -W -Wall -Werror
 # Note that $(DESTDIR) is used by the Debian build process.
 #prefix = $(DESTDIR)/usr
 # For typical manually built package:
-prefix = /usr/local
+prefix = /usr
 # For custom stash script
 #prefix = /usr/local/stash/jbwm
 # For use with NetBSD linkfarm or GNU stow.
