@@ -31,7 +31,7 @@ INSTALLATION
 Please see the file INSTALL for details on building evilwm.
 
 
-STJBTING EVILWM
+STARTING EVILWM
 
 If you use a session manager from GNOME or KDE or something like that,
 you'll have to read its documentation to see how to set which window
@@ -119,7 +119,7 @@ AEWM LICENCE
 
 Copyright (c) 1998-2000 Decklin Foster.
 
-THIS SOFTWJBE IS PROVIDED BY THE AUTHOR "AS IS", WITHOUT ANY EXPRESS
+THIS SOFTWARE IS PROVIDED BY THE AUTHOR "AS IS", WITHOUT ANY EXPRESS
 OR IMPLIED WJBRANTIES OF ANY KIND. IN NO EVENT SHALL THE AUTHOR BE
 HELD LIABLE FOR ANY DAMAGES CONNECTED WITH THE USE OF THIS PROGRAM.
 

@@ -15,7 +15,7 @@
 #endif /* USE_XFT */
 
 /* Default colors */
-#define DEF_FG          "#ffffff"
+#define DEF_FG          "#909090"
 #define DEF_FC          "#00a000"
 #define DEF_BG          "#202020"
 #define TITLEBAR_CLOSE_BG	0x70, 0x60, 0x60
