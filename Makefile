@@ -9,9 +9,9 @@ CFLAGS=-Os -W -Wall -Werror
 
 # Edit this line if you don't want jbwm to install under /usr.
 # Note that $(DESTDIR) is used by the Debian build process.
-#prefix = $(DESTDIR)/usr
+prefix = $(DESTDIR)/usr
 # For typical manually built package:
-prefix = /usr
+#prefix = /usr
 # For custom stash script
 #prefix = /usr/local/stash/jbwm
 # For use with NetBSD linkfarm or GNU stow.
