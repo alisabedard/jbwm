@@ -1,5 +1,3 @@
-# If you don't use CC 
-#CC       = gcc
 #CC = clang
 CFLAGS=-Os -W -Wall -Werror
 #CFLAGS+=-ggdb -DDEBUG
