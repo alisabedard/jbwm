@@ -8,25 +8,18 @@
 
 #include <stdio.h>
 
-#define LOG_INFO(...) printf(__VA_ARGS__);
-#define LOG_ERROR(...) fprintf(stderr, __VA_ARGS__);
+#define ERROR(...) {fprintf(stderr, __VA_ARGS__); exit(1);}
 
 #ifdef DEBUG
-#define LOG_DEBUG(...) \
+#define LOG(...) \
 {\
 	fprintf(stderr, "%s:%d:  ", __FILE__, __LINE__);\
-	fprintf(stderr, __VA_ARGS__);\
+	fprintf(stderr, __VA_ARGS__); putc('\n', stderr);\
 }
-#define MJBK fprintf(stderr, "%s:  %d\n", __FILE__, __LINE__);
+#define MARK() LOG("MARK")
 #else
-#define LOG_DEBUG(...)
-#define MJBK
-#endif
-
-#ifdef XDEBUG
-#define LOG_XDEBUG(...) fprintf(stderr, __VA_ARGS__);
-#else
-#define LOG_XDEBUG(...)
+#define LOG(...)
+#define MARK()
 #endif
 
 #endif /* JBWM__LOG_H__ */

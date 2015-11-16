@@ -29,16 +29,6 @@ initialize_JBWMEnvironment(void)
 	jbwm.titlebar.initialized = false;
 }
 
-/* These are difficult to consolidate in
-   JBWMEnvironment structure, as memory would
-   have to be manually allocated for each.  */
-/* Things that affect user interaction */
-GlobalOptions opt = {
-	DEF_FONT,
-	{DEF_FG, DEF_BG, DEF_FC},
-	DEF_TERM
-};
-
 Application *head_app = NULL;
 
 /* Client tracking information */
@@ -147,21 +137,6 @@ parse_command_line_args(int argc, char **argv)
 		case 'd':
 			setenv("DISPLAY", ARG, 1);
 			break;
-		case 'F':
-			SETARG(opt.font);
-			break;
-		case 'f':
-			SETARG(opt.color.fg);
-			break;
-		case 'b':
-			SETARG(opt.color.bg);
-			break;
-		case 'c':
-			SETARG(opt.color.fc);
-			break;
-		case 'T':
-			SETARG(opt.term);
-			break;
 		case 'A':
 			process_app_class_options(ARG);
 			break;
@@ -178,9 +153,7 @@ parse_command_line_args(int argc, char **argv)
 			printf("jbwm version %s\n", VERSION);
 			exit(0);
 		default:
-			fprintf(stderr,
-				"jbwm -[d:F:f:b:v:T:w:s:A:g:Vv:S1:2:]\n");
-			exit(0);
+			ERROR("jbwm -[d:F:f:b:v:T:w:s:A:g:Vv:S1:2:]\n");
 		}
 	}
 }
@@ -194,17 +167,9 @@ setup_fonts(void)
 #else /* !USE_XFT */
 #define FONTOPEN(f) XLoadQueryFont(jbwm.X.dpy, f)
 #endif /* USE_XFT */
-
-	jbwm.X.font =
-		opt.font ? FONTOPEN(opt.font) : FONTOPEN(DEF_FONT);
+	jbwm.X.font=FONTOPEN(DEF_FONT);
 	if(!jbwm.X.font)
-		LOG_ERROR("couldn't find a font to use: "
-#ifdef USE_ARGV
-			"try starting with -f fontname\n"
-#else
-			"set available font in config.h and rebuild"
-#endif /* USE_ARGV */
-			);
+		ERROR("bad font");
 }
 
 void
@@ -240,13 +205,14 @@ static void
 allocate_colors(const ubyte i)
 {
 	XColor dummy;
+	Display *d;
+	Colormap c;
 
-#define COLORALLOC(item)\
-	XAllocNamedColor(jbwm.X.dpy, DefaultColormap(jbwm.X.dpy, i),\
-		opt.color.item, &jbwm.X.screens[i].item, &dummy);
-	COLORALLOC(fg);
-	COLORALLOC(bg);
-	COLORALLOC(fc);
+	d=jbwm.X.dpy;
+	c=DefaultColormap(d, i);
+	XAllocNamedColor(d, c, DEF_FG, &jbwm.X.screens[i].fg, &dummy);
+	XAllocNamedColor(d, c, DEF_FC, &jbwm.X.screens[i].fc, &dummy);
+	XAllocNamedColor(d, c, DEF_BG, &jbwm.X.screens[i].bg, &dummy);
 }
 
 static void

@@ -13,13 +13,6 @@
 static void init_geometry(Client * c);
 static void reparent(Client * c);
 
-#ifdef XDEBUG
-static const char *map_state_string(int map_state);
-static void debug_wm_normal_hints(XSizeHints * size);
-#else
-#define debug_wm_normal_hints(s)
-#endif
-
 static inline void
 initialize_client_fields(Client * c, ScreenInfo * s, Window w)
 {
@@ -106,11 +99,11 @@ init_geometry_size(Client * c, XWindowAttributes * attr)
 	const int awidth = attr->width;
 	const int aheight = attr->height;
 
-	if((awidth >= c->size->min_width)
-		&& (aheight >= c->size->min_height))
+	if((awidth >= c->size.min_width)
+		&& (aheight >= c->size.min_height))
 		set_size(c, awidth, aheight);
 	else
-		set_size(c, c->size->min_width, c->size->min_height);
+		set_size(c, c->size.min_width, c->size.min_height);
 }
 
 static void
@@ -124,10 +117,10 @@ set_position(Client * c, const int x, const int y)
 static void
 init_geometry_position(Client * c, XWindowAttributes * attr)
 {
-	if(!c->size)
+	if(!c->size.flags)
 		return;
 	if((attr->map_state == IsViewable)
-		|| c->size->flags & USPosition)
+		|| c->size.flags & USPosition)
 		set_position(c, attr->x, attr->y);
 	else
 	{
@@ -159,7 +152,7 @@ init_long_properties(Client * c, unsigned long *nitems)
 	unsigned long *lprop;
 
 	if((lprop =
-		jbwm_get_property(c->window, JBWM_ATOM_VWM_DESKTOP,
+		jbwm_get_property(c->window, GETATOM("_NET_WM_DESKTOP"),
 		XA_CARDINAL, nitems)))
 	{
 		if(*nitems && valid_vdesk(lprop[0]))
@@ -174,13 +167,13 @@ init_atom_properties(Client * c, unsigned long *nitems)
 	Atom *aprop;
 
 	if((aprop =
-		jbwm_get_property(c->window, JBWM_ATOM_WM_STATE,
+		jbwm_get_property(c->window, GETATOM("WM_STATE"),
 		XA_ATOM, nitems)))
 	{
 		unsigned long i;
 
 		for(i = 0; i < *nitems; i++)
-			if(aprop[i] == JBWM_ATOM_VWM_STICKY)
+			if(aprop[i] == GETATOM("_NET_WM_STATE_STICKY"))
 				add_sticky(c);
 		XFree(aprop);
 	}
@@ -261,17 +254,8 @@ reparent(Client * c)
 void
 get_wm_normal_hints(Client * c)
 {
-	if(c->size)
-		XFree(c->size);
-	c->size = XAllocSizeHints();
-	if(!c->size)	/* If memory could not be allocated */
-		return;
-	{
-		long supplied_return;
-
-		XGetWMNormalHints(jbwm.X.dpy, c->window, c->size,
-			&supplied_return);
-	}
+	long dummy;
+	XGetWMNormalHints(jbwm.X.dpy, c->window, &(c->size), &dummy);
 }
 
 void *

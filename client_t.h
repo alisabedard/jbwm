@@ -21,7 +21,7 @@ struct Client
 
 	unsigned int exposed_width;
 
-	XSizeHints *size;
+	XSizeHints size;
 
 	byte vdesk;
 	int shade_height;

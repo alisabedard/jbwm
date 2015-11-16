@@ -73,18 +73,11 @@ void jbwm_grab_button(Window w, unsigned int mask,
 extern JBWMEnvironment jbwm;
 
 /* Things that affect user interaction */
-extern const char *opt_term[3];
 extern Application *head_app;
 
 /* These will take some time to integrate into jbwm structure.  */
 /* Client tracking information */
 extern Client *head_client;
 extern Client *current;
-
-#ifdef DEBUG
-#define LOG(msg) fprintf(stderr, "%s:%d - %s\n", __FILE__, __LINE__, msg)
-#else /* !DEBUG */
-#define LOG(msg)
-#endif /* DEBUG */
 
 #endif /* not JBWM_JBWM_H */

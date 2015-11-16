@@ -72,7 +72,7 @@ handle_client_key_event(XKeyEvent * e, Client * c, KeySym key)
 		key_moveresize(c);
 		break;
 	case KEY_KILL:
-		send_wm_delete(c, !(e->state & jbwm.keymasks.mod));
+		send_wm_delete(c);
 		break;
 	case KEY_LOWER:
 	case KEY_ALTLOWER:
@@ -130,16 +130,10 @@ jbwm_handle_key_event(XKeyEvent * e)
 	switch (key)
 	{
 	case KEY_NEW:
-		system(opt.term);
+		system(TERMINAL_CMD);
 		break;
 	case KEY_QUIT:
 		exit(0);
-	case KEY_LOCK:
-		system(XLOCK_CMD);
-		break;
-	case KEY_BROWSER:
-		system(BROWSER_CMD);
-		break;
 	case KEY_NEXT:
 		next();
 		break;

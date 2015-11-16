@@ -21,7 +21,7 @@
 	XSendEvent(jbwm.X.dpy, c->window, false, StructureNotifyMask,\
 		   (XEvent *)&(c->ce))
 
-void send_wm_delete(Client * c, int kill_client);
+void send_wm_delete(Client * c);
 
 Client *find_client(Window w);
 void gravitate_client(Client * c, int sign);

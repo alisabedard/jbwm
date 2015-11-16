@@ -5,28 +5,6 @@
 #include <stdlib.h>
 #include "jbwm.h"
 
-#if 0
-void
-jbwm_current_to_head(void)
-{
-	if(current && (current != head_client))
-	{
-		Client *c;
-
-		/* Advance to either end of list or current node.  */
-		for(c = head_client; c && (c->next != current);
-			c = c->next)
-			;
-		if(c && (c->next == current))
-		{
-			c->next = current->next;
-			current->next = head_client;
-			head_client = current;
-		}
-	}
-}
-#endif
-
 static ScreenInfo *
 find_screen(Window root)
 {
@@ -44,6 +22,7 @@ handle_map_request(XMapRequestEvent * e)
 {
 	Client *c = find_client(e->window);
 
+	LOG("handle_map_request(e)");
 	if(c)
 	{
 		/* Avoid mapping any ghost windows.  */
@@ -66,6 +45,7 @@ cleanup()
 {
 	Client *c, *i;
 
+	LOG("cleanup()");
 	jbwm.need_cleanup=0;
 	for(c = head_client; c; c = i)
 	{
@@ -82,24 +62,22 @@ handle_unmap_event(XUnmapEvent * e)
 {
 	Client *c;
 
+	LOG("handle_unmap_event(e)");
 	if((c = find_client(e->window)))
 	{
-		if(c->ignore_unmap)
+		if(!c->ignore_unmap)
 		{
-			c->ignore_unmap--;
-		}
-		else
-		{
+			LOG("!c->ignore_unmap");
 			c->flags |= JB_CLIENT_REMOVE;
 			jbwm.need_cleanup=1;
 		}
+		else
+		{
+			LOG("%d ignores remaining", c->ignore_unmap);
+			//c->ignore_unmap--;
+			c->ignore_unmap=1;
+		}
 	}
-#ifdef DEBUG
-	else
-	{
-		puts("Cannot find client to unmap.");
-	}
-#endif
 }
 
 #ifdef USE_CMAP
@@ -107,7 +85,8 @@ static void
 handle_colormap_change(XColormapEvent * e)
 {
 	Client *c = find_client(e->window);
-
+	
+	LOG("handle_colormap_change(e)");
 	if(c && e->new)
 	{
 		c->cmap = e->colormap;
@@ -120,41 +99,40 @@ static void
 handle_property_change(XPropertyEvent * e)
 {
 	Client *c;
+	const Atom a = e->atom;
 
-	const Atom atom = e->atom;
+	LOG("handle_property_change(e)");
 
 	c = find_client(e->window);
 	if(c)
 	{
 		moveresize(c);
-#ifdef DEBUG
-		printf("ATOM: %u\n", (unsigned int)atom);
-		fflush(stdout);
-#endif
-		switch(atom)
+		switch(a)
 		{
 		case XA_WM_NORMAL_HINTS:
+			LOG("XA_WM_NORMAL_HINTS");
 			get_wm_normal_hints(c);
 			break;
 #ifdef USE_TBAR
 		case XA_WM_NAME:
+			LOG("XA_WM_NAME");
 			update_info_window(c);
 			break;
 #endif /* USE_TBAR */
-		/* The following atom is issued when Motif dialogs close.  */
-		case 319:
-//		case 321:
-		case 402:
-		case 406:
-		case 456:
-			remove_client(c);
-			break;
-		}
+		default:
+		{
+#ifdef DEBUG	
+			char *n;
 
+			n=XGetAtomName(jbwm.X.dpy, a);
+			LOG("Atom %u: %s", (unsigned int)a, n);
+			XFree(n);
+#endif /* DEBUG */
+			if(a==GETATOM("_MOTIF_WM_MESSAGES"))
+				c->ignore_unmap--;
+		}
+		}
 	}
-#ifdef DEBUG
-	else {puts("Cannot find client for which property changed.");}
-#endif
 }
 
 static void
@@ -172,7 +150,6 @@ handle_enter_event(XCrossingEvent * e)
 			return;
 skip:
 		select_client(c);
-		//jbwm_current_to_head();
 	}
 }
 
@@ -230,14 +207,14 @@ head:
 	switch (ev.type)
 	{
 	case EnterNotify:
-#ifdef XDEBUG
-		LOG("EnterNotify");
-#endif
 		handle_enter_event(&ev.xcrossing);
 		break;
 	case UnmapNotify:
 		LOG("UnmapNotify");
 		handle_unmap_event(&ev.xunmap);
+		break;
+	case ClientMessage:
+		LOG("ClientMessage");
 		break;
 	case PropertyNotify:
 		LOG("PropertyNotify");

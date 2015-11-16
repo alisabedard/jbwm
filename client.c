@@ -38,12 +38,11 @@ set_wm_state(Client * c, int state)
 	 * machines).
 	 */
 	long data[2];		/* = { state, None }; */
-
-	const Atom state_atom = JBWM_ATOM_WM_STATE;
+	const Atom sa=GETATOM("WM_STATE");
 
 	data[0] = state;
-	XChangeProperty(jbwm.X.dpy, c->window, state_atom, state_atom,
-		32, PropModeReplace, (unsigned char *)data, 2);
+	XChangeProperty(jbwm.X.dpy, c->window, sa, sa, 32, 
+		PropModeReplace, (unsigned char *)data, 2);
 }
 
 void
@@ -126,13 +125,25 @@ unparent_window(Client * c)
 	XReparentWindow(jbwm.X.dpy, c->window, c->screen->root,
 		c->geometry.x, c->geometry.y);
 	XRemoveFromSaveSet(jbwm.X.dpy, c->window);
-	XDestroyWindow(jbwm.X.dpy, c->parent);
+	if(c->parent)
+		XDestroyWindow(jbwm.X.dpy, c->parent);
 }
 
 void
 remove_client(Client * c)
 {
-	XGrabServer(jbwm.X.dpy);
+	Display *d=jbwm.X.dpy;
+	const Window w=c->window;
+
+	LOG("remove_client()");
+	XGrabServer(d);
+	if(c->flags & JB_CLIENT_REMOVE)
+	{
+		LOG("JB_CLIENT_REMOVE");
+		set_wm_state(c, WithdrawnState);
+		XDeleteProperty(d, w, JA_VWM_DESKTOP);
+		XDeleteProperty(d, w, JA_VWM_STATE);
+	}
 #ifdef USE_TBAR
 	remove_info_window(c);
 #endif /* USE_TBAR */
@@ -140,15 +151,13 @@ remove_client(Client * c)
 	relink_window_list(c);
 	if(current == c)
 		current = NULL;
-	if(c->size)
-		XFree(c->size);
 	free(c);
-	XUngrabServer(jbwm.X.dpy);
-	XSync(jbwm.X.dpy, false);
+	XUngrabServer(d);
+	XSync(d, false);
 }
 
 static int
-send_xmessage(Window w, Atom a, long x)
+xmsg(Window w, Atom a, long x)
 {
 	XEvent ev;
 
@@ -163,12 +172,24 @@ send_xmessage(Window w, Atom a, long x)
 }
 
 void
-send_wm_delete(Client * c, int kill_client)
+send_wm_delete(Client * c)
 {
-	XUnmapWindow(jbwm.X.dpy, c->parent);
-	if(kill_client)
-		send_xmessage(c->window, JBWM_ATOM_WM_PROTOS,
-			JBWM_ATOM_WM_DELETE);
+	int i, n;
+	bool found;
+	Atom *protocols;
+	
+	found=false;
+	if(XGetWMProtocols(jbwm.X.dpy, c->window, &protocols, &n))
+	{
+		for(i=0; i<n; i++)
+		{
+			found=(protocols[i] == JA_WM_DELETE);
+		}
+		XFree(protocols);
+	}
+	if(found)
+		xmsg(c->window, GETATOM("WM_PROTOCOLS"),
+			GETATOM("WM_DELETE_WINDOW"));
 	else
 		XKillClient(jbwm.X.dpy, c->window);
 }

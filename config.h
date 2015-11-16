@@ -1,4 +1,4 @@
-/* Copyright 2007, Jeffrey E. Bedard */
+/* Copyright 2007-2015, Jeffrey E. Bedard */
 /*
  * This file is ment to hold configuration values and to resolve
  * configuration dependencies.
@@ -6,6 +6,14 @@
 
 #ifndef JBWM_CONFIG_H
 #define JBWM_CONFIG_H
+
+#ifndef TERMINAL_CMD
+#ifndef DEBIAN
+#define TERMINAL_CMD "urxvt &"
+#else /* DEBIAN */
+#define TERMINAL_CMD "x-terminal-emulator &"
+#endif /* !DEBIAN */
+#endif /* !TERMINAL_CMD */
 
 /* Default fonts */
 #ifdef USE_XFT
@@ -22,7 +30,6 @@
 #define TITLEBAR_SHADE_BG	0x60, 0x70, 0x60
 #define TITLEBJB_RESIZE_BG	0x60, 0x60, 0x70
 
-/* #define GRAB_MASK Mod1Mask */
 #define GRAB_MASK Mod4Mask
 #define LOCK_MASK LockMask
 #define MOD_MASK ControlMask
@@ -31,13 +38,7 @@
 #define JBWM_SNAP_DISTANCE 12
 
 #define SPACE           3
-#ifdef DEBIAN
-#define DEF_TERM        "x-terminal-emulator &"
-#else
-#define DEF_TERM        "urxvt &"
-#endif
-#define XLOCK_CMD	"slock"
-#define BROWSER_CMD	"firefox &"
+
 
 /* Sanity checks: */
 #if defined(USE_XPM) && defined(USE_XBM)

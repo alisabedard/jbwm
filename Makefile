@@ -1,7 +1,7 @@
 #CC = clang
+#CFLAGS+=-Os
 CFLAGS=-Os -W -Wall -Werror
-#CFLAGS+=-ggdb -DDEBUG
-#CFLAGS+=-DXDEBUG
+CFLAGS+=-ggdb -DDEBUG
 # profiling flag.
 #CFLAGS = -pg -O0 -W -Wall -Werror
 
@@ -22,7 +22,6 @@ INCLUDES += -I$(XROOT)/include
 LDPATH  += -L$(XROOT)/lib
 
 LIBS += -lX11 
-
 
 DEFINES  = $(EXTRA_DEFINES) 
 
@@ -68,7 +67,7 @@ CFLAGS += -std=c99
 
 # Uncomment to enable parsing command line arguments.
 # Saves 2030 bytes
-# DEFINES += -DUSE_ARGV
+#DEFINES += -DUSE_ARGV
 
 # Uncomment to enable titlebars
 DEFINES += -DUSE_TBAR

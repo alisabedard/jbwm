@@ -56,7 +56,7 @@ button1_event(XButtonEvent * e, Client * c)
 	XRaiseWindow(jbwm.X.dpy, c->parent);
 	/* Text for close button press.  */
 	if((x < JB_BUTTON_WIDTH) && (y < TITLEBAR_HEIGHT))
-		send_wm_delete(c, !(e->state & jbwm.keymasks.mod));
+		send_wm_delete(c);
 	if(x > width - JB_RESIZE_DELTA)
 		sweep(c);	/* Resize the window.  */
 	else if(x > width - JB_SHADE_DELTA && y < TITLEBAR_HEIGHT)

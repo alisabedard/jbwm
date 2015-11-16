@@ -5,9 +5,6 @@
 #ifndef KEY_NEW
 #define KEY_NEW		XK_Return
 #endif /* !KEY_NEW */
-#define KEY_LOCK	XK_F1
-#define KEY_BROWSER	XK_F2
-#define KEY_SLEEP	XK_F3
 #define KEY_QUIT	XK_Escape
 #define KEY_TOPLEFT	XK_KP_Home
 #define KEY_TOPRIGHT	XK_KP_Page_Up
@@ -41,7 +38,7 @@
  * XFree86/Cygwin, so the KILL key is an option in the Makefile
  */
 #ifndef KEY_KILL
-#define KEY_KILL	XK_F4
+#define KEY_KILL	XK_q
 #endif
 
 #define JBWM_VWM_KEYS \
@@ -50,11 +47,11 @@
 
 #define JBWM_KEYS_TO_GRAB \
 {\
-	KEY_NEXT, KEY_NEW, KEY_LOCK, KEY_QUIT, KEY_KILL,\
+	KEY_NEXT, KEY_NEW, KEY_QUIT, KEY_KILL,\
 	KEY_TOPLEFT, KEY_TOPRIGHT, KEY_BOTTOMLEFT, KEY_BOTTOMRIGHT,\
 	KEY_LEFT, KEY_RIGHT, KEY_DOWN, KEY_UP,\
 	KEY_LOWER, KEY_ALTLOWER, KEY_INFO, KEY_MAX,\
-	JBWM_VWM_KEYS, KEY_MOVE, KEY_RAISE, KEY_BROWSER, 0\
+	JBWM_VWM_KEYS, KEY_MOVE, KEY_RAISE, 0\
 };
 
 #define JBWM_ALT_KEYS_TO_GRAB \
