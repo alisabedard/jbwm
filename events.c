@@ -29,7 +29,6 @@ handle_map_request(XMapRequestEvent * e)
 		if(c->flags & JB_CLIENT_REMOVE)
 			return;
 		unhide(c);
-		c->ignore_unmap++;
 	}
 	else
 	{
@@ -63,9 +62,13 @@ handle_unmap_event(XUnmapEvent * e)
 	Client *c;
 
 	LOG("handle_unmap_event(e)");
+	LOG("send_event: %s", e->send_event?"true":"false");
+	LOG("from_configure: %s", e->from_configure?"true":"false");
+		
 	if((c = find_client(e->window)))
 	{
-		if(!c->ignore_unmap)
+		LOG("%d ignores remaining", c->ignore_unmap);
+		if(c->ignore_unmap<1)
 		{
 			LOG("!c->ignore_unmap");
 			c->flags |= JB_CLIENT_REMOVE;
@@ -73,9 +76,7 @@ handle_unmap_event(XUnmapEvent * e)
 		}
 		else
 		{
-			LOG("%d ignores remaining", c->ignore_unmap);
-			//c->ignore_unmap--;
-			c->ignore_unmap=1;
+			c->ignore_unmap--;
 		}
 	}
 }
@@ -119,18 +120,16 @@ handle_property_change(XPropertyEvent * e)
 			update_info_window(c);
 			break;
 #endif /* USE_TBAR */
+#ifdef DEBUG
 		default:
-		{
-#ifdef DEBUG	
-			char *n;
+			{
+				char *n;
 
-			n=XGetAtomName(jbwm.X.dpy, a);
-			LOG("Atom %u: %s", (unsigned int)a, n);
-			XFree(n);
+				n=XGetAtomName(jbwm.X.dpy, a);
+				LOG("Atom %u: %s", (unsigned int)a, n);
+				XFree(n);
+			}
 #endif /* DEBUG */
-			if(a==GETATOM("_MOTIF_WM_MESSAGES"))
-				c->ignore_unmap--;
-		}
 		}
 	}
 }

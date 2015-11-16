@@ -179,6 +179,7 @@ send_wm_delete(Client * c)
 	Atom *protocols;
 	
 	found=false;
+	/* This behavior is specified by ICCM.  */
 	if(XGetWMProtocols(jbwm.X.dpy, c->window, &protocols, &n))
 	{
 		for(i=0; i<n; i++)
