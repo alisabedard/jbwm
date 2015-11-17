@@ -28,7 +28,7 @@
 #define DEF_BG          "#202020"
 #define TITLEBAR_CLOSE_BG	0x70, 0x60, 0x60
 #define TITLEBAR_SHADE_BG	0x60, 0x70, 0x60
-#define TITLEBJB_RESIZE_BG	0x60, 0x60, 0x70
+#define TITLEBAR_RESIZE_BG	0x60, 0x60, 0x70
 
 #define GRAB_MASK Mod4Mask
 #define LOCK_MASK LockMask
@@ -37,18 +37,15 @@
 #define JBWM_BORDER_WIDTH 1
 #define JBWM_SNAP_DISTANCE 12
 
-#define SPACE           3
-
-
 /* Sanity checks: */
 #if defined(USE_XPM) && defined(USE_XBM)
 #undef USE_XBM	/* Prefer USE_XPM */
 #endif /* USE_XPM && USE_XBM */
 
+/* Font values:  */
 #define FONT_Y_OFFSET jbwm.X.font->descent
-/* Values.  */
 #ifdef USE_XFT
-#define TITLE_FONT_HEIGHT jbwm.X.font->height
+#define TITLE_FONT_HEIGHT (jbwm.X.font->height+3)
 #else /* ! USE_XFT */
 #ifndef USE_XPM
 #define TITLE_FONT_HEIGHT (jbwm.X.font->ascent+jbwm.X.font->descent)

@@ -159,6 +159,7 @@ parse_command_line_args(int argc, char **argv)
 }
 #endif /* USE_ARGV */
 
+#ifdef USE_TBAR
 static void
 setup_fonts(void)
 {
@@ -171,6 +172,7 @@ setup_fonts(void)
 	if(!jbwm.X.font)
 		ERROR("bad font");
 }
+#endif /* USE_TBAR */
 
 void
 jbwm_grab_button(Window w, unsigned int mask, unsigned int button)
@@ -225,9 +227,11 @@ setup_gc_parameters(XGCValues * gv, const ubyte i)
 	gv->function = GXinvert;
 	gv->subwindow_mode = IncludeInferiors;
 	gv->line_width = JBWM_BORDER_WIDTH;
+#ifdef USE_TBAR
 #ifndef USE_XFT
 	gv->font = jbwm.X.font->fid;
 #endif /* ! USE_XFT */
+#endif /* USE_TBAR */
 }
 
 static void
@@ -309,8 +313,7 @@ setup_screens(void)
 {
 	/* now set up each screen in turn */
 	jbwm.X.num_screens = ScreenCount(jbwm.X.dpy);
-	jbwm.X.screens =
-		malloc(jbwm.X.num_screens * sizeof(ScreenInfo));
+	jbwm.X.screens = malloc(jbwm.X.num_screens * sizeof(ScreenInfo));
 	{
 		/* used in scanning windows (XQueryTree) */
 		ubyte i = jbwm.X.num_screens;
@@ -325,9 +328,14 @@ setup_display(void)
 {
 	const char *dpy_env = getenv("DISPLAY");
 	if(!(jbwm.X.dpy = XOpenDisplay(dpy_env ? dpy_env : ":0")))
-		exit(1);
+	{
+		ERROR("bad DISPLAY");
+	}
 	XSetErrorHandler(handle_xerror);
+#ifdef USE_TBAR
+	/* Fonts only needed with title bars */
 	setup_fonts();
+#endif /* USE_TBAR */
 	jbwm.X.cursor = XCreateFontCursor(jbwm.X.dpy, XC_fleur);
 #ifdef USE_SHAPE
 	setup_shape();

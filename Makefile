@@ -58,15 +58,12 @@ CFLAGS += -std=c99
 # Not necessary except on old NetBSD:
 #INCLUDES += -I/usr/pkg/include/freetype2 -I/usr/X11R6/include/freetype2
 
-# Titlebar close button support:
-#DEFINES += -DUSE_CLOSE_BUTTON
-
 # Uncomment to enable colormap support
 # Saves 600 bytes
 #DEFINES += -DUSE_CMAP
 
 # Uncomment to enable parsing command line arguments.
-# Saves 2030 bytes
+# Saves ~2030 bytes
 #DEFINES += -DUSE_ARGV
 
 # Uncomment to enable titlebars
@@ -78,7 +75,7 @@ SRCS += titlebar.c
 
 # ----- You shouldn't need to change anything under this line ------ #
 
-version = 1.35
+version = 1.36
 
 distname = jbwm-$(version)
 

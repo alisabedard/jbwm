@@ -234,12 +234,17 @@ void
 moveresize(Client * c)
 {
 	XRectangle *g = &(c->geometry);
+	const ubyte b = c->border;
+#ifdef USE_TBAR
 	const ubyte tb = TITLEBAR_HEIGHT;
 	const unsigned int parent_height = g->height + tb;
-	const ubyte b = c->border;
+	const short y = g->y-b-tb;
+#else
+	const unsigned int parent_height = g->height;
+	const short y = g->y-b;
+#endif
 	const unsigned short width = g->width;
 	const short x = g->x-b;
-	const short y = g->y-b-tb;
 
 	if(c->flags & JB_CLIENT_SHADED)
 	{
@@ -250,8 +255,11 @@ moveresize(Client * c)
 	XMoveResizeWindow(jbwm.X.dpy, c->parent, x, y, width, parent_height);
 	/* Offset the child window within the parent window
 		to display titlebar */
+#ifdef USE_TBAR
 	XMoveResizeWindow(jbwm.X.dpy, c->window, 0, tb, width, 
 		g->height);
+#endif
+
 	send_config(c);
 #ifdef USE_TBAR
 	/* Only update the titlebar if the width has changed.  */

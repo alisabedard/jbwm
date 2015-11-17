@@ -13,11 +13,13 @@ struct JBWMEnvironment
 	{
 		/* Commonly used X information */
 		Display *dpy;
+#ifdef USE_TBAR
 #ifdef USE_XFT
 		XftFont *font;
 #else				/* ! USE_XFT */
 		XFontStruct *font;
 #endif				/* USE_XFT */
+#endif /* USE_TBAR */
 		ubyte num_screens;
 		ScreenInfo *screens;
 		Cursor cursor;

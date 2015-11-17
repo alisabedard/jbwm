@@ -159,7 +159,7 @@ initialize_buttons(JBWMTitlebarData * titlebar, Display * dpy)
 #define RGB_TBUTTON(item, bg) TBUTTON(item, jbwm_new_gc(bg))
 #define XCOLOR_TBUTTON(item, bg) TBUTTON(item, jbwm_new_gc_for_XColor(bg))
 	RGB_TBUTTON(close, TITLEBAR_CLOSE_BG);
-	RGB_TBUTTON(resize, TITLEBJB_RESIZE_BG);
+	RGB_TBUTTON(resize, TITLEBAR_RESIZE_BG);
 	RGB_TBUTTON(shade, TITLEBAR_SHADE_BG);
 	handle = XCOLOR_TBUTTON(handle, jbwm.X.screens->bg);
 	handle->span_image = true;
@@ -173,7 +173,7 @@ initialize_font_data(JBWMTitlebarData * titlebar, Display * dpy)
 	Visual *visual = DefaultVisual(dpy, scr);
 	Colormap colormap = DefaultColormap(dpy, scr);
 
-	XftColorAllocName(dpy, visual, colormap, opt.color.fg,
+	XftColorAllocName(dpy, visual, colormap, DEF_FG,
 		&(titlebar->xft.fg));
 	titlebar->xft.draw =
 		XftDrawCreate(dpy, DefaultRootWindow(dpy), visual,
@@ -189,9 +189,9 @@ jbwm_JBWMTitlebarData_init(JBWMTitlebarData * titlebar)
 	if(titlebar->initialized)
 		return;
 
-#if defined(USE_XPM) || defined(USE_XBM)
+#ifdef USE_XPM
 	initialize_images(titlebar);
-#endif /* USE_XPM || USE_XBM */
+#endif /* USE_XPM */
 	initialize_buttons(titlebar, dpy);
 #ifdef USE_XFT
 	initialize_font_data(titlebar, dpy);
@@ -214,12 +214,6 @@ delete_buttons(JBWMTitlebarData * titlebar)
 static void
 free_XImage(JBWMTitlebarData * t)
 {
-#define XDI(i) XDestroyImage(t->i)
-	XDI(close);
-	XDI(resize);
-	XDI(shade);
-	XDI(handle);
-	XDI(close_inactive);
 	XDestroyImage(t->close);
 	XDestroyImage(t->resize);
 	XDestroyImage(t->shade);
@@ -274,7 +268,6 @@ update_info_window(Client * c)
 	/* Client specific data.  */
 	XMoveResizeWindow(jbwm.X.dpy, iw, 0, 0, c->geometry.width,
 		TITLEBAR_HEIGHT);
-	XClearWindow(jbwm.X.dpy, iw);
 	/* Depending on common data.  */
 	jbwm_JBWMTitlebarData_init(&(jbwm.titlebar));
 	{
