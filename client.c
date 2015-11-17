@@ -174,6 +174,7 @@ xmsg(Window w, Atom a, long x)
 void
 send_wm_delete(Client * c)
 {
+#if 0
 	int i, n;
 	bool found;
 	Atom *protocols;
@@ -193,6 +194,9 @@ send_wm_delete(Client * c)
 			GETATOM("WM_DELETE_WINDOW"));
 	else
 		XKillClient(jbwm.X.dpy, c->window);
+#endif
+	xmsg(c->window, GETATOM("WM_PROTOCOLS"),
+		GETATOM("WM_DELETE_WINDOW"));
 }
 
 #ifdef USE_SHAPE
