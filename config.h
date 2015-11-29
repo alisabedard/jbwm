@@ -19,7 +19,7 @@
 #ifdef USE_XFT
 #define DEF_FONT "Monospace 10"
 #else /* ! USE_XFT */
-#define DEF_FONT "9x15"
+#define DEF_FONT "fixed"
 #endif /* USE_XFT */
 
 /* Default colors */
