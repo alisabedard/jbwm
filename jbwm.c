@@ -91,7 +91,8 @@ parse_modifiers(char *s)
 		{
 		"mod4", Mod4Mask},
 		{
-	"mod5", Mod5Mask}};
+		"mod5", Mod5Mask}
+	};
 	const char *delim = ",+";
 	char *tmp;
 	unsigned int ret = 0;
@@ -100,8 +101,14 @@ parse_modifiers(char *s)
 		ubyte i = 0;
 
 		while(i++ < 8)
-			if(!strcmp(modifiers[i].name, tmp))
+		{
+			const char * n=modifiers[i].name;
+
+			if(!strncmp(n, tmp, sizeof(n)))
+			{
 				ret |= modifiers[i].mask;
+			}
+		}
 	}
 
 	return ret;
