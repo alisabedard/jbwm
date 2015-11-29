@@ -121,39 +121,37 @@ parse_geometry(const char *arg)
 }
 
 static void
-parse_command_line_args(int argc, char **argv)
+parse_argv(int argc, char **argv)
 {
-	int i;
+	char opt;
+	const char *optstring="1:2:A:d:g:V";
 
-	for(i = 1; i < argc; i++)
+	while((opt=getopt(argc, argv, optstring))!=-1)
 	{
-		if(argv[i][0] != '-')
-			continue;
-		switch (argv[i][1])
+		switch(opt)
 		{
-#define ARG argv[++i]
-#define SETARG(arg) arg = ARG
-#define SETNARG(arg) arg = atoi(ARG)
-		case 'd':
-			setenv("DISPLAY", ARG, 1);
-			break;
-		case 'A':
-			process_app_class_options(ARG);
-			break;
-		case 'g':
-			parse_geometry(ARG);
-			break;
-		case '1':
-			jbwm.keymasks.grab = parse_modifiers(ARG);
-			break;
-		case '2':
-			jbwm.keymasks.mod = parse_modifiers(ARG);
-			break;
-		case 'V':
-			printf("jbwm version %s\n", VERSION);
-			exit(0);
-		default:
-			ERROR("jbwm -[d:F:f:b:v:T:w:s:A:g:Vv:S1:2:]\n");
+			case '1':
+				jbwm.keymasks.grab = parse_modifiers(optarg);
+				break;
+			case '2':
+				jbwm.keymasks.mod = parse_modifiers(optarg);
+				break;
+			case 'A':
+				process_app_class_options(optarg);
+				break;
+			case 'd':
+				setenv("DISPLAY", optarg, 1);
+				break;
+			case 'g':
+				parse_geometry(optarg);
+				break;
+			case 'V':
+				puts(VERSION);
+				exit(0);
+			default: /* Usage */
+				fprintf(stderr, "%s [%s]\n", argv[0],
+					optstring);
+				exit(1);
 		}
 	}
 }
@@ -356,7 +354,7 @@ main(int argc
 {
 	initialize_JBWMEnvironment();
 #ifdef USE_ARGV
-	parse_command_line_args(argc, argv);
+	parse_argv(argc, argv);
 #endif /* USE_ARGV */
 	setup_display();
 	main_event_loop();

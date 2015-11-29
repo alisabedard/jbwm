@@ -63,7 +63,7 @@ CFLAGS += -std=c99
 #DEFINES += -DUSE_CMAP
 
 # Uncomment to enable parsing command line arguments.
-# Saves ~2030 bytes
+#  Saves ~2030 bytes
 #DEFINES += -DUSE_ARGV
 
 # Uncomment to enable titlebars
