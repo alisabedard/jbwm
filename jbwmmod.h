@@ -7,7 +7,9 @@
 #include "keymap.h"
 #include "screen.h"
 #include "client.h"
+#ifdef USE_TBAR
 #include "titlebar.h"
+#endif /* USE_TBAR */
 #include "new.h"
 #include "events.h"
 #include "graphics.h"

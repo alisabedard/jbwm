@@ -31,7 +31,7 @@ Client_new(Window w, ScreenInfo * s)
 
 	c = calloc(1, sizeof(Client));
 	initialize_client_fields(c, s, w);
-	c->border = JBWM_BORDER_WIDTH;
+	c->border = JBWM_BORDER;
 	init_geometry(c);
 
 	return c;
@@ -244,7 +244,7 @@ reparent(Client * c)
 	XSetWindowBorderWidth(jbwm.X.dpy, w, 0);
 #ifdef USE_TBAR
 	if(!(c->flags & JB_CLIENT_NO_TB))
-		update_info_window(c);
+		update_titlebar(c);
 #endif
 	XReparentWindow(jbwm.X.dpy, w, c->parent, 0, 0);
 	XMapWindow(jbwm.X.dpy, w);

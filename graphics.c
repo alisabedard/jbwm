@@ -1,9 +1,10 @@
-/* Copyright 2008-2011, Jeffrey E. Bedard <antiright@gmail.com> */
+/* Copyright 2008-2015, Jeffrey E. Bedard <jefbed@gmail.com> */
 
 #include "jbwm.h"
 
+#if 0
 XColor
-jbwm_get_XColor(const ubyte r, const ubyte g, const ubyte b)
+jbwm_color_rgb(const ubyte r, const ubyte g, const ubyte b)
 {
 	XColor c;
 
@@ -16,9 +17,36 @@ jbwm_get_XColor(const ubyte r, const ubyte g, const ubyte b)
 
 	return c;
 }
+#endif
+
+void
+free_color(XColor c)
+{
+        Display *d;
+        Colormap cm;
+        unsigned long p[1];
+
+        d=jbwm.X.dpy;
+        cm=DefaultColormap(d, DefaultScreen(d));
+        p[0]=c.pixel;
+        XFreeColors(d, cm, p, 1, AllPlanes);
+}
+
+XColor
+jbwm_color(const char *name)
+{
+	XColor c, none;
+	Display *d;
+
+	d=jbwm.X.dpy;
+	XAllocNamedColor(d, DefaultColormap(d, DefaultScreen(d)), name, &c, 
+		&none);
+
+	return c;
+}
 
 GC
-jbwm_new_gc_for_XColor(XColor color)
+jbwm_new_gc(XColor color)
 {
 	XGCValues values;
 
@@ -28,31 +56,39 @@ jbwm_new_gc_for_XColor(XColor color)
 		GCForeground, &values);
 }
 
-#ifdef USE_GRADIENT
 void
-draw_gradient(Window win, GC gc, const int x, const int y,
-	const unsigned int w, const unsigned int h)
+draw(Window w, XRectangle *g, const char *color)
 {
-	unsigned int i;
-	Display *dpy = jbwm.X.dpy;
-	XGCValues gv;
+	GC gc;
+	Display *d;
+	XColor c;
+	
 
-	XGetGCValues(dpy, gc, GCForeground, &gv);
-	if(gv.foreground)
-		gv.foreground = gv.foreground / 2;
-	for(i = 0; i <= h; i++)
-	{
-		GC lgc;
-		const ubyte d = 8;
-
-		gv.foreground += (i <= h / 2) ? d : -d;
-		lgc = XCreateGC(dpy, win, GCForeground, &gv);
-#ifdef DEBUG
-		printf("fg: %d line: %d\n", (int)gv.foreground, i);
-		fflush(stdout);
-#endif /* DEBUG */
-		XDrawLine(dpy, win, lgc, x, y + i, x + w, y + i);
-		XFreeGC(dpy, lgc);
-	}
+	c=jbwm_color(color);
+	gc=jbwm_new_gc(c);
+	d=jbwm.X.dpy;
+	XFillRectangle(d, w, gc, g->x, g->y, g->width, g->height);
+	XFreeGC(d, gc);
+	free_color(c);
 }
-#endif /* USE_GRADIENT */
+
+#ifdef USE_XPM
+#include <X11/xpm.h>
+
+void
+draw_xpm(Window w, XRectangle *g, char **xpm)
+{
+	XImage *i;
+	Display *d;
+	GC gc;
+	XpmAttributes a;
+
+	d=jbwm.X.dpy;
+	a.valuemask=XpmSize;
+	XpmCreateImageFromData(d, xpm, &i, NULL, &a);
+	gc=XCreateGC(d, w, 0, NULL);
+	XPutImage(d, w, gc, i, 0, 0, g->x, g->y, a.width, a.height);
+	XFreeGC(d, gc);
+	XDestroyImage(i);
+}
+#endif /* USE_XPM */

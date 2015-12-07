@@ -16,11 +16,8 @@ find_client(Window w)
 	Client *c;
 
 	for(c = head_client; c && (w != c->parent) && (w != c->window)
-		/* This allows the info_window member, which is the 
-		 * titlebar parent, to match events.  Particularaly, 
-		 * it allows the titlebar to be used as a drag handle.  */
-#ifdef USE_TBAR
-		&& (w != c->info_window)
+#ifdef USE_TBAR /* Allow titlebar to receive events: */
+		&& (w != c->titlebar)
 #endif
 		; c = c->next)
 		/* empty */ ;
@@ -145,7 +142,7 @@ remove_client(Client * c)
 		XDeleteProperty(d, w, JA_VWM_STATE);
 	}
 #ifdef USE_TBAR
-	remove_info_window(c);
+	delete_titlebar(c);
 #endif /* USE_TBAR */
 	unparent_window(c);
 	relink_window_list(c);
@@ -226,7 +223,7 @@ set_shape(Client * c)
 	if(is_shaped(c))
 	{
 		XShapeCombineShape(jbwm.X.dpy, c->parent,
-			ShapeBounding, 0, TITLEBAR_HEIGHT, c->window, 
+			ShapeBounding, 0, TDIM, c->window, 
 			ShapeBounding, ShapeSet);
 	}
 }

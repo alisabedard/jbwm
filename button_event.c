@@ -34,7 +34,7 @@ shade_window(Client * c)
 	}
 	else
 	{
-		const ubyte h=TITLEBAR_HEIGHT+1;
+		const ubyte h=TDIM+1;
 
 		c->shade_height = c->geometry.height;
 		c->ignore_unmap++;
@@ -55,11 +55,11 @@ button1_event(XButtonEvent * e, Client * c)
 
 	XRaiseWindow(jbwm.X.dpy, c->parent);
 	/* Text for close button press.  */
-	if((x < JB_BUTTON_WIDTH) && (y < TITLEBAR_HEIGHT))
+	if((x < TDIM) && (y < TDIM))
 		send_wm_delete(c);
-	if(x > width - JB_RESIZE_DELTA)
+	if(x > width - TDIM)
 		sweep(c);	/* Resize the window.  */
-	else if(x > width - JB_SHADE_DELTA && y < TITLEBAR_HEIGHT)
+	else if(x > width - TDIM - TDIM && y < TDIM)
 		shade_window(c);
 	else
 		drag(c);	/* Move the window.  */

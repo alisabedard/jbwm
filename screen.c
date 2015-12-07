@@ -12,14 +12,14 @@ static inline void
 draw_outline(Client * c)
 {
 	const bool s=c->flags & JB_CLIENT_SHADED; 
-	const ubyte h=s?0:TITLEBAR_HEIGHT; 
+	const ubyte h=s?0:TDIM; 
 #ifdef USE_SHAPE
 	if(is_shaped(c))
 		return;
 #endif /* USE_SHAPE */
 #define CG c->geometry
 	XDrawRectangle(jbwm.X.dpy, c->screen->root, c->screen->gc, 
-		CG.x, CG.y-TITLEBAR_HEIGHT, CG.width, CG.height + h);
+		CG.x, CG.y-TDIM, CG.width, CG.height + h);
 }
 
 static void
@@ -97,7 +97,7 @@ sweep(Client * c)
 
 static inline void sborder(short *xy, const ubyte border)
 {
-	if(abs(*xy+border)<JBWM_SNAP_DISTANCE)
+	if(abs(*xy+border)<JBWM_SNAP)
 		*xy=-border;	
 }
 
@@ -142,7 +142,7 @@ snap_client(Client * c)
 	int dx, dy;
 	Client *ci;
 	XRectangle *g = &(c->geometry);
-#define S JBWM_SNAP_DISTANCE
+#define S JBWM_SNAP
 
 	snap_client_to_screen_border(c);
 	/* snap to other windows */
@@ -236,7 +236,7 @@ moveresize(Client * c)
 	XRectangle *g = &(c->geometry);
 	const ubyte b = c->border;
 #ifdef USE_TBAR
-	const ubyte tb = TITLEBAR_HEIGHT;
+	const ubyte tb = TDIM;
 	const unsigned int parent_height = g->height + tb;
 	const short y = g->y-b-tb;
 #else
@@ -264,7 +264,7 @@ moveresize(Client * c)
 #ifdef USE_TBAR
 	/* Only update the titlebar if the width has changed.  */
 	if(g->width != c->exposed_width)
-		update_info_window(c);
+		update_titlebar(c);
 #endif
 	/* Store width value for above test.  */
 	c->exposed_width = width;
@@ -291,9 +291,9 @@ maximize(Client * c)
 
 		memcpy(og, g, sizeof(XRectangle));
 		g->x = 0;
-		g->y=TITLEBAR_HEIGHT;
+		g->y=TDIM;
 		g->width = s->width;
-		g->height = s->height-TITLEBAR_HEIGHT;
+		g->height = s->height-TDIM;
 		c->flags |= JB_CLIENT_MAXIMIZED;
 	}
 	moveresize(c);

@@ -117,7 +117,7 @@ handle_property_change(XPropertyEvent * e)
 #ifdef USE_TBAR
 		case XA_WM_NAME:
 			LOG("XA_WM_NAME");
-			update_info_window(c);
+			update_titlebar(c);
 			break;
 #endif /* USE_TBAR */
 #ifdef DEBUG
@@ -162,8 +162,8 @@ handle_expose_event(XEvent * ev)
 		Window ev_win = ev->xexpose.window;
 		Client *c = find_client(ev_win);
 
-		if(c && (ev_win == c->info_window))
-			update_info_window(c);
+		if(c && (ev_win == c->titlebar))
+			update_titlebar(c);
 	}
 }
 #endif

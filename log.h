@@ -22,4 +22,6 @@
 #define MARK()
 #endif
 
+#define UNUSED(x)
+
 #endif /* JBWM__LOG_H__ */

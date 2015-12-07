@@ -1,6 +1,6 @@
 /*
  * jbwm - Restructuring, optimization, and feature fork
- *        Copyright 2007-2012, Jeffrey E. Bedard <jefbed@gmail.com>
+ *        Copyright 2007-2015, Jeffrey E. Bedard <jefbed@gmail.com>
  * evilwm - Minimalist Window Manager for X Copyright (C) 1999-2006 Ciaran
  * Anscomb <jbwm@6809.org.uk> see README for license and other details.
  */
@@ -20,13 +20,6 @@ initialize_JBWMEnvironment_keymasks(void)
 	jbwm.keymasks.numlock = LOCK_MASK;
 	jbwm.keymasks.grab = GRAB_MASK;
 	jbwm.keymasks.mod = MOD_MASK;
-}
-
-static void
-initialize_JBWMEnvironment(void)
-{
-	initialize_JBWMEnvironment_keymasks();
-	jbwm.titlebar.initialized = false;
 }
 
 Application *head_app = NULL;
@@ -168,12 +161,21 @@ parse_argv(int argc, char **argv)
 static void
 setup_fonts(void)
 {
+	Display *d;
+	
+	d = jbwm.X.dpy;
 #ifdef USE_XFT
-#define FONTOPEN(f) XftFontOpenName(jbwm.X.dpy, DefaultScreen(jbwm.X.dpy), f)
-#else /* !USE_XFT */
-#define FONTOPEN(f) XLoadQueryFont(jbwm.X.dpy, f)
-#endif /* USE_XFT */
-	jbwm.X.font=FONTOPEN(DEF_FONT);
+	{
+		const ubyte s = DefaultScreen(d);
+
+		//jbwm.X.font=XftFontOpenName(d, s, DEF_FONT);
+		jbwm.X.font=XftFontOpen(d, s, 
+			XFT_FAMILY, XftTypeString, DEF_FONT,
+			XFT_SIZE, XftTypeDouble, FONT_SIZE, NULL);
+	}
+#else
+	jbwm.X.font=XLoadQueryFont(d, DEF_FONT);
+#endif
 	if(!jbwm.X.font)
 		ERROR("bad font");
 }
@@ -208,59 +210,19 @@ setup_event_listeners(const ubyte i)
 		CWEventMask, &attr);
 }
 
-static void
+static inline void
 allocate_colors(const ubyte i)
 {
-	XColor dummy;
-	Display *d;
-	Colormap c;
-
-	d=jbwm.X.dpy;
-	c=DefaultColormap(d, i);
-	XAllocNamedColor(d, c, DEF_FG, &jbwm.X.screens[i].fg, &dummy);
-	XAllocNamedColor(d, c, DEF_FC, &jbwm.X.screens[i].fc, &dummy);
-	XAllocNamedColor(d, c, DEF_BG, &jbwm.X.screens[i].bg, &dummy);
+	jbwm.X.screens[i].fg=jbwm_color(DEF_FG);
+	jbwm.X.screens[i].bg=jbwm_color(DEF_BG);
+	jbwm.X.screens[i].fc=jbwm_color(DEF_FC);
 }
 
 static void
-setup_gc_parameters(XGCValues * gv, const ubyte i)
-{
-	allocate_colors(i);
-	gv->foreground = jbwm.X.screens[i].fg.pixel;
-	gv->background = jbwm.X.screens[i].bg.pixel;
-	/* set up GC parameters - same for each screen */
-	gv->function = GXinvert;
-	gv->subwindow_mode = IncludeInferiors;
-	gv->line_width = JBWM_BORDER_WIDTH;
-#ifdef USE_TBAR
-#ifndef USE_XFT
-	gv->font = jbwm.X.font->fid;
-#endif /* ! USE_XFT */
-#endif /* USE_TBAR */
-}
-
-static void
-setup_gc(const ubyte i)
-{
-	XGCValues gv;
-
-	setup_gc_parameters(&gv, i);
-	jbwm.X.screens[i].gc =
-		XCreateGC(jbwm.X.dpy, jbwm.X.screens[i].root,
-		GCFunction | GCSubwindowMode | GCLineWidth
-#ifndef USE_XFT
-		| GCFont
-#endif /* ! USE_XFT */
-		, &gv);
-}
-
-static void
-setup_each_client(int i, int j, Window * wins)
+setup_each_client(const ubyte i, const ubyte j, Window *wins)
 {
 	XWindowAttributes winattr;
 
-	if(!wins)
-		return;
 	XGetWindowAttributes(jbwm.X.dpy, wins[j], &winattr);
 	if(!winattr.override_redirect
 		&& winattr.map_state == IsViewable)
@@ -273,8 +235,9 @@ setup_clients(const ubyte i)
 	Window dw1, dw2, *wins;
 	unsigned int j, nwins;
 
-	XQueryTree(jbwm.X.dpy, jbwm.X.screens[i].root, &dw1, &dw2,
-		&wins, &nwins);
+	if(XQueryTree(jbwm.X.dpy, jbwm.X.screens[i].root, &dw1, &dw2,
+		&wins, &nwins)==0)
+		return;
 	for(j = 0; j < nwins; j++)
 		setup_each_client(i, j, wins);
 	XFree(wins);
@@ -291,7 +254,33 @@ setup_screen_elements(const ubyte i)
 }
 
 static void
-setup_display_per_screen(int i)
+setup_gc(const ubyte i)
+{
+	XGCValues gv;
+
+	allocate_colors(i);
+	gv.foreground = jbwm.X.screens[i].fg.pixel;
+	gv.background = jbwm.X.screens[i].bg.pixel;
+	/* set up GC parameters - same for each screen */
+	gv.function = GXinvert;
+	gv.subwindow_mode = IncludeInferiors;
+	gv.line_width = JBWM_BORDER;
+#ifdef USE_TBAR
+#ifndef USE_XFT
+	gv.font = jbwm.X.font->fid;
+#endif /* ! USE_XFT */
+#endif /* USE_TBAR */
+
+	jbwm.X.screens[i].gc = XCreateGC(jbwm.X.dpy, jbwm.X.screens[i].root,
+               GCFunction | GCSubwindowMode | GCLineWidth
+#ifndef USE_XFT
+               | GCFont
+#endif /* ! USE_XFT */
+               , &gv);
+}
+
+static void
+setup_display_per_screen(const ubyte i)
 {
 	setup_screen_elements(i);
 	setup_gc(i);
@@ -316,25 +305,26 @@ setup_shape(void)
 static void
 setup_screens(void)
 {
-	/* now set up each screen in turn */
-	jbwm.X.num_screens = ScreenCount(jbwm.X.dpy);
-	jbwm.X.screens = malloc(jbwm.X.num_screens * sizeof(ScreenInfo));
-	{
-		/* used in scanning windows (XQueryTree) */
-		ubyte i = jbwm.X.num_screens;
+	ubyte i;
 
-		while(i--)
-			setup_display_per_screen(i);
-	}
+	/* Now set up each screen in turn: jbwm.X.num_screens is used 
+	   in scanning windows (XQueryTree) */
+	i = jbwm.X.num_screens = ScreenCount(jbwm.X.dpy);
+	jbwm.X.screens = malloc(i * sizeof(ScreenInfo));
+	while(i--)
+		setup_display_per_screen(i);
 }
 
 static void
 setup_display(void)
 {
-	const char *dpy_env = getenv("DISPLAY");
-	if(!(jbwm.X.dpy = XOpenDisplay(dpy_env ? dpy_env : ":0")))
 	{
-		ERROR("bad DISPLAY");
+		const char *dpy_env = getenv("DISPLAY");
+
+		if(!(jbwm.X.dpy = XOpenDisplay(dpy_env ? dpy_env : ":0")))
+		{
+			ERROR("bad DISPLAY");
+		}
 	}
 	XSetErrorHandler(handle_xerror);
 #ifdef USE_TBAR
@@ -348,23 +338,20 @@ setup_display(void)
 	setup_screens();
 }
 
-int
-main(int argc
-#ifndef USE_ARGV
-	__attribute__ ((unused))
-#endif /* not USE_ARGV */
-	, char **argv
-#ifndef USE_ARGV
-	__attribute__ ((unused))
-#endif /* not USE_ARGV */
-	)
+int 
+main(
+#ifdef USE_ARGV
+	int argc, char **argv)
+#else
+	void)
+#endif
 {
-	initialize_JBWMEnvironment();
+	initialize_JBWMEnvironment_keymasks();
 #ifdef USE_ARGV
 	parse_argv(argc, argv);
 #endif /* USE_ARGV */
 	setup_display();
 	main_event_loop();
 
-	return 1;
+	return 0;
 }

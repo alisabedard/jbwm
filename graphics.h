@@ -1,26 +1,21 @@
 #ifndef JBWM_GRAPHICS_H
 #define JBWM_GRAPHICS_H
 
-#include "JBWMButton.h"
+GC
+jbwm_new_gc(XColor c);
 
-GC jbwm_new_gc_for_XColor(XColor color);
+XColor
+jbwm_color(const char *name);
 
-XColor jbwm_get_XColor(const ubyte r, const ubyte g, const ubyte b);
+void
+free_color(XColor c);
 
-/*GC
-jbwm_new_gc(const ubyte r, const ubyte g, const ubyte b);*/
+void
+draw(Window w, XRectangle *g, const char *color);
 
-#define jbwm_new_gc(r, g, b) jbwm_new_gc_for_XColor(jbwm_get_XColor(r, g, b))
-
-#ifdef USE_XBM
-#define jbwm_get_XImage_for_XBM(data, width, height)\
-	XCreateImage(jbwm.X.dpy, (Visual *) CopyFromParent, 1, XYBitmap,\
-			0, (char *) data, width, height, 8, 0)
-#endif /* USE_XBM */
-
-#ifdef USE_GRADIENT
-void draw_gradient(Window win, GC gc, const int x, const int y,
-	const unsigned int w, const unsigned int h);
-#endif /* USE_GRADIENT */
+#ifdef USE_XPM
+void
+draw_xpm(Window w, XRectangle *g, char **xpm);
+#endif /* USE_XPM */
 
 #endif /* JBWM_GRAPHICS_H */

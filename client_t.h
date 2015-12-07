@@ -47,7 +47,7 @@ struct Client
 	Client *next;
 
 #ifdef USE_TBAR
-	Window info_window;
+	Window titlebar;
 #endif
 	Window close_button;
 	Window resize_handle_right;

@@ -28,7 +28,6 @@ struct JBWMEnvironment
 		int shape_event;
 #endif				/* USE_SHAPE */
 	} X;
-	JBWMTitlebarData titlebar;
 	ubyte need_cleanup;
 };
 

@@ -1,47 +1,25 @@
+/* jbwm, Copyright 2015 Jeffrey E. Bedard */
 #ifndef JBWM_TITLEBAR_H
 #define JBWM_TITLEBAR_H
 
 #include "graphics.h"
 
-typedef struct _JBWMTitlebarData
-{
-	Bool initialized;
+void 
+update_titlebar(Client * c);
 
-	struct
-	{
-		JBWMButton *close, *resize, *handle, *shade;
-	} buttons;
+void 
+delete_titlebar(Client * c);
 
-#ifdef USE_XFT
-	struct
-	{
-		XftDraw *draw;
-		XftColor fg;
-	} xft;
-#endif				/* USE_XFT */
-#ifdef USE_XPM
-	XImage *close, *resize, *close_inactive, *handle, *shade;
-#endif				/* USE_XPM */
-} JBWMTitlebarData;
-
-void JBWMTitlebarData_delete(JBWMTitlebarData * titlebar);
-
-void jbwm_JBWMTitlebarData_init(JBWMTitlebarData * titlebar);
-
-void update_info_window(Client * c);
-
-void remove_info_window(Client * c);
-
-void jbwm_draw_close_button(Client * c);
-
-#define JB_BUTTON_WIDTH TITLEBAR_HEIGHT
-#define JB_BUTTON_HEIGHT TITLEBAR_HEIGHT
-#ifdef USE_XPM
-#define JB_RESIZE_BUTTON_WIDTH 24
-#else
-#define JB_RESIZE_BUTTON_WIDTH JB_BUTTON_WIDTH
+/* Ensure that the title text fits within the titlebar.  */
+#ifdef USE_TBAR
+//#define TDIM (jbwm.X.font->ascent+jbwm.X.font->descent-JBWM_BORDER)
+#define TDIM 16
+#else /* !USE_TBAR */
+#define TDIM 8
 #endif
-#define JB_RESIZE_DELTA (JB_RESIZE_BUTTON_WIDTH+JBWM_BORDER_WIDTH)
-#define JB_SHADE_DELTA (JB_RESIZE_DELTA+JB_BUTTON_WIDTH+JBWM_BORDER_WIDTH)
+#ifdef USE_XPM
+#undef TDIM
+#define TDIM 24
+#endif
 
 #endif /* JBWM_TITLEBAR_H */

@@ -1,7 +1,8 @@
 #CC = clang
-CFLAGS+=-Os
+#CFLAGS+=-Os
+CFLAGS=-Os -W -Wall
 #CFLAGS=-Os -W -Wall -Werror
-#CFLAGS+=-ggdb -DDEBUG
+#CFLAGS+=-O0 -ggdb -DDEBUG
 # profiling flag.
 #CFLAGS = -pg -O0 -W -Wall -Werror
 
@@ -27,16 +28,10 @@ DEFINES  = $(EXTRA_DEFINES)
 
 # Configure jbwm by editing the following DEFINES lines.  You can also
 # add options by setting EXTRA_DEFINES on the make(1) command line,
-# e.g., make EXTRA_DEFINfES="-DDEBUG".
+# e.g., make EXTRA_DEFINES="-DDEBUG".
 
-#CFLAGS += -Wall -W -pedantic -std=c89
-CFLAGS += -std=c99
-# Optimization:
-#CFLAGS += -Os -ffast-math -fomit-frame-pointer 
-# Machine-specific:
-#CFLAGS += -mfpmath=both -mpc64 -floop-parallelize-all
-# Debugging:
-#CFLAGS = -ggdb -pg
+# Uncomment to debug and profile
+#CFLAGS = -O0 -ggdb -pg
 #DEFINES += -DDEBUG
 
 # Uncomment to enable SHAPE extension support
@@ -47,15 +42,13 @@ CFLAGS += -std=c99
 #DEFINES += -DUSE_XPM
 #LIBS	+= -lXpm
 
-# Titlebar gradient support: WIP!
-# DEFINES += -DUSE_GRADIENT
-
 # Titlebar Xft support:
 # Warning, Xft impedes performance and leaks memory.
-#DEFINES += -DUSE_XFT
-#LIBS += -lXft
-#INCLUDES += `pkg-config --cflags xft`
-# Not necessary except on old NetBSD:
+DEFINES += -DUSE_XFT
+LIBS += -lXft
+INCLUDES += `pkg-config --cflags xft`
+
+# Not necessary except on old NetBSD, for Xft support:
 #INCLUDES += -I/usr/pkg/include/freetype2 -I/usr/X11R6/include/freetype2
 
 # Uncomment to enable colormap support
@@ -68,10 +61,13 @@ CFLAGS += -std=c99
 
 # Uncomment to enable titlebars
 DEFINES += -DUSE_TBAR
-SRCS += titlebar.c
+SRCS += titlebar.c 
+
+# Uncomment to use a colored titlebar theme (no size difference):
+# DEFINES += -DUSE_COLORS
 
 # Uncomment to enable window snapping.
-#DEFINES += -DUSE_SNAP
+# DEFINES += -DUSE_SNAP
 
 # ----- You shouldn't need to change anything under this line ------ #
 
@@ -87,7 +83,8 @@ LDFLAGS += $(LDPATH) $(LIBS)
 #LDFLAGS += -static 
 
 HEADERS  = jbwm.h log.h
-SRCS += client.c events.c jbwm.c misc.c new.c screen.c JBWMButton.c
+#SRCS += client.c events.c jbwm.c misc.c new.c screen.c JBWMButton.c
+SRCS += client.c events.c jbwm.c misc.c new.c screen.c 
 SRCS += graphics.c key_event.c button_event.c keymap.c
 OBJS     = $(SRCS:.c=.o)
 
@@ -114,8 +111,11 @@ jbwm: $(OBJS)
 INSTALL=install -c
 INSTALL_PROG=$(INSTALL) -s
 INSTALL_DIR=install -d
+strip: jbwm
+	strip --strip-all --remove-section=.comment \
+		--remove-section=.note jbwm
 
-install: jbwm
+install: strip
 	if [ -f jbwm.exe ]; then mv jbwm.exe jbwm; fi
 	$(INSTALL_DIR) $(prefix)/bin $(prefix)/share/man/man1
 	$(INSTALL_PROG) jbwm $(prefix)/bin
