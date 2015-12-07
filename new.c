@@ -224,7 +224,7 @@ reparent(Client * c)
 	const XRectangle *g = &(c->geometry);
 	const ubyte b = c->border;
 	const int x = g->x - b;
-	const int y = g->y - b; //- y_mod;
+	const int y = g->y - b; 
 	const Window w = c->window;
 
 	if(!c->screen)

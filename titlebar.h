@@ -12,8 +12,7 @@ delete_titlebar(Client * c);
 
 /* Ensure that the title text fits within the titlebar.  */
 #ifdef USE_TBAR
-//#define TDIM (jbwm.X.font->ascent+jbwm.X.font->descent-JBWM_BORDER)
-#define TDIM 16
+#define TDIM (jbwm.X.font->ascent+jbwm.X.font->descent)
 #else /* !USE_TBAR */
 #define TDIM 8
 #endif

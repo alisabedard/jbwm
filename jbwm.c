@@ -168,7 +168,6 @@ setup_fonts(void)
 	{
 		const ubyte s = DefaultScreen(d);
 
-		//jbwm.X.font=XftFontOpenName(d, s, DEF_FONT);
 		jbwm.X.font=XftFontOpen(d, s, 
 			XFT_FAMILY, XftTypeString, DEF_FONT,
 			XFT_SIZE, XftTypeDouble, FONT_SIZE, NULL);

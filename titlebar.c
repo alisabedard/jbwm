@@ -37,15 +37,10 @@ draw_title(Client * c, char *name)
 {
 	const size_t name_length = name ? strlen(name) : 0;
 	const int x = TDIM + 8;
-#ifdef USE_XPM
+#ifdef USE_XPm
 	const int y = 2*TDIM/3;
 #else /* USE_XPM */
-#ifdef USE_XFT
 	const int y = jbwm.X.font->ascent-JBWM_BORDER;
-#else /* !USE_XFT */
-
-	const int y = jbwm.X.font->ascent+JBWM_BORDER;
-#endif /* USE_XFT */
 #endif
 	Display *d;
 	Window w;
