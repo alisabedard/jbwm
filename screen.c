@@ -13,19 +13,21 @@ draw_outline(Client * c)
 {
 	const bool s=c->flags & JB_CLIENT_SHADED; 
 	const ubyte h=s?0:TDIM; 
+	XRectangle *g;
+
 #ifdef USE_SHAPE
 	if(is_shaped(c))
 		return;
 #endif /* USE_SHAPE */
-#define CG c->geometry
-	XDrawRectangle(jbwm.X.dpy, c->screen->root, c->screen->gc, 
-		CG.x, CG.y-TDIM, CG.width, CG.height + h);
+	g=&(c->geometry);
+	XDrawRectangle(jbwm.X.dpy, c->screen->root, c->screen->gc, g->x, 
+		g->y-TDIM, g->width, g->height + h);
 }
 
 static void
 recalculate_size(Client * c, Position p1, Position p2)
 {
-	XRectangle *g = &(CG);
+	XRectangle *g = &(c->geometry);
 
 	g->width = abs(p1.x - p2.x);
 	g->height = abs(p1.y - p2.y);
@@ -35,8 +37,8 @@ static void
 recalculate_sweep(Client * c, Position p1, Position p2)
 {
 	recalculate_size(c, p1, p2);
-	CG.x = p1.x;
-	CG.y = p1.y;
+	c->geometry.x = p1.x;
+	c->geometry.y = p1.y;
 
 	SET_CLIENT_CE(c);
 }

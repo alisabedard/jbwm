@@ -181,17 +181,10 @@ setup_fonts(void)
 #endif /* USE_TBAR */
 
 void
-jbwm_grab_button(Window w, unsigned int mask, unsigned int button)
+jbwm_grab_button(Window w, unsigned int mask, unsigned int btn)
 {
-	do
-	{
-#define GRAB(mod) XGrabButton(jbwm.X.dpy, button, mask | mod, w, false,\
-	ButtonMask, GrabModeAsync, GrabModeSync, None, None)
-		GRAB(0);
-		GRAB(LockMask);
-		GRAB(Mod2Mask);	/* Grab for ALT in client window */
-	}
-	while(0);
+	XGrabButton(jbwm.X.dpy, btn, mask, w, false, ButtonMask, 
+		GrabModeAsync, GrabModeSync, None, None);
 }
 
 static void
