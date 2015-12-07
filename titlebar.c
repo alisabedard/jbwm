@@ -101,6 +101,7 @@ draw_titlebar(Client * c, char *name)
 	const unsigned short shade_offset = resize_offset - TDIM;
 	XRectangle g;
 
+	XClearWindow(jbwm.X.dpy, c->titlebar);
 #ifndef USE_XPM
 	g.x=g.y=0;
 	g.width=g.height=TDIM;
