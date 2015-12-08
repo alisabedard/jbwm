@@ -5,11 +5,33 @@
 
 #include "jbwm.h"
 
+void
+configure(Client *c)
+{
+	XConfigureEvent *e;
+	XRectangle *g;
+
+	e=&(c->ce);
+	e->event=c->window;
+	g=&(c->geometry);
+	e->x=g->x;
+	e->y=g->y;
+	e->width=g->width;
+	e->height=g->height;
+}
+
+void
+send_configure(Client *c)
+{
+	configure(c);
+	XSendEvent(jbwm.X.dpy, c->window, false, StructureNotifyMask,
+		(XEvent *)&(c->ce));
+}
+
 /*
  * used all over the place.  return the client that has specified window as
  * either window or parent
  */
-
 Client *
 find_client(Window w)
 {
@@ -50,13 +72,6 @@ initialize_client_ce(Client * c)
 	c->ce.above = None;
 	c->ce.override_redirect = false;
 	c->ce.window = c->window;
-}
-
-void
-send_config(Client * c)
-{
-	SET_CLIENT_CE(c);
-	SEND_CONFIG(c);
 }
 
 void

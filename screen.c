@@ -11,20 +11,21 @@
 static inline void
 draw_outline(Client * c)
 {
-	const bool s=c->flags & JB_CLIENT_SHADED; 
-	const ubyte h=s?0:TDIM; 
+	const bool shaded=c->flags & JB_CLIENT_SHADED; 
 	XRectangle *g;
+	ScreenInfo *scr;
 
 #ifdef USE_SHAPE
 	if(is_shaped(c))
 		return;
 #endif /* USE_SHAPE */
 	g=&(c->geometry);
-	XDrawRectangle(jbwm.X.dpy, c->screen->root, c->screen->gc, g->x, 
-		g->y-TDIM, g->width, g->height + h);
+	scr=c->screen;
+	XDrawRectangle(jbwm.X.dpy, scr->root, scr->gc, g->x, g->y-TDIM, 
+		g->width, g->height + (shaded?0:TDIM));
 }
 
-static void
+static inline void
 recalculate_size(Client * c, Position p1, Position p2)
 {
 	XRectangle *g = &(c->geometry);
@@ -33,14 +34,13 @@ recalculate_size(Client * c, Position p1, Position p2)
 	g->height = abs(p1.y - p2.y);
 }
 
-static void
+static inline void
 recalculate_sweep(Client * c, Position p1, Position p2)
 {
 	recalculate_size(c, p1, p2);
 	c->geometry.x = p1.x;
 	c->geometry.y = p1.y;
-
-	SET_CLIENT_CE(c);
+	configure(c);
 }
 
 static inline bool
@@ -50,7 +50,7 @@ grab_pointer(Window w, int mask, Cursor cursor)
 		GrabModeAsync, None, cursor, CurrentTime) == GrabSuccess;
 }
 
-static void
+static inline void
 handle_motion_notify(Client * c, XRectangle * g, XMotionEvent * mev)
 {
 	Position p1, p2;
@@ -71,13 +71,12 @@ sweep(Client * c)
 	XRectangle *g;
 
 	/* Resizing shaded windows yields undefined behavior.  */
-	if(c->flags & JB_CLIENT_SHADED)
+	if(!grab_pointer(c->screen->root, MouseMask, jbwm.X.cursor) 
+		|| c->flags & JB_CLIENT_SHADED)
+	{
 		return;
-
+	}
 	g = &(c->geometry);
-
-	if(!grab_pointer(c->screen->root, MouseMask, jbwm.X.cursor))
-		return;
 	setmouse(c->window, g->width, g->height);
 	for(;;)
 	{
@@ -119,7 +118,8 @@ snap_client_to_screen_border(Client * c)
 	sborder(&g->y, g->height + b - dh);
 }
 
-static inline int absmin(const int a, const int b)
+static inline int 
+absmin(const int a, const int b)
 {
 	return abs(a)<abs(b)?a:b;
 }
@@ -181,17 +181,20 @@ static inline void
 drag_motion(Client * c, XEvent ev, int x1, int y1, int old_cx,
 	int old_cy)
 {
+	XRectangle *g;
+
 	draw_outline(c);	/* clear */
-	c->geometry.x = old_cx + (ev.xmotion.x - x1);
-	c->geometry.y = old_cy + (ev.xmotion.y - y1);
-	SET_CLIENT_CE(c);
+	g=&(c->geometry);
+	g->x = old_cx + (ev.xmotion.x - x1);
+	g->y = old_cy + (ev.xmotion.y - y1);
+	configure(c);
 #ifdef USE_SNAP
 	snap_client(c);
 #endif /* USE_SNAP */
 	draw_outline(c);
 }
 
-static void
+static inline void
 drag_button_release(Client * c)
 {
 	XUngrabPointer(jbwm.X.dpy, CurrentTime);
@@ -222,12 +225,14 @@ drag(Client * c)
 {
 	Position p, old_p;
 	Window root;
+	XRectangle *g;
 
 	root = c->screen->root;
 	if(!grab_pointer(root, MouseMask, jbwm.X.cursor))
 		return;
-	old_p.x = c->geometry.x;
-	old_p.y = c->geometry.y;
+	g=&(c->geometry);
+	old_p.x = g->x;
+	old_p.y = g->y;
 	get_mouse_position((int *)&(p.x), (int *)&(p.y), root);
 	drag_event_loop(c, p.x, p.y, old_p.x, old_p.y);
 }
@@ -238,9 +243,8 @@ moveresize(Client * c)
 	XRectangle *g = &(c->geometry);
 	const ubyte b = c->border;
 #ifdef USE_TBAR
-	const ubyte tb = TDIM;
-	const unsigned int parent_height = g->height + tb;
-	const short y = g->y-b-tb;
+	const unsigned int parent_height = g->height + TDIM;
+	const short y = g->y-b-TDIM;
 #else
 	const unsigned int parent_height = g->height;
 	const short y = g->y-b;
@@ -258,11 +262,9 @@ moveresize(Client * c)
 	/* Offset the child window within the parent window
 		to display titlebar */
 #ifdef USE_TBAR
-	XMoveResizeWindow(jbwm.X.dpy, c->window, 0, tb, width, 
-		g->height);
+	XMoveResizeWindow(jbwm.X.dpy, c->window, 0, TDIM, width, g->height);
 #endif
-
-	send_config(c);
+	send_configure(c);
 #ifdef USE_TBAR
 	/* Only update the titlebar if the width has changed.  */
 	if(g->width != c->exposed_width)

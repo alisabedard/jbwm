@@ -90,7 +90,7 @@ set_size(Client * c, const unsigned int width,
 {
 	c->geometry.width = width;
 	c->geometry.height = height;
-	send_config(c);
+	send_configure(c);
 }
 
 static void
@@ -111,7 +111,7 @@ set_position(Client * c, const int x, const int y)
 {
 	c->geometry.x = x;
 	c->geometry.y = y;
-	send_config(c);
+	send_configure(c);
 }
 
 static void
