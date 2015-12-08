@@ -8,8 +8,6 @@
 #include <stdio.h>
 #include "jbwm.h"
 
-#define MAXIMUM_PROPERTY_LENGTH 4096
-
 static void init_geometry(Client * c);
 static void reparent(Client * c);
 
@@ -18,7 +16,6 @@ initialize_client_fields(Client * c, ScreenInfo * s, Window w)
 {
 	c->next = head_client;
 	head_client = c;
-
 	c->screen = s;
 	c->window = w;
 	c->window_type = None;
@@ -43,8 +40,8 @@ make_new_client(Window w, ScreenInfo * s)
 	Client *c=Client_new(w, s);
 	if(c->flags & JB_CLIENT_DONT_MANAGE)
 		return;
-	XSelectInput(jbwm.X.dpy, c->window, EnterWindowMask | PropertyChangeMask
-		| ColormapChangeMask);
+	XSelectInput(jbwm.X.dpy, c->window, EnterWindowMask 
+		| PropertyChangeMask | ColormapChangeMask);
 #ifdef USE_SHAPE
 	set_shape(c);
 #endif /* USE_SHAPE */
@@ -53,40 +50,51 @@ make_new_client(Window w, ScreenInfo * s)
 	jbwm_grab_button(w, jbwm.keymasks.grab, AnyButton);
 }
 
-/*
- * Calls XGetWindowAttributes, XGetWMHints and XGetWMNormalHints to determine
- * window's initial geometry.
- * 
- * XGetWindowAttributes
- */
+static void *
+jbwm_get_property(Window w, Atom property, Atom req_type,
+	unsigned long *nitems_return)
+{
+	Atom actual_type;
+	int actual_format;
+	unsigned long bytes_after;
+	unsigned char *prop;
+
+	if(XGetWindowProperty(jbwm.X.dpy, w, property, 0L, 1024, false, 
+		req_type, &actual_type, &actual_format, nitems_return, 
+		&bytes_after, &prop) == Success)
+	{
+		if(actual_type == req_type)
+			return (void *)prop;
+		else
+			XFree(prop);
+	}
+	return NULL;
+}
 
 static unsigned long
 handle_mwm_hints(Client * c)
 {
-	PropMwmHints *mprop;
+	PropMwmHints *m;
 	unsigned long nitems;
 	const Atom mwm_hints = GETATOM("_XA_MWM_HINTS");
 
-	if((mprop =
-		jbwm_get_property(c->window, mwm_hints, mwm_hints,
-		&nitems)))
+	if((m=jbwm_get_property(c->window, mwm_hints, mwm_hints, &nitems)))
 	{
-		if(nitems >= PROP_MWM_HINTS_ELEMENTS
-			&& (mprop->flags & MWM_HINTS_DECORATIONS)
-			&& !(mprop->decorations & MWM_DECOR_ALL)
-			&& !(mprop->decorations & MWM_DECOR_BORDER))
+		if(nitems >= PROP_MWM_HINTS_ELEMENTS 
+			&& (m->flags & MWM_HINTS_DECORATIONS)
+			&& !(m->decorations & MWM_DECOR_ALL)
+			&& !(m->decorations & MWM_DECOR_BORDER))
 		{
 			c->border = 0;
 		}
-		XFree(mprop);
+		XFree(m);
 	}
 
 	return nitems;
 }
 
 static void
-set_size(Client * c, const unsigned int width,
-	const unsigned int height)
+set_size(Client * c, const unsigned int width, const unsigned int height)
 {
 	c->geometry.width = width;
 	c->geometry.height = height;
@@ -173,8 +181,12 @@ init_atom_properties(Client * c, unsigned long *nitems)
 		unsigned long i;
 
 		for(i = 0; i < *nitems; i++)
+		{
 			if(aprop[i] == GETATOM("_NET_WM_STATE_STICKY"))
+			{
 				add_sticky(c);
+			}
+		}
 		XFree(aprop);
 	}
 }
@@ -185,7 +197,9 @@ init_geometry_properties(Client * c)
 	unsigned long nitems;
 	nitems = handle_mwm_hints(c);
 	if(!c->screen)
+	{
 		return;
+	}
 	c->vdesk = c->screen->vdesk;
 	init_long_properties(c, &nitems);
 	remove_sticky(c);
@@ -197,6 +211,7 @@ static void
 init_geometry(Client * c)
 {
 	XWindowAttributes attr;
+	long dummy;
 
 	initialize_client_ce(c);
 	init_geometry_properties(c);
@@ -205,7 +220,7 @@ init_geometry(Client * c)
 #ifdef USE_CMAP
 	c->cmap = attr.colormap;
 #endif /* USE_CMAP */
-	get_wm_normal_hints(c);
+	XGetWMNormalHints(jbwm.X.dpy, c->window, &(c->size), &dummy);
 	init_geometry_size(c, &attr);
 	init_geometry_position(c, &attr);
 	/* Test if the reparent that is to come 
@@ -217,65 +232,40 @@ init_geometry(Client * c)
 static void
 reparent(Client * c)
 {
-	XSetWindowAttributes p_attr;
-	unsigned long valuemask =
-		CWOverrideRedirect | CWBorderPixel | CWBackPixel |
-		CWEventMask;
 	const XRectangle *g = &(c->geometry);
 	const ubyte b = c->border;
 	const int x = g->x - b;
 	const int y = g->y - b; 
 	const Window w = c->window;
+	const unsigned long valuemask = CWOverrideRedirect | CWBorderPixel 
+#ifdef USE_SHAPE
+		| CWBackPixel | CWEventMask;
+#else
+		| CWBackPixel | CWEventMask | CWBackPixel;
+#endif /* USE_SHAPE */
+	const int s=c->screen->screen;
+	XSetWindowAttributes p_attr;
+	Display *d;
 
 	if(!c->screen)
 		return;
+	d=jbwm.X.dpy;
 #ifndef USE_SHAPE
-	p_attr.background_pixel = BlackPixel(jbwm.X.dpy, c->screen->screen);
-	valuemask |= CWBackPixel;
+	p_attr.background_pixel = BlackPixel(d, s);
 #endif /* !USE_SHAPE */
 	p_attr.border_pixel = c->screen->bg.pixel;
 	p_attr.override_redirect = true;
 	p_attr.event_mask = ChildMask | ButtonPressMask | EnterWindowMask;
-	c->parent = XCreateWindow(jbwm.X.dpy, c->screen->root, x, y, 
-		g->width, g->height, b, DefaultDepth(jbwm.X.dpy, 
-		c->screen->screen), CopyFromParent, DefaultVisual(jbwm.X.dpy,
-		c->screen->screen), valuemask, &p_attr);
-	XAddToSaveSet(jbwm.X.dpy, w);
-	XSetWindowBorderWidth(jbwm.X.dpy, w, 0);
+	c->parent = XCreateWindow(d, c->screen->root, x, y, g->width, 
+		g->height, b, DefaultDepth(d, s), CopyFromParent, 
+		DefaultVisual(d, s), valuemask, &p_attr);
+	XAddToSaveSet(d, w);
+	XSetWindowBorderWidth(d, w, 0);
 #ifdef USE_TBAR
 	if(!(c->flags & JB_CLIENT_NO_TB))
 		update_titlebar(c);
 #endif
-	XReparentWindow(jbwm.X.dpy, w, c->parent, 0, 0);
-	XMapWindow(jbwm.X.dpy, w);
+	XReparentWindow(d, w, c->parent, 0, 0);
+	XMapWindow(d, w);
 }
 
-/* Get WM_NORMAL_HINTS property */
-void
-get_wm_normal_hints(Client * c)
-{
-	long dummy;
-	XGetWMNormalHints(jbwm.X.dpy, c->window, &(c->size), &dummy);
-}
-
-void *
-jbwm_get_property(Window w, Atom property, Atom req_type,
-	unsigned long *nitems_return)
-{
-	Atom actual_type;
-	int actual_format;
-	unsigned long bytes_after;
-	unsigned char *prop;
-
-	if(XGetWindowProperty(jbwm.X.dpy, w, property, 0L,
-		MAXIMUM_PROPERTY_LENGTH / 4, false, req_type,
-		&actual_type, &actual_format, nitems_return,
-		&bytes_after, &prop) == Success)
-	{
-		if(actual_type == req_type)
-			return (void *)prop;
-		else
-			XFree(prop);
-	}
-	return NULL;
-}

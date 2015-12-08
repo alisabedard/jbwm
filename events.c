@@ -112,7 +112,11 @@ handle_property_change(XPropertyEvent * e)
 		{
 		case XA_WM_NORMAL_HINTS:
 			LOG("XA_WM_NORMAL_HINTS");
-			get_wm_normal_hints(c);
+			{
+				long dummy;
+				XGetWMNormalHints(jbwm.X.dpy, c->window, 
+					&(c->size), &dummy);
+			}
 			break;
 #ifdef USE_TBAR
 		case XA_WM_NAME:
