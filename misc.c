@@ -18,7 +18,7 @@ handle_xerror(Display * dpy, XErrorEvent * e)
 	{
 	case BadAccess:
 		if(e->request_code == X_ChangeWindowAttributes)
-			ERROR("root window unavailable");
+			ERROR("RootWindowTaken");
 		break;
 	case BadColor:
 		LOG("BadColor");
@@ -39,8 +39,8 @@ handle_xerror(Display * dpy, XErrorEvent * e)
 		LOG("Error # %d\n", e->error_code);
 		if((c = find_client(e->resourceid)))
 		{
-			/* This is used for nonmanaged windows 
-			 * that are not mapped with OverrideRedirect 
+			/* This is used for nonmanaged windows,
+			 * that are not mapped, with OverrideRedirect 
 			 * being set.  This is for wm-spec conformance.  */
 			if(c->flags & JB_CLIENT_DONT_MANAGE)
 			{

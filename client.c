@@ -114,6 +114,7 @@ fix_client(Client * c)
 static inline void
 relink_window_list(Client * c)
 {
+	LOG("relink_window_list()");
 	if(head_client == c)
 		head_client = c->next;
 	else
@@ -134,6 +135,7 @@ relink_window_list(Client * c)
 static void
 unparent_window(Client * c)
 {
+	LOG("unparent_window()");
 	XReparentWindow(jbwm.X.dpy, c->window, c->screen->root,
 		c->geometry.x, c->geometry.y);
 	XRemoveFromSaveSet(jbwm.X.dpy, c->window);
@@ -180,6 +182,7 @@ xmsg(Window w, Atom a, long x)
 	ev.xclient.data.l[0] = x;
 	ev.xclient.data.l[1] = CurrentTime;
 
+	LOG("xmsg()");
 	return XSendEvent(jbwm.X.dpy, w, false, NoEventMask, &ev);
 }
 
@@ -207,6 +210,7 @@ send_wm_delete(Client * c)
 	else
 		XKillClient(jbwm.X.dpy, c->window);
 #endif
+	LOG("send_wm_delete()");
 	xmsg(c->window, GETATOM("WM_PROTOCOLS"),
 		GETATOM("WM_DELETE_WINDOW"));
 }

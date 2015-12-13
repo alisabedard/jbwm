@@ -1,4 +1,4 @@
-/* Copyright 2008, Jeffrey Bedard <antiright@gmail.com> */
+/* Copyright 2008-2015, Jeffrey Bedard <antiright@gmail.com> */
 
 /* jbwm - Minimalist Window Manager for X
  * Copyright (C) 1999-2006 Ciaran Anscomb <jbwm@6809.org.uk>
@@ -9,13 +9,11 @@
 static void
 move_client_with_vdesk(Client * c, Bool next)
 {
-	ScreenInfo *current_screen = current->screen;
-	const int target_vdesk =
-		(current_screen->vdesk + next) ? 1 : -1;
+	const int target_vdesk = (current->screen->vdesk + next) ? 1 : -1;
 
 	if(next ? (target_vdesk < 10) : (target_vdesk >= 0))
 	{
-		switch_vdesk(current_screen, c->vdesk = target_vdesk);
+		switch_vdesk(current->screen, c->vdesk = target_vdesk);
 		XRaiseWindow(jbwm.X.dpy, c->window);
 	}
 }

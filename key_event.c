@@ -130,7 +130,14 @@ jbwm_handle_key_event(XKeyEvent * e)
 	switch (key)
 	{
 	case KEY_NEW:
-		system(TERMINAL_CMD);
+		{
+			const int r=system(TERMINAL_CMD);
+
+			if(WIFEXITED(r) && WEXITSTATUS(r))
+			{
+				ERROR(TERMINAL_CMD);
+			}
+		}
 		break;
 	case KEY_QUIT:
 		exit(0);
