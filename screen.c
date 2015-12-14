@@ -78,7 +78,8 @@ sweep(Client * c)
 		return;
 	}
 	g = &(c->geometry);
-	setmouse(c->window, g->width, g->height);
+	XWarpPointer(jbwm.X.dpy, None, c->window, 0, 0, 0, 0, 
+		g->width, g->height);
 sweep_loop:	
 	XMaskEvent(jbwm.X.dpy, MouseMask, &ev);
 	switch (ev.type)
@@ -231,12 +232,6 @@ get_mouse_position(Window w, int *x, int *y)
 }
 
 void
-setmouse(Window w, const int x, const int y)
-{
-	XWarpPointer(jbwm.X.dpy, None, w, 0, 0, 0, 0, x, y);
-}
-
-void
 drag(Client * c)
 {
 	Window root=c->screen->root;
@@ -248,7 +243,7 @@ drag(Client * c)
 	g=&(c->geometry);
 	old_p.x = g->x;
 	old_p.y = g->y;
-	get_mouse_position(root, (int *)&(p.x), (int *)&(p.y));
+	get_mouse_position(root, &(p.x), &(p.y));
 	drag_event_loop(c, p.x, p.y, old_p.x, old_p.y);
 }
 

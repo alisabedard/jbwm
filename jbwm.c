@@ -285,7 +285,7 @@ setup_display_per_screen(const ubyte i)
 static void
 setup_shape(void)
 {
-	int e_dummy;
+	int __attribute__((unused)) e_dummy;
 
 	jbwm.X.have_shape =
 		XShapeQueryExtension(jbwm.X.dpy, &jbwm.X.shape_event,

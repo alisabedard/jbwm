@@ -116,7 +116,9 @@ relink_window_list(Client * c)
 {
 	LOG("relink_window_list()");
 	if(head_client == c)
+	{
 		head_client = c->next;
+	}
 	else
 	{
 		Client *p;
@@ -135,10 +137,12 @@ relink_window_list(Client * c)
 static void
 unparent_window(Client * c)
 {
+	const Window w=c->window;
+
 	LOG("unparent_window()");
-	XReparentWindow(jbwm.X.dpy, c->window, c->screen->root,
-		c->geometry.x, c->geometry.y);
-	XRemoveFromSaveSet(jbwm.X.dpy, c->window);
+	XReparentWindow(jbwm.X.dpy, w, c->screen->root, c->geometry.x, 
+		c->geometry.y);
+	XRemoveFromSaveSet(jbwm.X.dpy, w);
 	if(c->parent)
 		XDestroyWindow(jbwm.X.dpy, c->parent);
 }
@@ -170,7 +174,7 @@ remove_client(Client * c)
 	XSync(d, false);
 }
 
-static int
+static void
 xmsg(Window w, Atom a, long x)
 {
 	XEvent ev;
@@ -183,33 +187,12 @@ xmsg(Window w, Atom a, long x)
 	ev.xclient.data.l[1] = CurrentTime;
 
 	LOG("xmsg()");
-	return XSendEvent(jbwm.X.dpy, w, false, NoEventMask, &ev);
+	XSendEvent(jbwm.X.dpy, w, false, NoEventMask, &ev);
 }
 
 void
 send_wm_delete(Client * c)
 {
-#if 0
-	int i, n;
-	bool found;
-	Atom *protocols;
-	
-	found=false;
-	/* This behavior is specified by ICCM.  */
-	if(XGetWMProtocols(jbwm.X.dpy, c->window, &protocols, &n))
-	{
-		for(i=0; i<n; i++)
-		{
-			found=(protocols[i] == JA_WM_DELETE);
-		}
-		XFree(protocols);
-	}
-	if(found)
-		xmsg(c->window, GETATOM("WM_PROTOCOLS"),
-			GETATOM("WM_DELETE_WINDOW"));
-	else
-		XKillClient(jbwm.X.dpy, c->window);
-#endif
 	LOG("send_wm_delete()");
 	xmsg(c->window, GETATOM("WM_PROTOCOLS"),
 		GETATOM("WM_DELETE_WINDOW"));

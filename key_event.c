@@ -6,11 +6,20 @@
 #include "jbwm.h"
 
 static void
+point(Client *c, const int x, const int y)
+{
+	Display *d;
+
+	d=jbwm.X.dpy;
+	XRaiseWindow(d, c->parent);
+	XWarpPointer(d, None, c->window, 0, 0, 0, 0, x, y);
+}
+
+static void
 key_moveresize(Client * c)
 {
 	moveresize(c);
-	XRaiseWindow(jbwm.X.dpy, c->parent);
-	setmouse(c->window, JBWM_RESIZE_INCREMENT, JBWM_RESIZE_INCREMENT);
+	point(c, JBWM_RESIZE_INCREMENT, JBWM_RESIZE_INCREMENT);
 }
 
 static void
@@ -95,28 +104,26 @@ handle_client_key_event(XKeyEvent * e, Client * c, KeySym key)
 static inline void
 next(void)
 {
-	Client *n=current;
+	Client *c;
+
+	c=current;
 	do
 	{
-		if(n)
+		if(c)
 		{
-			n=n->next;
-			if(!n&&!current)
+			c=c->next;
+			if(!c&&!current)
 				return;
 		}
-		if(!n)
-			n=head_client;
-		if(!n)
+		if(!c)
+			c=head_client;
+		if(!c)
 			return;
-		if(n==current)
+		if(c==current)
 			return;
-	} while(n->vdesk != n->screen->vdesk);
-	XRaiseWindow(jbwm.X.dpy, n->parent);
-	select_client(n);
-	{
-		XRectangle *g = &(n->geometry);
-		setmouse(n->window, g->width, g->height);
-	}
+	} while(c->vdesk != c->screen->vdesk);
+	select_client(c);
+	point(c, c->geometry.width, c->geometry.height);
 }
 
 void

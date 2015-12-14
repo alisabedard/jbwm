@@ -210,7 +210,6 @@ static void
 init_geometry(Client * c)
 {
 	XWindowAttributes attr;
-	long dummy;
 
 	initialize_client_ce(c);
 	init_geometry_properties(c);
@@ -219,7 +218,8 @@ init_geometry(Client * c)
 #ifdef USE_CMAP
 	c->cmap = attr.colormap;
 #endif /* USE_CMAP */
-	XGetWMNormalHints(jbwm.X.dpy, c->window, &(c->size), &dummy);
+	XGetWMNormalHints(jbwm.X.dpy, c->window, &(c->size), 
+		&(attr.all_event_masks) /* dummy */);
 	init_geometry_size(c, &attr);
 	init_geometry_position(c, &attr);
 	/* Test if the reparent that is to come 
@@ -243,21 +243,21 @@ reparent(Client * c)
 		| CWBackPixel | CWEventMask | CWBackPixel;
 #endif /* USE_SHAPE */
 	const int s=c->screen->screen;
-	XSetWindowAttributes p_attr;
+	XSetWindowAttributes attr;
 	Display *d;
 
 	if(!c->screen)
 		return;
 	d=jbwm.X.dpy;
 #ifndef USE_SHAPE
-	p_attr.background_pixel = BlackPixel(d, s);
+	attr.background_pixel = BlackPixel(d, s);
 #endif /* !USE_SHAPE */
-	p_attr.border_pixel = c->screen->bg.pixel;
-	p_attr.override_redirect = true;
-	p_attr.event_mask = ChildMask | ButtonPressMask | EnterWindowMask;
+	attr.border_pixel = c->screen->bg.pixel;
+	attr.override_redirect = true;
+	attr.event_mask = ChildMask | ButtonPressMask | EnterWindowMask;
 	c->parent = XCreateWindow(d, c->screen->root, x, y, g->width, 
 		g->height, b, DefaultDepth(d, s), CopyFromParent, 
-		DefaultVisual(d, s), valuemask, &p_attr);
+		DefaultVisual(d, s), valuemask, &attr);
 	XAddToSaveSet(d, w);
 	XSetWindowBorderWidth(d, w, 0);
 #ifdef USE_TBAR
