@@ -7,7 +7,7 @@ struct JBWMEnvironment
 {
 	struct
 	{
-		unsigned int numlock, grab, mod;
+		unsigned int grab, mod;
 	} keymasks;
 	struct
 	{

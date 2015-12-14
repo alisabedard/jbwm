@@ -145,8 +145,7 @@ init_geometry_position(Client * c, XWindowAttributes * attr)
 			Window root = s->root;
 			Position p;
 
-			get_mouse_position((int *)&p.x, (int *)&p.y,
-				root);
+			get_mouse_position(root, (int *)&p.x, (int *)&p.y);
 			set_position(c,
 				(p.x * (mx - b - g->width)) / mx,
 				(p.y * (my - b - g->height)) / my);

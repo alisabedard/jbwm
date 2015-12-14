@@ -4,7 +4,7 @@
 
 typedef struct
 {
-	short x, y;
+	int x, y;
 } Position;
 
 void drag(Client * c);
@@ -16,11 +16,7 @@ void unhide(Client * c);
 void switch_vdesk(ScreenInfo * s, const ubyte v);
 void grab_keys_for_screen(ScreenInfo * s);
 void maximize(Client * c);
-
-#define get_mouse_position(x, y, root) XQueryPointer(jbwm.X.dpy, \
-		root, &root, &root, x, y, (int *)&root, (int *)&root, \
-		(unsigned int *)&root);
-
-#define setmouse(w, x, y) XWarpPointer(jbwm.X.dpy, None, w, 0, 0, 0, 0, x, y)
+void get_mouse_position(Window w, int *x, int *y);
+void setmouse(Window w, const int x, const int y);
 
 #endif /* JBWM_SCREEN_H */

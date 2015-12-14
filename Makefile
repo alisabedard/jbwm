@@ -1,7 +1,8 @@
 #CC = clang
-CFLAGS=-Os -march=native 
-#CFLAGS=-Os -W -Wall -Werror
-#CFLAGS=-Os -W -Wall -Werror
+
+CFLAGS=-Os -march=native -W -Wall -Werror
+#CFLAGS=-O0 -ggdb -W -Wall -Werror
+
 #CFLAGS=-O0 -ggdb -DDEBUG
 # profiling flag.
 #CFLAGS = -pg -O0 -W -Wall -Werror

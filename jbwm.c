@@ -17,7 +17,6 @@ JBWMEnvironment jbwm;
 static void
 initialize_JBWMEnvironment_keymasks(void)
 {
-	jbwm.keymasks.numlock = LOCK_MASK;
 	jbwm.keymasks.grab = GRAB_MASK;
 	jbwm.keymasks.mod = MOD_MASK;
 }

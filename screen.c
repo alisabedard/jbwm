@@ -44,10 +44,11 @@ recalculate_sweep(Client * c, Position p1, Position p2)
 }
 
 static inline bool
-grab_pointer(Window w, int mask, Cursor cursor)
+grab_pointer(Window w, Cursor cursor)
 {
-	return XGrabPointer(jbwm.X.dpy, w, false, mask, GrabModeAsync,
-		GrabModeAsync, None, cursor, CurrentTime) == GrabSuccess;
+	const int gm=GrabModeAsync;
+	return XGrabPointer(jbwm.X.dpy, w, false, MouseMask, gm, gm, None, 
+		cursor, CurrentTime) == GrabSuccess;
 }
 
 static inline void
@@ -71,27 +72,26 @@ sweep(Client * c)
 	XRectangle *g;
 
 	/* Resizing shaded windows yields undefined behavior.  */
-	if(!grab_pointer(c->screen->root, MouseMask, jbwm.X.cursor) 
+	if(!grab_pointer(c->screen->root, jbwm.X.cursor) 
 		|| c->flags & JB_CLIENT_SHADED)
 	{
 		return;
 	}
 	g = &(c->geometry);
 	setmouse(c->window, g->width, g->height);
-	for(;;)
+sweep_loop:	
+	XMaskEvent(jbwm.X.dpy, MouseMask, &ev);
+	switch (ev.type)
 	{
-		XMaskEvent(jbwm.X.dpy, MouseMask, &ev);
-		switch (ev.type)
-		{
-		case MotionNotify:
-			handle_motion_notify(c, g, &(ev.xmotion));
-			break;
-		case ButtonRelease:
-			XUngrabPointer(jbwm.X.dpy, CurrentTime);
-			moveresize(c);
-			return;
-		}
+	case MotionNotify:
+		handle_motion_notify(c, g, &(ev.xmotion));
+		break;
+	case ButtonRelease:
+		XUngrabPointer(jbwm.X.dpy, CurrentTime);
+		moveresize(c);
+		return;
 	}
+	goto sweep_loop;
 }
 
 #ifdef USE_SNAP
@@ -221,19 +221,34 @@ drag_event_loop(Client * c, int x1, int y1, int old_cx, int old_cy)
 }
 
 void
+get_mouse_position(Window w, int *x, int *y)
+{
+	/* Dummy variables to satisfy required arguments.  */
+	int __attribute__((unused)) d;
+	unsigned int __attribute__((unused)) u;
+
+	XQueryPointer(jbwm.X.dpy, w, &w, &w, x, y, &d, &d, &u);
+}
+
+void
+setmouse(Window w, const int x, const int y)
+{
+	XWarpPointer(jbwm.X.dpy, None, w, 0, 0, 0, 0, x, y);
+}
+
+void
 drag(Client * c)
 {
+	Window root=c->screen->root;
 	Position p, old_p;
-	Window root;
 	XRectangle *g;
 
-	root = c->screen->root;
-	if(!grab_pointer(root, MouseMask, jbwm.X.cursor))
+	if(!grab_pointer(root, jbwm.X.cursor))
 		return;
 	g=&(c->geometry);
 	old_p.x = g->x;
 	old_p.y = g->y;
-	get_mouse_position((int *)&(p.x), (int *)&(p.y), root);
+	get_mouse_position(root, (int *)&(p.x), (int *)&(p.y));
 	drag_event_loop(c, p.x, p.y, old_p.x, old_p.y);
 }
 
