@@ -2,34 +2,19 @@
 
 #include "jbwm.h"
 
-#if 0
-XColor
-jbwm_color_rgb(const ubyte r, const ubyte g, const ubyte b)
-{
-	XColor c;
-
-	c.red = r << 8;
-	c.green = g << 8;
-	c.blue = b << 8;
-
-	XAllocColor(jbwm.X.dpy, DefaultColormap(jbwm.X.dpy,
-		DefaultScreen(jbwm.X.dpy)), &c);
-
-	return c;
-}
-#endif
-
 void
 free_color(XColor c)
 {
         Display *d;
-        Colormap cm;
         unsigned long p[1];
 
-        d=jbwm.X.dpy;
-        cm=DefaultColormap(d, DefaultScreen(d));
         p[0]=c.pixel;
-        XFreeColors(d, cm, p, 1, AllPlanes);
+        d=jbwm.X.dpy;
+	{
+        	const Colormap cm=DefaultColormap(d, DefaultScreen(d));
+
+        	XFreeColors(d, cm, p, 1, AllPlanes);
+	}
 }
 
 XColor
