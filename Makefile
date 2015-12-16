@@ -1,6 +1,8 @@
 #CC = clang
 
-CFLAGS=-Os -march=native -W -Wall -Werror
+#CFLAGS=-Os -march=native -W -Wall -Werror
+#CFLAGS=-Os -W -Wall -Werror
+#CFLAGS=-Os
 #CFLAGS=-O0 -ggdb -W -Wall -Werror
 
 #CFLAGS=-O0 -ggdb -DDEBUG
@@ -12,8 +14,6 @@ CFLAGS=-Os -march=native -W -Wall -Werror
 prefix = $(DESTDIR)/usr
 # For typical manually built package:
 #prefix = /usr
-# For custom stash script
-#prefix = /usr/local/stash/jbwm
 # For use with NetBSD linkfarm or GNU stow.
 #prefix = /usr/local/packages/jbwm
 # For local home install, managed by GNU stow.

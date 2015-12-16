@@ -31,8 +31,8 @@ typedef unsigned char ubyte;
 #include "misc.h"
 #include "screen.h"
 #include "jbwmmod.h"
-#include "atoms.h"
 #include "log.h"
+#include "atoms.h"
 
 /* Required for interpreting MWM hints: */
 #define _XA_MWM_HINTS           "_MOTIF_WM_HINTS"

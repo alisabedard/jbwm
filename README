@@ -6,7 +6,8 @@ FEATURES of JBWM
 * Window shading with titlebar
 * Code cleanups, simpler UI and key bindings
 
-
+From evilwm:
+---------------------------------------
 evilwm 1.0 by Ciaran Anscomb <evilwm@6809.org.uk>
 
 evilwm is a minimalist window manager for the X Window System.
@@ -18,10 +19,8 @@ clean and easy to use.
 
 FEATURES
 
- * No window decorations apart from a simple 1 pixel border.
  * No icons.
  * Good keyboard control, including repositioning and maximise toggles.
- * Solid window drags (optional - may be slow on old machines).
  * Virtual desktops.
  * Small binary size (even with everything turned on).
 

@@ -1,10 +1,7 @@
 Problems and ideas follow:
 
-Fix handling of openmotif/xmgrace dialogs.  
+Fix meta-TAB window switching.
 Would love others to test this and help out.
-Sometimes closed windows stick around, and keep appearing.
-	This is probably an off-by-one error in the client linked list.  
-	Believed to be fixed, fingers crossed.  
 Too much preprocessor goop.
 Too many choices for compile time.
 Too many globals.
