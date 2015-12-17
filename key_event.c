@@ -107,6 +107,8 @@ next(void)
 {
 	Client *c;
 
+	LOG("next()");
+#if 0
 	c=current;
 	do
 	{
@@ -116,13 +118,28 @@ next(void)
 			if(!c&&!current)
 				return;
 		}
-		if(!c)
+		else
+		{
 			c=head_client;
+		}
 		if(!c)
 			return;
 		if(c==current)
 			return;
 	} while(c->vdesk != c->screen->vdesk);
+#endif
+	c=current?current:head_client;
+	if(!c)
+		return;
+	c=c->next;
+	if(!c)
+		return;
+	c=c->next?c->next:c;
+#if 0
+	c=c->next;
+	if(!c)
+		return;
+#endif
 	select_client(c);
 	point(c, c->geometry.width, c->geometry.height);
 }

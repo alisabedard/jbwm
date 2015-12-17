@@ -3,7 +3,7 @@
 CFLAGS=-Os -W -Wall
 
 # Debug:
-#CFLAGS=-O0 -ggdb -DDEBUG -W -Wall -Werror
+CFLAGS=-O0 -ggdb -DDEBUG -W -Wall -Werror
 
 # Profile:
 #CFLAGS += -pg 
@@ -73,7 +73,7 @@ SRCS += titlebar.c
 
 # ----- You shouldn't need to change anything under this line ------ #
 
-version = 1.36
+version = 1.37
 
 distname = jbwm-$(version)
 

@@ -292,14 +292,17 @@ maximize(Client * c)
 
 	g = &(c->geometry);
 	og = &(c->old_geometry);
-	if(c->flags & JB_CLIENT_MAXIMIZED)
+	if(c->flags & JB_CLIENT_MAXIMIZED) /* Restore: */
 	{
 		memcpy(g, og, sizeof(XRectangle));
 		/* og->width is used as a flag here.  */
 		c->flags &= ~ JB_CLIENT_MAXIMIZED;
 		og->width = 0;
+		XChangeProperty(jbwm.X.dpy, c->window, JA_VWM_STATE, 
+			XA_ATOM, 32, PropModeReplace, NULL, 0);
+		
 	}
-	else
+	else /* Maximize: */
 	{
 		ScreenInfo *s = c->screen;
 
@@ -309,6 +312,17 @@ maximize(Client * c)
 		g->width = s->width;
 		g->height = s->height-TDIM;
 		c->flags |= JB_CLIENT_MAXIMIZED;
+		{
+			Atom state[3];
+			int i = 0;
+
+			state[i++] = GETATOM("_NET_WM_ACTION_MAXIMIZE_VERT");
+			state[i++] = GETATOM("_NET_WM_ACTION_MAXIMIZE_HORZ");
+			state[i++] = GETATOM("_NET_WM_ACTION_FULLSCREEN");
+			XChangeProperty(jbwm.X.dpy, c->window, JA_VWM_STATE,
+				XA_ATOM, 32, PropModeReplace,
+				(unsigned char *)&state, i);
+		}
 	}
 	moveresize(c);
 	XRaiseWindow(jbwm.X.dpy, c->parent);

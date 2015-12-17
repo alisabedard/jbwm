@@ -12,7 +12,7 @@
 static void
 grab(ScreenInfo * s, KeySym * ks, const unsigned int mask)
 {
-	while(*(ks++))
+	for(;*ks; ks++)
 	{
 		const int gm=GrabModeAsync;
 	

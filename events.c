@@ -201,6 +201,59 @@ jbwm_handle_configure_request(XConfigureRequestEvent * e)
 		XConfigureWindow(jbwm.X.dpy, e->window, e->value_mask, &wc);
 }
 
+static void
+handle_client_message(XClientMessageEvent *e)
+{
+	ScreenInfo *s;
+	Client *c;
+	Window cur_root, dw;
+	int di;
+	unsigned int dui;
+
+	XQueryPointer(jbwm.X.dpy, jbwm.X.screens[0].root, &cur_root, &dw, &di,
+		&di, &di, &di, &dui);
+	s=find_screen(cur_root);
+	if(e->message_type==GETATOM("_NET_WM_DESKTOP"))
+	{
+		switch_vdesk(s, e->data.l[0]);
+		return;
+	}
+	c=find_client(e->window);
+	if(!c)
+		return;
+	if(e->message_type==GETATOM("_NET_ACTIVE_WINDOW"))
+	{
+		if(c->screen==s)
+			select_client(c);
+		return;
+	}
+	if(e->message_type==GETATOM("_NET_CLOSE_WINDOW"))
+	{
+		/* Only do this if it came from direct user action */
+                if (e->data.l[1] == 2) {
+                        send_wm_delete(c);
+                }
+                return;
+	}
+	if(e->message_type == GETATOM("_NET_WM_STATE"))
+	{
+		int i;
+		bool m;
+
+		m=false;
+		for(i=1; i<=2; i++)
+		{	
+			if((Atom)e->data.l[i] 
+				== GETATOM("_NET_WM_STATE_FULLSCREEN"))
+			{
+				m=true;
+			}
+		}
+		if(m)
+			maximize(c);
+	} 
+}
+
 void
 main_event_loop(void)
 {
@@ -215,9 +268,6 @@ head:
 	case UnmapNotify:
 		LOG("UnmapNotify");
 		handle_unmap_event(&ev.xunmap);
-		break;
-	case ClientMessage:
-		LOG("ClientMessage");
 		break;
 	case PropertyNotify:
 		LOG("PropertyNotify");
@@ -251,6 +301,9 @@ head:
 		handle_colormap_change(&ev.xcolormap);
 		break;
 #endif /* USE_CMAP */
+	case ClientMessage:
+		handle_client_message(&ev.xclient);
+		break;
 #ifdef USE_SHAPE
 	case ShapeNotify:
 		LOG("ShapeNotify");
