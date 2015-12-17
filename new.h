@@ -1,4 +1,4 @@
-/*  JBWM Copyright 2008, Jeffrey E. Bedard <antiright@gmail.com> */
+/*  JBWM Copyright 2008, Jeffrey E. Bedard <jefbed@gmail.com> */
 
 #ifndef JBWM_NEW_H
 #define JBWM_NEW_H

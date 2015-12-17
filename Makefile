@@ -1,25 +1,26 @@
 #CC = clang
 
-#CFLAGS=-Os -march=native -W -Wall -Werror
-#CFLAGS=-Os -W -Wall -Werror
-#CFLAGS=-Os
-#CFLAGS=-O0 -ggdb -W -Wall -Werror
+CFLAGS=-Os -W -Wall
 
-#CFLAGS=-O0 -ggdb -DDEBUG
-# profiling flag.
-#CFLAGS = -pg -O0 -W -Wall -Werror
+# Debug:
+#CFLAGS=-O0 -ggdb -DDEBUG -W -Wall -Werror
+
+# Profile:
+#CFLAGS += -pg 
 
 # Edit this line if you don't want jbwm to install under /usr.
 # Note that $(DESTDIR) is used by the Debian build process.
 prefix = $(DESTDIR)/usr
 # For typical manually built package:
-#prefix = /usr
-# For use with NetBSD linkfarm or GNU stow.
-#prefix = /usr/local/packages/jbwm
-# For local home install, managed by GNU stow.
-#prefix = ~/opt/stow/jbwm
+#prefix = /usr/local
 
+# For older *nix installs
 XROOT    = /usr/X11R6
+INCLUDES += -I$(XROOT)/include
+LDPATH  += -L$(XROOT)/lib
+
+# Fix build on NetBSD
+XROOT    = /usr/X11R7
 INCLUDES += -I$(XROOT)/include
 LDPATH  += -L$(XROOT)/lib
 
@@ -83,39 +84,22 @@ LDFLAGS += $(LDPATH) $(LIBS)
 # Uncomment for static linking of binary:
 #LDFLAGS += -static 
 
-HEADERS  = jbwm.h log.h
-#SRCS += client.c events.c jbwm.c misc.c new.c screen.c JBWMButton.c
 SRCS += client.c events.c jbwm.c misc.c new.c screen.c 
 SRCS += graphics.c key_event.c button_event.c keymap.c
-OBJS     = $(SRCS:.c=.o)
-
-.PHONY: all install dist debuild clean
-
-all: jbwm
-
-# Uncomment this target and comment out the other jbwm target
-# if you want to save ~400 more bytes
-
-#jbwm: $(SRCS) $(HEADERS)
-#	rm -f all.c
-#	cat *.h *.c > all.c
-#	$(CC) $(CFLAGS) all.c -o $@ $(LDFLAGS)
-#	rm -f all.c
-
+OBJS = $(SRCS:.c=.o)
 
 jbwm: $(OBJS) 
 	$(CC) $(CFLAGS) $(OBJS) -o $@ $(LDFLAGS)
 
-%.o: %.c $(HEADERS)
-	$(CC) $(CFLAGS) -c $<
+all: jbwm
 
-INSTALL=install -c
-INSTALL_PROG=$(INSTALL) -s
-INSTALL_DIR=install -d
 strip: jbwm
 	strip --strip-all --remove-section=.comment \
 		--remove-section=.note jbwm
 
+INSTALL=install -c
+INSTALL_PROG=$(INSTALL) -s
+INSTALL_DIR=install -d
 install: strip
 	if [ -f jbwm.exe ]; then mv jbwm.exe jbwm; fi
 	$(INSTALL_DIR) $(prefix)/bin $(prefix)/share/man/man1

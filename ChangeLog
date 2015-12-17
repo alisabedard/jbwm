@@ -9,7 +9,7 @@
 
 
 *** Changes between 1.1 and 1.2
-Thu Aug 23 15:48:21 EDT 2007 Jeffrey Bedard <antiright@gmail.com>
+Thu Aug 23 15:48:21 EDT 2007 Jeffrey Bedard <jefbed@gmail.com>
   * Removed INFOBANNER support for non-TITLEBAR configurations.
     Refactored titlebar code, removed non-TITLEBAR preprocessor
     code paths.  Added virtual desktop window assignment with 
@@ -17,18 +17,18 @@ Thu Aug 23 15:48:21 EDT 2007 Jeffrey Bedard <antiright@gmail.com>
 
 *** Changes between 1.0 and 1.1
 
-Thu Aug 16 09:54:22 EDT 2007  Jeffrey Bedard <antiright@gmail.com>
+Thu Aug 16 09:54:22 EDT 2007  Jeffrey Bedard <jefbed@gmail.com>
   * Fixed shrinking.  Fixed killing children.  Fixed some titlebar
     metrics.  
 
 *** Changes between 1.0 and evilwm-1.0.0/evilwm-0.99.25
 
-Sat Aug 11 20:07:34 EST 2007  Jeffrey Bedard <antiright@gmail.com>
+Sat Aug 11 20:07:34 EST 2007  Jeffrey Bedard <jefbed@gmail.com>
   * Decided to fork, considering code base has changed significantly,
     thus preventing seamless integration of evilwm changes.  This
-    fork/branch will be called jbwm, the antiright window manager.
+    fork/branch will be called jbwm, the jefbed window manager.
     It is intended for general use, but some features may be added
-    with special consideration of the antiright scripting environment.  
+    with special consideration of the jefbed scripting environment.  
     This fork so far adds titlebar support (optional), fixes keyboard
     resizing, many many code cleanups, optimizations based on profiling
     data, reduced binary size.

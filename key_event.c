@@ -3,6 +3,7 @@
  * Copyright (C) 1999-2006 Ciaran Anscomb <jbwm@6809.org.uk>
  * see README for license and other details. */
 
+#include <sys/wait.h>
 #include "jbwm.h"
 
 static void
@@ -125,6 +126,7 @@ next(void)
 	select_client(c);
 	point(c, c->geometry.width, c->geometry.height);
 }
+
 
 void
 jbwm_handle_key_event(XKeyEvent * e)

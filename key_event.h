@@ -1,4 +1,4 @@
-/* Copyright 2008, Jeffrey Bedard <antiright@gmail.com> */
+/* Copyright 2008-2015, Jeffrey Bedard <jefbed@gmail.com> */
 
 #ifndef JBWM_KEY_EVENT_H
 #define JBWM_KEY_EVENT_H
