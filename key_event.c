@@ -108,7 +108,6 @@ next(void)
 	Client *c;
 
 	LOG("next()");
-#if 0
 	c=current;
 	do
 	{
@@ -118,30 +117,20 @@ next(void)
 			if(!c&&!current)
 				return;
 		}
-		else
-		{
+		if(!c)
 			c=head_client;
-		}
 		if(!c)
 			return;
 		if(c==current)
 			return;
 	} while(c->vdesk != c->screen->vdesk);
-#endif
-	c=current?current:head_client;
 	if(!c)
 		return;
-	c=c->next;
-	if(!c)
-		return;
-	c=c->next?c->next:c;
-#if 0
-	c=c->next;
-	if(!c)
-		return;
-#endif
+	unhide(c);
 	select_client(c);
+	point(c, 0, 0);
 	point(c, c->geometry.width, c->geometry.height);
+	XSync(jbwm.X.dpy, False);
 }
 
 
