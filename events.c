@@ -96,44 +96,77 @@ handle_colormap_change(XColormapEvent * e)
 }
 #endif /* USE_CMAP */
 
+#ifdef DEBUG
+static const char *
+get_atom_name(const Atom a)
+{
+	char *n;
+	static char buf[48];
+
+	n=XGetAtomName(jbwm.X.dpy, a);
+	strncpy(buf, n, sizeof(buf));
+	XFree(n);
+	buf[sizeof(buf)-1]=0;
+
+	return buf;
+}
+#endif /* DEBUG */
 static void
 handle_property_change(XPropertyEvent * e)
 {
 	Client *c;
 	const Atom a = e->atom;
 
-	LOG("handle_property_change(e)");
-
+	if(!e->window)
+	{
+		LOG("!e->window");
+	}
 	c = find_client(e->window);
 	if(c)
 	{
-		moveresize(c);
+		LOG("handle_property_change(w=%lx, a=%s[%d])", e->window, 
+			get_atom_name(a), (int)a);
 		switch(a)
 		{
+#if 0
 		case XA_WM_NORMAL_HINTS:
 			LOG("XA_WM_NORMAL_HINTS");
 			{
-				long dummy;
+				long __attribute__((unused)) flags;
+
 				XGetWMNormalHints(jbwm.X.dpy, c->window, 
-					&(c->size), &dummy);
+					&(c->size), &flags);
+				LOG("geometry=%dx%d+%d+%d\nflags=%d\n", 
+					c->size.width, c->size.height, 
+					c->size.x, c->size.y, 
+					(int)flags);
 			}
-			break;
+			return;
+#endif
+		case XA_WM_HINTS: /* Mainly used for icons */
+			return;
 #ifdef USE_TBAR
 		case XA_WM_NAME:
 			LOG("XA_WM_NAME");
 			update_titlebar(c);
-			break;
+			return;
 #endif /* USE_TBAR */
-#ifdef DEBUG
 		default:
+#if 0
+			if(a==GETATOM("WM_STATE"))
 			{
-				char *n;
-
-				n=XGetAtomName(jbwm.X.dpy, a);
-				LOG("Atom %u: %s", (unsigned int)a, n);
-				XFree(n);
+				return;
 			}
-#endif /* DEBUG */
+#endif
+			if(a==GETATOM("_NET_WM_OPAQUE_REGION"))
+			{
+				return;
+			}
+			if(a==GETATOM("_NET_WM_USER_TIME"))
+			{
+				return;
+			}
+			moveresize(c);
 		}
 	}
 }
@@ -163,10 +196,12 @@ handle_expose_event(XEvent * ev)
 	if(ev->xexpose.count == 0)
 	{
 		/* xproperty was used instead of xexpose, previously.  */
-		Window ev_win = ev->xexpose.window;
-		Client *c = find_client(ev_win);
+		const Window w = ev->xexpose.window;
+		Client *c;
 
-		if(c && (ev_win == c->titlebar))
+		if(!(c= find_client(w)))
+			return;
+		if(w==c->titlebar)
 			update_titlebar(c);
 	}
 }
@@ -250,7 +285,9 @@ handle_client_message(XClientMessageEvent *e)
 			}
 		}
 		if(m)
+		{
 			maximize(c);
+		}
 	} 
 }
 

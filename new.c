@@ -111,7 +111,7 @@ init_geometry_size(Client * c, XWindowAttributes * attr)
 		&& (aheight >= c->size.min_height))
 		set_size(c, awidth, aheight);
 	else
-		set_size(c, c->size.min_width, c->size.min_height);
+		set_size(c, c->size.base_width, c->size.base_height);
 }
 
 static void

@@ -3,7 +3,7 @@
 CFLAGS=-Os -W -Wall
 
 # Debug:
-#CFLAGS=-O0 -ggdb -DDEBUG -W -Wall -Werror
+CFLAGS=-O0 -ggdb -DDEBUG -W -Wall -Werror
 
 # Profile:
 #CFLAGS += -pg 

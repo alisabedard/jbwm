@@ -9,6 +9,9 @@ void
 send_configure(Client *c);
 
 void 
+xmsg(Window w, Atom a, long x);
+
+void 
 send_wm_delete(Client * c);
 
 Client *

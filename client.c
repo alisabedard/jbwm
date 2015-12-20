@@ -37,6 +37,16 @@ find_client(Window w)
 {
 	Client *c;
 
+	for(c=head_client; c; c=c->next)
+	{
+		if(w==c->parent || w==c->window || w==c->titlebar)
+		{
+			return c;
+		}
+	}
+
+	return NULL;
+#if 0
 	for(c = head_client; c && (w != c->parent) && (w != c->window)
 #ifdef USE_TBAR /* Allow titlebar to receive events: */
 		&& (w != c->titlebar)
@@ -46,6 +56,7 @@ find_client(Window w)
 
 	/* non-null if client found.  */
 	return c;
+#endif
 }
 
 void
@@ -138,13 +149,20 @@ static void
 unparent_window(Client * c)
 {
 	const Window w=c->window;
+	const Window p=c->parent;
 
 	LOG("unparent_window()");
+	if(!p)
+	{
+		LOG("Already unparented!");
+		return;
+	}
 	XReparentWindow(jbwm.X.dpy, w, c->screen->root, c->geometry.x, 
 		c->geometry.y);
 	XRemoveFromSaveSet(jbwm.X.dpy, w);
-	if(c->parent)
-		XDestroyWindow(jbwm.X.dpy, c->parent);
+	if(p)
+		XDestroyWindow(jbwm.X.dpy, p);
+	c->parent=0;
 }
 
 void
@@ -174,7 +192,7 @@ remove_client(Client * c)
 	XSync(d, false);
 }
 
-static void
+void
 xmsg(Window w, Atom a, long x)
 {
 	XEvent ev;

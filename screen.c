@@ -8,6 +8,21 @@
 #include <string.h>
 #include "screen.h"
 
+static void
+ewmh_set_net_wm_state(Client *c)
+{
+	Atom state[3];
+        int i = 0;
+        LOG("ewmh_set_net_wm_state()\n");
+	state[i++] = GETATOM("_NET_WM_ACTION_MAXIMIZE_VERT");
+        state[i++] = GETATOM("_NET_WM_ACTION_MAXIMIZE_HORZ");
+        state[i++] = GETATOM("_NET_WM_ACTION_FULLSCREEN");
+        XChangeProperty(jbwm.X.dpy, c->window, JA_VWM_STATE, XA_ATOM, 32, 
+		PropModeReplace, (unsigned char *)&state, i);
+        XChangeProperty(jbwm.X.dpy, c->parent, JA_VWM_STATE, XA_ATOM, 32, 
+		PropModeReplace, (unsigned char *)&state, i);
+}
+
 static inline void
 draw_outline(Client * c)
 {
@@ -90,6 +105,7 @@ sweep_loop:
 	case ButtonRelease:
 		XUngrabPointer(jbwm.X.dpy, CurrentTime);
 		moveresize(c);
+		ewmh_set_net_wm_state(c);
 		return;
 	}
 	goto sweep_loop;
@@ -290,6 +306,7 @@ maximize(Client * c)
 	XRectangle *g;
 	XRectangle *og;
 
+	LOG("maximize()");
 	g = &(c->geometry);
 	og = &(c->old_geometry);
 	if(c->flags & JB_CLIENT_MAXIMIZED) /* Restore: */
@@ -300,6 +317,7 @@ maximize(Client * c)
 		og->width = 0;
 		XChangeProperty(jbwm.X.dpy, c->window, JA_VWM_STATE, 
 			XA_ATOM, 32, PropModeReplace, NULL, 0);
+		ewmh_set_net_wm_state(c);
 		
 	}
 	else /* Maximize: */
@@ -308,21 +326,13 @@ maximize(Client * c)
 
 		memcpy(og, g, sizeof(XRectangle));
 		g->x = 0;
-		g->y=TDIM;
+		//g->y=TDIM;
+		g->y=0;
 		g->width = s->width;
-		g->height = s->height-TDIM;
+		//g->height = s->height-TDIM;
+		g->height = s->height;
 		c->flags |= JB_CLIENT_MAXIMIZED;
-		{
-			Atom state[3];
-			int i = 0;
-
-			state[i++] = GETATOM("_NET_WM_ACTION_MAXIMIZE_VERT");
-			state[i++] = GETATOM("_NET_WM_ACTION_MAXIMIZE_HORZ");
-			state[i++] = GETATOM("_NET_WM_ACTION_FULLSCREEN");
-			XChangeProperty(jbwm.X.dpy, c->window, JA_VWM_STATE,
-				XA_ATOM, 32, PropModeReplace,
-				(unsigned char *)&state, i);
-		}
+		ewmh_set_net_wm_state(c);
 	}
 	moveresize(c);
 	XRaiseWindow(jbwm.X.dpy, c->parent);

@@ -271,6 +271,50 @@ setup_gc(const ubyte i)
 }
 
 static void
+setup_ewmh_for_screen(ScreenInfo *s)
+{
+	Atom supported[] = {
+		GETATOM("_NET_CLOSE_WINDOW"),
+		GETATOM("_NET_MOVERESIZE_WINDOW"),
+		GETATOM("_NET_WM_STATE"),
+		GETATOM("_NET_CURRENT_DESKTOP"),
+		GETATOM("_NET_WM_ACTION_MAXIMIZE_HORZ"),
+		GETATOM("_NET_WM_ACTION_MAXIMIZE_VERT"),
+		GETATOM("_NET_WM_ACTION_FULLSCREEN"),
+		GETATOM("_NET_WM_STATE_HIDDEN"),
+		GETATOM("_NET_WM_ALLOWED_ACTIONS"),
+		GETATOM("_NET_WM_ACTION_MOVE"),
+		GETATOM("_NET_WM_ACTION_RESIZE"),
+		GETATOM("_NET_WM_ACTION_CLOSE"),
+		GETATOM("_NET_WM_NAME"),
+		GETATOM("_NET_WM_DESKTOP"),
+		GETATOM("_NET_DESKTOP_VIEWPORT"),
+		GETATOM("_NET_DESKTOP_GEOMETRY")
+	};
+	unsigned long workarea[4] = { 0, 0, 
+		DisplayWidth(jbwm.X.dpy, s->screen),
+		DisplayHeight(jbwm.X.dpy, s->screen)
+	};
+	unsigned long vdesk = s->vdesk;
+
+	XChangeProperty(jbwm.X.dpy, s->root, GETATOM("_NET_SUPPORTED"),
+		XA_ATOM, 32, PropModeReplace, (unsigned char *)&supported,
+		sizeof(supported) / sizeof(Atom));
+	XChangeProperty(jbwm.X.dpy, s->root, GETATOM("_NET_DESKTOP_GEOMETRY"),
+		XA_CARDINAL, 32, PropModeReplace,
+		(unsigned char *)&workarea[2], 2);
+	XChangeProperty(jbwm.X.dpy, s->root, GETATOM("_NET_DESKTOP_VIEWPORT"),
+		XA_CARDINAL, 32, PropModeReplace, 
+		(unsigned char *)&workarea[0], 2);
+	XChangeProperty(jbwm.X.dpy, s->root, GETATOM("_NET_CURRENT_DESKTOP"),
+		XA_CARDINAL, 32, PropModeReplace,
+		(unsigned char *)&vdesk, 1);
+	XChangeProperty(jbwm.X.dpy, s->root, GETATOM("_NET_WM_NAME"),
+		XA_STRING, 8, PropModeReplace,
+		(const unsigned char *)"jbwm", 4);
+}
+
+static void
 setup_display_per_screen(const ubyte i)
 {
 	setup_screen_elements(i);
@@ -279,6 +323,7 @@ setup_display_per_screen(const ubyte i)
 	grab_keys_for_screen(&jbwm.X.screens[i]);
 	/* scan all the windows on this screen */
 	setup_clients(i);
+	setup_ewmh_for_screen(&jbwm.X.screens[i]);
 }
 
 #ifdef USE_SHAPE
