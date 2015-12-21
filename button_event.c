@@ -19,10 +19,13 @@ move_client_with_vdesk(Client * c, Bool next)
 }
 
 static void
-shade_window(Client * c)
+shade(Client * c)
 {
 	/* This implements window shading, a substitute 
 	   for iconification.  */
+#ifdef EWMH
+	const Atom shaded=GETATOM("_NET_WM_STATE_SHADED");
+#endif//EWMH
 	if(c->flags & JB_CLIENT_SHADED)
 	{
 		c->geometry.height=c->shade_height;
@@ -30,6 +33,9 @@ shade_window(Client * c)
 		XMapWindow(jbwm.X.dpy, c->window);
 		moveresize(c);
 		select_client(c);
+#ifdef EWMH
+		XDeleteProperty(jbwm.X.dpy, c->window, shaded);
+#endif//EWMH
 	}
 	else
 	{
@@ -42,6 +48,10 @@ shade_window(Client * c)
 		c->geometry.height = h;
 		c->flags |= JB_CLIENT_SHADED;
 		XSetWindowBorder(jbwm.X.dpy, c->parent, c->screen->bg.pixel);
+#ifdef EWMH
+		XChangeProperty(jbwm.X.dpy, c->window, shaded, XA_CARDINAL, 32,
+			PropModeReplace, NULL, 0);
+#endif//EWMH
 	}
 }
 
@@ -55,11 +65,17 @@ button1_event(XButtonEvent * e, Client * c)
 	XRaiseWindow(jbwm.X.dpy, c->parent);
 	/* Text for close button press.  */
 	if((x < TDIM) && (y < TDIM))
+	{
+		/* This fixes a bug where deleting a shaded window will cause
+		   the parent window to stick around as a ghost window. */
+		if(c->flags&JB_CLIENT_SHADED)
+			shade(c);		
 		send_wm_delete(c);
+	}
 	if(x > width - TDIM)
 		sweep(c);	/* Resize the window.  */
 	else if(x > width - TDIM - TDIM && y < TDIM)
-		shade_window(c);
+		shade(c);
 	else
 		drag(c);	/* Move the window.  */
 }

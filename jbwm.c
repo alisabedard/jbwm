@@ -275,27 +275,30 @@ setup_gc(const ubyte i)
                , &gv);
 }
 
-#if 0
+#ifdef EWMH
 static void
 setup_ewmh_for_screen(ScreenInfo *s)
 {
 	Atom supported[] = {
-		GETATOM("_NET_CLOSE_WINDOW"),
-		GETATOM("_NET_MOVERESIZE_WINDOW"),
 		GETATOM("_NET_WM_STATE"),
 		GETATOM("_NET_CURRENT_DESKTOP"),
-		GETATOM("_NET_WM_ACTION_MAXIMIZE_HORZ"),
-		GETATOM("_NET_WM_ACTION_MAXIMIZE_VERT"),
 		GETATOM("_NET_WM_ACTION_FULLSCREEN"),
-		GETATOM("_NET_WM_STATE_HIDDEN"),
 		GETATOM("_NET_WM_ALLOWED_ACTIONS"),
 		GETATOM("_NET_WM_ACTION_MOVE"),
 		GETATOM("_NET_WM_ACTION_RESIZE"),
 		GETATOM("_NET_WM_ACTION_CLOSE"),
 		GETATOM("_NET_WM_NAME"),
 		GETATOM("_NET_WM_DESKTOP"),
+		GETATOM("_NET_NUMBER_OF_DESKTOPS"),
 		GETATOM("_NET_DESKTOP_VIEWPORT"),
 		GETATOM("_NET_DESKTOP_GEOMETRY")
+	};
+	Atom actions[] = {
+		GETATOM("_NET_WM_ALLOWED_ACTIONS"),
+		GETATOM("_NET_WM_ACTION_MOVE"),
+		GETATOM("_NET_WM_ACTION_RESIZE"),
+		GETATOM("_NET_WM_ACTION_CLOSE"),
+		GETATOM("_NET_WM_ACTION_FULLSCREEN")
 	};
 	unsigned long workarea[4] = { 0, 0, 
 		DisplayWidth(jbwm.X.dpy, s->screen),
@@ -306,6 +309,9 @@ setup_ewmh_for_screen(ScreenInfo *s)
 	XChangeProperty(jbwm.X.dpy, s->root, GETATOM("_NET_SUPPORTED"),
 		XA_ATOM, 32, PropModeReplace, (unsigned char *)&supported,
 		sizeof(supported) / sizeof(Atom));
+	XChangeProperty(jbwm.X.dpy, s->root, GETATOM("_NET_WM_ALLOWED_ACTIONS"),
+		XA_ATOM, 32, PropModeReplace, (unsigned char *)&actions,
+		sizeof(actions) / sizeof(Atom));
 	XChangeProperty(jbwm.X.dpy, s->root, GETATOM("_NET_DESKTOP_GEOMETRY"),
 		XA_CARDINAL, 32, PropModeReplace,
 		(unsigned char *)&workarea[2], 2);
@@ -315,11 +321,14 @@ setup_ewmh_for_screen(ScreenInfo *s)
 	XChangeProperty(jbwm.X.dpy, s->root, GETATOM("_NET_CURRENT_DESKTOP"),
 		XA_CARDINAL, 32, PropModeReplace,
 		(unsigned char *)&vdesk, 1);
+	const unsigned char n=1;
+	XChangeProperty(jbwm.X.dpy, s->root, GETATOM("_NET_NUMBER_OF_DESKTOPS"),
+		XA_CARDINAL, 32, PropModeReplace, &n, 1);
 	XChangeProperty(jbwm.X.dpy, s->root, GETATOM("_NET_WM_NAME"),
 		XA_STRING, 8, PropModeReplace,
 		(const unsigned char *)"jbwm", 4);
 }
-#endif
+#endif//EWMH
 
 static void
 setup_display_per_screen(const ubyte i)
@@ -330,9 +339,9 @@ setup_display_per_screen(const ubyte i)
 	grab_keys_for_screen(&jbwm.X.screens[i]);
 	/* scan all the windows on this screen */
 	setup_clients(i);
-#if 0
+#ifdef EWMH
 	setup_ewmh_for_screen(&jbwm.X.screens[i]);
-#endif
+#endif//EWMH
 }
 
 #ifdef USE_SHAPE

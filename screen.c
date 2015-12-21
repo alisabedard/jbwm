@@ -8,21 +8,6 @@
 #include <string.h>
 #include "screen.h"
 
-#if 0
-static void
-ewmh_set_net_wm_state(Client *c)
-{
-	Atom state[3];
-        int i = 0;
-        LOG("ewmh_set_net_wm_state()\n");
-	state[i++] = GETATOM("_NET_WM_ACTION_MAXIMIZE_VERT");
-        state[i++] = GETATOM("_NET_WM_ACTION_MAXIMIZE_HORZ");
-        state[i++] = GETATOM("_NET_WM_ACTION_FULLSCREEN");
-        XChangeProperty(jbwm.X.dpy, c->window, JA_VWM_STATE, XA_ATOM, 32, 
-		PropModeReplace, (unsigned char *)&state, i);
-}
-#endif
-
 static inline void
 draw_outline(Client * c)
 {
@@ -282,14 +267,14 @@ maximize(Client * c)
 {
 	LOG("maximize()");
 	XRectangle *g = &(c->geometry);
-	if(c->flags & JB_CLIENT_MAXIMIZED) /* Restore: */
+	if(c->flags & JB_CLIENT_MAXIMIZED) // restore:
 	{
 		memcpy(g, &(c->old_geometry), sizeof(XRectangle));
 		c->flags &= ~ JB_CLIENT_MAXIMIZED;
 		XChangeProperty(jbwm.X.dpy, c->window, JA_VWM_STATE, 
 			XA_ATOM, 32, PropModeReplace, NULL, 0);
 	}
-	else /* Maximize: */
+	else // maximize:
 	{
 		memcpy(&(c->old_geometry), g, sizeof(XRectangle));
 		g->x = g->y = 0;

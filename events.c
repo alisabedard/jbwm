@@ -11,7 +11,6 @@ find_screen(Window root)
 	for(ubyte i = 0; i < jbwm.X.num_screens; i++)
 		if(jbwm.X.screens[i].root == root)
 			return &jbwm.X.screens[i];
-
 	return NULL;
 }
 
@@ -83,7 +82,7 @@ handle_property_change(XPropertyEvent * e)
 	if(!c) return;
 #ifdef DEBUG
 	char *an=XGetAtomName(jbwm.X.dpy, e->atom);
-	LOG("atom: %s(%d)", an, e->atom);
+	LOG("atom: %s(%lu)", an, e->atom);
 	XFree(an);
 #endif//DEBUG
 	switch(e->atom)
