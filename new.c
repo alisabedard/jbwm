@@ -23,13 +23,10 @@ initialize_client_fields(Client * c, ScreenInfo * s, Window w)
 Client *
 Client_new(Window w, ScreenInfo * s)
 {
-	Client *c;
-
-	c = calloc(1, sizeof(Client));
+	Client *c = calloc(1, sizeof(Client));
 	initialize_client_fields(c, s, w);
 	c->border = JBWM_BORDER;
 	init_geometry(c);
-
 	return c;
 }
 
@@ -49,6 +46,7 @@ make_new_client(Window w, ScreenInfo * s)
 	jbwm_grab_button(w, jbwm.keymasks.grab, AnyButton);
 }
 
+#ifdef EWMH
 static void *
 jbwm_get_property(Window w, Atom property, Atom req_type,
 	unsigned long *nitems_return)
@@ -69,28 +67,27 @@ jbwm_get_property(Window w, Atom property, Atom req_type,
 	}
 	return NULL;
 }
+#endif//EWMH
 
+#ifdef EWMH
 static unsigned long
 handle_mwm_hints(Client * c)
 {
-	PropMwmHints *m;
 	unsigned long nitems;
 	const Atom mwm_hints = GETATOM("_XA_MWM_HINTS");
-
+	PropMwmHints *m;
 	if((m=jbwm_get_property(c->window, mwm_hints, mwm_hints, &nitems)))
 	{
 		if(nitems >= PROP_MWM_HINTS_ELEMENTS 
 			&& (m->flags & MWM_HINTS_DECORATIONS)
 			&& !(m->decorations & MWM_DECOR_ALL)
 			&& !(m->decorations & MWM_DECOR_BORDER))
-		{
 			c->border = 0;
-		}
 		XFree(m);
 	}
-
 	return nitems;
 }
+#endif//EWMH
 
 static void
 set_size(Client * c, const unsigned int width, const unsigned int height)
@@ -124,8 +121,7 @@ set_position(Client * c, const int x, const int y)
 static void
 init_geometry_position(Client * c, XWindowAttributes * attr)
 {
-	if(!c->size.flags)
-		return;
+	if(!c->size.flags) return;
 	if((attr->map_state == IsViewable)
 		|| c->size.flags & USPosition)
 		set_position(c, attr->x, attr->y);
@@ -136,17 +132,13 @@ init_geometry_position(Client * c, XWindowAttributes * attr)
 		if(!s)
 			return;
 		{
+			Position p;
+			get_mouse_position(s->root, (int *)&p.x, (int *)&p.y);
 			const short mx = s->width;
 			const short my = s->height;
-			const XRectangle *g = &(c->geometry);
 			const ubyte b = c->border;
-
-			Window root = s->root;
-			Position p;
-
-			get_mouse_position(root, (int *)&p.x, (int *)&p.y);
-			set_position(c,
-				(p.x * (mx - b - g->width)) / mx,
+			const XRectangle *g = &(c->geometry);
+			set_position(c, (p.x * (mx - b - g->width)) / mx,
 				(p.y * (my - b - g->height)) / my);
 		}
 	}
@@ -156,10 +148,8 @@ init_geometry_position(Client * c, XWindowAttributes * attr)
 static void
 init_long_properties(Client * c, unsigned long *nitems)
 {
-	unsigned long *lprop;
-
-	if((lprop =
-		jbwm_get_property(c->window, GETATOM("_NET_WM_DESKTOP"),
+	if((unsigned long *lprop = jbwm_get_property(c->window, 
+		GETATOM("_NET_WM_DESKTOP"),
 		XA_CARDINAL, nitems)))
 	{
 		if(*nitems && lprop[0]<9)
@@ -169,6 +159,7 @@ init_long_properties(Client * c, unsigned long *nitems)
 }
 #endif//EWMH
 
+#ifdef EWMH
 static void
 init_atom_properties(Client * c, unsigned long *nitems)
 {
@@ -190,6 +181,7 @@ init_atom_properties(Client * c, unsigned long *nitems)
 		XFree(aprop);
 	}
 }
+#endif//EWMH
 
 static void
 init_geometry_properties(Client * c)
@@ -199,13 +191,12 @@ init_geometry_properties(Client * c)
 		return;
 	}
 	c->vdesk = c->screen->vdesk;
-	unsigned long nitems = handle_mwm_hints(c);
 #ifdef EMWH
+	unsigned long nitems = handle_mwm_hints(c);
 	init_long_properties(c, &nitems);
-#endif//EWMH
-	remove_sticky(c);
 	init_atom_properties(c, &nitems);
-
+#endif//EWMH
+	//remove_sticky(c);
 }
 
 static void

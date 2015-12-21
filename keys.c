@@ -17,14 +17,10 @@ static void
 moveresize_dir(Client * c, XKeyEvent * e, short *xy,
 	unsigned short *wh, const byte sign)
 {
-	const ubyte inc = JBWM_RESIZE_INCREMENT;
-	const byte mod = sign * inc;
-
 	/* These operations invalid when maximized.  */
-	if(c->flags & JB_CLIENT_MAXIMIZED)
-		return;
-
-	if((e->state & jbwm.keymasks.mod) && (*wh > inc))
+	if(c->flags & JB_CLIENT_MAXIMIZED) return;
+	const byte mod = sign * JBWM_RESIZE_INCREMENT;
+	if((e->state & jbwm.keymasks.mod) && (*wh > JBWM_RESIZE_INCREMENT))
 	{
 #ifdef USE_SHAPE
 		if(is_shaped(c))
@@ -81,10 +77,8 @@ handle_client_key_event(XKeyEvent * e, Client * c, KeySym key)
 static void
 next(void)
 {
-	Client *c;
-
 	LOG("next()");
-	c=current;
+	Client *c=current;
 	do
 	{
 		if(c)
@@ -100,8 +94,7 @@ next(void)
 		if(c==current)
 			return;
 	} while(c->vdesk != c->screen->vdesk);
-	if(!c)
-		return;
+	if(!c) return;
 	unhide(c);
 	select_client(c);
 	point(c, 0, 0);
@@ -123,11 +116,8 @@ jbwm_handle_key_event(XKeyEvent * e)
 	case KEY_NEW:
 		{
 			const int r=system(TERMINAL_CMD);
-
 			if(WIFEXITED(r) && WEXITSTATUS(r))
-			{
 				ERROR(TERMINAL_CMD);
-			}
 		}
 		break;
 	case KEY_QUIT:
@@ -166,7 +156,6 @@ grab(ScreenInfo * s, KeySym * ks, const unsigned int mask)
 	for(;*ks; ks++)
 	{
 		const int gm=GrabModeAsync;
-	
 		XGrabKey(jbwm.X.dpy, XKeysymToKeycode(jbwm.X.dpy, *ks), 
 			jbwm.keymasks.grab| mask, s->root, true, gm, gm); 
 	}

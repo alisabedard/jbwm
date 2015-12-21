@@ -9,11 +9,9 @@ void
 configure(Client *c)
 {
 	XConfigureEvent *e;
-	XRectangle *g;
-
 	e=&(c->ce);
 	e->event=c->window;
-	g=&(c->geometry);
+	XRectangle *g=&(c->geometry);
 	e->x=g->x;
 	e->y=g->y;
 	e->width=g->width;
@@ -35,9 +33,7 @@ send_configure(Client *c)
 Client *
 find_client(Window w)
 {
-	Client *c;
-
-	for(c=head_client; c; c=c->next)
+	for(Client *c=head_client; c; c=c->next)
 		if(w==c->parent || w==c->window || w==c->titlebar)
 			return c;
 	return NULL;
