@@ -1,10 +1,11 @@
 FEATURES of JBWM
-* 22K binary size
+* ~22K binary size (with gcc 5.3.0 on linux/amd64)
 * Titlebar support if wanted
 * Xft support if wanted
 * Xpm support if wanted
 * Window shading with titlebar
 * Code cleanups, simpler UI and key bindings
+* Use of C99 features where possible.  
 
 From evilwm:
 ---------------------------------------

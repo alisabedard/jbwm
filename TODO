@@ -1,7 +1,7 @@
 Problems and ideas follow:
 
-Fix meta-TAB window switching.
-Would love others to test this and help out.
+Use C99 semantics where possible.
+!!Would love others to test this and help out.!!
 Too much preprocessor goop.
 Too many choices for compile time.
 Too many globals.
