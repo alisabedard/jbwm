@@ -355,6 +355,16 @@ setup_screens(void)
 		setup_display_per_screen(i);
 }
 
+#include <X11/Xproto.h>
+
+int
+handle_xerror(Display * dpy __attribute__((unused)), XErrorEvent * e)
+{
+        if((e->error_code==BadAccess) && (e->request_code 
+                == X_ChangeWindowAttributes)) ERROR("RootWindowTaken");
+        return 0; // Ignore everything else.         
+}
+
 static void
 setup_display(void)
 {

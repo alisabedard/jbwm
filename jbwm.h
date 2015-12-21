@@ -28,7 +28,6 @@ typedef unsigned char ubyte;
 #include "client_t.h"
 #include "application_t.h"
 #include "jbwmenv.h"
-#include "misc.h"
 #include "screen.h"
 #include "jbwmmod.h"
 #include "log.h"

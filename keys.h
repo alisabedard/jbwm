@@ -1,5 +1,9 @@
-#ifndef _KEYMAP_H
-#define _KEYMAP_H
+/* Copyright 2008-2015, Jeffrey Bedard <jefbed@gmail.com> */
+
+#ifndef __KEYS_H
+#define __KEYS_H
+
+void jbwm_handle_key_event(XKeyEvent * e);
 
 #define KEY_NEXT	XK_Tab
 #ifndef KEY_NEW
@@ -61,4 +65,4 @@
 
 void grab_keys_for_screen(ScreenInfo * s);
 
-#endif /* _KEYMAP_H */
+#endif /* __KEYS_H */

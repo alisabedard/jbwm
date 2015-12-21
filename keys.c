@@ -1,4 +1,4 @@
-/* Copyright 2008-2011, Jeffrey Bedard <jefbed@gmail.com> */
+/* Copyright 2008-2015, Jeffrey Bedard <jefbed@gmail.com> */
 /* jbwm - Minimalist Window Manager for X
  * Copyright (C) 1999-2006 Ciaran Anscomb <jbwm@6809.org.uk>
  * see README for license and other details. */
@@ -9,21 +9,9 @@
 static void
 point(Client *c, const int x, const int y)
 {
-	Display *d;
-
-	d=jbwm.X.dpy;
-	XRaiseWindow(d, c->parent);
-	XWarpPointer(d, None, c->window, 0, 0, 0, 0, x, y);
+	XRaiseWindow(jbwm.X.dpy, c->parent);
+	XWarpPointer(jbwm.X.dpy, None, c->window, 0, 0, 0, 0, x, y);
 }
-
-#if 0
-static void
-key_moveresize(Client * c)
-{
-	moveresize(c);
-	point(c, JBWM_RESIZE_INCREMENT, JBWM_RESIZE_INCREMENT);
-}
-#endif
 
 static void
 moveresize_dir(Client * c, XKeyEvent * e, short *xy,
@@ -46,7 +34,6 @@ moveresize_dir(Client * c, XKeyEvent * e, short *xy,
 	}
 	else
 		*xy += mod;
-	//key_moveresize(c);
 	moveresize(c);
 	point(c, JBWM_RESIZE_INCREMENT, JBWM_RESIZE_INCREMENT);
 }
@@ -70,27 +57,6 @@ handle_client_key_event(XKeyEvent * e, Client * c, KeySym key)
 	case KEY_RIGHT:
 		moveresize_dir(c, e, &(g->x), &(g->width), 1);
 		break;
-#if 0
-	case KEY_TOPLEFT:
-		g->x = g->y = c->border;
-		key_moveresize(c);
-		break;
-	case KEY_TOPRIGHT:
-		g->x = jbwm.X.screens->width - g->width - c->border;
-		g->y = c->border;
-		key_moveresize(c);
-		break;
-	case KEY_BOTTOMLEFT:
-		g->x = c->border;
-		g->y = jbwm.X.screens->height - g->height - c->border;
-		key_moveresize(c);
-		break;
-	case KEY_BOTTOMRIGHT:
-		g->x = jbwm.X.screens->width - g->width - c->border;
-		g->y = jbwm.X.screens->height - g->height - c->border;
-		key_moveresize(c);
-		break;
-#endif
 	case KEY_KILL:
 		send_wm_delete(c);
 		break;
@@ -112,7 +78,7 @@ handle_client_key_event(XKeyEvent * e, Client * c, KeySym key)
 	}
 }
 
-static inline void
+static void
 next(void)
 {
 	Client *c;
@@ -193,3 +159,26 @@ jbwm_handle_key_event(XKeyEvent * e)
 			handle_client_key_event(e, current, key);
 	}
 }
+
+static void
+grab(ScreenInfo * s, KeySym * ks, const unsigned int mask)
+{
+	for(;*ks; ks++)
+	{
+		const int gm=GrabModeAsync;
+	
+		XGrabKey(jbwm.X.dpy, XKeysymToKeycode(jbwm.X.dpy, *ks), 
+			jbwm.keymasks.grab| mask, s->root, true, gm, gm); 
+	}
+}
+
+void
+grab_keys_for_screen(ScreenInfo * s)
+{
+	KeySym keys[] = JBWM_KEYS_TO_GRAB;
+	KeySym mod_keys[] = JBWM_ALT_KEYS_TO_GRAB;
+	
+	grab(s, keys, 0);
+	grab(s, mod_keys, jbwm.keymasks.mod);
+}
+

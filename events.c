@@ -8,9 +8,7 @@
 static ScreenInfo *
 find_screen(Window root)
 {
-	ubyte i;
-
-	for(i = 0; i < jbwm.X.num_screens; i++)
+	for(ubyte i = 0; i < jbwm.X.num_screens; i++)
 		if(jbwm.X.screens[i].root == root)
 			return &jbwm.X.screens[i];
 
@@ -18,35 +16,12 @@ find_screen(Window root)
 }
 
 static void
-handle_map_request(XMapRequestEvent * e)
-{
-	Client *c = find_client(e->window);
-
-	LOG("handle_map_request(e)");
-	if(c)
-	{
-		/* Avoid mapping any ghost windows.  */
-		if(c->flags & JB_CLIENT_REMOVE)
-			return;
-		unhide(c);
-	}
-	else
-	{
-		XWindowAttributes attr;
-
-		XGetWindowAttributes(jbwm.X.dpy, e->window, &attr);
-		make_new_client(e->window, find_screen(attr.root));
-	}
-}
-
-static void
 cleanup()
 {
-	Client *c, *i;
-
 	LOG("cleanup()");
 	jbwm.need_cleanup=0;
-	for(c = head_client; c; c = i)
+	Client *i;
+	for(Client *c = head_client; c; c = i)
 	{
 		i = c->next;
 		if(c->flags & JB_CLIENT_REMOVE)
@@ -59,35 +34,27 @@ cleanup()
 static void
 handle_unmap_event(XUnmapEvent * e)
 {
-	Client *c;
-
 	LOG("handle_unmap_event(e)");
 	LOG("send_event: %s", e->send_event?"true":"false");
 	LOG("from_configure: %s", e->from_configure?"true":"false");
-		
-	if((c = find_client(e->window)))
+	Client *c=find_client(e->window);
+	if(!c) return;
+	LOG("%d ignores remaining", c->ignore_unmap);
+	if(c->ignore_unmap<1)
 	{
-		LOG("%d ignores remaining", c->ignore_unmap);
-		if(c->ignore_unmap<1)
-		{
-			LOG("!c->ignore_unmap");
-			c->flags |= JB_CLIENT_REMOVE;
-			jbwm.need_cleanup=1;
-		}
-		else
-		{
-			c->ignore_unmap--;
-		}
+		LOG("!c->ignore_unmap");
+		c->flags |= JB_CLIENT_REMOVE;
+		jbwm.need_cleanup=1;
 	}
+	else c->ignore_unmap--;
 }
 
 #ifdef USE_CMAP
 static void
 handle_colormap_change(XColormapEvent * e)
 {
-	Client *c = find_client(e->window);
-	
 	LOG("handle_colormap_change(e)");
+	Client *c = find_client(e->window);
 	if(c && e->new)
 	{
 		c->cmap = e->colormap;
@@ -96,14 +63,13 @@ handle_colormap_change(XColormapEvent * e)
 }
 #endif /* USE_CMAP */
 
+#if 0
 #ifdef DEBUG
 static const char *
 get_atom_name(const Atom a)
 {
-	char *n;
+	char *n=XGetAtomName(jbwm.X.dpy, a);
 	static char buf[48];
-
-	n=XGetAtomName(jbwm.X.dpy, a);
 	strncpy(buf, n, sizeof(buf));
 	XFree(n);
 	buf[sizeof(buf)-1]=0;
@@ -111,9 +77,15 @@ get_atom_name(const Atom a)
 	return buf;
 }
 #endif /* DEBUG */
+#endif
+
 static void
 handle_property_change(XPropertyEvent * e)
 {
+	Client *c=find_client(e->window);
+	if(!c) return;
+	moveresize(c);
+#if 0
 	Client *c;
 	const Atom a = e->atom;
 
@@ -196,24 +168,21 @@ handle_property_change(XPropertyEvent * e)
 			moveresize(c);
 		}
 	}
+#endif
 }
 
 static void
 handle_enter_event(XCrossingEvent * e)
 {
-	Client *c;
-
-	if((c = find_client(e->window)))
-	{
-		/* Make sure event is on current desktop and only process
-			event on the application window.  */
-		if(is_sticky(c))
-			goto skip;
-		if((c->vdesk != c->screen->vdesk) || (e->window != c->window))
-			return;
+	Client *c=find_client(e->window);
+	if(!c) return;
+	/* Make sure event is on current desktop and only process event 
+	   on the application window.  */
+	if(is_sticky(c)) goto skip;
+	if((c->vdesk != c->screen->vdesk) || (e->window != c->window))
+		return;
 skip:
 		select_client(c);
-	}
 }
 
 #ifdef USE_TBAR
@@ -237,17 +206,18 @@ handle_expose_event(XEvent * ev)
 static void
 jbwm_handle_configure_request(XConfigureRequestEvent * e)
 {
-	Client *c;
 	XWindowChanges wc;
 
-	c=find_client(e->window);
 	wc.x=e->x;
 	wc.y=e->y;
 	wc.width=e->width;
 	wc.height=e->height;
-	wc.border_width=0;
+	wc.border_width=e->border_width;
 	wc.sibling=e->above;
 	wc.stack_mode=e->detail;
+	XConfigureWindow(jbwm.X.dpy, e->window, e->value_mask, &wc);
+#if 0
+	Client *c=find_client(e->window);
 	if(c)
 	{
 		if(e->value_mask & CWStackMode && e->value_mask & CWSibling)
@@ -260,7 +230,7 @@ jbwm_handle_configure_request(XConfigureRequestEvent * e)
 		}
 	}
 	else
-		XConfigureWindow(jbwm.X.dpy, e->window, e->value_mask, &wc);
+#endif
 }
 
 static void
@@ -291,7 +261,7 @@ handle_client_message(XClientMessageEvent *e)
 	}
 	if(e->message_type==GETATOM("_NET_CLOSE_WINDOW"))
 	{
-		/* Only do this if it came from direct user action */
+		// Only do this if it came from direct user action 
                 if (e->data.l[1] == 2) {
                         send_wm_delete(c);
                 }
@@ -330,38 +300,32 @@ head:
 		handle_enter_event(&ev.xcrossing);
 		break;
 	case UnmapNotify:
-		LOG("UnmapNotify");
 		handle_unmap_event(&ev.xunmap);
 		break;
 	case PropertyNotify:
-		LOG("PropertyNotify");
 		handle_property_change(&ev.xproperty);
 		break;
 	case MapRequest:
-		LOG("MapRequest");
-		handle_map_request(&ev.xmaprequest);
+		if(!find_client(ev.xmaprequest.window))
+			make_new_client(ev.xmaprequest.window, 
+			find_screen(ev.xmaprequest.parent));
 		break;
 	case KeyPress:
-		LOG("KeyPress");
 		jbwm_handle_key_event(&ev.xkey);
 		break;
 #ifdef USE_TBAR
 	case Expose:
-		LOG("Expose");
 		handle_expose_event(&ev);
 		break;
 #endif
 	case ButtonPress:
-		LOG("ButtonPress");
 		jbwm_handle_button_event(&ev.xbutton);
 		break;
 	case ConfigureRequest:
-		LOG("ConfigureRequest");
 		jbwm_handle_configure_request(&ev.xconfigurerequest);
 		break;
 #ifdef USE_CMAP
 	case ColormapNotify:
-		LOG("ColormapNotify");
 		handle_colormap_change(&ev.xcolormap);
 		break;
 #endif /* USE_CMAP */
