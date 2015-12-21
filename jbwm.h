@@ -46,15 +46,6 @@ typedef struct
 	unsigned long decorations;
 } PropMwmHints;
 
-/* readability stuff */
-
-/* some coding shorthand */
-
-#define ChildMask       (SubstructureRedirectMask|SubstructureNotifyMask)
-#define ButtonMask      (ButtonPressMask|ButtonReleaseMask)
-#define MouseMask       (ButtonMask|PointerMotionMask)
-#define JBWMMask	(ChildMask|JBWMMask)
-
 void 
 jbwm_grab_button(Window w, unsigned int mask, unsigned int button);
 

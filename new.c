@@ -152,6 +152,7 @@ init_geometry_position(Client * c, XWindowAttributes * attr)
 	}
 }
 
+#ifdef EWMH
 static void
 init_long_properties(Client * c, unsigned long *nitems)
 {
@@ -166,6 +167,7 @@ init_long_properties(Client * c, unsigned long *nitems)
 		XFree(lprop);
 	}
 }
+#endif//EWMH
 
 static void
 init_atom_properties(Client * c, unsigned long *nitems)
@@ -192,14 +194,15 @@ init_atom_properties(Client * c, unsigned long *nitems)
 static void
 init_geometry_properties(Client * c)
 {
-	unsigned long nitems;
-	nitems = handle_mwm_hints(c);
 	if(!c->screen)
 	{
 		return;
 	}
 	c->vdesk = c->screen->vdesk;
+	unsigned long nitems = handle_mwm_hints(c);
+#ifdef EMWH
 	init_long_properties(c, &nitems);
+#endif//EWMH
 	remove_sticky(c);
 	init_atom_properties(c, &nitems);
 
@@ -208,11 +211,9 @@ init_geometry_properties(Client * c)
 static void
 init_geometry(Client * c)
 {
-	XWindowAttributes attr;
-
 	initialize_client_ce(c);
 	init_geometry_properties(c);
-
+	XWindowAttributes attr;
 	XGetWindowAttributes(jbwm.X.dpy, c->window, &attr);
 #ifdef USE_CMAP
 	c->cmap = attr.colormap;
@@ -272,7 +273,8 @@ reparent(Client *c)
 	XSetWindowAttributes a;
 
 	a.override_redirect=true;
-	a.event_mask = ChildMask | ButtonPressMask | EnterWindowMask;
+	a.event_mask = SubstructureRedirectMask | SubstructureNotifyMask 
+		| ButtonPressMask | EnterWindowMask;
 	c->parent=XCreateWindow(jbwm.X.dpy, c->screen->root, 
 		c->geometry.x, c->geometry.y, c->geometry.width, 
 		c->geometry.height, c->border, DefaultDepth(jbwm.X.dpy, s),

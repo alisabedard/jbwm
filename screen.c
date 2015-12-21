@@ -8,6 +8,8 @@
 #include <string.h>
 #include "screen.h"
 
+#define MouseMask (ButtonPressMask|ButtonReleaseMask|PointerMotionMask)
+
 static inline void
 draw_outline(Client * c)
 {

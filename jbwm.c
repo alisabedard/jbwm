@@ -90,9 +90,7 @@ parse_modifiers(char *s)
 	unsigned int ret = 0;
 	for(tmp = strtok(s, delim); tmp; tmp = strtok(NULL, delim))
 	{
-		ubyte i = 0;
-
-		while(i++ < 8)
+		for(ubyte i; i<8; i++)
 		{
 			const char * n=modifiers[i].name;
 
@@ -156,36 +154,30 @@ parse_argv(int argc, char **argv)
 		}
 	}
 }
-#endif /* USE_ARGV */
+#endif//USE_ARGV
 
 #ifdef USE_TBAR
 static void
 setup_fonts(void)
 {
-	Display *d;
-	
-	d = jbwm.X.dpy;
+	Display *d = jbwm.X.dpy;
 #ifdef USE_XFT
-	{
-		const ubyte s = DefaultScreen(d);
-
-		jbwm.X.font=XftFontOpen(d, s, 
-			XFT_FAMILY, XftTypeString, DEF_FONT,
-			XFT_SIZE, XftTypeDouble, FONT_SIZE, NULL);
-	}
-#else
+	jbwm.X.font=XftFontOpen(d, DefaultScreen(d), XFT_FAMILY, 
+		XftTypeString, DEF_FONT, XFT_SIZE, XftTypeDouble, 
+		FONT_SIZE, NULL);
+#else//!USE_XFT
 	jbwm.X.font=XLoadQueryFont(d, DEF_FONT);
-#endif
-	if(!jbwm.X.font)
-		ERROR("bad font");
+#endif//USE_XFT
+	if(!jbwm.X.font) ERROR("bad font");
 }
-#endif /* USE_TBAR */
+#endif//USE_TBAR 
 
 void
 jbwm_grab_button(Window w, unsigned int mask, unsigned int btn)
 {
-	XGrabButton(jbwm.X.dpy, btn, mask, w, false, ButtonMask, 
-		GrabModeAsync, GrabModeSync, None, None);
+	XGrabButton(jbwm.X.dpy, btn, mask, w, false, 
+		ButtonPressMask|ButtonReleaseMask, GrabModeAsync, 
+		GrabModeSync, None, None);
 }
 
 static void
@@ -218,23 +210,20 @@ static void
 setup_each_client(const ubyte i, const ubyte j, Window *wins)
 {
 	XWindowAttributes winattr;
-
 	XGetWindowAttributes(jbwm.X.dpy, wins[j], &winattr);
-	if(!winattr.override_redirect
-		&& winattr.map_state == IsViewable)
+	if(!winattr.override_redirect && winattr.map_state == IsViewable)
 		make_new_client(wins[j], &jbwm.X.screens[i]);
 }
 
 static void
 setup_clients(const ubyte i)
 {
-	Window dw1, dw2, *wins;
-	unsigned int j, nwins;
-
-	if(XQueryTree(jbwm.X.dpy, jbwm.X.screens[i].root, &dw1, &dw2,
-		&wins, &nwins)==0)
-		return;
-	for(j = 0; j < nwins; j++)
+	unsigned int nwins;
+	Window *wins;
+	Window d;
+	if(XQueryTree(jbwm.X.dpy, jbwm.X.screens[i].root, &d, &d, &wins, 
+		&nwins)==0) return;
+	for(unsigned int j = 0; j < nwins; j++) 
 		setup_each_client(i, j, wins);
 	XFree(wins);
 }
@@ -252,27 +241,20 @@ setup_screen_elements(const ubyte i)
 static void
 setup_gc(const ubyte i)
 {
-	XGCValues gv;
-
 	allocate_colors(i);
-	gv.foreground = jbwm.X.screens[i].fg.pixel;
-	gv.background = jbwm.X.screens[i].bg.pixel;
-	/* set up GC parameters - same for each screen */
-	gv.function = GXinvert;
-	gv.subwindow_mode = IncludeInferiors;
-	gv.line_width = JBWM_BORDER;
-#ifdef USE_TBAR
+	XGCValues gv={.foreground=jbwm.X.screens[i].fg.pixel, 
+		.background=jbwm.X.screens[i].bg.pixel, .function=GXinvert,
+		.subwindow_mode=IncludeInferiors, .line_width=JBWM_BORDER,
+#if defined(USE_TBAR) && !defined(USE_XFT)
+		.font=jbwm.X.font->fid
+#endif//USE_TBAR&&!USE_XFT
+		};
+	unsigned long vm=GCFunction|GCSubwindowMode|GCLineWidth;
 #ifndef USE_XFT
-	gv.font = jbwm.X.font->fid;
-#endif /* ! USE_XFT */
-#endif /* USE_TBAR */
-
+	vm|=GCFont;
+#endif//USE_XFT
 	jbwm.X.screens[i].gc = XCreateGC(jbwm.X.dpy, jbwm.X.screens[i].root,
-               GCFunction | GCSubwindowMode | GCLineWidth
-#ifndef USE_XFT
-               | GCFont
-#endif /* ! USE_XFT */
-               , &gv);
+               vm, &gv);
 }
 
 #ifdef EWMH
@@ -305,28 +287,19 @@ setup_ewmh_for_screen(ScreenInfo *s)
 		DisplayHeight(jbwm.X.dpy, s->screen)
 	};
 	unsigned long vdesk = s->vdesk;
-
-	XChangeProperty(jbwm.X.dpy, s->root, GETATOM("_NET_SUPPORTED"),
+	const Window r=s->root;
+	XChangeProperty(jbwm.X.dpy, r, GETATOM("_NET_SUPPORTED"),
 		XA_ATOM, 32, PropModeReplace, (unsigned char *)&supported,
 		sizeof(supported) / sizeof(Atom));
-	XChangeProperty(jbwm.X.dpy, s->root, GETATOM("_NET_WM_ALLOWED_ACTIONS"),
+	XChangeProperty(jbwm.X.dpy, r, GETATOM("_NET_WM_ALLOWED_ACTIONS"),
 		XA_ATOM, 32, PropModeReplace, (unsigned char *)&actions,
 		sizeof(actions) / sizeof(Atom));
-	XChangeProperty(jbwm.X.dpy, s->root, GETATOM("_NET_DESKTOP_GEOMETRY"),
-		XA_CARDINAL, 32, PropModeReplace,
-		(unsigned char *)&workarea[2], 2);
-	XChangeProperty(jbwm.X.dpy, s->root, GETATOM("_NET_DESKTOP_VIEWPORT"),
-		XA_CARDINAL, 32, PropModeReplace, 
-		(unsigned char *)&workarea[0], 2);
-	XChangeProperty(jbwm.X.dpy, s->root, GETATOM("_NET_CURRENT_DESKTOP"),
-		XA_CARDINAL, 32, PropModeReplace,
-		(unsigned char *)&vdesk, 1);
+	JCARD(r, "_NET_DESKTOP_GEOMETRY", &workarea[2], 2);
+	JCARD(r, "_NET_DESKTOP_VIEWPORT", &workarea[0], 2);
+	JCARD(r, "_NET_CURRENT_DESKTOP", &vdesk, 1);
 	const unsigned char n=1;
-	XChangeProperty(jbwm.X.dpy, s->root, GETATOM("_NET_NUMBER_OF_DESKTOPS"),
-		XA_CARDINAL, 32, PropModeReplace, &n, 1);
-	XChangeProperty(jbwm.X.dpy, s->root, GETATOM("_NET_WM_NAME"),
-		XA_STRING, 8, PropModeReplace,
-		(const unsigned char *)"jbwm", 4);
+	JCARD(r, "_NET_NUMBER_OF_DESKTOPS", &n, 1);
+	JSTRING(r, "_NET_WM_NAME", "jbwm", 4);
 }
 #endif//EWMH
 
@@ -397,7 +370,7 @@ setup_display(void)
 	setup_screens();
 }
 
-int 
+int
 main(
 #ifdef USE_ARGV
 	int argc, char **argv)
