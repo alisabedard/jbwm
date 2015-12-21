@@ -8,7 +8,8 @@
 
 #include <stdio.h>
 
-#define ERROR(...) {fprintf(stderr, __VA_ARGS__); exit(1);}
+#define ERROR(...) {fprintf(stderr, __VA_ARGS__); putc('\n', stderr); \
+	exit(1);}
 
 #ifdef DEBUG
 #define LOG(...) \

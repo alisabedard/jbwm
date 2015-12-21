@@ -270,6 +270,7 @@ setup_gc(const ubyte i)
                , &gv);
 }
 
+#if 0
 static void
 setup_ewmh_for_screen(ScreenInfo *s)
 {
@@ -313,6 +314,7 @@ setup_ewmh_for_screen(ScreenInfo *s)
 		XA_STRING, 8, PropModeReplace,
 		(const unsigned char *)"jbwm", 4);
 }
+#endif
 
 static void
 setup_display_per_screen(const ubyte i)
@@ -323,7 +325,9 @@ setup_display_per_screen(const ubyte i)
 	grab_keys_for_screen(&jbwm.X.screens[i]);
 	/* scan all the windows on this screen */
 	setup_clients(i);
+#if 0
 	setup_ewmh_for_screen(&jbwm.X.screens[i]);
+#endif
 }
 
 #ifdef USE_SHAPE
@@ -354,14 +358,9 @@ setup_screens(void)
 static void
 setup_display(void)
 {
-	{
-		const char *dpy_env = getenv("DISPLAY");
-
-		if(!(jbwm.X.dpy = XOpenDisplay(dpy_env ? dpy_env : ":0")))
-		{
-			ERROR("bad DISPLAY");
-		}
-	}
+	jbwm.X.dpy=XOpenDisplay(NULL);
+	if(!jbwm.X.dpy)
+		ERROR("BadDISPLAY");
 	XSetErrorHandler(handle_xerror);
 #ifdef USE_TBAR
 	/* Fonts only needed with title bars */

@@ -21,7 +21,8 @@ move_client_with_vdesk(Client * c, Bool next)
 static void
 shade_window(Client * c)
 {
-	/* This implements window shading, a substitute for iconification.  */
+	/* This implements window shading, a substitute 
+	   for iconification.  */
 	if(c->flags & JB_CLIENT_SHADED)
 	{
 		c->geometry.height=c->shade_height;
@@ -69,6 +70,9 @@ jbwm_handle_button_event(XButtonEvent * e)
 	Client *c;
 
 	if(!(c = find_client(e->window)))
+		return;
+	/* Move/Resize operations invalid on maximized windows.  */
+	if(c->flags & JB_CLIENT_MAXIMIZED)
 		return;
 	switch (e->button)
 	{

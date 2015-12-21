@@ -16,19 +16,25 @@ point(Client *c, const int x, const int y)
 	XWarpPointer(d, None, c->window, 0, 0, 0, 0, x, y);
 }
 
+#if 0
 static void
 key_moveresize(Client * c)
 {
 	moveresize(c);
 	point(c, JBWM_RESIZE_INCREMENT, JBWM_RESIZE_INCREMENT);
 }
+#endif
 
 static void
 moveresize_dir(Client * c, XKeyEvent * e, short *xy,
 	unsigned short *wh, const byte sign)
 {
-	const byte inc = JBWM_RESIZE_INCREMENT;
+	const ubyte inc = JBWM_RESIZE_INCREMENT;
 	const byte mod = sign * inc;
+
+	/* These operations invalid when maximized.  */
+	if(c->flags & JB_CLIENT_MAXIMIZED)
+		return;
 
 	if((e->state & jbwm.keymasks.mod) && (*wh > inc))
 	{
@@ -40,7 +46,9 @@ moveresize_dir(Client * c, XKeyEvent * e, short *xy,
 	}
 	else
 		*xy += mod;
-	key_moveresize(c);
+	//key_moveresize(c);
+	moveresize(c);
+	point(c, JBWM_RESIZE_INCREMENT, JBWM_RESIZE_INCREMENT);
 }
 
 static void
@@ -62,6 +70,7 @@ handle_client_key_event(XKeyEvent * e, Client * c, KeySym key)
 	case KEY_RIGHT:
 		moveresize_dir(c, e, &(g->x), &(g->width), 1);
 		break;
+#if 0
 	case KEY_TOPLEFT:
 		g->x = g->y = c->border;
 		key_moveresize(c);
@@ -81,6 +90,7 @@ handle_client_key_event(XKeyEvent * e, Client * c, KeySym key)
 		g->y = jbwm.X.screens->height - g->height - c->border;
 		key_moveresize(c);
 		break;
+#endif
 	case KEY_KILL:
 		send_wm_delete(c);
 		break;

@@ -128,22 +128,51 @@ handle_property_change(XPropertyEvent * e)
 			get_atom_name(a), (int)a);
 		switch(a)
 		{
-#if 0
 		case XA_WM_NORMAL_HINTS:
 			LOG("XA_WM_NORMAL_HINTS");
 			{
-				long __attribute__((unused)) flags;
+				XSizeHints h;
+				long flags;
 
-				XGetWMNormalHints(jbwm.X.dpy, c->window, 
-					&(c->size), &flags);
-				LOG("geometry=%dx%d+%d+%d\nflags=%d\n", 
-					c->size.width, c->size.height, 
-					c->size.x, c->size.y, 
-					(int)flags);
+				XGetWMNormalHints(jbwm.X.dpy, c->window, &h, 
+					&flags);
+				if(flags & PWinGravity)
+				{
+					LOG("PWinGravity");
+					c->size.win_gravity=h.win_gravity;
+				}
+				if(flags & PMinSize)
+				{
+					LOG("PWinSize");
+					c->size.min_width=h.min_width;
+					c->size.min_height=h.min_height;
+				}
+				if(flags & PSize)
+				{
+					LOG("PSize");
+					c->size.base_width=h.base_width;
+					c->size.base_height=h.base_height;
+				}
+				if(flags & PResizeInc)
+				{
+					LOG("PResizeInc");
+					c->size.width_inc=h.width_inc;
+					c->size.height_inc=h.height_inc;
+				}
 			}
 			return;
-#endif
-		case XA_WM_HINTS: /* Mainly used for icons */
+		case XA_WM_HINTS: /* Mainly used for icons and urgency*/
+			{
+				XWMHints *h;
+				h=XGetWMHints(jbwm.X.dpy, c->window);
+				if(h->flags & XUrgencyHint)
+				{
+					c->vdesk=c->screen->vdesk;
+					unhide(c);
+					XRaiseWindow(jbwm.X.dpy, c->parent);
+				}
+				XFree(h);
+			}
 			return;
 #ifdef USE_TBAR
 		case XA_WM_NAME:
@@ -152,12 +181,10 @@ handle_property_change(XPropertyEvent * e)
 			return;
 #endif /* USE_TBAR */
 		default:
-#if 0
-			if(a==GETATOM("WM_STATE"))
+			if(a==GETATOM("_NET_WM_STATE"))
 			{
 				return;
 			}
-#endif
 			if(a==GETATOM("_NET_WM_OPAQUE_REGION"))
 			{
 				return;

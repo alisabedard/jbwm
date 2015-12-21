@@ -8,6 +8,7 @@
 #include <string.h>
 #include "screen.h"
 
+#if 0
 static void
 ewmh_set_net_wm_state(Client *c)
 {
@@ -19,9 +20,8 @@ ewmh_set_net_wm_state(Client *c)
         state[i++] = GETATOM("_NET_WM_ACTION_FULLSCREEN");
         XChangeProperty(jbwm.X.dpy, c->window, JA_VWM_STATE, XA_ATOM, 32, 
 		PropModeReplace, (unsigned char *)&state, i);
-        XChangeProperty(jbwm.X.dpy, c->parent, JA_VWM_STATE, XA_ATOM, 32, 
-		PropModeReplace, (unsigned char *)&state, i);
 }
+#endif
 
 static inline void
 draw_outline(Client * c)
@@ -105,7 +105,6 @@ sweep_loop:
 	case ButtonRelease:
 		XUngrabPointer(jbwm.X.dpy, CurrentTime);
 		moveresize(c);
-		ewmh_set_net_wm_state(c);
 		return;
 	}
 	goto sweep_loop;
@@ -253,7 +252,6 @@ drag(Client * c)
 	Window root=c->screen->root;
 	Position p, old_p;
 	XRectangle *g;
-
 	if(!grab_pointer(root, jbwm.X.cursor))
 		return;
 	g=&(c->geometry);
@@ -267,10 +265,11 @@ void
 moveresize(Client * c)
 {
 	XRectangle *g = &(c->geometry);
+	const bool max = c->flags & JB_CLIENT_MAXIMIZED;
 	const ubyte b = c->border;
 #ifdef USE_TBAR
-	const unsigned int parent_height = g->height + TDIM;
-	const short y = g->y-b-TDIM;
+	const unsigned int parent_height = g->height + (max?0:TDIM);
+	const short y = g->y-b-(max?0:TDIM);
 #else
 	const unsigned int parent_height = g->height;
 	const short y = g->y-b;
@@ -288,7 +287,8 @@ moveresize(Client * c)
 	/* Offset the child window within the parent window
 		to display titlebar */
 #ifdef USE_TBAR
-	XMoveResizeWindow(jbwm.X.dpy, c->window, 0, TDIM, width, g->height);
+	XMoveResizeWindow(jbwm.X.dpy, c->window, 0, 
+		c->flags & JB_CLIENT_MAXIMIZED ? 0 : TDIM, width, g->height);
 #endif
 	send_configure(c);
 #ifdef USE_TBAR
@@ -317,7 +317,7 @@ maximize(Client * c)
 		og->width = 0;
 		XChangeProperty(jbwm.X.dpy, c->window, JA_VWM_STATE, 
 			XA_ATOM, 32, PropModeReplace, NULL, 0);
-		ewmh_set_net_wm_state(c);
+		//ewmh_set_net_wm_state(c);
 		
 	}
 	else /* Maximize: */
@@ -329,10 +329,11 @@ maximize(Client * c)
 		//g->y=TDIM;
 		g->y=0;
 		g->width = s->width;
-		//g->height = s->height-TDIM;
+		g->height = s->height;
+		//g->height = s->height+TDIM;
 		g->height = s->height;
 		c->flags |= JB_CLIENT_MAXIMIZED;
-		ewmh_set_net_wm_state(c);
+		//ewmh_set_net_wm_state(c);
 	}
 	moveresize(c);
 	XRaiseWindow(jbwm.X.dpy, c->parent);

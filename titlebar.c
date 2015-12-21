@@ -130,27 +130,32 @@ draw_titlebar(Client * c, char *name)
 void
 update_titlebar(Client * c)
 {
-	Window iw = c->titlebar;
+	Window tb = c->titlebar;
 
+	if(c->flags & JB_CLIENT_MAXIMIZED)
+	{
+		/* May generate BadWindow on subsequent invocations,
+		   however the error handler makes such irrelevant.  */
+		XDestroyWindow(jbwm.X.dpy, tb);
+		c->titlebar=0;
+		return;
+	}
 #ifdef USE_SHAPE
 	set_shape(c);
 #endif /* USE_SHAPE */
-	if(!iw)
+	if(!tb)
 	{
 		new_titlebar(c);
 		/* Return here to prevent BadWindow/BadDrawable errors */
 		return;
 	}
 
-	/* Client specific data.  */
-	XMoveResizeWindow(jbwm.X.dpy, iw, 0, 0, c->geometry.width,
-		TDIM);
-	/* Depending on common data.  */
+	/* Expand/Contract the titlebar width as necessary:  */
+	XMoveResizeWindow(jbwm.X.dpy, tb, 0, 0, c->geometry.width, TDIM);
 	{
-		char *name;
-
-		XFetchName(jbwm.X.dpy, c->window, &name);
-		draw_titlebar(c, name);
+		XTextProperty p;
+		XGetTextProperty(jbwm.X.dpy, c->window, &p, XA_WM_NAME);
+		draw_titlebar(c, (char *)p.value);
 	}
 }
 

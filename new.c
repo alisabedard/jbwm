@@ -228,6 +228,7 @@ init_geometry(Client * c)
 		c->ignore_unmap++;
 }
 
+#if 0
 static void
 reparent(Client * c)
 {
@@ -237,11 +238,7 @@ reparent(Client * c)
 	const int y = g->y - b; 
 	const Window w = c->window;
 	const unsigned long valuemask = CWOverrideRedirect | CWBorderPixel 
-#ifdef USE_SHAPE
 		| CWBackPixel | CWEventMask;
-#else
-		| CWBackPixel | CWEventMask | CWBackPixel;
-#endif /* USE_SHAPE */
 	const int s=c->screen->screen;
 	XSetWindowAttributes attr;
 	Display *d;
@@ -266,5 +263,23 @@ reparent(Client * c)
 #endif
 	XReparentWindow(d, w, c->parent, 0, 0);
 	XMapWindow(d, w);
+}
+#endif
+static void
+reparent(Client *c)
+{
+	const unsigned long vm= CWOverrideRedirect | CWEventMask;
+	const ubyte s = c->screen->screen;
+	XSetWindowAttributes a;
+
+	a.override_redirect=true;
+	a.event_mask = ChildMask | ButtonPressMask | EnterWindowMask;
+	c->parent=XCreateWindow(jbwm.X.dpy, c->screen->root, 
+		c->geometry.x, c->geometry.y, c->geometry.width, 
+		c->geometry.height, c->border, DefaultDepth(jbwm.X.dpy, s),
+		CopyFromParent, DefaultVisual(jbwm.X.dpy, s), vm, &a);
+	XAddToSaveSet(jbwm.X.dpy, c->window);
+	XReparentWindow(jbwm.X.dpy, c->window, c->parent, 0, 0);
+	XMapWindow(jbwm.X.dpy, c->window);
 }
 

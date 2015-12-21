@@ -3,7 +3,7 @@
 
 typedef struct ScreenInfo
 {
-	int screen;
+	ubyte screen;
 	Window root;
 	GC gc;
 	XColor fg, bg;
