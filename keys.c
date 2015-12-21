@@ -144,14 +144,14 @@ jbwm_handle_key_event(XKeyEvent * e)
 	case XK_7:
 	case XK_8:
 	case XK_9:
-		switch_vdesk(screen, KEY_TO_VDESK(key));
+		switch_vdesk(screen, key-XK_1);
 		break;
 	case KEY_PREVDESK:
-		if(screen && screen->vdesk > KEY_TO_VDESK(XK_1))
+		if(screen && screen->vdesk > 0)
 			switch_vdesk(screen, screen->vdesk - 1);
 		break;
 	case KEY_NEXTDESK:
-		if(screen && screen->vdesk < KEY_TO_VDESK(XK_8))
+		if(screen && screen->vdesk < 9)
 			switch_vdesk(screen, screen->vdesk + 1);
 		break;
 	default:

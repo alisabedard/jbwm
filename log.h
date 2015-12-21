@@ -6,22 +6,25 @@
 #ifndef JBWM__LOG_H__
 #define JBWM__LOG_H__
 
+#ifdef STDIO
 #include <stdio.h>
-
 #define ERROR(...) {fprintf(stderr, __VA_ARGS__); putc('\n', stderr); \
 	exit(1);}
+#else//!STDIO
+#define ERROR(...) exit(1)
+#endif//STDIO
 
-#ifdef DEBUG
+#if defined(DEBUG) && defined(STDIO)
 #define LOG(...) \
 {\
 	fprintf(stderr, "%s:%d:  ", __FILE__, __LINE__);\
 	fprintf(stderr, __VA_ARGS__); putc('\n', stderr);\
 }
 #define MARK() LOG("MARK")
-#else
+#else // !DEBUG || !STDIO 
 #define LOG(...)
 #define MARK()
-#endif
+#endif // DEBUG && STDIO
 
 #define UNUSED(x)
 

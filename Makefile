@@ -1,5 +1,5 @@
 #CC = clang
-
+#CC=/opt/diet/bin/diet -Os gcc
 CFLAGS=-Os -W -Wall
 # Debug:
 #CFLAGS=-O0 -ggdb -DDEBUG -W -Wall -Werror
@@ -13,15 +13,11 @@ prefix = $(DESTDIR)/usr
 # For typical manually built package:
 #prefix = /usr/local
 
-# For older *nix installs
-XROOT    = /usr/X11R6
-INCLUDES += -I$(XROOT)/include
-LDPATH  += -L$(XROOT)/lib
-
-# Fix build on NetBSD
-XROOT    = /usr/X11R7
-INCLUDES += -I$(XROOT)/include
-LDPATH  += -L$(XROOT)/lib
+# Fix build on NetBSD and older systems:
+INCLUDES+=-I/usr/X11R6/include
+INCLUDES+=-I/usr/X11R7/include
+LDPATH+=-L/usr/X11R6/lib
+LDPATH+=-L/usr/X11R7/lib
 
 LIBS += -lX11 
 
@@ -69,6 +65,9 @@ SRCS += titlebar.c
 
 # Uncomment to enable window snapping.
 # DEFINES += -DUSE_SNAP
+
+# Uncomment to enable STDIO
+#DEFINES += -DSTDIO
 
 # ----- You shouldn't need to change anything under this line ------ #
 

@@ -48,20 +48,12 @@ typedef struct
 
 /* readability stuff */
 
-#define KEY_TO_VDESK(key) ((key) - XK_1)
-#define valid_vdesk(v) ((unsigned)(v) < KEY_TO_VDESK(XK_8))
-
-#define RAISE           1
-#define NO_RAISE        0	/* for unhide() */
-
-#define MAXIMISE_HORZ        (1<<0)
-#define MAXIMISE_VERT        (1<<1)
-
 /* some coding shorthand */
 
 #define ChildMask       (SubstructureRedirectMask|SubstructureNotifyMask)
 #define ButtonMask      (ButtonPressMask|ButtonReleaseMask)
 #define MouseMask       (ButtonMask|PointerMotionMask)
+#define JBWMMask	(ChildMask|JBWMMask)
 
 void 
 jbwm_grab_button(Window w, unsigned int mask, unsigned int button);

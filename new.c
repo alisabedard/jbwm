@@ -5,7 +5,6 @@
 
 #include <stdlib.h>
 #include <string.h>
-#include <stdio.h>
 #include "jbwm.h"
 
 static void init_geometry(Client * c);
@@ -162,7 +161,7 @@ init_long_properties(Client * c, unsigned long *nitems)
 		jbwm_get_property(c->window, GETATOM("_NET_WM_DESKTOP"),
 		XA_CARDINAL, nitems)))
 	{
-		if(*nitems && valid_vdesk(lprop[0]))
+		if(*nitems && lprop[0]<9)
 			c->vdesk = lprop[0];
 		XFree(lprop);
 	}

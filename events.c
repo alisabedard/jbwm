@@ -63,112 +63,40 @@ handle_colormap_change(XColormapEvent * e)
 }
 #endif /* USE_CMAP */
 
-#if 0
-#ifdef DEBUG
-static const char *
-get_atom_name(const Atom a)
+static void
+handle_wm_hints(Client *c)
 {
-	char *n=XGetAtomName(jbwm.X.dpy, a);
-	static char buf[48];
-	strncpy(buf, n, sizeof(buf));
-	XFree(n);
-	buf[sizeof(buf)-1]=0;
-
-	return buf;
+	XWMHints *h=XGetWMHints(jbwm.X.dpy, c->window);
+	if(h->flags & XUrgencyHint)
+	{
+		switch_vdesk(c->screen, c->screen->vdesk);
+		unhide(c);
+		XRaiseWindow(jbwm.X.dpy, c->parent);
+	}
+	XFree(h);
 }
-#endif /* DEBUG */
-#endif
 
 static void
 handle_property_change(XPropertyEvent * e)
 {
 	Client *c=find_client(e->window);
 	if(!c) return;
-	moveresize(c);
-#if 0
-	Client *c;
-	const Atom a = e->atom;
-
-	if(!e->window)
-	{
-		LOG("!e->window");
+#ifdef DEBUG
+	char *an=XGetAtomName(jbwm.X.dpy, e->atom);
+	LOG("atom: %s(%d)", an, e->atom);
+	XFree(an);
+#endif//DEBUG
+	switch(e->atom)
+	{ 
+	case XA_WM_NAME:
+		update_titlebar(c);
+		break;
+	case XA_WM_HINTS:
+		handle_wm_hints(c);
+		break;
+	default:
+		moveresize(c);
 	}
-	c = find_client(e->window);
-	if(c)
-	{
-		LOG("handle_property_change(w=%lx, a=%s[%d])", e->window, 
-			get_atom_name(a), (int)a);
-		switch(a)
-		{
-		case XA_WM_NORMAL_HINTS:
-			LOG("XA_WM_NORMAL_HINTS");
-			{
-				XSizeHints h;
-				long flags;
-
-				XGetWMNormalHints(jbwm.X.dpy, c->window, &h, 
-					&flags);
-				if(flags & PWinGravity)
-				{
-					LOG("PWinGravity");
-					c->size.win_gravity=h.win_gravity;
-				}
-				if(flags & PMinSize)
-				{
-					LOG("PWinSize");
-					c->size.min_width=h.min_width;
-					c->size.min_height=h.min_height;
-				}
-				if(flags & PSize)
-				{
-					LOG("PSize");
-					c->size.base_width=h.base_width;
-					c->size.base_height=h.base_height;
-				}
-				if(flags & PResizeInc)
-				{
-					LOG("PResizeInc");
-					c->size.width_inc=h.width_inc;
-					c->size.height_inc=h.height_inc;
-				}
-			}
-			return;
-		case XA_WM_HINTS: /* Mainly used for icons and urgency*/
-			{
-				XWMHints *h;
-				h=XGetWMHints(jbwm.X.dpy, c->window);
-				if(h->flags & XUrgencyHint)
-				{
-					c->vdesk=c->screen->vdesk;
-					unhide(c);
-					XRaiseWindow(jbwm.X.dpy, c->parent);
-				}
-				XFree(h);
-			}
-			return;
-#ifdef USE_TBAR
-		case XA_WM_NAME:
-			LOG("XA_WM_NAME");
-			update_titlebar(c);
-			return;
-#endif /* USE_TBAR */
-		default:
-			if(a==GETATOM("_NET_WM_STATE"))
-			{
-				return;
-			}
-			if(a==GETATOM("_NET_WM_OPAQUE_REGION"))
-			{
-				return;
-			}
-			if(a==GETATOM("_NET_WM_USER_TIME"))
-			{
-				return;
-			}
-			moveresize(c);
-		}
-	}
-#endif
 }
 
 static void
@@ -189,102 +117,49 @@ skip:
 static void
 handle_expose_event(XEvent * ev)
 {
+	// Ignore extra expose events
 	if(ev->xexpose.count == 0)
 	{
 		/* xproperty was used instead of xexpose, previously.  */
 		const Window w = ev->xexpose.window;
-		Client *c;
-
-		if(!(c= find_client(w)))
-			return;
-		if(w==c->titlebar)
-			update_titlebar(c);
+		Client *c=find_client(w);
+		if(!c) return;
+		if(w==c->titlebar) update_titlebar(c);
 	}
 }
-#endif
+#endif//USE_TBAR
 
 static void
 jbwm_handle_configure_request(XConfigureRequestEvent * e)
 {
-	XWindowChanges wc;
-
-	wc.x=e->x;
-	wc.y=e->y;
-	wc.width=e->width;
-	wc.height=e->height;
-	wc.border_width=e->border_width;
-	wc.sibling=e->above;
-	wc.stack_mode=e->detail;
+	XWindowChanges wc={.x=e->x, .y=e->y, .width=e->width, .height=e->height,
+		.border_width=e->border_width, .sibling=e->above, 
+		.stack_mode=e->detail};
 	XConfigureWindow(jbwm.X.dpy, e->window, e->value_mask, &wc);
-#if 0
-	Client *c=find_client(e->window);
-	if(c)
-	{
-		if(e->value_mask & CWStackMode && e->value_mask & CWSibling)
-		{
-			Client *s;
-
-			s = find_client(e->above);
-			if(s)
-				wc.sibling=s->parent;
-		}
-	}
-	else
-#endif
 }
 
 static void
 handle_client_message(XClientMessageEvent *e)
 {
-	ScreenInfo *s;
-	Client *c;
-	Window cur_root, dw;
-	int di;
-	unsigned int dui;
-
-	XQueryPointer(jbwm.X.dpy, jbwm.X.screens[0].root, &cur_root, &dw, &di,
-		&di, &di, &di, &dui);
-	s=find_screen(cur_root);
-	if(e->message_type==GETATOM("_NET_WM_DESKTOP"))
+	// Define the atoms we'll use:
+	struct Messages { const Atom desktop, active, close, state, fullscreen;
+		} m = { .desktop=GETATOM("_NET_WM_DESKTOP"), 
+		.active=GETATOM("_NET_ACTIVE_WINDOW"), 
+		.close=GETATOM("_NET_CLOSE_WINDOW"),
+		.state=GETATOM("_NET_WM_STATE"), 
+		.fullscreen=GETATOM("_NET_WM_STATE_FULLSCREEN")};
+	Client *c=find_client(e->window);
+	if(!c) return;
+	const Atom t=e->message_type;
+	if(t==m.desktop) switch_vdesk(c->screen, e->data.l[0]);
+	else if(t==m.active) select_client(c);
+	else if(t==m.close && e->data.l[1]==2) send_wm_delete(c);
+	else if(t==m.state)
 	{
-		switch_vdesk(s, e->data.l[0]);
-		return;
-	}
-	c=find_client(e->window);
-	if(!c)
-		return;
-	if(e->message_type==GETATOM("_NET_ACTIVE_WINDOW"))
-	{
-		if(c->screen==s)
-			select_client(c);
-		return;
-	}
-	if(e->message_type==GETATOM("_NET_CLOSE_WINDOW"))
-	{
-		// Only do this if it came from direct user action 
-                if (e->data.l[1] == 2) {
-                        send_wm_delete(c);
-                }
-                return;
-	}
-	if(e->message_type == GETATOM("_NET_WM_STATE"))
-	{
-		int i;
-		bool m;
-
-		m=false;
-		for(i=1; i<=2; i++)
-		{	
-			if((Atom)e->data.l[i] 
-				== GETATOM("_NET_WM_STATE_FULLSCREEN"))
-			{
-				m=true;
-			}
-		}
-		if(m)
-		{
-			maximize(c);
-		}
+		bool m=false;
+		for(int i=1; i<=2; i++) if((Atom)e->data.l[i] 
+			== GETATOM("_NET_WM_STATE_FULLSCREEN")) m=true;
+		if(m) maximize(c);
 	} 
 }
 

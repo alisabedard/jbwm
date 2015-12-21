@@ -148,8 +148,10 @@ parse_argv(int argc, char **argv)
 				puts(VERSION);
 				exit(0);
 			default: /* Usage */
+#ifdef STDIO
 				fprintf(stderr, "%s [%s]\n", argv[0],
 					optstring);
+#endif//STDIO
 				exit(1);
 		}
 	}
@@ -193,10 +195,13 @@ setup_event_listeners(const ubyte i)
 
 	/* set up root window attributes 
 	   - same for each screen */
-	attr.event_mask =
-		ChildMask | EnterWindowMask | ColormapChangeMask |
-		PropertyChangeMask;
-
+	attr.event_mask = SubstructureRedirectMask;
+	attr.event_mask |= SubstructureNotifyMask;
+	attr.event_mask |= EnterWindowMask;
+	attr.event_mask |= PropertyChangeMask;
+#ifdef USE_CMAP
+	attr.event_mask |= ColormapChangeMask;
+#endif//USE_CMAP
 	XChangeWindowAttributes(jbwm.X.dpy, jbwm.X.screens[i].root,
 		CWEventMask, &attr);
 }
@@ -239,7 +244,7 @@ setup_screen_elements(const ubyte i)
 {
 	jbwm.X.screens[i].screen = i;
 	jbwm.X.screens[i].root = RootWindow(jbwm.X.dpy, i);
-	jbwm.X.screens[i].vdesk = KEY_TO_VDESK(XK_1);
+	jbwm.X.screens[i].vdesk = 0;
 	jbwm.X.screens[i].width = DisplayWidth(jbwm.X.dpy, i);
 	jbwm.X.screens[i].height = DisplayHeight(jbwm.X.dpy, i);
 }
