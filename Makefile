@@ -1,7 +1,6 @@
 #CC = clang
 
 CFLAGS=-Os -W -Wall
-
 # Debug:
 #CFLAGS=-O0 -ggdb -DDEBUG -W -Wall -Werror
 
@@ -75,7 +74,8 @@ SRCS += titlebar.c
 
 version = 1.37
 
-distname = jbwm-$(version)
+PROG=jbwm
+distname = $(PROG)-$(version)
 
 DEFINES += -DVERSION=\"$(version)\" $(DEBIAN)
 CFLAGS  += $(INCLUDES) $(DEFINES) 
@@ -84,47 +84,34 @@ LDFLAGS += $(LDPATH) $(LIBS)
 # Uncomment for static linking of binary:
 #LDFLAGS += -static 
 
-SRCS += client.c events.c jbwm.c misc.c new.c screen.c 
-SRCS += graphics.c key_event.c button_event.c keymap.c
+SRCS += client.c events.c jbwm.c new.c screen.c 
+SRCS += graphics.c button_event.c keys.c
 OBJS = $(SRCS:.c=.o)
 
-jbwm: $(OBJS) 
+$(PROG): $(OBJS) 
 	$(CC) $(CFLAGS) $(OBJS) -o $@ $(LDFLAGS)
 
-all: jbwm
+all: $(PROG)
 
-strip: jbwm
+strip: $(PROG)
 	strip --strip-all --remove-section=.comment \
-		--remove-section=.note jbwm
+		--remove-section=.note $(PROG)
 
 INSTALL=install -c
 INSTALL_PROG=$(INSTALL) -s
 INSTALL_DIR=install -d
 install: strip
-	if [ -f jbwm.exe ]; then mv jbwm.exe jbwm; fi
 	$(INSTALL_DIR) $(prefix)/bin $(prefix)/share/man/man1
-	$(INSTALL_PROG) jbwm $(prefix)/bin
-	$(INSTALL) jbwm.1 $(prefix)/share/man/man1
-
-dist:
-	darcs dist --dist-name $(distname)
-	mv $(distname).tar.gz ..
-
-debuild: dist
-	-cd ..; rm -rf $(distname)/ $(distname).orig/
-	cd ..; mv $(distname).tar.gz jbwm_$(version).orig.tar.gz
-	cd ..; tar xfz jbwm_$(version).orig.tar.gz
-	cp -a debian ../$(distname)/
-	rm -rf ../$(distname)/debian/_darcs/
-	cd ../$(distname); debuild
+	$(INSTALL_PROG) $(PROG) $(prefix)/bin
+	$(INSTALL) $(PROG).1 $(prefix)/share/man/man1
 
 clean:
-	rm -f jbwm jbwm.exe $(OBJS) *.core
+	rm -f $(PROG) *.o
 
 distclean: clean
 	rm -f *~ *.out .*.swp .*.swn
 
 archive:
-	cd ..;  tar cjf jbwm-$(version).tar.bz2 jbwm
+	cd ..;  tar cJf $(PROG)-$(version).tar.xz $(PROG)
 
 # DO NOT DELETE
