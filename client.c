@@ -22,7 +22,7 @@ void
 send_configure(Client *c)
 {
 	configure(c);
-	XSendEvent(jbwm.X.dpy, c->window, false, StructureNotifyMask,
+	XSendEvent(D, c->window, false, StructureNotifyMask,
 		(XEvent *)&(c->ce));
 }
 
@@ -63,20 +63,20 @@ select_client(Client * c)
 {
 	if(current)
 	{
-		XSetWindowBorder(jbwm.X.dpy, current->parent,
+		XSetWindowBorder(D, current->parent,
 			current->screen->bg.pixel);
 		current->flags &= ~JB_CLIENT_ACTIVE;
 	}
 	if(c)
 	{
 		c->flags |= JB_CLIENT_ACTIVE;
-		XSetWindowBorder(jbwm.X.dpy, c->parent,
+		XSetWindowBorder(D, c->parent,
 			!is_sticky(c) ? c->screen->fg.pixel : c->
 			screen->fc.pixel);
 #ifdef USE_CMAP
-		XInstallColormap(jbwm.X.dpy, c->cmap);
+		XInstallColormap(D, c->cmap);
 #endif /* USE_CMAP */
-		XSetInputFocus(jbwm.X.dpy, c->window,
+		XSetInputFocus(D, c->window,
 			RevertToPointerRoot, CurrentTime);
 	}
 	current = c;
@@ -108,10 +108,10 @@ unparent_window(Client * c)
 {
 	LOG("unparent_window()");
 	if(!c->parent) return;
-	XReparentWindow(jbwm.X.dpy, c->window, c->screen->root, c->geometry.x, 
+	XReparentWindow(D, c->window, c->screen->root, c->geometry.x, 
 		c->geometry.y);
-	XRemoveFromSaveSet(jbwm.X.dpy, c->window);
-	if(c->parent) XDestroyWindow(jbwm.X.dpy, c->parent);
+	XRemoveFromSaveSet(D, c->window);
+	if(c->parent) XDestroyWindow(D, c->parent);
 	c->parent=0;
 }
 
@@ -127,10 +127,10 @@ remove_client(Client * c)
 void
 xmsg(Window w, Atom a, long x)
 {
-	XEvent ev = {.type=ClientMessage, .xclient.window=w, 
+	XEvent ev = {.xclient.type=ClientMessage, .xclient.window=w, 
 		.xclient.message_type=a, .xclient.format=32, 
 		.xclient.data.l[0]=x, .xclient.data.l[1]=CurrentTime};
-	XSendEvent(jbwm.X.dpy, w, false, NoEventMask, &ev);
+	XSendEvent(D, w, false, NoEventMask, &ev);
 }
 
 void
@@ -138,6 +138,9 @@ send_wm_delete(Client * c)
 {
 	xmsg(c->window, GETATOM("WM_PROTOCOLS"),
 		GETATOM("WM_DELETE_WINDOW"));
+#if 0
+	XDestroySubwindows(D, c->parent);
+#endif//0
 }
 
 #ifdef USE_SHAPE
@@ -147,7 +150,7 @@ is_shaped(Client * c)
 	int bounding_shaped;
 	int i;
 	unsigned int u;
-	return XShapeQueryExtents(jbwm.X.dpy, c->window, &bounding_shaped,
+	return XShapeQueryExtents(D, c->window, &bounding_shaped,
 		&i, &i, &u, &u, &i, &i, &i, &u, &u)
 		&& bounding_shaped;
 }
@@ -166,7 +169,7 @@ set_shape(Client * c)
 	 */
 	if(is_shaped(c))
 	{
-		XShapeCombineShape(jbwm.X.dpy, c->parent,
+		XShapeCombineShape(D, c->parent,
 			ShapeBounding, 0, TDIM, c->window, 
 			ShapeBounding, ShapeSet);
 	}
