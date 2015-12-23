@@ -5,6 +5,9 @@ typedef struct ScreenInfo
 {
 	ubyte screen;
 	Window root;
+#ifdef EWMH
+	Window supporting;
+#endif//EWMH
 	GC gc;
 	XColor fg, bg;
 	ubyte vdesk;

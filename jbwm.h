@@ -61,4 +61,9 @@ extern Application *head_app;
 extern Client *head_client;
 extern Client *current;
 
+#ifdef EWMH
+void
+set_ewmh_allowed_actions(const Window w);
+#endif//EWMH
+
 #endif /* not JBWM_JBWM_H */

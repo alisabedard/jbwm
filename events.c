@@ -57,7 +57,7 @@ handle_colormap_change(XColormapEvent * e)
 	if(c && e->new)
 	{
 		c->cmap = e->colormap;
-		XInstallColormap(jbwm.X.dpy, c->cmap);
+		XInstallColormap(D, c->cmap);
 	}
 }
 #endif /* USE_CMAP */
@@ -65,37 +65,43 @@ handle_colormap_change(XColormapEvent * e)
 static void
 handle_wm_hints(Client *c)
 {
-	XWMHints *h=XGetWMHints(jbwm.X.dpy, c->window);
+	XWMHints *h=XGetWMHints(D, c->window);
 	if(h->flags & XUrgencyHint)
 	{
 		switch_vdesk(c->screen, c->screen->vdesk);
 		unhide(c);
-		XRaiseWindow(jbwm.X.dpy, c->parent);
+		XRaiseWindow(D, c->parent);
 	}
 	XFree(h);
 }
 
+#ifdef DEBUG
+static void
+print_atom(const Atom a, const unsigned int line)
+{
+	char *an=XGetAtomName(D, a);
+	fprintf(stderr, "\t%s:%d %s(%lu)\n", __FILE__, line, an, a);
+	XFree(an);
+}
+#endif//DEBUG
+
 static void
 handle_property_change(XPropertyEvent * e)
 {
+	const Atom a=e->atom;
+#ifdef DEBUG
+	LOG("handle_property_change()");
+	print_atom(a, __LINE__);
+#endif//DEBUG
 	Client *c=find_client(e->window);
 	if(!c) return;
-#ifdef DEBUG
-	char *an=XGetAtomName(jbwm.X.dpy, e->atom);
-	LOG("atom: %s(%lu)", an, e->atom);
-	XFree(an);
-#endif//DEBUG
-	switch(e->atom)
-	{ 
-	case XA_WM_NAME:
-		update_titlebar(c);
-		break;
-	case XA_WM_HINTS:
-		handle_wm_hints(c);
-		break;
-	default:
-		moveresize(c);
-	}
+	if(a==XA_WM_NAME) update_titlebar(c);
+	else if(a==XA_WM_HINTS) handle_wm_hints(c);
+#ifdef EWMH
+	else if(a==XA("_NET_WM_USER_TIME")) return;
+	else if(a==XA("_NET_WM_OPAQUE_REGION")) return;
+#endif//EWMH
+	else moveresize(c);
 }
 
 static void
@@ -134,31 +140,39 @@ jbwm_handle_configure_request(XConfigureRequestEvent * e)
 	XWindowChanges wc={.x=e->x, .y=e->y, .width=e->width, .height=e->height,
 		.border_width=e->border_width, .sibling=e->above, 
 		.stack_mode=e->detail};
-	XConfigureWindow(jbwm.X.dpy, e->window, e->value_mask, &wc);
+	XConfigureWindow(D, e->window, e->value_mask, &wc);
 }
 
 static void
 handle_client_message(XClientMessageEvent *e)
 {
+	LOG("handle_client_message()");
+	const Atom t=e->message_type;
+#ifdef DEBUG
+	print_atom(t, __LINE__);
+#endif//DEBUG
 	// Define the atoms we'll use:
-	struct Messages { const Atom desktop, active, close, state, fullscreen;
-		} m = { .desktop=GETATOM("_NET_WM_DESKTOP"), 
-		.active=GETATOM("_NET_ACTIVE_WINDOW"), 
-		.close=GETATOM("_NET_CLOSE_WINDOW"),
-		.state=GETATOM("_NET_WM_STATE"), 
-		.fullscreen=GETATOM("_NET_WM_STATE_FULLSCREEN")};
+	struct Messages { const Atom desktop, active, close, state, 
+		fullscreen; } m = { .desktop=XA("_NET_WM_DESKTOP"), 
+		.active=XA("_NET_ACTIVE_WINDOW"), 
+		.close=XA("_NET_CLOSE_WINDOW"),
+		.state=XA("_NET_WM_STATE"), 
+		.fullscreen=XA("_NET_WM_STATE_FULLSCREEN")};
 	Client *c=find_client(e->window);
 	if(!c) return;
-	const Atom t=e->message_type;
 	if(t==m.desktop) switch_vdesk(c->screen, e->data.l[0]);
 	else if(t==m.active) select_client(c);
 	else if(t==m.close && e->data.l[1]==2) send_wm_delete(c);
 	else if(t==m.state)
 	{
-		bool m=false;
-		for(int i=1; i<=2; i++) if((Atom)e->data.l[i] 
-			== GETATOM("_NET_WM_STATE_FULLSCREEN")) m=true;
-		if(m) maximize(c);
+		bool max=false;
+		for(int i=1; i<=2; i++) 
+			if((Atom)e->data.l[i] ==m.fullscreen)
+				max=true;
+		if(max)
+		{
+			 maximize(c);
+		}
 	} 
 }
 
@@ -167,7 +181,7 @@ main_event_loop(void)
 {
 	XEvent ev;
 head:
-	XNextEvent(jbwm.X.dpy, &ev);
+	XNextEvent(D, &ev);
 	switch (ev.type)
 	{
 	case EnterNotify:
@@ -198,6 +212,38 @@ head:
 	case ConfigureRequest:
 		jbwm_handle_configure_request(&ev.xconfigurerequest);
 		break;
+	case ConfigureNotify:
+		LOG("ConfigureNotify");
+		LOG("\tsend_event: %d", ev.xconfigure.send_event);
+		LOG("\toverride_redirect: %d", 
+			ev.xconfigure.override_redirect);
+		// Ignore window per XConfigureEvent(3)
+		if(ev.xconfigure.override_redirect) break;
+		else
+		{
+			Client *c=find_client(ev.xconfigure.window);
+			if(!c) break;
+			moveresize(c);
+		}
+		break;
+	case CreateNotify:
+		LOG("CreateNotify");
+		break;
+	case MapNotify:
+		LOG("MapNotify");
+		break;
+	case KeyRelease:
+		LOG("KeyRelease");
+		break;
+	case MappingNotify:
+		LOG("MappingNotify");
+		break;
+	case ReparentNotify:
+		LOG("ReparentNotify");
+		break;
+	case DestroyNotify:
+		LOG("DestroyNotify");
+		break;
 #ifdef USE_CMAP
 	case ColormapNotify:
 		handle_colormap_change(&ev.xcolormap);
@@ -212,6 +258,10 @@ head:
 		set_shape(find_client(ev.xany.window));
 		break;
 #endif /* USE_SHAPE */
+#ifdef DEBUG
+	default:
+		LOG("Unhandled event (%d)!", ev.type);
+#endif//DEBUG
 	}
 	if(jbwm.need_cleanup)
 		cleanup();

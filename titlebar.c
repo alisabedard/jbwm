@@ -23,7 +23,7 @@ new_titlebar(Client *c)
 	if(is_shaped(c))
 		return;
 #endif /* USE_SHAPE */
-	d=jbwm.X.dpy;
+	d=D;
 	w = c->titlebar = XCreateSimpleWindow(d, c->parent, 0, 0, 
 		c->geometry.width, TDIM, 0, 0, 0); 
 	XSelectInput(d, w, ExposureMask);
@@ -45,7 +45,7 @@ draw_title(Client * c, char *name)
 	Display *d;
 	Window w;
 
-	d=jbwm.X.dpy;
+	d=D;
 	w = c->titlebar;
 	if(!name)
 		return 0;
@@ -101,7 +101,7 @@ draw_titlebar(Client * c, char *name)
 	const unsigned short shade_offset = resize_offset - TDIM;
 	XRectangle g;
 
-	XClearWindow(jbwm.X.dpy, c->titlebar);
+	XClearWindow(D, c->titlebar);
 #ifndef USE_XPM
 	g.x=g.y=0;
 	g.width=g.height=TDIM;
@@ -136,7 +136,7 @@ update_titlebar(Client * c)
 	{
 		/* May generate BadWindow on subsequent invocations,
 		   however the error handler makes such irrelevant.  */
-		XDestroyWindow(jbwm.X.dpy, tb);
+		XDestroyWindow(D, tb);
 		c->titlebar=0;
 		return;
 	}
@@ -151,10 +151,10 @@ update_titlebar(Client * c)
 	}
 
 	/* Expand/Contract the titlebar width as necessary:  */
-	XMoveResizeWindow(jbwm.X.dpy, tb, 0, 0, c->geometry.width, TDIM);
+	XMoveResizeWindow(D, tb, 0, 0, c->geometry.width, TDIM);
 	{
 		XTextProperty p;
-		XGetTextProperty(jbwm.X.dpy, c->window, &p, XA_WM_NAME);
+		XGetTextProperty(D, c->window, &p, XA_WM_NAME);
 		draw_titlebar(c, (char *)p.value);
 	}
 }
@@ -163,7 +163,7 @@ void
 delete_titlebar(Client * c)
 {
 	if(c && c->titlebar)
-		XDestroyWindow(jbwm.X.dpy, c->titlebar);
+		XDestroyWindow(D, c->titlebar);
 	c->titlebar = None;
 }
 

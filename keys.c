@@ -9,8 +9,8 @@
 static void
 point(Client *c, const int x, const int y)
 {
-	XRaiseWindow(jbwm.X.dpy, c->parent);
-	XWarpPointer(jbwm.X.dpy, None, c->window, 0, 0, 0, 0, x, y);
+	XRaiseWindow(D, c->parent);
+	XWarpPointer(D, None, c->window, 0, 0, 0, 0, x, y);
 }
 
 static void
@@ -58,10 +58,10 @@ handle_client_key_event(XKeyEvent * e, Client * c, KeySym key)
 		break;
 	case KEY_LOWER:
 	case KEY_ALTLOWER:
-		XLowerWindow(jbwm.X.dpy, c->parent);
+		XLowerWindow(D, c->parent);
 		break;
 	case KEY_RAISE:
-		XRaiseWindow(jbwm.X.dpy, c->parent);
+		XRaiseWindow(D, c->parent);
 		break;
 	case KEY_MAX:
 		maximize(c);
@@ -99,7 +99,7 @@ next(void)
 	select_client(c);
 	point(c, 0, 0);
 	point(c, c->geometry.width, c->geometry.height);
-	XSync(jbwm.X.dpy, False);
+	XSync(D, False);
 }
 
 
@@ -156,7 +156,7 @@ grab(ScreenInfo * s, KeySym * ks, const unsigned int mask)
 	for(;*ks; ks++)
 	{
 		const int gm=GrabModeAsync;
-		XGrabKey(jbwm.X.dpy, XKeysymToKeycode(jbwm.X.dpy, *ks), 
+		XGrabKey(D, XKeysymToKeycode(jbwm.X.dpy, *ks), 
 			jbwm.keymasks.grab| mask, s->root, true, gm, gm); 
 	}
 }

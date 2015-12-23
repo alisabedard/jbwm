@@ -2,7 +2,8 @@
 #CC=/opt/diet/bin/diet -Os gcc
 CFLAGS=-Os -W -Wall
 # Debug:
-#CFLAGS=-O0 -ggdb -DDEBUG -DSTDIO -W -Wall -Werror
+#CFLAGS+=-ggdb -Werror
+CFLAGS=-O0 -ggdb -DDEBUG -DSTDIO -W -Wall -Werror
 
 # Profile:
 #CFLAGS += -pg 
@@ -70,7 +71,7 @@ SRCS += titlebar.c
 #DEFINES += -DSTDIO
 
 # Uncomment to enable EWMH
-#DEFINES += -DEWMH
+DEFINES += -DEWMH
 
 # ----- You shouldn't need to change anything under this line ------ #
 

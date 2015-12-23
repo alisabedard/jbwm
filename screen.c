@@ -19,7 +19,7 @@ draw_outline(Client * c)
 #endif /* USE_SHAPE */
 	XRectangle *g=&(c->geometry);
 	ScreenInfo *s=c->screen;
-	XDrawRectangle(jbwm.X.dpy, s->root, s->gc, g->x, g->y-TDIM, g->width, 
+	XDrawRectangle(D, s->root, s->gc, g->x, g->y-TDIM, g->width, 
 		g->height + (c->flags & JB_CLIENT_SHADED ?0:TDIM));
 }
 
@@ -43,7 +43,7 @@ static inline bool
 grab_pointer(Window w, Cursor cursor)
 {
 	const int gm=GrabModeAsync;
-	return XGrabPointer(jbwm.X.dpy, w, false, MouseMask, gm, gm, None, 
+	return XGrabPointer(D, w, false, MouseMask, gm, gm, None, 
 		cursor, CurrentTime) == GrabSuccess;
 }
 
@@ -69,18 +69,18 @@ sweep(Client * c)
 	if(!grab_pointer(c->screen->root, jbwm.X.cursor) 
 		|| c->flags & JB_CLIENT_SHADED) return;
 	XRectangle *g=&(c->geometry);
-	XWarpPointer(jbwm.X.dpy, None, c->window, 0, 0, 0, 0, 
+	XWarpPointer(D, None, c->window, 0, 0, 0, 0, 
 		g->width, g->height);
 	XEvent ev;
 sweep_loop:	
-	XMaskEvent(jbwm.X.dpy, MouseMask, &ev);
+	XMaskEvent(D, MouseMask, &ev);
 	switch (ev.type)
 	{
 	case MotionNotify:
 		handle_motion_notify(c, g, &(ev.xmotion));
 		break;
 	case ButtonRelease:
-		XUngrabPointer(jbwm.X.dpy, CurrentTime);
+		XUngrabPointer(D, CurrentTime);
 		moveresize(c);
 		return;
 	}
@@ -187,12 +187,12 @@ drag_event_loop(Client * c, int x1, int y1, int old_cx, int old_cy)
 
 	for(;;)
 	{
-		XMaskEvent(jbwm.X.dpy, MouseMask, &ev);
+		XMaskEvent(D, MouseMask, &ev);
 		if(ev.type == MotionNotify)
 			drag_motion(c, ev, x1, y1, old_cx, old_cy);
 		else
 		{
-			XUngrabPointer(jbwm.X.dpy, CurrentTime);
+			XUngrabPointer(D, CurrentTime);
 			moveresize(c);
 			return;
 		}
@@ -207,7 +207,7 @@ get_mouse_position(Window w, int *x, int *y)
 	int __attribute__((unused)) d;
 	unsigned int __attribute__((unused)) u;
 
-	XQueryPointer(jbwm.X.dpy, w, &w, &w, x, y, &d, &d, &u);
+	XQueryPointer(D, w, &w, &w, x, y, &d, &d, &u);
 }
 
 void
@@ -243,15 +243,15 @@ moveresize(Client * c)
 
 	if(c->flags & JB_CLIENT_SHADED)
 	{
-		XMoveWindow(jbwm.X.dpy, c->parent, x, y);
+		XMoveWindow(D, c->parent, x, y);
 		return;
 	}
 		
-	XMoveResizeWindow(jbwm.X.dpy, c->parent, x, y, width, parent_height);
+	XMoveResizeWindow(D, c->parent, x, y, width, parent_height);
 	/* Offset the child window within the parent window
 		to display titlebar */
 #ifdef USE_TBAR
-	XMoveResizeWindow(jbwm.X.dpy, c->window, 0, 
+	XMoveResizeWindow(D, c->window, 0, 
 		c->flags & JB_CLIENT_MAXIMIZED ? 0 : TDIM, width, g->height);
 #endif
 	send_configure(c);
@@ -273,8 +273,7 @@ maximize(Client * c)
 	{
 		memcpy(g, &(c->old_geometry), sizeof(XRectangle));
 		c->flags &= ~ JB_CLIENT_MAXIMIZED;
-		XChangeProperty(jbwm.X.dpy, c->window, JA_VWM_STATE, 
-			XA_ATOM, 32, PropModeReplace, NULL, 0);
+		XDeleteProperty(D, c->window, XA("_NET_WM_STATE_FULLSCREEN"));
 	}
 	else // maximize:
 	{
@@ -284,9 +283,11 @@ maximize(Client * c)
 		g->width = s->width;
 		g->height = s->height;
 		c->flags |= JB_CLIENT_MAXIMIZED;
+		const Atom state=XA("_NET_WM_STATE_FULLSCREEN");
+		JATOM(c->window, "_NET_WM_STATE", &state, 1);
 	}
 	moveresize(c);
-	XRaiseWindow(jbwm.X.dpy, c->parent);
+	XRaiseWindow(D, c->parent);
 }
 
 void
@@ -295,14 +296,14 @@ hide(Client * c)
 	/* This will generate an unmap event.  Tell event handler
 	 * to ignore it.  */
 	c->ignore_unmap++;
-	XUnmapWindow(jbwm.X.dpy, c->parent);
+	XUnmapWindow(D, c->parent);
 	set_wm_state(c, IconicState);
 }
 
 void
 unhide(Client * c)
 {
-	XMapWindow(jbwm.X.dpy, c->parent);
+	XMapWindow(D, c->parent);
 	set_wm_state(c, NormalState);
 }
 
@@ -325,5 +326,8 @@ switch_vdesk(ScreenInfo * s, const ubyte v)
 			unhide(c);
 	}
 	s->vdesk=v;
+#ifdef EWMH
+	JCARD(s->root, "_NET_CURRENT_DESKTOP", &(s->vdesk), 1);
+#endif//EWMH
 }
 

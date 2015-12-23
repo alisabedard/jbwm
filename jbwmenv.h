@@ -45,6 +45,8 @@ typedef struct
 	char *term;
 } GlobalOptions;
 
+#define D jbwm.X.dpy
+
 extern GlobalOptions opt;
 
 #endif /* not JBWM_ENVIRONMENT_H */

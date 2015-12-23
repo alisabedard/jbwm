@@ -33,7 +33,6 @@ process_app_class_options(const char *name)
 {
 	char *tmp;
 	Application *new = calloc(1, sizeof(Application));
-
 	if((tmp = strchr(name, '/')))
 	{
 		*(tmp++) = 0;
@@ -160,7 +159,7 @@ parse_argv(int argc, char **argv)
 static void
 setup_fonts(void)
 {
-	Display *d = jbwm.X.dpy;
+	Display *d = D;
 #ifdef USE_XFT
 	jbwm.X.font=XftFontOpen(d, DefaultScreen(d), XFT_FAMILY, 
 		XftTypeString, DEF_FONT, XFT_SIZE, XftTypeDouble, 
@@ -175,7 +174,7 @@ setup_fonts(void)
 void
 jbwm_grab_button(Window w, unsigned int mask, unsigned int btn)
 {
-	XGrabButton(jbwm.X.dpy, btn, mask, w, false, 
+	XGrabButton(D, btn, mask, w, false, 
 		ButtonPressMask|ButtonReleaseMask, GrabModeAsync, 
 		GrabModeSync, None, None);
 }
@@ -183,18 +182,13 @@ jbwm_grab_button(Window w, unsigned int mask, unsigned int btn)
 static void
 setup_event_listeners(const ubyte i)
 {
-	XSetWindowAttributes attr;
-
-	/* set up root window attributes 
-	   - same for each screen */
-	attr.event_mask = SubstructureRedirectMask;
-	attr.event_mask |= SubstructureNotifyMask;
-	attr.event_mask |= EnterWindowMask;
-	attr.event_mask |= PropertyChangeMask;
-#ifdef USE_CMAP
-	attr.event_mask |= ColormapChangeMask;
-#endif//USE_CMAP
-	XChangeWindowAttributes(jbwm.X.dpy, jbwm.X.screens[i].root,
+	XSetWindowAttributes attr={.event_mask=SubstructureRedirectMask
+		|SubstructureNotifyMask|EnterWindowMask|PropertyChangeMask
+#ifdef CMAP
+		|ColormapChangeMask
+#endif//CMAP
+		};
+	XChangeWindowAttributes(D, jbwm.X.screens[i].root,
 		CWEventMask, &attr);
 }
 
@@ -210,7 +204,7 @@ static void
 setup_each_client(const ubyte i, const ubyte j, Window *wins)
 {
 	XWindowAttributes winattr;
-	XGetWindowAttributes(jbwm.X.dpy, wins[j], &winattr);
+	XGetWindowAttributes(D, wins[j], &winattr);
 	if(!winattr.override_redirect && winattr.map_state == IsViewable)
 		make_new_client(wins[j], &jbwm.X.screens[i]);
 }
@@ -221,7 +215,7 @@ setup_clients(const ubyte i)
 	unsigned int nwins;
 	Window *wins;
 	Window d;
-	if(XQueryTree(jbwm.X.dpy, jbwm.X.screens[i].root, &d, &d, &wins, 
+	if(XQueryTree(D, jbwm.X.screens[i].root, &d, &d, &wins, 
 		&nwins)==0) return;
 	for(unsigned int j = 0; j < nwins; j++) 
 		setup_each_client(i, j, wins);
@@ -232,10 +226,10 @@ static void
 setup_screen_elements(const ubyte i)
 {
 	jbwm.X.screens[i].screen = i;
-	jbwm.X.screens[i].root = RootWindow(jbwm.X.dpy, i);
+	jbwm.X.screens[i].root = RootWindow(D, i);
 	jbwm.X.screens[i].vdesk = 0;
-	jbwm.X.screens[i].width = DisplayWidth(jbwm.X.dpy, i);
-	jbwm.X.screens[i].height = DisplayHeight(jbwm.X.dpy, i);
+	jbwm.X.screens[i].width = DisplayWidth(D, i);
+	jbwm.X.screens[i].height = DisplayHeight(D, i);
 }
 
 static void
@@ -253,53 +247,79 @@ setup_gc(const ubyte i)
 #ifndef USE_XFT
 	vm|=GCFont;
 #endif//USE_XFT
-	jbwm.X.screens[i].gc = XCreateGC(jbwm.X.dpy, jbwm.X.screens[i].root,
+	jbwm.X.screens[i].gc = XCreateGC(D, jbwm.X.screens[i].root,
                vm, &gv);
 }
 
 #ifdef EWMH
+void
+set_ewmh_allowed_actions(const Window w)
+{
+	LOG("set_ewmh_allowed_actions(%d)", (unsigned int)w);
+	const Atom naa=XA("_NET_WM_ALLOWED_ACTIONS");
+	Atom actions[] = { naa, 
+		XA("_NET_WM_ACTION_MOVE"),
+		XA("_NET_WM_ACTION_RESIZE"),
+		XA("_NET_WM_ACTION_CLOSE"),
+		XA("_NET_WM_ACTION_SHADE"),
+		XA("_NET_WM_ACTION_FULLSCREEN"),
+		XA("_NET_WM_ACTION_CHANGE_DESKTOP"),
+		XA("_NET_WM_ACTION_ABOVE"),
+		XA("_NET_WM_ACTION_BELOW"),
+		XA("_NET_WM_ACTION_MAXIMIZE_HORZ"),
+		XA("_NET_WM_ACTION_MAXIMIZE_VERT")};
+	XChangeProperty(D, w, naa, XA_ATOM, 32, PropModeReplace, 
+		(unsigned char *)&actions, sizeof(actions) / sizeof(Atom));
+}
+
 static void
 setup_ewmh_for_screen(ScreenInfo *s)
 {
-	Atom supported[] = {
-		GETATOM("_NET_WM_STATE"),
-		GETATOM("_NET_CURRENT_DESKTOP"),
-		GETATOM("_NET_WM_ACTION_FULLSCREEN"),
-		GETATOM("_NET_WM_ALLOWED_ACTIONS"),
-		GETATOM("_NET_WM_ACTION_MOVE"),
-		GETATOM("_NET_WM_ACTION_RESIZE"),
-		GETATOM("_NET_WM_ACTION_CLOSE"),
-		GETATOM("_NET_WM_NAME"),
-		GETATOM("_NET_WM_DESKTOP"),
-		GETATOM("_NET_NUMBER_OF_DESKTOPS"),
-		GETATOM("_NET_DESKTOP_VIEWPORT"),
-		GETATOM("_NET_DESKTOP_GEOMETRY")
-	};
-	Atom actions[] = {
-		GETATOM("_NET_WM_ALLOWED_ACTIONS"),
-		GETATOM("_NET_WM_ACTION_MOVE"),
-		GETATOM("_NET_WM_ACTION_RESIZE"),
-		GETATOM("_NET_WM_ACTION_CLOSE"),
-		GETATOM("_NET_WM_ACTION_FULLSCREEN")
-	};
+
+	const Atom supported[] = { XA("_NET_SUPPORTED"), 
+		XA("_NET_WM_STATE"), XA("_NET_CURRENT_DESKTOP"), 
+		XA("_NET_WM_ACTION_FULLSCREEN"),
+		XA("_NET_WM_ALLOWED_ACTIONS"), XA("_NET_WM_ACTION_CLOSE"),
+		XA("_NET_WM_NAME"), XA("_NET_WM_DESKTOP"),
+		XA("_NET_NUMBER_OF_DESKTOPS"), XA("_NET_DESKTOP_VIEWPORT"),
+		XA("_NET_DESKTOP_GEOMETRY"), XA("_NET_WM_ALLOWED_ACTIONS"),
+		XA("_NET_WM_ACTION_MOVE"), XA("_NET_WM_ACTION_RESIZE"),
+		XA("_NET_WM_ACTION_CLOSE"), XA("_NET_WM_ACTION_SHADE"),
+		XA("_NET_WM_ACTION_FULLSCREEN"), 
+		XA("_NET_WM_ACTION_CHANGE_DESKTOP"),
+		XA("_NET_WM_ACTION_ABOVE"), XA("_NET_WM_ACTION_BELOW"),
+		XA("_NET_WM_ACTION_MAXIMIZE_HORZ"), 
+		XA("_NET_WM_ACTION_MAXIMIZE_VERT"),
+		XA("_NET_SUPPORTING_WM_CHECK"), XA("_NET_WM_STATE_STICKY"),
+		XA("_NET_WM_STATE_MAXIMIZED_VERT"), 
+		XA("_NET_WM_STATE_MAXIMIZED_HORZ"), 
+		XA("_NET_WM_STATE_SHADED"), XA("_NET_WM_STATE_HIDDEN"),
+		XA("_NET_WM_STATE_FULLSCREEN"), XA("_NET_WM_STATE_ABOVE"),
+		XA("_NET_WM_STATE_BELOW"), 
+		XA("_NET_WM_STATE_DEMANDS_ATTENTION")};
 	unsigned long workarea[4] = { 0, 0, 
-		DisplayWidth(jbwm.X.dpy, s->screen),
-		DisplayHeight(jbwm.X.dpy, s->screen)
+		DisplayWidth(D, s->screen),
+		DisplayHeight(D, s->screen)
 	};
 	unsigned long vdesk = s->vdesk;
 	const Window r=s->root;
-	XChangeProperty(jbwm.X.dpy, r, GETATOM("_NET_SUPPORTED"),
-		XA_ATOM, 32, PropModeReplace, (unsigned char *)&supported,
-		sizeof(supported) / sizeof(Atom));
-	XChangeProperty(jbwm.X.dpy, r, GETATOM("_NET_WM_ALLOWED_ACTIONS"),
-		XA_ATOM, 32, PropModeReplace, (unsigned char *)&actions,
-		sizeof(actions) / sizeof(Atom));
+	XChangeProperty(D, r, supported[0], XA_ATOM, 32, PropModeReplace, 
+		(unsigned char *)&supported, sizeof(supported) / sizeof(Atom));
 	JCARD(r, "_NET_DESKTOP_GEOMETRY", &workarea[2], 2);
 	JCARD(r, "_NET_DESKTOP_VIEWPORT", &workarea[0], 2);
 	JCARD(r, "_NET_CURRENT_DESKTOP", &vdesk, 1);
 	const unsigned char n=1;
 	JCARD(r, "_NET_NUMBER_OF_DESKTOPS", &n, 1);
 	JSTRING(r, "_NET_WM_NAME", "jbwm", 4);
+	s->supporting=XCreateSimpleWindow(D, s->root, 0, 0, 1, 1, 0, 0, 0);
+	const Atom nswmck = XA("_NET_SUPPORTING_WM_CHECK");
+	XChangeProperty(D, s->root, nswmck, XA_WINDOW, 32, PropModeReplace,
+		(unsigned char *)&(s->supporting), 1);
+	XChangeProperty(D, s->supporting, nswmck, XA_WINDOW, 32, 
+		PropModeReplace, (unsigned char *)&(s->supporting), 1);
+	JSTRING(s->supporting, "_NET_WM_NAME", "jbwm", 4);
+	const pid_t pid=getpid();
+	JCARD(s->supporting, "_NET_WM_PID", &pid, 1);
 }
 #endif//EWMH
 
@@ -324,7 +344,7 @@ setup_shape(void)
 	int __attribute__((unused)) e_dummy;
 
 	jbwm.X.have_shape =
-		XShapeQueryExtension(jbwm.X.dpy, &jbwm.X.shape_event,
+		XShapeQueryExtension(D, &jbwm.X.shape_event,
 		&e_dummy);
 }
 #endif /* USE_SHAPE */
@@ -332,11 +352,9 @@ setup_shape(void)
 static void
 setup_screens(void)
 {
-	ubyte i;
-
 	/* Now set up each screen in turn: jbwm.X.num_screens is used 
 	   in scanning windows (XQueryTree) */
-	i = jbwm.X.num_screens = ScreenCount(jbwm.X.dpy);
+	ubyte i = jbwm.X.num_screens = ScreenCount(D);
 	jbwm.X.screens = malloc(i * sizeof(ScreenInfo));
 	while(i--)
 		setup_display_per_screen(i);
@@ -355,15 +373,14 @@ handle_xerror(Display * dpy __attribute__((unused)), XErrorEvent * e)
 static void
 setup_display(void)
 {
-	jbwm.X.dpy=XOpenDisplay(NULL);
-	if(!jbwm.X.dpy)
+	if(!(D=XOpenDisplay(NULL)))
 		ERROR("BadDISPLAY");
 	XSetErrorHandler(handle_xerror);
 #ifdef USE_TBAR
 	/* Fonts only needed with title bars */
 	setup_fonts();
 #endif /* USE_TBAR */
-	jbwm.X.cursor = XCreateFontCursor(jbwm.X.dpy, XC_fleur);
+	jbwm.X.cursor = XCreateFontCursor(D, XC_fleur);
 #ifdef USE_SHAPE
 	setup_shape();
 #endif /* USE_SHAPE */

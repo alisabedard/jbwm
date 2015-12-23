@@ -136,11 +136,7 @@ xmsg(Window w, Atom a, long x)
 void
 send_wm_delete(Client * c)
 {
-	xmsg(c->window, GETATOM("WM_PROTOCOLS"),
-		GETATOM("WM_DELETE_WINDOW"));
-#if 0
-	XDestroySubwindows(D, c->parent);
-#endif//0
+	xmsg(c->window, XA("WM_PROTOCOLS"), XA("WM_DELETE_WINDOW"));
 }
 
 #ifdef USE_SHAPE

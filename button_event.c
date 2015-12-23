@@ -14,7 +14,7 @@ move_client_with_vdesk(Client * c, Bool next)
 	if(next ? (target_vdesk < 10) : (target_vdesk >= 0))
 	{
 		switch_vdesk(current->screen, c->vdesk = target_vdesk);
-		XRaiseWindow(jbwm.X.dpy, c->window);
+		XRaiseWindow(D, c->window);
 	}
 }
 
@@ -24,17 +24,17 @@ shade(Client * c)
 	/* This implements window shading, a substitute 
 	   for iconification.  */
 #ifdef EWMH
-	const Atom shaded=GETATOM("_NET_WM_STATE_SHADED");
+	const Atom shaded=XA("_NET_WM_STATE_SHADED");
 #endif//EWMH
 	if(c->flags & JB_CLIENT_SHADED)
 	{
 		c->geometry.height=c->shade_height;
 		c->flags &= ~JB_CLIENT_SHADED;
-		XMapWindow(jbwm.X.dpy, c->window);
+		XMapWindow(D, c->window);
 		moveresize(c);
 		select_client(c);
 #ifdef EWMH
-		XDeleteProperty(jbwm.X.dpy, c->window, shaded);
+		XDeleteProperty(D, c->window, shaded);
 #endif//EWMH
 	}
 	else
@@ -43,14 +43,13 @@ shade(Client * c)
 
 		c->shade_height = c->geometry.height;
 		c->ignore_unmap++;
-		XUnmapWindow(jbwm.X.dpy, c->window);
-		XResizeWindow(jbwm.X.dpy, c->parent, c->geometry.width, h);
+		XUnmapWindow(D, c->window);
+		XResizeWindow(D, c->parent, c->geometry.width, h);
 		c->geometry.height = h;
 		c->flags |= JB_CLIENT_SHADED;
-		XSetWindowBorder(jbwm.X.dpy, c->parent, c->screen->bg.pixel);
+		XSetWindowBorder(D, c->parent, c->screen->bg.pixel);
 #ifdef EWMH
-		XChangeProperty(jbwm.X.dpy, c->window, shaded, XA_CARDINAL, 32,
-			PropModeReplace, NULL, 0);
+		JCARD(c->window, "_NET_WM_STATE", &shaded, 1);
 #endif//EWMH
 	}
 }
@@ -62,7 +61,7 @@ button1_event(XButtonEvent * e, Client * c)
 	const int y = e->y;
 	const int width = c->geometry.width;
 
-	XRaiseWindow(jbwm.X.dpy, c->parent);
+	XRaiseWindow(D, c->parent);
 	/* Text for close button press.  */
 	if((x < TDIM) && (y < TDIM))
 	{
@@ -96,7 +95,7 @@ jbwm_handle_button_event(XButtonEvent * e)
 		button1_event(e, c);
 		break;
 	case Button2:
-		XLowerWindow(jbwm.X.dpy, c->parent);
+		XLowerWindow(D, c->parent);
 		break;
 	case Button3:
 		/* Resize operations more useful here,
