@@ -19,8 +19,12 @@ draw_outline(Client * c)
 #endif /* USE_SHAPE */
 	XRectangle *g=&(c->geometry);
 	ScreenInfo *s=c->screen;
+#ifdef USE_TBAR
 	XDrawRectangle(D, s->root, s->gc, g->x, g->y-TDIM, g->width, 
 		g->height + (c->flags & JB_CLIENT_SHADED ?0:TDIM));
+#else//!USE_TBAR
+	XDrawRectangle(D, s->root, s->gc, g->x, g->y, g->width, g->height);
+#endif//USE_TBAR
 }
 
 static inline void
@@ -225,9 +229,9 @@ void
 moveresize(Client * c)
 {
 	XRectangle *g = &(c->geometry);
-	const bool max = c->flags & JB_CLIENT_MAXIMIZED;
 	const ubyte b = c->border;
 #ifdef USE_TBAR
+	const bool max = c->flags & JB_CLIENT_MAXIMIZED;
 	const unsigned int parent_height = g->height + (max?0:TDIM);
 	const short y = g->y-b-(max?0:TDIM);
 #else
@@ -249,6 +253,8 @@ moveresize(Client * c)
 #ifdef USE_TBAR
 	XMoveResizeWindow(D, c->window, 0, 
 		c->flags & JB_CLIENT_MAXIMIZED ? 0 : TDIM, width, g->height);
+#else//!USE_TBAR
+	XMoveResizeWindow(D, c->window, 0, 0, width, g->height);
 #endif//USE_TBAR
 	send_configure(c);
 #ifdef USE_TBAR

@@ -2,7 +2,6 @@
 #CC=/opt/diet/bin/diet -Os gcc
 CFLAGS=-Os -W -Wall
 # Debug:
-CFLAGS+=-ggdb -Werror
 CFLAGS=-O0 -ggdb -DDEBUG -DSTDIO -W -Wall -Werror
 
 # Profile:
@@ -58,8 +57,8 @@ DEFINES  = $(EXTRA_DEFINES)
 #DEFINES += -DUSE_ARGV
 
 # Uncomment to enable titlebars
-DEFINES += -DUSE_TBAR
-SRCS += titlebar.c 
+#DEFINES += -DUSE_TBAR
+#SRCS += titlebar.c 
 
 # Uncomment to use a colored titlebar theme (no size difference):
 # DEFINES += -DUSE_COLORS
@@ -71,8 +70,11 @@ SRCS += titlebar.c
 #DEFINES += -DSTDIO
 
 # Uncomment to enable EWMH
-DEFINES += -DEWMH
-SRCS += ewmh.c
+#DEFINES += -DEWMH
+#SRCS += ewmh.c
+
+# Uncomment to enable MWM hints
+#DEFINES += -DMWM
 
 # ----- You shouldn't need to change anything under this line ------ #
 

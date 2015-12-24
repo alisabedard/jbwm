@@ -217,10 +217,11 @@ setup_gc(const ubyte i)
 		.font=jbwm.X.font->fid
 #endif//USE_TBAR&&!USE_XFT
 		};
-	unsigned long vm=GCFunction|GCSubwindowMode|GCLineWidth;
-#ifndef USE_XFT
+	unsigned long vm=GCFunction|GCSubwindowMode|GCLineWidth|GCForeground
+		|GCBackground;
+#if defined(USE_TBAR) && !defined(USE_XFT)
 	vm|=GCFont;
-#endif//USE_XFT
+#endif//USE_TBAR&&!USE_XFT
 	jbwm.X.screens[i].gc = XCreateGC(D, jbwm.X.screens[i].root,
                vm, &gv);
 }

@@ -75,12 +75,22 @@ handle_wm_hints(Client *c)
 	XFree(h);
 }
 
+#ifdef DEBUG
+void
+print_atom(const Atom a, const unsigned int line)
+{
+        char *an=XGetAtomName(D, a);
+        fprintf(stderr, "\t%s:%d %s(%lu)\n", __FILE__, line, an, a);
+        XFree(an);
+}       
+#endif//DEBUG
+
 static void
 handle_property_change(XPropertyEvent * e)
 {
 	const Atom a=e->atom;
-#ifdef DEBUG
 	LOG("handle_property_change()");
+#ifdef DEBUG
 	print_atom(a, __LINE__);
 #endif//DEBUG
 	Client *c=find_client(e->window);
@@ -89,7 +99,6 @@ handle_property_change(XPropertyEvent * e)
 #ifdef USE_TBAR
 	else if(a==XA_WM_NAME) update_titlebar(c);
 #endif//USE_TBAR
-	else moveresize(c);
 }
 
 static void

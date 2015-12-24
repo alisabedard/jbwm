@@ -41,11 +41,6 @@ typedef struct _EWMHEnvironment {
 
 extern EWMHEnvironment ewmh;
 
-#ifdef DEBUG
-void
-print_atom(const Atom a, const unsigned int line);
-#endif//DEBUG
-
 void
 ewmh_client_message(XClientMessageEvent *e);
 

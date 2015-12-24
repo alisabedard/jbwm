@@ -49,8 +49,10 @@ struct Client
 #ifdef USE_TBAR
 	Window titlebar;
 #endif
+#if 0
 	Window close_button;
 	Window resize_handle_right;
+#endif//
 };
 
 /* This is to initialize the above CE.  */

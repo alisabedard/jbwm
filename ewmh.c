@@ -74,17 +74,6 @@ ewmh_init()
 		ERROR("BufferOverflow");
 }
 
-
-#ifdef DEBUG
-void
-print_atom(const Atom a, const unsigned int line)
-{
-        char *an=XGetAtomName(D, a);
-        fprintf(stderr, "\t%s:%d %s(%lu)\n", __FILE__, line, an, a);
-        XFree(an);
-}
-#endif//DEBUG
-
 void
 ewmh_client_message(XClientMessageEvent *e)
 {

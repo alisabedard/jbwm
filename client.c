@@ -34,8 +34,11 @@ Client *
 find_client(Window w)
 {
 	for(Client *c=head_client; c; c=c->next)
-		if(w==c->parent || w==c->window || w==c->titlebar)
-			return c;
+		if(w==c->parent || w==c->window 
+#ifdef USE_TBAR
+			|| w==c->titlebar
+#endif//USE_TBAR
+			) return c;
 	return NULL;
 }
 
