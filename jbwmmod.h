@@ -11,6 +11,9 @@
 #include "events.h"
 #include "graphics.h"
 #include "button_event.h"
+#include "atoms.h"
+#include "screen.h"
+#include "log.h"
 
 // Optional modules:
 #ifdef USE_TBAR

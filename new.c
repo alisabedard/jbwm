@@ -7,48 +7,6 @@
 #include <string.h>
 #include "jbwm.h"
 
-static void init_geometry(Client * c);
-static void reparent(Client * c);
-
-static inline void
-initialize_client_fields(Client * c, ScreenInfo * s, Window w)
-{
-	c->next = head_client;
-	head_client = c;
-	c->screen = s;
-	c->window = w;
-	c->window_type = None;
-}
-
-static Client *
-Client_new(Window w, ScreenInfo * s)
-{
-	Client *c = calloc(1, sizeof(Client));
-	initialize_client_fields(c, s, w);
-	c->border = JBWM_BORDER;
-	init_geometry(c);
-	return c;
-}
-
-void
-make_new_client(Window w, ScreenInfo * s)
-{
-	Client *c=Client_new(w, s);
-	if(c->flags & JB_CLIENT_DONT_MANAGE)
-		return;
-	XSelectInput(D, c->window, EnterWindowMask 
-		| PropertyChangeMask | ColormapChangeMask);
-#ifdef USE_SHAPE
-	set_shape(c);
-#endif /* USE_SHAPE */
-	reparent(c);
-	unhide(c);
-	jbwm_grab_button(w, jbwm.keymasks.grab, AnyButton);
-#ifdef EWMH
-	set_ewmh_allowed_actions(w);
-#endif//EWMH	
-}
-
 #ifdef EWMH
 static void *
 jbwm_get_property(Window w, Atom property, Atom req_type,
@@ -72,13 +30,13 @@ jbwm_get_property(Window w, Atom property, Atom req_type,
 }
 #endif//EWMH
 
-#ifdef EWMH
-static unsigned long
+#ifdef MWM
+static void
 handle_mwm_hints(Client * c)
 {
-	unsigned long nitems;
 	const Atom mwm_hints = XA("_XA_MWM_HINTS");
 	PropMwmHints *m;
+	unsigned long nitems;
 	if((m=jbwm_get_property(c->window, mwm_hints, mwm_hints, &nitems)))
 	{
 		if(nitems >= PROP_MWM_HINTS_ELEMENTS 
@@ -88,9 +46,8 @@ handle_mwm_hints(Client * c)
 			c->border = 0;
 		XFree(m);
 	}
-	return nitems;
 }
-#endif//EWMH
+#endif//MWM
 
 static void
 set_size(Client * c, const unsigned int width, const unsigned int height)
@@ -147,10 +104,11 @@ init_geometry_position(Client * c, XWindowAttributes * attr)
 
 #ifdef EWMH
 static void
-init_long_properties(Client * c, unsigned long *nitems)
+init_long_properties(Client * c)
 {
+	unsigned long nitems;
 	unsigned long *lprop=jbwm_get_property(c->window, ewmh.WM_DESKTOP, 
-		XA_CARDINAL, nitems);
+		XA_CARDINAL, &nitems);
 	if(lprop && nitems && (lprop[0]<9))
 		c->vdesk=lprop[0];
 	if(!lprop)
@@ -160,14 +118,14 @@ init_long_properties(Client * c, unsigned long *nitems)
 }
 
 static void
-init_atom_properties(Client * c, unsigned long *nitems)
+init_atom_properties(Client * c)
 {
 	Atom *aprop;
-
+	unsigned long nitems;
 	if((aprop = jbwm_get_property(c->window, XA("WM_STATE"), 
-		XA_ATOM, nitems)))
+		XA_ATOM, &nitems)))
 	{
-		for(ubyte i = 0; i < *nitems; i++)
+		for(ubyte i = 0; i < nitems; i++)
 		{
 			if(aprop[i] == ewmh.WM_STATE_STICKY)
 				add_sticky(c);
@@ -180,14 +138,16 @@ init_atom_properties(Client * c, unsigned long *nitems)
 #endif//EWMH
 
 static void
-init_geometry_properties(Client * c)
+init_properties(Client * c)
 {
 	if(!c->screen) return;
 	c->vdesk = c->screen->vdesk;
+#ifdef MWM
+	handle_mwm_hints(c);
+#endif//MWM
 #ifdef EWMH
-	unsigned long nitems = handle_mwm_hints(c);
-	init_long_properties(c, &nitems);
-	init_atom_properties(c, &nitems);
+	init_long_properties(c);
+	init_atom_properties(c);
 #endif//EWMH
 }
 
@@ -195,7 +155,6 @@ static void
 init_geometry(Client * c)
 {
 	initialize_client_ce(c);
-	init_geometry_properties(c);
 	XWindowAttributes attr;
 	XGetWindowAttributes(D, c->window, &attr);
 #ifdef USE_CMAP
@@ -227,5 +186,39 @@ reparent(Client *c)
 	XAddToSaveSet(D, w);
 	XReparentWindow(D, w, c->parent, 0, 0);
 	XMapWindow(D, w);
+}
+
+static Client *
+Client_new(Window w, ScreenInfo * s)
+{
+	Client *c = calloc(1, sizeof(Client));
+	c->next = head_client;
+	head_client = c;
+	c->screen = s;
+	c->window = w;
+	c->window_type = None;
+	c->border = JBWM_BORDER;
+	init_properties(c);
+	init_geometry(c);
+	return c;
+}
+
+void
+make_new_client(Window w, ScreenInfo * s)
+{
+	Client *c=Client_new(w, s);
+	if(c->flags & JB_CLIENT_DONT_MANAGE)
+		return;
+	XSelectInput(D, c->window, EnterWindowMask 
+		| PropertyChangeMask | ColormapChangeMask);
+#ifdef USE_SHAPE
+	set_shape(c);
+#endif /* USE_SHAPE */
+	reparent(c);
+	unhide(c);
+	jbwm_grab_button(w, jbwm.keymasks.grab, AnyButton);
+#ifdef EWMH
+	set_ewmh_allowed_actions(w);
+#endif//EWMH	
 }
 

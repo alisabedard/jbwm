@@ -167,6 +167,12 @@ head:
 	case ConfigureRequest:
 		jbwm_handle_configure_request(&ev.xconfigurerequest);
 		break;
+	case ConfigureNotify:
+		if(!ev.xconfigure.override_redirect)
+		{
+			Client *c=find_client(ev.xconfigure.window);
+			if(c) moveresize(c);
+		}
 #ifdef DEBUG
 #if 0
 	case ConfigureNotify:

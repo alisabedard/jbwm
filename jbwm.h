@@ -2,15 +2,12 @@
 #ifndef JBWM_H
 #define JBWM_H
 
-#include <string.h>
 #include <stdlib.h>
-#include <assert.h>
 #include <stdbool.h>
 
 #include <X11/X.h>
 #include <X11/Xatom.h>
 #include <X11/Xlib.h>
-#include <X11/Xmd.h>
 #include <X11/Xutil.h>
 #include <X11/keysym.h>
 #ifdef USE_SHAPE
@@ -28,11 +25,9 @@ typedef unsigned char ubyte;
 #include "client_t.h"
 #include "application_t.h"
 #include "jbwmenv.h"
-#include "screen.h"
 #include "jbwmmod.h"
-#include "log.h"
-#include "atoms.h"
 
+#ifdef MWM
 /* Required for interpreting MWM hints: */
 #define _XA_MWM_HINTS           "_MOTIF_WM_HINTS"
 #define PROP_MWM_HINTS_ELEMENTS 3
@@ -45,6 +40,7 @@ typedef struct
 	unsigned long functions;
 	unsigned long decorations;
 } PropMwmHints;
+#endif//MWM
 
 void 
 jbwm_grab_button(Window w, unsigned int mask, unsigned int button);

@@ -1,5 +1,6 @@
 
 #include "jbwm.h"
+#include <string.h>
 /* Include the title button bitmaps.  */
 #ifdef USE_XPM
 #include <X11/xpm.h>

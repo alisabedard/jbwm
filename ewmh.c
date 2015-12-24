@@ -146,11 +146,38 @@ ewmh_client_message(XClientMessageEvent *e)
   other data.l[] elements = 0
 */     
                 const Atom p1=(Atom)(e->data.l[1]);
-		if(p1!=XA_PRIMARY) return;
+		//if(p1!=XA_PRIMARY) return;
                 if(p1==ewmh.WM_STATE_ABOVE) XRaiseWindow(D, e->window);
                 else if(p1==ewmh.WM_STATE_BELOW) XLowerWindow(D, e->window);
                 else if(p1==ewmh.WM_STATE_FULLSCREEN&&c)
-                        maximize(c);
+		{
+			const ubyte action=e->data.l[0];
+			// TODO: May need to add a FULLSCREEN flag
+			const bool maxed=c->flags&JB_CLIENT_MAXIMIZED;
+			switch(action)
+			{
+			case 0: //remove
+				if(maxed) maximize(c); // toggle off
+				//XDeleteProperty(D, e->window, 
+				//	ewmh.WM_STATE_FULLSCREEN);
+				XDeleteProperty(D, e->window, 
+					ewmh.WM_STATE);
+				//XPROP(e->window, ewmh.WM_STATE,
+				//	XA_ATOM, &ewmh.WM_STATE_FULLSCREEN, 1);
+				break;
+			case 1: //add
+				if(!maxed) maximize(c); // toggle on
+				//XPROP(e->window, ewmh.WM_STATE_FULLSCREEN,
+				//	XA_ATOM, &ewmh.WM_STATE_FULLSCREEN, 1);
+				XPROP(e->window, ewmh.WM_STATE,
+					XA_ATOM, &ewmh.WM_STATE_FULLSCREEN, 1);
+				break;
+			case 2: //toggle
+				maximize(c);
+			}
+			//maximize(c);
+		}
+		else if(p1==ewmh.WM_STATE_HIDDEN) XUnmapWindow(D, e->window);
         } 
 }
 

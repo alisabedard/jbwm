@@ -2,8 +2,8 @@
 #CC=/opt/diet/bin/diet -Os gcc
 CFLAGS=-Os -W -Wall
 # Debug:
-#CFLAGS+=-ggdb -Werror
-#CFLAGS=-O0 -ggdb -DDEBUG -DSTDIO -W -Wall -Werror
+CFLAGS+=-ggdb -Werror
+CFLAGS=-O0 -ggdb -DDEBUG -DSTDIO -W -Wall -Werror
 
 # Profile:
 #CFLAGS += -pg 
