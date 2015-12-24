@@ -6,26 +6,11 @@
 
 #include "jbwm.h"
 
-static void
-move_client_with_vdesk(Client * c, Bool next)
-{
-	const int target_vdesk = (current->screen->vdesk + next) ? 1 : -1;
-
-	if(next ? (target_vdesk < 10) : (target_vdesk >= 0))
-	{
-		switch_vdesk(current->screen, c->vdesk = target_vdesk);
-		XRaiseWindow(D, c->window);
-	}
-}
-
-static void
+void
 shade(Client * c)
 {
 	/* This implements window shading, a substitute 
 	   for iconification.  */
-#ifdef EWMH
-	const Atom shaded=XA("_NET_WM_STATE_SHADED");
-#endif//EWMH
 	if(c->flags & JB_CLIENT_SHADED)
 	{
 		c->geometry.height=c->shade_height;
@@ -34,22 +19,21 @@ shade(Client * c)
 		moveresize(c);
 		select_client(c);
 #ifdef EWMH
-		XDeleteProperty(D, c->window, shaded);
+		XDeleteProperty(D, c->window, ewmh.WM_STATE_SHADED);
 #endif//EWMH
 	}
 	else
 	{
-		const ubyte h=TDIM+1;
-
 		c->shade_height = c->geometry.height;
 		c->ignore_unmap++;
 		XUnmapWindow(D, c->window);
+		const ubyte h=c->geometry.height=TDIM+1;
 		XResizeWindow(D, c->parent, c->geometry.width, h);
-		c->geometry.height = h;
 		c->flags |= JB_CLIENT_SHADED;
 		XSetWindowBorder(D, c->parent, c->screen->bg.pixel);
 #ifdef EWMH
-		JCARD(c->window, "_NET_WM_STATE", &shaded, 1);
+		XPROP(c->window, ewmh.WM_STATE, XA_CARDINAL, 
+			&ewmh.WM_STATE_SHADED, 1);
 #endif//EWMH
 	}
 }
@@ -57,13 +41,12 @@ shade(Client * c)
 static void
 button1_event(XButtonEvent * e, Client * c)
 {
-	const int x = e->x;
-	const int y = e->y;
+	const Position p={.x=e->x,.y=e->y};
 	const int width = c->geometry.width;
 
 	XRaiseWindow(D, c->parent);
 	/* Text for close button press.  */
-	if((x < TDIM) && (y < TDIM))
+	if((p.x < TDIM) && (p.y < TDIM))
 	{
 		/* This fixes a bug where deleting a shaded window will cause
 		   the parent window to stick around as a ghost window. */
@@ -71,24 +54,21 @@ button1_event(XButtonEvent * e, Client * c)
 			shade(c);		
 		send_wm_delete(c);
 	}
-	if(x > width - TDIM)
+	if(p.x > width - TDIM)
 		sweep(c);	/* Resize the window.  */
-	else if(x > width - TDIM - TDIM && y < TDIM)
+	else if(p.x > width - TDIM - TDIM && p.y < TDIM)
 		shade(c);
-	else
-		drag(c);	/* Move the window.  */
+	else drag(c);	/* Move the window.  */
 }
 
 void
 jbwm_handle_button_event(XButtonEvent * e)
 {
-	Client *c;
-
-	if(!(c = find_client(e->window)))
-		return;
+	Client *c=find_client(e->window);
+	// Return if invalid event.  
+	if(!c) return;
 	/* Move/Resize operations invalid on maximized windows.  */
-	if(c->flags & JB_CLIENT_MAXIMIZED)
-		return;
+	if(c->flags & JB_CLIENT_MAXIMIZED) return;
 	switch (e->button)
 	{
 	case Button1:
@@ -104,12 +84,6 @@ jbwm_handle_button_event(XButtonEvent * e)
 		   to register a middle button press, even
 		   with X Emulate3Buttons enabled.  */
 		sweep(c);
-		break;
-	case Button4:
-		move_client_with_vdesk(c, true);
-		break;
-	case Button5:
-		move_client_with_vdesk(c, false);
 		break;
 	}
 }

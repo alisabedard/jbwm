@@ -20,7 +20,7 @@ initialize_client_fields(Client * c, ScreenInfo * s, Window w)
 	c->window_type = None;
 }
 
-Client *
+static Client *
 Client_new(Window w, ScreenInfo * s)
 {
 	Client *c = calloc(1, sizeof(Client));
@@ -44,6 +44,9 @@ make_new_client(Window w, ScreenInfo * s)
 	reparent(c);
 	unhide(c);
 	jbwm_grab_button(w, jbwm.keymasks.grab, AnyButton);
+#ifdef EWMH
+	set_ewmh_allowed_actions(w);
+#endif//EWMH	
 }
 
 #ifdef EWMH
@@ -100,12 +103,10 @@ set_size(Client * c, const unsigned int width, const unsigned int height)
 static void
 init_geometry_size(Client * c, XWindowAttributes * attr)
 {
-	const int awidth = attr->width;
-	const int aheight = attr->height;
-
-	if((awidth >= c->size.min_width)
-		&& (aheight >= c->size.min_height))
-		set_size(c, awidth, aheight);
+	const int dim[]={attr->width, attr->height};
+	if((dim[0] >= c->size.min_width)
+		&& (dim[1] >= c->size.min_height))
+		set_size(c, dim[0], dim[1]);
 	else
 		set_size(c, c->size.base_width, c->size.base_height);
 }
@@ -148,15 +149,16 @@ init_geometry_position(Client * c, XWindowAttributes * attr)
 static void
 init_long_properties(Client * c, unsigned long *nitems)
 {
-	unsigned long *lprop=jbwm_get_property(c->window, 
-		XA("_NET_WM_DESKTOP"), XA_CARDINAL, nitems);
+	unsigned long *lprop=jbwm_get_property(c->window, ewmh.WM_DESKTOP, 
+		XA_CARDINAL, nitems);
 	if(lprop && nitems && (lprop[0]<9))
 		c->vdesk=lprop[0];
-	XFree(lprop);
+	if(!lprop)
+		XPROP(c->window, ewmh.WM_DESKTOP, XA_CARDINAL, &(c->vdesk), 1);
+	else
+		XFree(lprop);
 }
-#endif//EWMH
 
-#ifdef EWMH
 static void
 init_atom_properties(Client * c, unsigned long *nitems)
 {
@@ -166,8 +168,12 @@ init_atom_properties(Client * c, unsigned long *nitems)
 		XA_ATOM, nitems)))
 	{
 		for(ubyte i = 0; i < *nitems; i++)
-			if(aprop[i] == XA("_NET_WM_STATE_STICKY"))
+		{
+			if(aprop[i] == ewmh.WM_STATE_STICKY)
 				add_sticky(c);
+			else if(aprop[i] == XA("_NET_WM_STATE_STICKY"))
+				shade(c);
+		}
 		XFree(aprop);
 	}
 }
@@ -176,17 +182,13 @@ init_atom_properties(Client * c, unsigned long *nitems)
 static void
 init_geometry_properties(Client * c)
 {
-	if(!c->screen)
-	{
-		return;
-	}
+	if(!c->screen) return;
 	c->vdesk = c->screen->vdesk;
 #ifdef EWMH
 	unsigned long nitems = handle_mwm_hints(c);
 	init_long_properties(c, &nitems);
 	init_atom_properties(c, &nitems);
 #endif//EWMH
-	//remove_sticky(c);
 }
 
 static void
@@ -214,20 +216,16 @@ reparent(Client *c)
 {
 	const unsigned long vm= CWOverrideRedirect | CWEventMask;
 	const ubyte s = c->screen->screen;
-	XSetWindowAttributes a;
-
-	a.override_redirect=true;
-	a.event_mask = SubstructureRedirectMask | SubstructureNotifyMask 
-		| ButtonPressMask | EnterWindowMask;
-	c->parent=XCreateWindow(D, c->screen->root, 
-		c->geometry.x, c->geometry.y, c->geometry.width, 
-		c->geometry.height, c->border, DefaultDepth(D, s),
-		CopyFromParent, DefaultVisual(D, s), vm, &a);
-	XAddToSaveSet(D, c->window);
-	XReparentWindow(D, c->window, c->parent, 0, 0);
-	XMapWindow(D, c->window);
-#ifdef EWMH
-	set_ewmh_allowed_actions(c->window);
-#endif//EWMH	
+	XSetWindowAttributes a={.override_redirect=true,
+		.event_mask=SubstructureRedirectMask | SubstructureNotifyMask 
+		| ButtonPressMask | EnterWindowMask};
+	XRectangle *g=&(c->geometry);
+	c->parent=XCreateWindow(D, c->screen->root, g->x, g->y, g->width,
+		g->height, c->border, DefaultDepth(D, s), CopyFromParent, 
+		DefaultVisual(D, s), vm, &a);
+	const Window w=c->window;
+	XAddToSaveSet(D, w);
+	XReparentWindow(D, w, c->parent, 0, 0);
+	XMapWindow(D, w);
 }
 

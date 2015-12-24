@@ -7,27 +7,17 @@
 
 #include <signal.h>
 #include <X11/cursorfont.h>
-#include <unistd.h>
 #include <stdlib.h>
 #include "jbwm.h"
 
 /* Main application data structure.  */
 JBWMEnvironment jbwm;
 
-static void
-initialize_JBWMEnvironment_keymasks(void)
-{
-	jbwm.keymasks.grab = GRAB_MASK;
-	jbwm.keymasks.mod = MOD_MASK;
-}
-
-Application *head_app = NULL;
-
 /* Client tracking information */
-Client *head_client = NULL;
-Client *current = NULL;
+Client *head_client, *current;
 
 #ifdef USE_ARGV
+Application *head_app;
 static void
 process_app_class_options(const char *name)
 {
@@ -63,27 +53,11 @@ parse_modifiers(char *s)
 	{
 		const char *name;
 		unsigned int mask;
-	} modifiers[9] =
-	{
-		{
-		"shift", ShiftMask},
-		{
-		"lock", LockMask},
-		{
-		"control", ControlMask},
-		{
-		"mod", Mod1Mask},
-		{
-		"mod1", Mod1Mask},
-		{
-		"mod2", Mod2Mask},
-		{
-		"mod3", Mod3Mask},
-		{
-		"mod4", Mod4Mask},
-		{
-		"mod5", Mod5Mask}
-	};
+	} modifiers[9] = { { "shift", ShiftMask}, { "lock", LockMask}, 
+		{ "control", ControlMask}, { "mod", Mod1Mask}, 
+		{ "mod1", Mod1Mask}, { "mod2", Mod2Mask},
+		{ "mod3", Mod3Mask}, { "mod4", Mod4Mask},
+		{ "mod5", Mod5Mask}};
 	const char *delim = ",+";
 	char *tmp;
 	unsigned int ret = 0;
@@ -214,7 +188,7 @@ setup_clients(const ubyte i)
 {
 	unsigned int nwins;
 	Window *wins;
-	Window d;
+	Window d __attribute__((unused));
 	if(XQueryTree(D, jbwm.X.screens[i].root, &d, &d, &wins, 
 		&nwins)==0) return;
 	for(unsigned int j = 0; j < nwins; j++) 
@@ -251,78 +225,6 @@ setup_gc(const ubyte i)
                vm, &gv);
 }
 
-#ifdef EWMH
-void
-set_ewmh_allowed_actions(const Window w)
-{
-	LOG("set_ewmh_allowed_actions(%d)", (unsigned int)w);
-	const Atom naa=XA("_NET_WM_ALLOWED_ACTIONS");
-	Atom actions[] = { naa, 
-		XA("_NET_WM_ACTION_MOVE"),
-		XA("_NET_WM_ACTION_RESIZE"),
-		XA("_NET_WM_ACTION_CLOSE"),
-		XA("_NET_WM_ACTION_SHADE"),
-		XA("_NET_WM_ACTION_FULLSCREEN"),
-		XA("_NET_WM_ACTION_CHANGE_DESKTOP"),
-		XA("_NET_WM_ACTION_ABOVE"),
-		XA("_NET_WM_ACTION_BELOW"),
-		XA("_NET_WM_ACTION_MAXIMIZE_HORZ"),
-		XA("_NET_WM_ACTION_MAXIMIZE_VERT")};
-	XChangeProperty(D, w, naa, XA_ATOM, 32, PropModeReplace, 
-		(unsigned char *)&actions, sizeof(actions) / sizeof(Atom));
-}
-
-static void
-setup_ewmh_for_screen(ScreenInfo *s)
-{
-
-	const Atom supported[] = { XA("_NET_SUPPORTED"), 
-		XA("_NET_WM_STATE"), XA("_NET_CURRENT_DESKTOP"), 
-		XA("_NET_WM_ACTION_FULLSCREEN"),
-		XA("_NET_WM_ALLOWED_ACTIONS"), XA("_NET_WM_ACTION_CLOSE"),
-		XA("_NET_WM_NAME"), XA("_NET_WM_DESKTOP"),
-		XA("_NET_NUMBER_OF_DESKTOPS"), XA("_NET_DESKTOP_VIEWPORT"),
-		XA("_NET_DESKTOP_GEOMETRY"), XA("_NET_WM_ALLOWED_ACTIONS"),
-		XA("_NET_WM_ACTION_MOVE"), XA("_NET_WM_ACTION_RESIZE"),
-		XA("_NET_WM_ACTION_CLOSE"), XA("_NET_WM_ACTION_SHADE"),
-		XA("_NET_WM_ACTION_FULLSCREEN"), 
-		XA("_NET_WM_ACTION_CHANGE_DESKTOP"),
-		XA("_NET_WM_ACTION_ABOVE"), XA("_NET_WM_ACTION_BELOW"),
-		XA("_NET_WM_ACTION_MAXIMIZE_HORZ"), 
-		XA("_NET_WM_ACTION_MAXIMIZE_VERT"),
-		XA("_NET_SUPPORTING_WM_CHECK"), XA("_NET_WM_STATE_STICKY"),
-		XA("_NET_WM_STATE_MAXIMIZED_VERT"), 
-		XA("_NET_WM_STATE_MAXIMIZED_HORZ"), 
-		XA("_NET_WM_STATE_SHADED"), XA("_NET_WM_STATE_HIDDEN"),
-		XA("_NET_WM_STATE_FULLSCREEN"), XA("_NET_WM_STATE_ABOVE"),
-		XA("_NET_WM_STATE_BELOW"), 
-		XA("_NET_WM_STATE_DEMANDS_ATTENTION")};
-	unsigned long workarea[4] = { 0, 0, 
-		DisplayWidth(D, s->screen),
-		DisplayHeight(D, s->screen)
-	};
-	unsigned long vdesk = s->vdesk;
-	const Window r=s->root;
-	XChangeProperty(D, r, supported[0], XA_ATOM, 32, PropModeReplace, 
-		(unsigned char *)&supported, sizeof(supported) / sizeof(Atom));
-	JCARD(r, "_NET_DESKTOP_GEOMETRY", &workarea[2], 2);
-	JCARD(r, "_NET_DESKTOP_VIEWPORT", &workarea[0], 2);
-	JCARD(r, "_NET_CURRENT_DESKTOP", &vdesk, 1);
-	const unsigned char n=1;
-	JCARD(r, "_NET_NUMBER_OF_DESKTOPS", &n, 1);
-	JSTRING(r, "_NET_WM_NAME", "jbwm", 4);
-	s->supporting=XCreateSimpleWindow(D, s->root, 0, 0, 1, 1, 0, 0, 0);
-	const Atom nswmck = XA("_NET_SUPPORTING_WM_CHECK");
-	XChangeProperty(D, s->root, nswmck, XA_WINDOW, 32, PropModeReplace,
-		(unsigned char *)&(s->supporting), 1);
-	XChangeProperty(D, s->supporting, nswmck, XA_WINDOW, 32, 
-		PropModeReplace, (unsigned char *)&(s->supporting), 1);
-	JSTRING(s->supporting, "_NET_WM_NAME", "jbwm", 4);
-	const pid_t pid=getpid();
-	JCARD(s->supporting, "_NET_WM_PID", &pid, 1);
-}
-#endif//EWMH
-
 static void
 setup_display_per_screen(const ubyte i)
 {
@@ -356,8 +258,7 @@ setup_screens(void)
 	   in scanning windows (XQueryTree) */
 	ubyte i = jbwm.X.num_screens = ScreenCount(D);
 	jbwm.X.screens = malloc(i * sizeof(ScreenInfo));
-	while(i--)
-		setup_display_per_screen(i);
+	while(i--) setup_display_per_screen(i);
 }
 
 #include <X11/Xproto.h>
@@ -376,6 +277,9 @@ setup_display(void)
 	if(!(D=XOpenDisplay(NULL)))
 		ERROR("BadDISPLAY");
 	XSetErrorHandler(handle_xerror);
+#ifdef EWMH
+	ewmh_init();
+#endif//EWMH
 #ifdef USE_TBAR
 	/* Fonts only needed with title bars */
 	setup_fonts();
@@ -395,7 +299,8 @@ main(
 	void)
 #endif
 {
-	initialize_JBWMEnvironment_keymasks();
+	jbwm.keymasks.grab = GRAB_MASK;
+	jbwm.keymasks.mod = MOD_MASK;
 #ifdef USE_ARGV
 	parse_argv(argc, argv);
 #endif /* USE_ARGV */

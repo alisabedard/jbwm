@@ -37,7 +37,7 @@
 #else
 #define DEF_FG          "white"
 #define DEF_FC          "grey20"
-#define DEF_BG          "grey5"
+#define DEF_BG          "grey10"
 #define TITLEBAR_CLOSE_BG	"grey20"
 #define TITLEBAR_SHADE_BG	"grey30"
 #define TITLEBAR_RESIZE_BG	"grey40"

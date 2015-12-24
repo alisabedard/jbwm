@@ -39,7 +39,7 @@ recalculate_sweep(Client * c, Position p1, Position p2)
 	configure(c);
 }
 
-static inline bool
+static bool
 grab_pointer(Window w, Cursor cursor)
 {
 	const int gm=GrabModeAsync;
@@ -47,7 +47,7 @@ grab_pointer(Window w, Cursor cursor)
 		cursor, CurrentTime) == GrabSuccess;
 }
 
-static inline void
+static void
 handle_motion_notify(Client * c, XRectangle * g, XMotionEvent * mev)
 {
 	draw_outline(c);
@@ -131,13 +131,12 @@ static void
 snap_client(Client * c)
 {
 	int dx, dy;
-	Client *ci;
 #define S JBWM_SNAP
 	/* snap to other windows */
 	snap_client_to_screen_border(c);
 	dx = dy = S;
 	XRectangle *g = &(c->geometry);
-	for(ci = head_client; ci; ci = ci->next)
+	for(Client *ci = head_client; ci; ci = ci->next)
 	{
 		XRectangle *gi = &(ci->geometry);
 
@@ -184,20 +183,17 @@ static void
 drag_event_loop(Client * c, int x1, int y1, int old_cx, int old_cy)
 {
 	XEvent ev;
-
-	for(;;)
+drag_loop:
+	XMaskEvent(D, MouseMask, &ev);
+	if(ev.type == MotionNotify)
+		drag_motion(c, ev, x1, y1, old_cx, old_cy);
+	else
 	{
-		XMaskEvent(D, MouseMask, &ev);
-		if(ev.type == MotionNotify)
-			drag_motion(c, ev, x1, y1, old_cx, old_cy);
-		else
-		{
-			XUngrabPointer(D, CurrentTime);
-			moveresize(c);
-			return;
-		}
+		XUngrabPointer(D, CurrentTime);
+		moveresize(c);
+		return;
 	}
-
+	goto drag_loop;
 }
 
 void
@@ -253,13 +249,13 @@ moveresize(Client * c)
 #ifdef USE_TBAR
 	XMoveResizeWindow(D, c->window, 0, 
 		c->flags & JB_CLIENT_MAXIMIZED ? 0 : TDIM, width, g->height);
-#endif
+#endif//USE_TBAR
 	send_configure(c);
 #ifdef USE_TBAR
 	/* Only update the titlebar if the width has changed.  */
 	if(g->width != c->exposed_width)
 		update_titlebar(c);
-#endif
+#endif//USE_TBAR
 	/* Store width value for above test.  */
 	c->exposed_width = width;
 }
@@ -273,7 +269,9 @@ maximize(Client * c)
 	{
 		memcpy(g, &(c->old_geometry), sizeof(XRectangle));
 		c->flags &= ~ JB_CLIENT_MAXIMIZED;
+#ifdef EWMH
 		XDeleteProperty(D, c->window, XA("_NET_WM_STATE_FULLSCREEN"));
+#endif//EWMH
 	}
 	else // maximize:
 	{
@@ -283,8 +281,10 @@ maximize(Client * c)
 		g->width = s->width;
 		g->height = s->height;
 		c->flags |= JB_CLIENT_MAXIMIZED;
-		const Atom state=XA("_NET_WM_STATE_FULLSCREEN");
-		JATOM(c->window, "_NET_WM_STATE", &state, 1);
+#ifdef EWMH
+		XPROP(c->window, ewmh.WM_STATE, XA_ATOM, 
+			&ewmh.WM_STATE_FULLSCREEN, 1);
+#endif//EWMH
 	}
 	moveresize(c);
 	XRaiseWindow(D, c->parent);
@@ -327,7 +327,7 @@ switch_vdesk(ScreenInfo * s, const ubyte v)
 	}
 	s->vdesk=v;
 #ifdef EWMH
-	JCARD(s->root, "_NET_CURRENT_DESKTOP", &(s->vdesk), 1);
+	XPROP(s->root, ewmh.CURRENT_DESKTOP, XA_CARDINAL, &(s->vdesk), 1);
 #endif//EWMH
 }
 

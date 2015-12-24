@@ -45,7 +45,7 @@ set_wm_state(Client * c, int state)
 	unsigned char data[2];		// = { state, None }; 
 
 	data[0] = state;
-	JCARD(c->window, "WM_STATE", data, 2);
+	XPROP(c->window, XA("WM_STATE"), XA_CARDINAL, data, 2);
 }
 
 void
@@ -70,14 +70,16 @@ select_client(Client * c)
 	if(c)
 	{
 		c->flags |= JB_CLIENT_ACTIVE;
-		XSetWindowBorder(D, c->parent,
-			!is_sticky(c) ? c->screen->fg.pixel : c->
-			screen->fc.pixel);
+		XSetWindowBorder(D, c->parent, !is_sticky(c) 
+			? c->screen->fg.pixel : c->screen->fc.pixel);
 #ifdef USE_CMAP
 		XInstallColormap(D, c->cmap);
 #endif /* USE_CMAP */
-		XSetInputFocus(D, c->window,
-			RevertToPointerRoot, CurrentTime);
+		XSetInputFocus(D, c->window, RevertToPointerRoot, CurrentTime);
+#ifdef EWMH
+		XPROP(c->screen->root, ewmh.ACTIVE_WINDOW, XA_WINDOW,
+			&(c->window), 1);
+#endif//EWMH
 	}
 	current = c;
 }

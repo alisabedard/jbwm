@@ -75,16 +75,6 @@ handle_wm_hints(Client *c)
 	XFree(h);
 }
 
-#ifdef DEBUG
-static void
-print_atom(const Atom a, const unsigned int line)
-{
-	char *an=XGetAtomName(D, a);
-	fprintf(stderr, "\t%s:%d %s(%lu)\n", __FILE__, line, an, a);
-	XFree(an);
-}
-#endif//DEBUG
-
 static void
 handle_property_change(XPropertyEvent * e)
 {
@@ -95,12 +85,10 @@ handle_property_change(XPropertyEvent * e)
 #endif//DEBUG
 	Client *c=find_client(e->window);
 	if(!c) return;
-	if(a==XA_WM_NAME) update_titlebar(c);
-	else if(a==XA_WM_HINTS) handle_wm_hints(c);
-#ifdef EWMH
-	else if(a==XA("_NET_WM_USER_TIME")) return;
-	else if(a==XA("_NET_WM_OPAQUE_REGION")) return;
-#endif//EWMH
+	if(a==XA_WM_HINTS) handle_wm_hints(c);
+#ifdef USE_TBAR
+	else if(a==XA_WM_NAME) update_titlebar(c);
+#endif//USE_TBAR
 	else moveresize(c);
 }
 
@@ -143,39 +131,6 @@ jbwm_handle_configure_request(XConfigureRequestEvent * e)
 	XConfigureWindow(D, e->window, e->value_mask, &wc);
 }
 
-static void
-handle_client_message(XClientMessageEvent *e)
-{
-	LOG("handle_client_message()");
-	const Atom t=e->message_type;
-#ifdef DEBUG
-	print_atom(t, __LINE__);
-#endif//DEBUG
-	// Define the atoms we'll use:
-	struct Messages { const Atom desktop, active, close, state, 
-		fullscreen; } m = { .desktop=XA("_NET_WM_DESKTOP"), 
-		.active=XA("_NET_ACTIVE_WINDOW"), 
-		.close=XA("_NET_CLOSE_WINDOW"),
-		.state=XA("_NET_WM_STATE"), 
-		.fullscreen=XA("_NET_WM_STATE_FULLSCREEN")};
-	Client *c=find_client(e->window);
-	if(!c) return;
-	if(t==m.desktop) switch_vdesk(c->screen, e->data.l[0]);
-	else if(t==m.active) select_client(c);
-	else if(t==m.close && e->data.l[1]==2) send_wm_delete(c);
-	else if(t==m.state)
-	{
-		bool max=false;
-		for(int i=1; i<=2; i++) 
-			if((Atom)e->data.l[i] ==m.fullscreen)
-				max=true;
-		if(max)
-		{
-			 maximize(c);
-		}
-	} 
-}
-
 void
 main_event_loop(void)
 {
@@ -212,6 +167,8 @@ head:
 	case ConfigureRequest:
 		jbwm_handle_configure_request(&ev.xconfigurerequest);
 		break;
+#ifdef DEBUG
+#if 0
 	case ConfigureNotify:
 		LOG("ConfigureNotify");
 		LOG("\tsend_event: %d", ev.xconfigure.send_event);
@@ -226,6 +183,7 @@ head:
 			moveresize(c);
 		}
 		break;
+#endif//0
 	case CreateNotify:
 		LOG("CreateNotify");
 		break;
@@ -244,14 +202,17 @@ head:
 	case DestroyNotify:
 		LOG("DestroyNotify");
 		break;
+#endif//DEBUG
 #ifdef USE_CMAP
 	case ColormapNotify:
 		handle_colormap_change(&ev.xcolormap);
 		break;
 #endif /* USE_CMAP */
+#ifdef EWMH
 	case ClientMessage:
-		handle_client_message(&ev.xclient);
+		ewmh_client_message(&ev.xclient);
 		break;
+#endif//EWMH
 #ifdef USE_SHAPE
 	case ShapeNotify:
 		LOG("ShapeNotify");

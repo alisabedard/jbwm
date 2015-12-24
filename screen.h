@@ -2,6 +2,8 @@
 #ifndef JBWM_SCREEN_H
 #define JBWM_SCREEN_H
 
+#define DESKTOPS 10
+
 typedef struct
 {
 	int x, y;

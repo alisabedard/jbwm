@@ -30,12 +30,8 @@ jbwm_new_gc(XColor color)
 void
 draw(Window w, XRectangle *g, const char *color)
 {
-	GC gc;
-	XColor c;
-	
-
-	c=jbwm_color(color);
-	gc=jbwm_new_gc(c);
+	XColor c=jbwm_color(color);
+	GC gc=jbwm_new_gc(c);
 	XFillRectangle(D, w, gc, g->x, g->y, g->width, g->height);
 	XFreeGC(D, gc);
 	free_color(c);

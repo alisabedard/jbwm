@@ -3,7 +3,7 @@
 CFLAGS=-Os -W -Wall
 # Debug:
 #CFLAGS+=-ggdb -Werror
-CFLAGS=-O0 -ggdb -DDEBUG -DSTDIO -W -Wall -Werror
+#CFLAGS=-O0 -ggdb -DDEBUG -DSTDIO -W -Wall -Werror
 
 # Profile:
 #CFLAGS += -pg 
@@ -72,6 +72,7 @@ SRCS += titlebar.c
 
 # Uncomment to enable EWMH
 DEFINES += -DEWMH
+SRCS += ewmh.c
 
 # ----- You shouldn't need to change anything under this line ------ #
 
