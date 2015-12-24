@@ -6,6 +6,13 @@ FEATURES of JBWM
 * Window shading with titlebar
 * Code cleanups, simpler UI and key bindings
 * Use of C99 features where possible.  
+KNOWN ISSUES (mostly EWMH related)
+* Firefox fullscreen mode does not work.  The browser becomes unresponsive.
+	Use another browser instead, as firefox does not properly handle
+	ewmh hints.  The current evilwm, however, does work with Firefox
+	fullscreen mode, so work is under way to fix this.  Any help
+	is appreciated.  
+* bbpager works properly with evilwm, but not jbwm.  
 
 From evilwm:
 ---------------------------------------
@@ -120,7 +127,7 @@ AEWM LICENCE
 Copyright (c) 1998-2000 Decklin Foster.
 
 THIS SOFTWARE IS PROVIDED BY THE AUTHOR "AS IS", WITHOUT ANY EXPRESS
-OR IMPLIED WJBRANTIES OF ANY KIND. IN NO EVENT SHALL THE AUTHOR BE
+OR IMPLIED WARANTIES OF ANY KIND. IN NO EVENT SHALL THE AUTHOR BE
 HELD LIABLE FOR ANY DAMAGES CONNECTED WITH THE USE OF THIS PROGRAM.
 
 You are granted permission to copy, publish, distribute, and/or sell
