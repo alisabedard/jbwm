@@ -65,6 +65,13 @@ ewmh_init()
 	EA(WM_STATE_BELOW);
 	EA(WM_STATE_DEMANDS_ATTENTION);
 	EA(WM_STATE_FOCUSED);
+	EA(WM_STATE_SKIP_PAGER);
+
+	LOG("Added %d _NET atoms, %lu allowed", ewmh.count, 
+		sizeof(ewmh.supported)/sizeof(Atom));
+	// Quit if overflow, sanity check.  
+	if(ewmh.count>sizeof(ewmh.supported)/sizeof(Atom))
+		ERROR("BufferOverflow");
 }
 
 
@@ -83,13 +90,12 @@ ewmh_client_message(XClientMessageEvent *e)
 {
 	const Atom t=e->message_type;
 #ifdef DEBUG
-        puts("-CLIENTMESSAGE-");
+        puts("----CLIENTMESSAGE----");
         print_atom(t, __LINE__);
         print_atom(e->data.l[0], __LINE__);
         print_atom(e->data.l[1], __LINE__);
         print_atom(e->data.l[2], __LINE__);
         print_atom(e->data.l[3], __LINE__);
-        puts("---------------");
 #endif//DEBUG
         ScreenInfo *s = jbwm.X.screens;
         if(t==ewmh.CURRENT_DESKTOP) switch_vdesk(s, e->data.l[0]);
@@ -107,10 +113,13 @@ ewmh_client_message(XClientMessageEvent *e)
         }
 	else if(t==ewmh.DESKTOP_VIEWPORT)
 	{
+		long vp[2]={0,0};
+		XPROP(jbwm.X.screens->root, ewmh.DESKTOP_VIEWPORT, 
+			XA_CARDINAL, &vp, 2);
 	}
 	else if(t==ewmh.NUMBER_OF_DESKTOPS)
 	{
-		ubyte num=DESKTOPS;
+		long num=DESKTOPS;
 		XPROP(jbwm.X.screens->root, ewmh.NUMBER_OF_DESKTOPS, 
 			XA_CARDINAL, &num, 1);
 	}
@@ -128,7 +137,6 @@ ewmh_client_message(XClientMessageEvent *e)
                         c->geometry.height=e->data.l[4];
                         moveresize(c);
                 }
-       
         }
         else if(t==ewmh.WM_STATE)
         {
@@ -145,30 +153,29 @@ ewmh_client_message(XClientMessageEvent *e)
         _NET_WM_STATE_TOGGLE        2    toggle property 
   other data.l[] elements = 0
 */     
-                const Atom p1=(Atom)(e->data.l[1]);
-		//if(p1!=XA_PRIMARY) return;
-                if(p1==ewmh.WM_STATE_ABOVE) XRaiseWindow(D, e->window);
-                else if(p1==ewmh.WM_STATE_BELOW) XLowerWindow(D, e->window);
-                else if(p1==ewmh.WM_STATE_FULLSCREEN&&c)
+                const Atom state=(Atom)(e->data.l[1]);
+		const ubyte action=e->data.l[0];
+                if(state==ewmh.WM_STATE_ABOVE && action) 
+			XRaiseWindow(D, e->window);
+                else if(state==ewmh.WM_STATE_BELOW && action) 
+			XLowerWindow(D, e->window);
+		else if(state==ewmh.WM_STATE_SKIP_PAGER && c)
+			if(action) add_sticky(c);
+			else remove_sticky(c);
+                else if(state==ewmh.WM_STATE_FULLSCREEN && c)
 		{
-			const ubyte action=e->data.l[0];
 			// TODO: May need to add a FULLSCREEN flag
 			const bool maxed=c->flags&JB_CLIENT_MAXIMIZED;
 			switch(action)
 			{
 			case 0: //remove
 				if(maxed) maximize(c); // toggle off
-				//XDeleteProperty(D, e->window, 
-				//	ewmh.WM_STATE_FULLSCREEN);
+			// TODO: Don't clobber all of _NET_WM_STATE
 				XDeleteProperty(D, e->window, 
 					ewmh.WM_STATE);
-				//XPROP(e->window, ewmh.WM_STATE,
-				//	XA_ATOM, &ewmh.WM_STATE_FULLSCREEN, 1);
 				break;
 			case 1: //add
 				if(!maxed) maximize(c); // toggle on
-				//XPROP(e->window, ewmh.WM_STATE_FULLSCREEN,
-				//	XA_ATOM, &ewmh.WM_STATE_FULLSCREEN, 1);
 				XPROP(e->window, ewmh.WM_STATE,
 					XA_ATOM, &ewmh.WM_STATE_FULLSCREEN, 1);
 				break;
@@ -177,7 +184,7 @@ ewmh_client_message(XClientMessageEvent *e)
 			}
 			//maximize(c);
 		}
-		else if(p1==ewmh.WM_STATE_HIDDEN) XUnmapWindow(D, e->window);
+		else if(state==ewmh.WM_STATE_HIDDEN) XUnmapWindow(D, e->window);
         } 
 }
 

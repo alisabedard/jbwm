@@ -173,23 +173,8 @@ head:
 			Client *c=find_client(ev.xconfigure.window);
 			if(c) moveresize(c);
 		}
-#ifdef DEBUG
-#if 0
-	case ConfigureNotify:
-		LOG("ConfigureNotify");
-		LOG("\tsend_event: %d", ev.xconfigure.send_event);
-		LOG("\toverride_redirect: %d", 
-			ev.xconfigure.override_redirect);
-		// Ignore window per XConfigureEvent(3)
-		if(ev.xconfigure.override_redirect) break;
-		else
-		{
-			Client *c=find_client(ev.xconfigure.window);
-			if(!c) break;
-			moveresize(c);
-		}
 		break;
-#endif//0
+#ifdef DEBUG
 	case CreateNotify:
 		LOG("CreateNotify");
 		break;
