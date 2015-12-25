@@ -276,7 +276,7 @@ maximize(Client * c)
 		memcpy(g, &(c->old_geometry), sizeof(XRectangle));
 		c->flags &= ~ JB_CLIENT_MAXIMIZED;
 #ifdef EWMH
-		XDeleteProperty(D, c->window, XA("_NET_WM_STATE_FULLSCREEN"));
+		XDeleteProperty(D, c->window, ewmh.WM_STATE);
 #endif//EWMH
 	}
 	else // maximize:

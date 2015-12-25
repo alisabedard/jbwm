@@ -196,11 +196,13 @@ ewmh_client_message(XClientMessageEvent *e)
 			}
 			//maximize(c);
 		}
+#if 0
 		else if(state==ewmh.WM_STATE_HIDDEN)
 		{
 			if(!e->data.l[3])
 			 	XUnmapWindow(D, e->window);
 		}
+#endif//0
         } 
 }
 
