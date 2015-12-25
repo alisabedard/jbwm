@@ -136,13 +136,23 @@ jbwm_handle_key_event(XKeyEvent * e)
 	case XK_9:
 		switch_vdesk(screen, key-XK_1);
 		break;
+	case XK_0:
+		switch_vdesk(screen, 10);
+		break;
 	case KEY_PREVDESK:
+		// First desktop 0, per wm-spec
+		switch_vdesk(screen, screen->vdesk-1);
+#if 0
 		if(screen && screen->vdesk > 0)
-			switch_vdesk(screen, screen->vdesk - 1);
+			switch_vdesk(screen, screen->vdesk-1);
+#endif//0
 		break;
 	case KEY_NEXTDESK:
-		if(screen && screen->vdesk < 9)
-			switch_vdesk(screen, screen->vdesk + 1);
+		switch_vdesk(screen, screen->vdesk+1);
+#if 0
+		if(screen && screen->vdesk < DESKTOPS)
+			switch_vdesk(screen, screen->vdesk);
+#endif//0
 		break;
 	default:
 		if(current)

@@ -45,9 +45,8 @@ void jbwm_handle_key_event(XKeyEvent * e);
 #define KEY_KILL	XK_q
 #endif
 
-#define JBWM_VWM_KEYS \
-		KEY_FIX, KEY_PREVDESK, KEY_NEXTDESK,\
-		XK_1, XK_2, XK_3, XK_4, XK_5, XK_6, XK_7, XK_8, XK_9
+#define JBWM_VWM_KEYS KEY_FIX, KEY_PREVDESK, KEY_NEXTDESK, XK_0, XK_1, XK_2,\
+	XK_3, XK_4, XK_5, XK_6, XK_7, XK_8, XK_9
 
 #define JBWM_KEYS_TO_GRAB \
 {\
@@ -56,12 +55,12 @@ void jbwm_handle_key_event(XKeyEvent * e);
 	KEY_LEFT, KEY_RIGHT, KEY_DOWN, KEY_UP,\
 	KEY_LOWER, KEY_ALTLOWER, KEY_INFO, KEY_MAX,\
 	JBWM_VWM_KEYS, KEY_MOVE, KEY_RAISE, 0\
-};
+}
 
 #define JBWM_ALT_KEYS_TO_GRAB \
 {\
 	KEY_KILL, KEY_LEFT, KEY_RIGHT, KEY_DOWN, KEY_UP, 0\
-};
+}
 
 void grab_keys_for_screen(ScreenInfo * s);
 

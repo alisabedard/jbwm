@@ -123,6 +123,17 @@ unparent_window(Client * c)
 void
 remove_client(Client * c)
 {
+	if(c->flags&JB_CLIENT_REMOVE)
+	{
+#ifdef EWMH
+		XDeleteProperty(D, c->window, ewmh.WM_DESKTOP);
+		XDeleteProperty(D, c->window, ewmh.WM_STATE);
+#endif//EWMH
+		set_wm_state(c, WithdrawnState);
+	}
+#ifdef EWMH
+	else XDeleteProperty(D, c->window, ewmh.WM_ALLOWED_ACTIONS);
+#endif//EWMH
 	unparent_window(c);
 	relink_window_list(c);
 	if(current==c) current=NULL;

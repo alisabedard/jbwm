@@ -316,7 +316,7 @@ unhide(Client * c)
 void
 switch_vdesk(ScreenInfo * s, const ubyte v)
 {
-	if(v==s->vdesk) return;
+	if(v==s->vdesk || v>DESKTOPS) return;
 	for(Client *c=head_client; c; c=c->next)
 	{
 		if(is_sticky(c))

@@ -7,7 +7,7 @@
 #include <string.h>
 #include "jbwm.h"
 
-#ifdef EWMH
+#if defined(EWMH) || defined(MWM)
 static void *
 jbwm_get_property(Window w, Atom property, Atom req_type,
 	unsigned long *nitems_return)
@@ -28,7 +28,7 @@ jbwm_get_property(Window w, Atom property, Atom req_type,
 	}
 	return NULL;
 }
-#endif//EWMH
+#endif//EWMH||MWM
 
 #ifdef MWM
 static void
@@ -87,8 +87,7 @@ init_geometry_position(Client * c, XWindowAttributes * attr)
 	{
 		const ScreenInfo *s = c->screen;
 
-		if(!s)
-			return;
+		if(s)
 		{
 			Position p;
 			get_mouse_position(s->root, (int *)&p.x, (int *)&p.y);
@@ -129,7 +128,7 @@ init_atom_properties(Client * c)
 		{
 			if(aprop[i] == ewmh.WM_STATE_STICKY)
 				add_sticky(c);
-			else if(aprop[i] == XA("_NET_WM_STATE_STICKY"))
+			else if(aprop[i] == ewmh.WM_STATE_SHADED)
 				shade(c);
 		}
 		XFree(aprop);
@@ -209,8 +208,11 @@ make_new_client(Window w, ScreenInfo * s)
 	Client *c=Client_new(w, s);
 	if(c->flags & JB_CLIENT_DONT_MANAGE)
 		return;
-	XSelectInput(D, c->window, EnterWindowMask 
-		| PropertyChangeMask | ColormapChangeMask);
+	long mask=EnterWindowMask|PropertyChangeMask;
+#ifdef USE_CMAP
+	mask|=ColormapChangeMask;
+#endif//USE_CMAP
+	XSelectInput(D, c->window, mask);
 #ifdef USE_SHAPE
 	set_shape(c);
 #endif /* USE_SHAPE */

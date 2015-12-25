@@ -98,6 +98,7 @@ handle_property_change(XPropertyEvent * e)
 	if(a==XA_WM_HINTS) handle_wm_hints(c);
 #ifdef USE_TBAR
 	else if(a==XA_WM_NAME) update_titlebar(c);
+	else moveresize(c); // Required to show titlebar on new client
 #endif//USE_TBAR
 }
 

@@ -41,40 +41,40 @@ DEFINES  = $(EXTRA_DEFINES)
 
 # Titlebar Xft support:
 # Warning, Xft impedes performance and leaks memory.
-#DEFINES += -DUSE_XFT
-#LIBS += -lXft
-#INCLUDES += `pkg-config --cflags xft`
+DEFINES += -DUSE_XFT
+LIBS += -lXft
+INCLUDES += `pkg-config --cflags xft`
 
 # Not necessary except on old NetBSD, for Xft support:
 #INCLUDES += -I/usr/pkg/include/freetype2 -I/usr/X11R6/include/freetype2
 
 # Uncomment to enable colormap support
 # Saves 600 bytes
-#DEFINES += -DUSE_CMAP
+DEFINES += -DUSE_CMAP
 
 # Uncomment to enable parsing command line arguments.
 #  Saves ~2030 bytes
 #DEFINES += -DUSE_ARGV
 
 # Uncomment to enable titlebars
-#DEFINES += -DUSE_TBAR
-#SRCS += titlebar.c 
+DEFINES += -DUSE_TBAR
+SRCS += titlebar.c 
 
 # Uncomment to use a colored titlebar theme (no size difference):
-# DEFINES += -DUSE_COLORS
+#DEFINES += -DUSE_COLORS
 
-# Uncomment to enable window snapping.
-# DEFINES += -DUSE_SNAP
+# Uncomment to enable window snapping. (Adds 4k bytes)
+DEFINES += -DUSE_SNAP
 
-# Uncomment to enable STDIO
+# Uncomment to enable STDIO (Adds 16 bytes)
 #DEFINES += -DSTDIO
 
-# Uncomment to enable EWMH
-#DEFINES += -DEWMH
-#SRCS += ewmh.c
+# Uncomment to enable EWMH (Adds 8k bytes)
+DEFINES += -DEWMH
+SRCS += ewmh.c
 
 # Uncomment to enable MWM hints
-#DEFINES += -DMWM
+DEFINES += -DMWM
 
 # ----- You shouldn't need to change anything under this line ------ #
 

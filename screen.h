@@ -2,6 +2,7 @@
 #ifndef JBWM_SCREEN_H
 #define JBWM_SCREEN_H
 
+// Used by vdesk switching and EWMH
 #define DESKTOPS 10
 
 typedef struct
