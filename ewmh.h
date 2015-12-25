@@ -16,7 +16,7 @@ typedef struct _EWMHEnvironment {
 	Atom SUPPORTED, CURRENT_DESKTOP, NUMBER_OF_DESKTOPS, DESKTOP_VIEWPORT, 
 		DESKTOP_GEOMETRY, SUPPORTING_WM_CHECK, ACTIVE_WINDOW,
 		MOVERESIZE_WINDOW, CLOSE_WINDOW, CLIENT_LIST, RESTACK_WINDOW,
-		REQUEST_FRAME_EXTENTS;
+		REQUEST_FRAME_EXTENTS, VIRTUAL_ROOTS;
 
 	// Atoms with "_NET_WM" prefix:
 	Atom WM_ALLOWED_ACTIONS, WM_NAME, WM_DESKTOP, WM_MOVERESIZE, WM_PID,
@@ -40,6 +40,9 @@ typedef struct _EWMHEnvironment {
 } EWMHEnvironment;
 
 extern EWMHEnvironment ewmh;
+
+void
+ewmh_update_client_list();
 
 void
 ewmh_client_message(XClientMessageEvent *e);

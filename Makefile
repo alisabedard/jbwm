@@ -1,6 +1,6 @@
 #CC = clang
 #CC=/opt/diet/bin/diet -Os gcc
-CFLAGS=-Os -W -Wall
+#CFLAGS=-Os -W -Wall
 # Debug:
 CFLAGS=-O0 -ggdb -DDEBUG -DSTDIO -W -Wall -Werror
 
@@ -41,16 +41,16 @@ DEFINES  = $(EXTRA_DEFINES)
 
 # Titlebar Xft support:
 # Warning, Xft impedes performance and leaks memory.
-DEFINES += -DUSE_XFT
-LIBS += -lXft
-INCLUDES += `pkg-config --cflags xft`
+#DEFINES += -DUSE_XFT
+#LIBS += -lXft
+#INCLUDES += `pkg-config --cflags xft`
 
 # Not necessary except on old NetBSD, for Xft support:
 #INCLUDES += -I/usr/pkg/include/freetype2 -I/usr/X11R6/include/freetype2
 
 # Uncomment to enable colormap support
 # Saves 600 bytes
-DEFINES += -DUSE_CMAP
+#DEFINES += -DUSE_CMAP
 
 # Uncomment to enable parsing command line arguments.
 #  Saves ~2030 bytes

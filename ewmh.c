@@ -33,6 +33,7 @@ ewmh_init()
 	EA(CLIENT_LIST);
 	EA(RESTACK_WINDOW);
 	EA(REQUEST_FRAME_EXTENTS);
+	EA(VIRTUAL_ROOTS);
 
 	EA(WM_ALLOWED_ACTIONS);
 	EA(WM_NAME);
@@ -74,6 +75,28 @@ ewmh_init()
 		ERROR("BufferOverflow");
 }
 
+static void
+set_desktop_viewport()
+{
+	const long vp[2]={0,0};
+	XPROP(jbwm.X.screens->root, ewmh.DESKTOP_VIEWPORT, XA_CARDINAL, &vp, 2);
+}
+
+void
+ewmh_update_client_list()
+{
+	const unsigned short max = 1024;
+	Window wl[max];
+	unsigned short count=0;
+	for(Client *i=head_client; i; i=i->next)
+	{
+		LOG("count:%d", count);
+		if(!i) break; // Prevent segfault
+		wl[count++]=i->window;
+	}
+	XPROP(jbwm.X.screens->root, ewmh.CLIENT_LIST, XA_WINDOW, &wl, count);
+}
+
 void
 ewmh_client_message(XClientMessageEvent *e)
 {
@@ -87,6 +110,7 @@ ewmh_client_message(XClientMessageEvent *e)
         print_atom(e->data.l[3], __LINE__);
 #endif//DEBUG
         ScreenInfo *s = jbwm.X.screens;
+	const Window r=s->root;
         if(t==ewmh.CURRENT_DESKTOP) switch_vdesk(s, e->data.l[0]);
         Client *c=find_client(e->window);
         if(t==ewmh.WM_DESKTOP && e->data.l[1]==2 && c) 
@@ -102,15 +126,14 @@ ewmh_client_message(XClientMessageEvent *e)
         }
 	else if(t==ewmh.DESKTOP_VIEWPORT)
 	{
-		long vp[2]={0,0};
-		XPROP(jbwm.X.screens->root, ewmh.DESKTOP_VIEWPORT, 
-			XA_CARDINAL, &vp, 2);
+		set_desktop_viewport();
 	}
 	else if(t==ewmh.NUMBER_OF_DESKTOPS)
 	{
 		long num=DESKTOPS;
-		XPROP(jbwm.X.screens->root, ewmh.NUMBER_OF_DESKTOPS, 
-			XA_CARDINAL, &num, 1);
+		XPROP(r, ewmh.NUMBER_OF_DESKTOPS, XA_CARDINAL, &num, 1);
+		set_desktop_viewport();
+		XPROP(r, ewmh.VIRTUAL_ROOTS, XA_WINDOW, &r, 1);
 	}
         else if(t==ewmh.ACTIVE_WINDOW && e->data.l[0]==2 && c) select_client(c);
 	else if(t==ewmh.CLOSE_WINDOW && e->data.l[1]==2 && c) send_wm_delete(c);
@@ -173,7 +196,11 @@ ewmh_client_message(XClientMessageEvent *e)
 			}
 			//maximize(c);
 		}
-		else if(state==ewmh.WM_STATE_HIDDEN) XUnmapWindow(D, e->window);
+		else if(state==ewmh.WM_STATE_HIDDEN)
+		{
+			if(!e->data.l[3])
+			 	XUnmapWindow(D, e->window);
+		}
         } 
 }
 

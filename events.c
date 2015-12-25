@@ -184,10 +184,11 @@ head:
 			if(c) moveresize(c);
 		}
 		break;
-#ifdef DEBUG
 	case CreateNotify:
-		LOG("CreateNotify");
+	case DestroyNotify:
+		ewmh_update_client_list();
 		break;
+#ifdef DEBUG
 	case MapNotify:
 		LOG("MapNotify");
 		break;
@@ -199,9 +200,6 @@ head:
 		break;
 	case ReparentNotify:
 		LOG("ReparentNotify");
-		break;
-	case DestroyNotify:
-		LOG("DestroyNotify");
 		break;
 #endif//DEBUG
 #ifdef USE_CMAP
