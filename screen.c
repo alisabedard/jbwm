@@ -277,7 +277,7 @@ maximize(Client * c)
 		memcpy(g, &(c->old_size), sizeof(XSizeHints));
 		c->flags &= ~ JB_CLIENT_MAXIMIZED;
 #ifdef EWMH
-		XDeleteProperty(D, c->window, ewmh.WM_STATE);
+		ewmh_remove_state(c->window, ewmh.WM_STATE_FULLSCREEN);
 #endif//EWMH
 	}
 	else // maximize:
@@ -289,8 +289,7 @@ maximize(Client * c)
 		g->height = s->height;
 		c->flags |= JB_CLIENT_MAXIMIZED;
 #ifdef EWMH
-		XPROP(c->window, ewmh.WM_STATE, XA_ATOM, 
-			&ewmh.WM_STATE_FULLSCREEN, 1);
+		ewmh_add_state(c->window, ewmh.WM_STATE_FULLSCREEN);
 #endif//EWMH
 	}
 	moveresize(c);

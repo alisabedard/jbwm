@@ -45,6 +45,12 @@ void
 ewmh_update_client_list();
 
 void
+ewmh_remove_state(const Window w, const Atom state);
+
+void
+ewmh_add_state(const Window w, const Atom state);
+
+void
 ewmh_client_message(XClientMessageEvent *e);
 
 void

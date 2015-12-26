@@ -97,6 +97,30 @@ ewmh_update_client_list()
 	XPROP(jbwm.X.screens->root, ewmh.CLIENT_LIST, XA_WINDOW, &wl, count);
 }
 
+
+// Remove specified atom from WM_STATE
+void
+ewmh_remove_state(const Window w, const Atom state)
+{
+	Atom *a;
+	unsigned long n;
+	a=get_property(w, ewmh.WM_STATE, XA_ATOM, &n);
+	if(!a) return;
+	const unsigned long nitems=n;
+	while(n--)
+		if(a[n]==state)
+			a[n]=0;
+	XPROP(w, ewmh.WM_STATE, XA_ATOM, &a, nitems);
+	XFree(a);
+}
+
+void
+ewmh_add_state(const Window w, const Atom state)
+{
+	 XChangeProperty(D, w, ewmh.WM_STATE, XA_ATOM, 32, 
+                        PropModePrepend, (unsigned char *)&state, 1);
+}
+
 void
 ewmh_client_message(XClientMessageEvent *e)
 {
@@ -182,27 +206,14 @@ ewmh_client_message(XClientMessageEvent *e)
 			{
 			case 0: //remove
 				if(maxed) maximize(c); // toggle off
-			// TODO: Don't clobber all of _NET_WM_STATE
-				XDeleteProperty(D, e->window, 
-					ewmh.WM_STATE);
 				break;
 			case 1: //add
 				if(!maxed) maximize(c); // toggle on
-				XPROP(e->window, ewmh.WM_STATE,
-					XA_ATOM, &ewmh.WM_STATE_FULLSCREEN, 1);
 				break;
 			case 2: //toggle
 				maximize(c);
 			}
-			//maximize(c);
 		}
-#if 0
-		else if(state==ewmh.WM_STATE_HIDDEN)
-		{
-			if(!e->data.l[3])
-			 	XUnmapWindow(D, e->window);
-		}
-#endif//0
         } 
 }
 
