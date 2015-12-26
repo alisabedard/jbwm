@@ -14,7 +14,7 @@ delete_titlebar(Client * c);
 #ifdef USE_TBAR
 #define TDIM (jbwm.X.font->ascent+jbwm.X.font->descent)
 #else /* !USE_TBAR */
-#define TDIM 8
+#define TDIM 16
 #endif
 #ifdef USE_XPM
 #undef TDIM

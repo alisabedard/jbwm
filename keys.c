@@ -72,8 +72,10 @@ handle_client_key_event(XKeyEvent * e, Client * c, KeySym key)
 	case KEY_MOVE:
 		drag(c);
 		break;
+#ifdef USE_TBAR
 	case KEY_SHADE:
 		shade(c);
+#endif//USE_TBAR
 	}
 }
 

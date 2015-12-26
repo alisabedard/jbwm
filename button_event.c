@@ -6,6 +6,7 @@
 
 #include "jbwm.h"
 
+#ifdef USE_TBAR
 void
 shade(Client * c)
 {
@@ -37,16 +38,17 @@ shade(Client * c)
 #endif//EWMH
 	}
 }
+#endif//USE_TBAR
 
 static void
 button1_event(XButtonEvent * e, Client * c)
 {
-	const Position p={.x=e->x,.y=e->y};
 	const int width = c->geometry.width;
 
 	XRaiseWindow(D, c->parent);
-	/* Text for close button press.  */
-	if((p.x < TDIM) && (p.y < TDIM))
+#ifdef USE_TBAR
+	const Position p={.x=e->x,.y=e->y};
+	if((p.x < TDIM) && (p.y < TDIM)) // Close button
 	{
 		/* This fixes a bug where deleting a shaded window will cause
 		   the parent window to stick around as a ghost window. */
@@ -54,11 +56,14 @@ button1_event(XButtonEvent * e, Client * c)
 			shade(c);		
 		send_wm_delete(c);
 	}
-	if(p.x > width - TDIM)
-		sweep(c);	/* Resize the window.  */
-	else if(p.x > width - TDIM - TDIM && p.y < TDIM)
+	if(p.x > width - TDIM) // Resize button
+		sweep(c);	
+	else if(p.x > width - TDIM - TDIM && p.y < TDIM) // Shade button
 		shade(c);
-	else drag(c);	/* Move the window.  */
+	else drag(c);	// Handle
+#else//!USE_TBAR
+	drag(c); // Move the window
+#endif//USE_TBAR
 }
 
 void

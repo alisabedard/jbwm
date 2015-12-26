@@ -5,10 +5,13 @@
  * Anscomb <jbwm@6809.org.uk> see README for license and other details.
  */
 
+#include "jbwm.h"
 #include <signal.h>
 #include <X11/cursorfont.h>
 #include <stdlib.h>
-#include "jbwm.h"
+#ifdef USE_ARGV
+#include <unistd.h>
+#endif//USE_ARGV
 
 /* Main application data structure.  */
 JBWMEnvironment jbwm;

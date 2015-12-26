@@ -8,8 +8,9 @@
 #CFLAGS += -pg 
 
 # Edit this line if you don't want jbwm to install under /usr.
+PREFIX=/usr
 # Note that $(DESTDIR) is used by the Debian build process.
-prefix = $(DESTDIR)/usr
+prefix = $(DESTDIR)/$(PREFIX)
 # For typical manually built package:
 #prefix = /usr/local
 
@@ -41,20 +42,20 @@ DEFINES  = $(EXTRA_DEFINES)
 
 # Titlebar Xft support:
 # Warning, Xft impedes performance and leaks memory.
-#DEFINES += -DUSE_XFT
-#LIBS += -lXft
-#INCLUDES += `pkg-config --cflags xft`
+DEFINES += -DUSE_XFT
+LIBS += -lXft
+INCLUDES += `pkg-config --cflags xft`
 
 # Not necessary except on old NetBSD, for Xft support:
 #INCLUDES += -I/usr/pkg/include/freetype2 -I/usr/X11R6/include/freetype2
 
 # Uncomment to enable colormap support
 # Saves 600 bytes
-#DEFINES += -DUSE_CMAP
+DEFINES += -DUSE_CMAP
 
 # Uncomment to enable parsing command line arguments.
 #  Saves ~2030 bytes
-#DEFINES += -DUSE_ARGV
+DEFINES += -DUSE_ARGV
 
 # Uncomment to enable titlebars
 DEFINES += -DUSE_TBAR
@@ -67,7 +68,7 @@ SRCS += titlebar.c
 DEFINES += -DUSE_SNAP
 
 # Uncomment to enable STDIO (Adds 16 bytes)
-#DEFINES += -DSTDIO
+DEFINES += -DSTDIO
 
 # Uncomment to enable EWMH (Adds 8k bytes)
 DEFINES += -DEWMH

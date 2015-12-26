@@ -128,8 +128,10 @@ init_atom_properties(Client * c)
 		{
 			if(aprop[i] == ewmh.WM_STATE_STICKY)
 				add_sticky(c);
+#ifdef USE_TBAR
 			else if(aprop[i] == ewmh.WM_STATE_SHADED)
 				shade(c);
+#endif//USE_TBAR
 		}
 		XFree(aprop);
 	}
