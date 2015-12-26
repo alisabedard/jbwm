@@ -1,8 +1,8 @@
 #CC = clang
 #CC=/opt/diet/bin/diet -Os gcc
-CFLAGS=-Os -W -Wall -Werror
+CFLAGS=-Os -W -Wall
 # Debug:
-#CFLAGS=-O0 -ggdb -DDEBUG -DSTDIO -W -Wall -Werror
+CFLAGS=-O0 -ggdb -DDEBUG -DSTDIO -W -Wall 
 
 # Profile:
 #CFLAGS += -pg 
@@ -55,7 +55,7 @@ INCLUDES += -I/usr/pkg/include/freetype2 -I/usr/X11R6/include/freetype2
 
 # Uncomment to enable parsing command line arguments.
 #  Saves ~2030 bytes
-#DEFINES += -DUSE_ARGV -DSTDIO
+DEFINES += -DUSE_ARGV -DSTDIO
 
 # Uncomment to enable titlebars
 DEFINES += -DUSE_TBAR

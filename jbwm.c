@@ -23,6 +23,7 @@ JBWMEnvironment jbwm;
 static unsigned int
 parse_modifiers(char *arg)
 {
+	LOG("parse_modifiers()");
 	struct
 	{
 		const char *name;
@@ -41,9 +42,10 @@ parse_modifiers(char *arg)
 static void
 parse_argv(int argc, char **argv)
 {
-	char opt;
+	LOG("parse_argv(%d,%s...)", argc, argv[0]);
 	const char *optstring="1:2:d:V";
 
+	char opt;
 	while((opt=getopt(argc, argv, optstring))!=-1)
 	{
 		switch(opt)
