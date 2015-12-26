@@ -4,9 +4,10 @@
 
 /* client structure */
 
-typedef struct Client Client;
+typedef struct Client Client; 
 struct Client
 {
+	Client *next;
 	Window window;
 	Window parent;
 	ScreenInfo *screen;
@@ -19,12 +20,11 @@ struct Client
 	ubyte border;
 	XRectangle old_geometry;	/* used when maximising */
 
-	unsigned int exposed_width;
 
 	XSizeHints size;
 
 	byte vdesk;
-	int shade_height;
+	unsigned short shade_height;
 
 	Atom window_type;
 
@@ -36,7 +36,6 @@ struct Client
 #define JB_CLIENT_DONT_MANAGE 		(1<<4)
 #define JB_CLIENT_NO_TB 		(1<<5)
 #define JB_CLIENT_MAXIMIZED		(1<<6)
-
 	ubyte flags;
 
 	/*
@@ -44,15 +43,11 @@ struct Client
 	 * assignment and, thus, faster send_config calls.
 	 */
 	XConfigureEvent ce;
-	Client *next;
 
 #ifdef USE_TBAR
 	Window titlebar;
+	unsigned int exposed_width;
 #endif
-#if 0
-	Window close_button;
-	Window resize_handle_right;
-#endif//
 };
 
 /* This is to initialize the above CE.  */

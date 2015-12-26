@@ -88,7 +88,7 @@ ewmh_update_client_list()
 	const unsigned short max = 1024;
 	Window wl[max];
 	unsigned short count=0;
-	for(Client *i=head_client; i; i=i->next)
+	for(Client *i=jbwm.head; i; i=i->next)
 	{
 		LOG("count:%d", count);
 		if(!i) break; // Prevent segfault
@@ -122,7 +122,7 @@ ewmh_client_message(XClientMessageEvent *e)
                         hide(c);
 		XChangeProperty(D, c->window, ewmh.WM_DESKTOP, XA_CARDINAL, 32,
 			PropModeReplace, (unsigned char *)&(c->vdesk), 1);
-                select_client(current);
+                select_client(jbwm.current);
         }
 	else if(t==ewmh.DESKTOP_VIEWPORT)
 	{

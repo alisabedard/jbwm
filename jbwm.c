@@ -11,13 +11,11 @@
 #include <stdlib.h>
 #ifdef USE_ARGV
 #include <unistd.h>
+#include <string.h>
 #endif//USE_ARGV
 
 /* Main application data structure.  */
 JBWMEnvironment jbwm;
-
-/* Client tracking information */
-Client *head_client, *current;
 
 #ifdef USE_ARGV
 
@@ -37,6 +35,7 @@ parse_modifiers(char *arg)
 	for(ubyte i=0; i<9; i++)
 		if(!strcmp(m[i].name, arg))
 			return m[i].mask;
+	return 0;
 }
 
 static void

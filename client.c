@@ -33,7 +33,7 @@ send_configure(Client *c)
 Client *
 find_client(Window w)
 {
-	for(Client *c=head_client; c; c=c->next)
+	for(Client *c=jbwm.head; c; c=c->next)
 		if(w==c->parent || w==c->window 
 #ifdef USE_TBAR
 			|| w==c->titlebar
@@ -64,11 +64,11 @@ initialize_client_ce(Client * c)
 void
 select_client(Client * c)
 {
-	if(current)
+	if(jbwm.current)
 	{
-		XSetWindowBorder(D, current->parent,
-			current->screen->bg.pixel);
-		current->flags &= ~JB_CLIENT_ACTIVE;
+		XSetWindowBorder(D, jbwm.current->parent,
+			jbwm.current->screen->bg.pixel);
+		jbwm.current->flags &= ~JB_CLIENT_ACTIVE;
 	}
 	if(c)
 	{
@@ -84,7 +84,7 @@ select_client(Client * c)
 			&(c->window), 1);
 #endif//EWMH
 	}
-	current = c;
+	jbwm.current = c;
 }
 
 void
@@ -99,8 +99,8 @@ static inline void
 relink_window_list(Client * c)
 {
 	LOG("relink_window_list()");
-	if(head_client == c) head_client = c->next;
-	else for(Client *p = head_client; p && p->next; p = p->next)
+	if(jbwm.head == c) jbwm.head = c->next;
+	else for(Client *p = jbwm.head; p && p->next; p = p->next)
 		if(p->next == c)
 		{
 			p->next = c->next;
@@ -136,7 +136,7 @@ remove_client(Client * c)
 #endif//EWMH
 	unparent_window(c);
 	relink_window_list(c);
-	if(current==c) current=NULL;
+	if(jbwm.current==c) jbwm.current=NULL;
 	free(c);
 }
 

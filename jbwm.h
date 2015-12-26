@@ -44,15 +44,6 @@ typedef struct
 void 
 jbwm_grab_button(Window w, unsigned int mask, unsigned int button);
 
-/* Main environment structure, to replace evilwm's
-   large collection of global variables.  */
-extern JBWMEnvironment jbwm;
-
-/* These will take some time to integrate into jbwm structure.  */
-/* Client tracking information */
-extern Client *head_client;
-extern Client *current;
-
 #ifdef EWMH
 void
 set_ewmh_allowed_actions(const Window w);

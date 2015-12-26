@@ -140,7 +140,7 @@ snap_client(Client * c)
 	snap_client_to_screen_border(c);
 	dx = dy = S;
 	XRectangle *g = &(c->geometry);
-	for(Client *ci = head_client; ci; ci = ci->next)
+	for(Client *ci = jbwm.head; ci; ci = ci->next)
 	{
 		XRectangle *gi = &(ci->geometry);
 
@@ -261,9 +261,9 @@ moveresize(Client * c)
 	/* Only update the titlebar if the width has changed.  */
 	if(g->width != c->exposed_width)
 		update_titlebar(c);
-#endif//USE_TBAR
 	/* Store width value for above test.  */
 	c->exposed_width = width;
+#endif//USE_TBAR
 }
 
 void
@@ -317,7 +317,7 @@ void
 switch_vdesk(ScreenInfo * s, const ubyte v)
 {
 	if(v==s->vdesk || v>DESKTOPS) return;
-	for(Client *c=head_client; c; c=c->next)
+	for(Client *c=jbwm.head; c; c=c->next)
 	{
 		if(is_sticky(c))
 		{

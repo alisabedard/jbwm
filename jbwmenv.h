@@ -3,7 +3,7 @@
 #define JBWM_ENVIRONMENT_H
 #include "titlebar.h"
 
-struct JBWMEnvironment
+typedef struct 
 {
 	struct
 	{
@@ -28,10 +28,11 @@ struct JBWMEnvironment
 		int shape_event;
 #endif				/* USE_SHAPE */
 	} X;
-	ubyte need_cleanup;
-};
-
-typedef struct JBWMEnvironment JBWMEnvironment;
+	bool need_cleanup;
+	// Client tracking:
+	Client *current;
+	Client *head;
+} JBWMEnvironment;
 
 typedef struct
 {
@@ -45,8 +46,9 @@ typedef struct
 	char *term;
 } GlobalOptions;
 
-#define D jbwm.X.dpy
-
 extern GlobalOptions opt;
+extern JBWMEnvironment jbwm;
+
+#define D jbwm.X.dpy
 
 #endif /* not JBWM_ENVIRONMENT_H */

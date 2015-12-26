@@ -11,7 +11,7 @@
 void
 ewmh_init();
 
-typedef struct _EWMHEnvironment {
+typedef struct {
 	// All Atoms with the "_NET" prefix enumerated here:
 	Atom SUPPORTED, CURRENT_DESKTOP, NUMBER_OF_DESKTOPS, DESKTOP_VIEWPORT, 
 		DESKTOP_GEOMETRY, SUPPORTING_WM_CHECK, ACTIVE_WINDOW,

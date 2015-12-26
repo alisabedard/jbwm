@@ -193,8 +193,8 @@ static Client *
 Client_new(Window w, ScreenInfo * s)
 {
 	Client *c = calloc(1, sizeof(Client));
-	c->next = head_client;
-	head_client = c;
+	c->next = jbwm.head;
+	jbwm.head = c;
 	c->screen = s;
 	c->window = w;
 	c->window_type = None;

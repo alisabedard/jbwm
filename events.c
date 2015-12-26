@@ -20,7 +20,7 @@ cleanup()
 	LOG("cleanup()");
 	jbwm.need_cleanup=0;
 	Client *i;
-	for(Client *c = head_client; c; c = i)
+	for(Client *c = jbwm.head; c; c = i)
 	{
 		i = c->next;
 		if(c->flags & JB_CLIENT_REMOVE)

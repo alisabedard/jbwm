@@ -83,20 +83,20 @@ static void
 next(void)
 {
 	LOG("next()");
-	Client *c=current;
+	Client *c=jbwm.current;
 	do
 	{
 		if(c)
 		{
 			c=c->next;
-			if(!c&&!current)
+			if(!c&&!jbwm.current)
 				return;
 		}
 		if(!c)
-			c=head_client;
+			c=jbwm.head;
 		if(!c)
 			return;
-		if(c==current)
+		if(c==jbwm.current)
 			return;
 	} while(c->vdesk != c->screen->vdesk);
 	if(!c) return;
@@ -160,8 +160,8 @@ jbwm_handle_key_event(XKeyEvent * e)
 #endif//0
 		break;
 	default:
-		if(current)
-			handle_client_key_event(e, current, key);
+		if(jbwm.current)
+			handle_client_key_event(e, jbwm.current, key);
 	}
 }
 
