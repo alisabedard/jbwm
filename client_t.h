@@ -23,7 +23,15 @@ struct Client
 #define JB_CLIENT_DONT_MANAGE 		(1<<4)
 #define JB_CLIENT_NO_TB 		(1<<5)
 #define JB_CLIENT_MAXIMIZED		(1<<6)
-	ubyte flags;
+#define JB_CLIENT_NO_MIN		(1<<7)
+#define JB_CLIENT_NO_RESIZE		(1<<8)
+#define JB_CLIENT_TEAROFF		(1<<9)
+#define JB_CLIENT_NO_BORDER		(1<<10)
+#define JB_CLIENT_NO_CLOSE		(1<<11)
+#define JB_CLIENT_NO_MAX		(1<<12)
+#define JB_CLIENT_NO_MOVE		(1<<13)
+#define JB_CLIENT_MODAL			(1<<14)
+	unsigned short flags;
 
 	// Optional fields:
 #ifdef USE_CMAP
