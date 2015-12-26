@@ -71,6 +71,9 @@ handle_client_key_event(XKeyEvent * e, Client * c, KeySym key)
 		break;
 	case KEY_MOVE:
 		drag(c);
+		break;
+	case KEY_SHADE:
+		shade(c);
 	}
 }
 

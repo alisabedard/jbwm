@@ -37,6 +37,8 @@ void jbwm_handle_key_event(XKeyEvent * e);
 #define KEY_MAX		XK_space
 #define KEY_FIX		XK_f
 #define KEY_MOVE	XK_m
+#define KEY_SHADE	XK_s
+
 /*
  * Mixtures of Ctrl, Alt an Escape are used for things like VMWare and
  * XFree86/Cygwin, so the KILL key is an option in the Makefile
@@ -54,7 +56,7 @@ void jbwm_handle_key_event(XKeyEvent * e);
 	KEY_TOPLEFT, KEY_TOPRIGHT, KEY_BOTTOMLEFT, KEY_BOTTOMRIGHT,\
 	KEY_LEFT, KEY_RIGHT, KEY_DOWN, KEY_UP,\
 	KEY_LOWER, KEY_ALTLOWER, KEY_INFO, KEY_MAX,\
-	JBWM_VWM_KEYS, KEY_MOVE, KEY_RAISE, 0\
+	JBWM_VWM_KEYS, KEY_MOVE, KEY_RAISE, KEY_SHADE, 0\
 }
 
 #define JBWM_ALT_KEYS_TO_GRAB \
