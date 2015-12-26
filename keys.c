@@ -66,8 +66,8 @@ handle_client_key_event(XKeyEvent * e, Client * c, KeySym key)
 	case KEY_MAX:
 		maximize(c);
 		break;
-	case KEY_FIX:
-		fix_client(c);
+	case KEY_STICK:
+		stick(c);
 		break;
 	case KEY_MOVE:
 		drag(c);

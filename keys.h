@@ -35,7 +35,7 @@ void jbwm_handle_key_event(XKeyEvent * e);
 #define KEY_ALTLOWER	XK_minus
 #define KEY_INFO	XK_F5
 #define KEY_MAX		XK_space
-#define KEY_FIX		XK_f
+#define KEY_STICK		XK_f
 #define KEY_MOVE	XK_m
 #define KEY_SHADE	XK_s
 
@@ -47,7 +47,7 @@ void jbwm_handle_key_event(XKeyEvent * e);
 #define KEY_KILL	XK_q
 #endif
 
-#define JBWM_VWM_KEYS KEY_FIX, KEY_PREVDESK, KEY_NEXTDESK, XK_0, XK_1, XK_2,\
+#define JBWM_VWM_KEYS KEY_STICK, KEY_PREVDESK, KEY_NEXTDESK, XK_0, XK_1, XK_2,\
 	XK_3, XK_4, XK_5, XK_6, XK_7, XK_8, XK_9
 
 #define JBWM_KEYS_TO_GRAB \

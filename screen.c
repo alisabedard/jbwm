@@ -40,7 +40,7 @@ recalculate_sweep(Client * c, Position p1, Position p2)
 	recalculate_size(c, p1, p2);
 	c->geometry.x = p1.x;
 	c->geometry.y = p1.y;
-	configure(c);
+	//configure(c);
 }
 
 static bool
@@ -176,7 +176,7 @@ drag_motion(Client * c, XEvent ev, int x1, int y1, int old_cx,
 	XRectangle *g=&(c->geometry);
 	g->x = old_cx + (ev.xmotion.x - x1);
 	g->y = old_cy + (ev.xmotion.y - y1);
-	configure(c);
+	//configure(c);
 #ifdef USE_SNAP
 	snap_client(c);
 #endif /* USE_SNAP */
@@ -256,7 +256,7 @@ moveresize(Client * c)
 #else//!USE_TBAR
 	XMoveResizeWindow(D, c->window, 0, 0, width, g->height);
 #endif//USE_TBAR
-	send_configure(c);
+	configure(c);
 #ifdef USE_TBAR
 	/* Only update the titlebar if the width has changed.  */
 	if(g->width != c->exposed_width)

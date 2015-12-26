@@ -8,22 +8,11 @@
 void
 configure(Client *c)
 {
-	XConfigureEvent *e;
-	e=&(c->ce);
-	e->event=c->window;
 	XRectangle *g=&(c->geometry);
-	e->x=g->x;
-	e->y=g->y;
-	e->width=g->width;
-	e->height=g->height;
-}
-
-void
-send_configure(Client *c)
-{
-	configure(c);
-	XSendEvent(D, c->window, false, StructureNotifyMask,
-		(XEvent *)&(c->ce));
+	const Window w=c->window;
+	XConfigureEvent e={.x=g->x, .y=g->y, .width=g->width, 
+		.height=g->height, .event=w};
+	XSendEvent(D, w, false, StructureNotifyMask, (XEvent *)&e);
 }
 
 /*
@@ -88,7 +77,7 @@ select_client(Client * c)
 }
 
 void
-fix_client(Client * c)
+stick(Client * c)
 {
 	c->vdesk=c->screen->vdesk;
 	toggle_sticky(c);

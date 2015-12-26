@@ -5,9 +5,6 @@
 void
 configure(Client *c);
 
-void
-send_configure(Client *c);
-
 void 
 xmsg(Window w, Atom a, long x);
 
@@ -18,13 +15,10 @@ Client *
 find_client(Window w);
 
 void 
-gravitate_client(Client * c, int sign);
-
-void 
 select_client(Client * c);
 
 void 
-fix_client(Client * c);
+stick(Client * c);
 
 void 
 remove_client(Client * c);
@@ -35,10 +29,12 @@ send_config(Client * c);
 void 
 set_wm_state(Client * c, int state);
 
+#ifdef USE_SHAPE
 bool 
 is_shaped(Client * c);
 
 void 
 set_shape(Client * c);
+#endif//USE_SHAPE
 
 #endif /* JBWM_CLIENT_H */
