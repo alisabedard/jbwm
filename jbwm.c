@@ -23,34 +23,20 @@ Client *head_client, *current;
 
 /* Used for overriding the default WM modifiers */
 static unsigned int
-parse_modifiers(char *s)
+parse_modifiers(char *arg)
 {
 	struct
 	{
 		const char *name;
 		unsigned int mask;
-	} modifiers[] = { { "shift", ShiftMask}, { "lock", LockMask}, 
+	} m[] = { { "shift", ShiftMask}, { "lock", LockMask}, 
 		{ "control", ControlMask}, { "mod", Mod1Mask}, 
 		{ "mod1", Mod1Mask}, { "mod2", Mod2Mask},
 		{ "mod3", Mod3Mask}, { "mod4", Mod4Mask},
 		{ "mod5", Mod5Mask}};
-	const char *delim = ",+";
-	char *tmp;
-	unsigned int ret = 0;
-	for(tmp = strtok(s, delim); tmp; tmp = strtok(NULL, delim))
-	{
-		for(ubyte i; i<8; i++)
-		{
-			const char * n=modifiers[i].name;
-
-			if(!strncmp(n, tmp, sizeof(n)))
-			{
-				ret |= modifiers[i].mask;
-			}
-		}
-	}
-
-	return ret;
+	for(ubyte i=0; i<9; i++)
+		if(!strcmp(m[i].name, arg))
+			return m[i].mask;
 }
 
 static void
