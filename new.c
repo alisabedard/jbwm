@@ -9,23 +9,16 @@
 
 #if defined(EWMH) || defined(MWM)
 void *
-get_property(Window w, Atom property, Atom type,
-	unsigned long *num_items)
+get_property(Window w, Atom property, Atom type, unsigned long *num_items)
 {
-	Atom actual_type;
 	int actual_format;
 	unsigned long bytes_after;
 	unsigned char *prop;
 
 	if(XGetWindowProperty(D, w, property, 0L, 1024, false, 
-		type, &actual_type, &actual_format, num_items, 
+		property, &type, &actual_format, num_items, 
 		&bytes_after, &prop) == Success)
-	{
-		if(actual_type == type)
-			return (void *)prop;
-		else
-			XFree(prop);
-	}
+		return prop;
 	return NULL;
 }
 #endif//EWMH||MWM
@@ -38,7 +31,7 @@ handle_mwm_hints(Client * c)
 	struct { unsigned long flags, functions, 
 		decor, input_mode, status; } *m;
 	unsigned long n;
-	if(!(m=get_property(c->window, mwm_hints, XA_CARDINAL, &n)))
+	if(!(m=get_property(c->window, mwm_hints, mwm_hints, &n)))
 		return;
 
 // flags:
