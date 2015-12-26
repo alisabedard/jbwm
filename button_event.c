@@ -14,7 +14,7 @@ shade(Client * c)
 	   for iconification.  */
 	if(c->flags & JB_CLIENT_SHADED)
 	{
-		c->geometry.height=c->shade_height;
+		c->size.height=c->shade_height;
 		c->flags &= ~JB_CLIENT_SHADED;
 		XMapWindow(D, c->window);
 		moveresize(c);
@@ -26,11 +26,11 @@ shade(Client * c)
 	}
 	else // Shade the client
 	{
-		c->shade_height = c->geometry.height;
+		c->shade_height = c->size.height;
 		c->ignore_unmap++;
 		XUnmapWindow(D, c->window);
-		const ubyte h=c->geometry.height=TDIM+1;
-		XResizeWindow(D, c->parent, c->geometry.width, h);
+		const ubyte h=c->size.height=TDIM+1;
+		XResizeWindow(D, c->parent, c->size.width, h);
 		c->flags |= JB_CLIENT_SHADED;
 #if 0 // FIXME: Should be addded to WM_STATE list
 #ifdef EWMH
@@ -46,7 +46,7 @@ shade(Client * c)
 static void
 button1_event(XButtonEvent * e, Client * c)
 {
-	const int width = c->geometry.width;
+	const int width = c->size.width;
 
 	XRaiseWindow(D, c->parent);
 #ifdef USE_TBAR

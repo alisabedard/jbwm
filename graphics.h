@@ -11,11 +11,11 @@ void
 free_color(XColor c);
 
 void
-draw(Window w, XRectangle *g, const char *color);
+draw(Window w, XSizeHints *g, const char *color);
 
 #ifdef USE_XPM
 void
-draw_xpm(Window w, XRectangle *g, char **xpm);
+draw_xpm(Window w, XSizeHints *g, char **xpm);
 #endif /* USE_XPM */
 
 #endif /* JBWM_GRAPHICS_H */

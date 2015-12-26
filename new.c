@@ -52,13 +52,13 @@ handle_mwm_hints(Client * c)
 static void
 set_size(Client * c, const unsigned int width, const unsigned int height)
 {
-	c->geometry.width = width;
-	c->geometry.height = height;
+	c->size.width = width;
+	c->size.height = height;
 	configure(c);
 }
 
 static void
-init_geometry_size(Client * c, XWindowAttributes * attr)
+init_size_size(Client * c, XWindowAttributes * attr)
 {
 	const int dim[]={attr->width, attr->height};
 	if((dim[0] >= c->size.min_width)
@@ -71,13 +71,13 @@ init_geometry_size(Client * c, XWindowAttributes * attr)
 static void
 set_position(Client * c, const int x, const int y)
 {
-	c->geometry.x = x;
-	c->geometry.y = y;
+	c->size.x = x;
+	c->size.y = y;
 	configure(c);
 }
 
 static void
-init_geometry_position(Client * c, XWindowAttributes * attr)
+init_size_position(Client * c, XWindowAttributes * attr)
 {
 	if(!c->size.flags) return;
 	if((attr->map_state == IsViewable)
@@ -94,7 +94,7 @@ init_geometry_position(Client * c, XWindowAttributes * attr)
 			const short mx = s->width;
 			const short my = s->height;
 			const ubyte b = c->border;
-			const XRectangle *g = &(c->geometry);
+			const XSizeHints *g = &(c->size);
 			set_position(c, (p.x * (mx - b - g->width)) / mx,
 				(p.y * (my - b - g->height)) / my);
 		}
@@ -153,9 +153,8 @@ init_properties(Client * c)
 }
 
 static void
-init_geometry(Client * c)
+init_size(Client * c)
 {
-	initialize_client_ce(c);
 	XWindowAttributes attr;
 	XGetWindowAttributes(D, c->window, &attr);
 #ifdef USE_CMAP
@@ -163,8 +162,8 @@ init_geometry(Client * c)
 #endif /* USE_CMAP */
 	XGetWMNormalHints(D, c->window, &(c->size), 
 		&(attr.all_event_masks) /* dummy */);
-	init_geometry_size(c, &attr);
-	init_geometry_position(c, &attr);
+	init_size_size(c, &attr);
+	init_size_position(c, &attr);
 	/* Test if the reparent that is to come 
 	   would trigger an unmap event. */
 	if(attr.map_state == IsViewable)
@@ -179,7 +178,7 @@ reparent(Client *c)
 	XSetWindowAttributes a={.override_redirect=true,
 		.event_mask=SubstructureRedirectMask | SubstructureNotifyMask 
 		| ButtonPressMask | EnterWindowMask};
-	XRectangle *g=&(c->geometry);
+	XSizeHints *g=&(c->size);
 	c->parent=XCreateWindow(D, c->screen->root, g->x, g->y, g->width,
 		g->height, c->border, DefaultDepth(D, s), CopyFromParent, 
 		DefaultVisual(D, s), vm, &a);
@@ -197,10 +196,9 @@ Client_new(Window w, ScreenInfo * s)
 	jbwm.head = c;
 	c->screen = s;
 	c->window = w;
-	c->window_type = None;
 	c->border = JBWM_BORDER;
 	init_properties(c);
-	init_geometry(c);
+	init_size(c);
 	return c;
 }
 

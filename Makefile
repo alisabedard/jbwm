@@ -1,6 +1,6 @@
 #CC = clang
 #CC=/opt/diet/bin/diet -Os gcc
-CFLAGS=-Os -W -Wall
+CFLAGS=-Os -W -Wall -Werror
 # Debug:
 #CFLAGS=-O0 -ggdb -DDEBUG -DSTDIO -W -Wall -Werror
 

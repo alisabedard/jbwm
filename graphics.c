@@ -28,7 +28,7 @@ jbwm_new_gc(XColor color)
 }
 
 void
-draw(Window w, XRectangle *g, const char *color)
+draw(Window w, XSizeHints *g, const char *color)
 {
 	XColor c=jbwm_color(color);
 	GC gc=jbwm_new_gc(c);
@@ -41,7 +41,7 @@ draw(Window w, XRectangle *g, const char *color)
 #include <X11/xpm.h>
 
 void
-draw_xpm(Window w, XRectangle *g, char **xpm)
+draw_xpm(Window w, XSizeHints *g, char **xpm)
 {
 	XImage *i;
 	GC gc;

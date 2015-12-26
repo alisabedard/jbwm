@@ -143,10 +143,10 @@ ewmh_client_message(XClientMessageEvent *e)
                 const int source_indication = (e->data.l[0] >> 12) & 3;
                 if (source_indication == 2) 
                 {
-                        c->geometry.x=e->data.l[1];
-                        c->geometry.y=e->data.l[2];
-                        c->geometry.width=e->data.l[3];
-                        c->geometry.height=e->data.l[4];
+                        c->size.x=e->data.l[1];
+                        c->size.y=e->data.l[2];
+                        c->size.width=e->data.l[3];
+                        c->size.height=e->data.l[4];
                         moveresize(c);
                 }
         }

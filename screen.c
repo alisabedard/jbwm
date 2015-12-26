@@ -17,7 +17,7 @@ draw_outline(Client * c)
 	if(is_shaped(c))
 		return;
 #endif /* USE_SHAPE */
-	XRectangle *g=&(c->geometry);
+	XSizeHints *g=&(c->size);
 	ScreenInfo *s=c->screen;
 #ifdef USE_TBAR
 	XDrawRectangle(D, s->root, s->gc, g->x, g->y-TDIM, g->width, 
@@ -30,16 +30,16 @@ draw_outline(Client * c)
 static inline void
 recalculate_size(Client * c, Position p1, Position p2)
 {
-	c->geometry.width = abs(p1.x - p2.x);
-	c->geometry.height = abs(p1.y - p2.y);
+	c->size.width = abs(p1.x - p2.x);
+	c->size.height = abs(p1.y - p2.y);
 }
 
 static inline void
 recalculate_sweep(Client * c, Position p1, Position p2)
 {
 	recalculate_size(c, p1, p2);
-	c->geometry.x = p1.x;
-	c->geometry.y = p1.y;
+	c->size.x = p1.x;
+	c->size.y = p1.y;
 	//configure(c);
 }
 
@@ -52,7 +52,7 @@ grab_pointer(Window w, Cursor cursor)
 }
 
 static void
-handle_motion_notify(Client * c, XRectangle * g, XMotionEvent * mev)
+handle_motion_notify(Client * c, XSizeHints * g, XMotionEvent * mev)
 {
 	draw_outline(c);
 	Position p1;
@@ -72,7 +72,7 @@ sweep(Client * c)
 	/* Resizing shaded windows yields undefined behavior.  */
 	if(!grab_pointer(c->screen->root, jbwm.X.cursor) 
 		|| c->flags & JB_CLIENT_SHADED) return;
-	XRectangle *g=&(c->geometry);
+	XSizeHints *g=&(c->size);
 	XWarpPointer(D, None, c->window, 0, 0, 0, 0, 
 		g->width, g->height);
 	XEvent ev;
@@ -93,7 +93,7 @@ sweep_loop:
 
 #ifdef USE_SNAP
 
-static inline void sborder(short *xy, const ubyte border)
+static inline void sborder(int *xy, const ubyte border)
 {
 	if(abs(*xy+border)<JBWM_SNAP)
 		*xy=-border;	
@@ -102,7 +102,7 @@ static inline void sborder(short *xy, const ubyte border)
 static void
 snap_client_to_screen_border(Client * c)
 {
-	XRectangle *g = &(c->geometry);
+	XSizeHints *g = &(c->size);
 	/* snap to screen border */
 	const ubyte b = c->border;
 	sborder(&g->x, -b);
@@ -118,8 +118,8 @@ absmin(const int a, const int b)
 }
 
 static int
-snap_dim(short *cxy, unsigned short *cwh, short *cixy,
-	unsigned short *ciwh, const ubyte border, const ubyte snap)
+snap_dim(int *cxy, int *cwh, int *cixy, int *ciwh, 
+	const ubyte border, const ubyte snap)
 {
 	int d = snap;
 
@@ -139,10 +139,10 @@ snap_client(Client * c)
 	/* snap to other windows */
 	snap_client_to_screen_border(c);
 	dx = dy = S;
-	XRectangle *g = &(c->geometry);
+	XSizeHints *g = &(c->size);
 	for(Client *ci = jbwm.head; ci; ci = ci->next)
 	{
-		XRectangle *gi = &(ci->geometry);
+		XSizeHints *gi = &(ci->size);
 
 		if(ci != c && (ci->screen == c->screen)
 			&& (ci->vdesk == c->vdesk))
@@ -173,7 +173,7 @@ drag_motion(Client * c, XEvent ev, int x1, int y1, int old_cx,
 	int old_cy)
 {
 	draw_outline(c);	/* clear */
-	XRectangle *g=&(c->geometry);
+	XSizeHints *g=&(c->size);
 	g->x = old_cx + (ev.xmotion.x - x1);
 	g->y = old_cy + (ev.xmotion.y - y1);
 	//configure(c);
@@ -215,10 +215,10 @@ drag(Client * c)
 {
 	Window root=c->screen->root;
 	Position p, old_p;
-	XRectangle *g;
+	XSizeHints *g;
 	if(!grab_pointer(root, jbwm.X.cursor))
 		return;
-	g=&(c->geometry);
+	g=&(c->size);
 	old_p.x = g->x;
 	old_p.y = g->y;
 	get_mouse_position(root, &(p.x), &(p.y));
@@ -228,7 +228,7 @@ drag(Client * c)
 void
 moveresize(Client * c)
 {
-	XRectangle *g = &(c->geometry);
+	XSizeHints *g = &(c->size);
 	const ubyte b = c->border;
 #ifdef USE_TBAR
 	const bool max = c->flags & JB_CLIENT_MAXIMIZED;
@@ -270,10 +270,10 @@ void
 maximize(Client * c)
 {
 	LOG("maximize()");
-	XRectangle *g = &(c->geometry);
+	XSizeHints *g = &(c->size);
 	if(c->flags & JB_CLIENT_MAXIMIZED) // restore:
 	{
-		memcpy(g, &(c->old_geometry), sizeof(XRectangle));
+		memcpy(g, &(c->old_size), sizeof(XSizeHints));
 		c->flags &= ~ JB_CLIENT_MAXIMIZED;
 #ifdef EWMH
 		XDeleteProperty(D, c->window, ewmh.WM_STATE);
@@ -281,7 +281,7 @@ maximize(Client * c)
 	}
 	else // maximize:
 	{
-		memcpy(&(c->old_geometry), g, sizeof(XRectangle));
+		memcpy(&(c->old_size), g, sizeof(XSizeHints));
 		g->x = g->y = 0;
 		ScreenInfo *s = c->screen;
 		g->width = s->width;

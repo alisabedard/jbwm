@@ -11,25 +11,12 @@ struct Client
 	Window window;
 	Window parent;
 	ScreenInfo *screen;
-#ifdef USE_CMAP
-	Colormap cmap;
-#endif				/* USE_CMAP */
+	XSizeHints size, old_size;
+	ubyte vdesk;
 	int ignore_unmap;
-
-	XRectangle geometry;
 	ubyte border;
-	XRectangle old_geometry;	/* used when maximising */
-
-
-	XSizeHints size;
-
-	byte vdesk;
-	unsigned short shade_height;
-
-	Atom window_type;
 
 #define JB_CLIENT_IS_STICKY 		1
-/* Set when client needs to be removed: */
 #define JB_CLIENT_REMOVE		(1<<1)
 #define JB_CLIENT_ACTIVE 		(1<<2)
 #define JB_CLIENT_SHADED 		(1<<3)
@@ -38,16 +25,15 @@ struct Client
 #define JB_CLIENT_MAXIMIZED		(1<<6)
 	ubyte flags;
 
-	/*
-	 * This is stored within the structure to allow for one-time
-	 * assignment and, thus, faster send_config calls.
-	 */
-	XConfigureEvent ce;
-
+	// Optional fields:
+#ifdef USE_CMAP
+	Colormap cmap;
+#endif//USE_CMAP
 #ifdef USE_TBAR
 	Window titlebar;
-	unsigned int exposed_width;
-#endif
+	int exposed_width;
+	unsigned short shade_height;
+#endif//USE_TBAR
 };
 
 /* This is to initialize the above CE.  */

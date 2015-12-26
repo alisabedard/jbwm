@@ -22,7 +22,7 @@ new_titlebar(Client *c)
 		return;
 #endif /* USE_SHAPE */
 	const Window w = c->titlebar = XCreateSimpleWindow(D, c->parent, 0, 0, 
-		c->geometry.width, TDIM, 0, 0, 0); 
+		c->size.width, TDIM, 0, 0, 0); 
 	XSelectInput(D, w, ExposureMask);
 	XSetWindowBackground(D, w, c->screen->bg.pixel);
 	XMapRaised(D, w);
@@ -45,7 +45,7 @@ draw_title(Client * c, char *name)
 #ifdef USE_XFT
 	{
 		/* Prevent the text from going over the resize button.  */
-		const unsigned short max_width = c->geometry.width - 3 
+		const unsigned short max_width = c->size.width - 3 
 			* TDIM;
 		const ubyte s=c->screen->screen;
 		XGlyphInfo e;
@@ -88,10 +88,10 @@ draw_title(Client * c, char *name)
 static void
 draw_titlebar(Client * c, char *name)
 {
-	const unsigned short width = c->geometry.width;
+	const unsigned short width = c->size.width;
 	const unsigned short resize_offset = width - TDIM;
 	const unsigned short shade_offset = resize_offset - TDIM;
-	XRectangle g;
+	XSizeHints g;
 
 	XClearWindow(D, c->titlebar);
 #ifndef USE_XPM
@@ -110,7 +110,7 @@ draw_titlebar(Client * c, char *name)
 	do {
 		draw_xpm(c->titlebar, &g, gradient_xpm);
 		g.x+=1024;
-	} while(g.x<c->geometry.width);
+	} while(g.x<c->size.width);
 	g.x=shade_offset;
 	draw_xpm(c->titlebar, &g, shade_xpm);
 	g.x=resize_offset;
@@ -142,7 +142,7 @@ update_titlebar(Client * c)
 	}
 
 	/* Expand/Contract the titlebar width as necessary:  */
-	XMoveResizeWindow(D, tb, 0, 0, c->geometry.width, TDIM);
+	XMoveResizeWindow(D, tb, 0, 0, c->size.width, TDIM);
 	{
 		XTextProperty p;
 		XGetTextProperty(D, c->window, &p, XA_WM_NAME);

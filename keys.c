@@ -14,8 +14,7 @@ point(Client *c, const int x, const int y)
 }
 
 static void
-moveresize_dir(Client * c, XKeyEvent * e, short *xy,
-	unsigned short *wh, const byte sign)
+moveresize_dir(Client * c, XKeyEvent * e, int *xy, int *wh, const byte sign)
 {
 	/* These operations invalid when maximized.  */
 	if(c->flags & JB_CLIENT_MAXIMIZED) return;
@@ -37,7 +36,7 @@ moveresize_dir(Client * c, XKeyEvent * e, short *xy,
 static void
 handle_client_key_event(XKeyEvent * e, Client * c, KeySym key)
 {
-	XRectangle *g = &(c->geometry);
+	XSizeHints *g = &(c->size);
 
 	switch (key)
 	{
@@ -103,7 +102,7 @@ next(void)
 	unhide(c);
 	select_client(c);
 	point(c, 0, 0);
-	point(c, c->geometry.width, c->geometry.height);
+	point(c, c->size.width, c->size.height);
 	XSync(D, False);
 }
 

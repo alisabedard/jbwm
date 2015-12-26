@@ -8,7 +8,7 @@
 void
 configure(Client *c)
 {
-	XRectangle *g=&(c->geometry);
+	XSizeHints *g=&(c->size);
 	const Window w=c->window;
 	XConfigureEvent e={.x=g->x, .y=g->y, .width=g->width, 
 		.height=g->height, .event=w};
@@ -38,16 +38,6 @@ set_wm_state(Client * c, int state)
 
 	data[0] = state;
 	XPROP(c->window, XA("WM_STATE"), XA_CARDINAL, data, 2);
-}
-
-void
-initialize_client_ce(Client * c)
-{
-	c->ce.type = ConfigureNotify;
-	c->ce.border_width = 0;
-	c->ce.above = None;
-	c->ce.override_redirect = false;
-	c->ce.window = c->window;
 }
 
 void
@@ -102,8 +92,8 @@ unparent_window(Client * c)
 {
 	LOG("unparent_window()");
 	if(!c->parent) return;
-	XReparentWindow(D, c->window, c->screen->root, c->geometry.x, 
-		c->geometry.y);
+	XReparentWindow(D, c->window, c->screen->root, c->size.x, 
+		c->size.y);
 	XRemoveFromSaveSet(D, c->window);
 	if(c->parent) XDestroyWindow(D, c->parent);
 	c->parent=0;
