@@ -173,7 +173,9 @@ drag_motion(Client * c, XEvent ev, int x1, int y1, int old_cx,
 	XSizeHints *g=&(c->size);
 	g->x = old_cx + (ev.xmotion.x - x1);
 	g->y = old_cy + (ev.xmotion.y - y1);
+#ifdef USE_SNAP
 	snap_client(c);
+#endif//USE_SNAP
 	XMoveWindow(D, c->parent, g->x, g->y
 #ifdef USE_TBAR
 		-(!(c->flags&JB_CLIENT_NO_TB)?TDIM:0)
