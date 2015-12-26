@@ -184,10 +184,12 @@ head:
 			if(c) moveresize(c);
 		}
 		break;
+#ifdef EWMH
 	case CreateNotify:
 	case DestroyNotify:
 		ewmh_update_client_list();
 		break;
+#endif//EWMH
 #ifdef DEBUG
 	case MapNotify:
 		LOG("MapNotify");

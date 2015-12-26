@@ -85,7 +85,7 @@ distname = $(PROG)-$(version)
 
 DEFINES += -DVERSION=\"$(version)\" $(DEBIAN)
 CFLAGS  += $(INCLUDES) $(DEFINES) 
-CFLAGS += -D_XOPEN_SOURCE=700
+CFLAGS += -D_XOPEN_SOURCE=700 -std=c99
 LDFLAGS += $(LDPATH) $(LIBS)
 # Uncomment for static linking of binary:
 #LDFLAGS += -static 
@@ -117,7 +117,7 @@ clean:
 distclean: clean
 	rm -f *~ *.out .*.swp .*.swn
 
-archive:
+archive: distclean
 	cd ..;  tar cJf $(PROG)-$(version).tar.xz $(PROG)
 
 # DO NOT DELETE
