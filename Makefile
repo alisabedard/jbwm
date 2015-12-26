@@ -1,6 +1,6 @@
 #CC = clang
 #CC=/opt/diet/bin/diet -Os gcc
-CFLAGS=-Os -W -Wall
+#CFLAGS=-Os -W -Wall
 # Debug and profile:
 #CFLAGS=-O0 -ggdb -DDEBUG -DSTDIO -W -Wall -pg
 
@@ -50,7 +50,7 @@ INCLUDES += -I/usr/pkg/include/freetype2 -I/usr/X11R6/include/freetype2
 
 # Uncomment to enable parsing command line arguments.
 #  Saves ~2030 bytes
-DEFINES += -DUSE_ARGV -DSTDIO
+DEFINES += -DUSE_ARGV
 
 # Uncomment to enable titlebars
 DEFINES += -DUSE_TBAR
@@ -63,7 +63,7 @@ SRCS += titlebar.c
 DEFINES += -DUSE_SNAP
 
 # Uncomment to enable STDIO (Adds 16 bytes)
-#DEFINES += -DSTDIO
+DEFINES += -DSTDIO
 
 # Uncomment to enable EWMH (Adds ~4k bytes)
 DEFINES += -DEWMH
@@ -74,7 +74,7 @@ DEFINES += -DMWM
 
 # ----- You shouldn't need to change anything under this line ------ #
 
-version = 1.37
+version = 1.38
 
 PROG=jbwm
 distname = $(PROG)-$(version)
