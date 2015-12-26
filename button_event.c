@@ -18,12 +18,13 @@ shade(Client * c)
 		c->flags &= ~JB_CLIENT_SHADED;
 		XMapWindow(D, c->window);
 		moveresize(c);
-		select_client(c);
+#if 0 // FIXME: should be deleted from WM_STATE list
 #ifdef EWMH
 		XDeleteProperty(D, c->window, ewmh.WM_STATE_SHADED);
 #endif//EWMH
+#endif//0
 	}
-	else
+	else // Shade the client
 	{
 		c->shade_height = c->geometry.height;
 		c->ignore_unmap++;
@@ -31,11 +32,13 @@ shade(Client * c)
 		const ubyte h=c->geometry.height=TDIM+1;
 		XResizeWindow(D, c->parent, c->geometry.width, h);
 		c->flags |= JB_CLIENT_SHADED;
-		XSetWindowBorder(D, c->parent, c->screen->bg.pixel);
+#if 0 // FIXME: Should be addded to WM_STATE list
 #ifdef EWMH
 		XPROP(c->window, ewmh.WM_STATE, XA_CARDINAL, 
 			&ewmh.WM_STATE_SHADED, 1);
 #endif//EWMH
+#endif//0
+		select_client(c);
 	}
 }
 #endif//USE_TBAR

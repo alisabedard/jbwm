@@ -106,14 +106,7 @@ static void
 handle_enter_event(XCrossingEvent * e)
 {
 	Client *c=find_client(e->window);
-	if(!c) return;
-	/* Make sure event is on current desktop and only process event 
-	   on the application window.  */
-	if(is_sticky(c)) goto skip;
-	if((c->vdesk != c->screen->vdesk) || (e->window != c->window))
-		return;
-skip:
-		select_client(c);
+	if(c) select_client(c);
 }
 
 #ifdef USE_TBAR
