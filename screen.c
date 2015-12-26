@@ -213,14 +213,14 @@ get_mouse_position(Window w, int *x, int *y)
 void
 drag(Client * c)
 {
-	Window root=c->screen->root;
-	Position p, old_p;
-	XSizeHints *g;
+	const Window root=c->screen->root;
 	if(!grab_pointer(root, jbwm.X.cursor))
 		return;
-	g=&(c->size);
+	XSizeHints *g=&(c->size);
+	Position old_p;
 	old_p.x = g->x;
 	old_p.y = g->y;
+	Position p;
 	get_mouse_position(root, &(p.x), &(p.y));
 	drag_event_loop(c, p.x, p.y, old_p.x, old_p.y);
 }
@@ -250,12 +250,13 @@ moveresize(Client * c)
 	XMoveResizeWindow(D, c->parent, x, y, width, parent_height);
 	/* Offset the child window within the parent window
 		to display titlebar */
-#ifdef USE_TBAR
-	XMoveResizeWindow(D, c->window, 0, 
-		c->flags & JB_CLIENT_MAXIMIZED ? 0 : TDIM, width, g->height);
-#else//!USE_TBAR
-	XMoveResizeWindow(D, c->window, 0, 0, width, g->height);
+	bool no_offset=(c->flags&JB_CLIENT_MAXIMIZED)
+		||(c->flags&JB_CLIENT_NO_TB);
+#ifndef USE_TBAR
+	no_offset=true;
 #endif//USE_TBAR
+	XMoveResizeWindow(D, c->window, 0, no_offset ? 0 : TDIM, 
+		width, g->height);
 	configure(c);
 #ifdef USE_TBAR
 	/* Only update the titlebar if the width has changed.  */
