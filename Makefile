@@ -1,8 +1,8 @@
 #CC = clang
 #CC=/opt/diet/bin/diet -Os gcc
 CFLAGS=-Os -W -Wall
-# Debug:
-CFLAGS=-O0 -ggdb -DDEBUG -DSTDIO -W -Wall 
+# Debug and profile:
+#CFLAGS=-O0 -ggdb -DDEBUG -DSTDIO -W -Wall -pg
 
 # Profile:
 #CFLAGS += -pg 
@@ -26,15 +26,10 @@ DEFINES  = $(EXTRA_DEFINES)
 
 # Configure jbwm by editing the following DEFINES lines.  You can also
 # add options by setting EXTRA_DEFINES on the make(1) command line,
-# e.g., make EXTRA_DEFINES="-DDEBUG".
-
-# Uncomment to debug and profile
-#CFLAGS = -O0 -ggdb -pg
-#DEFINES += -DDEBUG
 
 # Uncomment to enable SHAPE extension support
-DEFINES += -DUSE_SHAPE
-LIBS += -lXext # Required for SHAPE extension
+#DEFINES += -DUSE_SHAPE
+#LIBS += -lXext # Required for SHAPE extension
 
 # XPM support is beautiful but substantially increases binary size.
 #DEFINES += -DUSE_XPM
@@ -42,9 +37,9 @@ LIBS += -lXext # Required for SHAPE extension
 
 # Titlebar Xft support:
 # Warning, Xft impedes performance and leaks memory.
-DEFINES += -DUSE_XFT
-LIBS += -lXft
-INCLUDES += `pkg-config --cflags xft`
+#DEFINES += -DUSE_XFT
+#LIBS += -lXft
+#INCLUDES += `pkg-config --cflags xft`
 
 # Not necessary except on old NetBSD, for Xft support:
 INCLUDES += -I/usr/pkg/include/freetype2 -I/usr/X11R6/include/freetype2

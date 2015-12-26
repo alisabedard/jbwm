@@ -13,6 +13,8 @@
 static inline void
 draw_outline(Client * c)
 {
+	if(!c->border)
+		return;
 #ifdef USE_SHAPE
 	if(is_shaped(c))
 		return;
@@ -55,12 +57,8 @@ static void
 handle_motion_notify(Client * c, XSizeHints * g, XMotionEvent * mev)
 {
 	draw_outline(c);
-	Position p1;
-	p1.x = g->x;
-	p1.y = g->y;
-	Position p2;
-	p2.x = mev->x;
-	p2.y = mev->y;
+	Position p1={.x=g->x, .y=g->y};
+	Position p2={.x=mev->x, .y=mev->y};
 	recalculate_sweep(c, p1, p2);
 	draw_outline(c);
 }
@@ -172,15 +170,15 @@ static inline void
 drag_motion(Client * c, XEvent ev, int x1, int y1, int old_cx,
 	int old_cy)
 {
-	draw_outline(c);	/* clear */
 	XSizeHints *g=&(c->size);
 	g->x = old_cx + (ev.xmotion.x - x1);
 	g->y = old_cy + (ev.xmotion.y - y1);
-	//configure(c);
-#ifdef USE_SNAP
 	snap_client(c);
-#endif /* USE_SNAP */
-	draw_outline(c);
+	XMoveWindow(D, c->parent, g->x, g->y
+#ifdef USE_TBAR
+		-(!(c->flags&JB_CLIENT_NO_TB)?TDIM:0)
+#endif//USE_TBAR
+		);
 }
 
 static void

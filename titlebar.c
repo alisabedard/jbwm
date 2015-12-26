@@ -17,6 +17,8 @@
 static void
 new_titlebar(Client *c)
 {
+	if(c->flags&JB_CLIENT_NO_TB)
+		return;
 #ifdef USE_SHAPE
 	if(is_shaped(c))
 		return;
@@ -91,32 +93,44 @@ draw_titlebar(Client * c, char *name)
 	const unsigned short width = c->size.width;
 	const unsigned short resize_offset = width - TDIM;
 	const unsigned short shade_offset = resize_offset - TDIM;
-	XSizeHints g;
+	XRectangle g={.x=0,.y=0,.width=TDIM,.height=TDIM};
 
 	XClearWindow(D, c->titlebar);
+	if(!(c->flags&JB_CLIENT_NO_CLOSE))
+	{
 #ifndef USE_XPM
-	g.x=g.y=0;
-	g.width=g.height=TDIM;
-	draw(c->titlebar, &g, TITLEBAR_CLOSE_BG);
-	g.x=shade_offset;
-	draw(c->titlebar, &g, TITLEBAR_SHADE_BG);
-	g.x=resize_offset;
-	draw(c->titlebar, &g, TITLEBAR_RESIZE_BG);
-#else /* USE_XPM */
-	g.x=g.y=0;
-	g.width=g.height=TDIM;
-	draw_xpm(c->titlebar, &g, close_button_xpm);
+		draw(c->titlebar, &g, TITLEBAR_CLOSE_BG);
+#else//USE_XPM
+		draw_xpm(c->titlebar, &g, close_button_xpm);
+#endif//!USE_XPM
+	}
+#ifdef USE_XPM
 	g.x=TDIM;
 	do {
 		draw_xpm(c->titlebar, &g, gradient_xpm);
 		g.x+=1024;
 	} while(g.x<c->size.width);
-	g.x=shade_offset;
-	draw_xpm(c->titlebar, &g, shade_xpm);
-	g.x=resize_offset;
-	draw_xpm(c->titlebar, &g, resize_button_xpm);
-#endif /* !USE_XPM */
-	draw_title(c, name);
+#endif//USE_XPM
+	if(!(c->flags&JB_CLIENT_NO_MIN))
+	{
+		g.x=shade_offset;
+#ifndef USE_XPM
+		draw(c->titlebar, &g, TITLEBAR_SHADE_BG);
+#else//USE_XPM
+		draw_xpm(c->titlebar, &g, shade_xpm);
+#endif//!USE_XPM
+	}
+	if(!(c->flags&JB_CLIENT_NO_RESIZE))
+	{
+		g.x=resize_offset;
+#ifndef USE_XPM
+		draw(c->titlebar, &g, TITLEBAR_RESIZE_BG);
+#else//USE_XPM
+		draw_xpm(c->titlebar, &g, resize_button_xpm);
+#endif//!USE_XPM
+	}
+	if(!(c->flags&JB_CLIENT_TEAROFF))
+		draw_title(c, name);
 }
 
 void
@@ -143,11 +157,9 @@ update_titlebar(Client * c)
 
 	/* Expand/Contract the titlebar width as necessary:  */
 	XMoveResizeWindow(D, tb, 0, 0, c->size.width, TDIM);
-	{
-		XTextProperty p;
-		XGetTextProperty(D, c->window, &p, XA_WM_NAME);
-		draw_titlebar(c, (char *)p.value);
-	}
+	XTextProperty p;
+	XGetTextProperty(D, c->window, &p, XA_WM_NAME);
+	draw_titlebar(c, (char *)p.value);
 }
 
 void
