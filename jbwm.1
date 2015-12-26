@@ -10,10 +10,6 @@ If you have enabled ARGV support in the Makefile:
 .LP
 .B jbwm [ \-d
 .I display
-.B ] [ \-A
-.I application class
-.B ] [ \-g
-.I application class geometry
 .B ] [ \-1
 .I keymask for primary modifier (Default: Windows/Meta key)
 .B ] [ \-2
@@ -59,10 +55,12 @@ Move window left, down, up or right.  Holding Shift resizes the
 window instead.
 .IP Space
 Maximise current window (toggle).
+.IP s
+Toggle window shade.
 .PP
 If compiled with virtual desktop support, these functions are also available: 
-.IP F
-Fix or unfix current window.
+.IP f
+Toggle window stickiness.
 .IP "1--0"
 Switch virtual desktop.
 .IP Left
@@ -76,12 +74,6 @@ to cycle through windows on screen.
 .SH OPTIONS
 Command line arguments are accepted if jbwm was compiled with ARGV enabled
 in its Makefile.  
-The
-.B \-A
-option takes a WM_CLASS value as its argument.  Then, windows matching
-the WM_CLASS can be given a default geometry with the
-.B \-g
-option.  
 Valid modifier values for the 
 .B \-1 
 and 

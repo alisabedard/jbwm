@@ -20,43 +20,16 @@ JBWMEnvironment jbwm;
 Client *head_client, *current;
 
 #ifdef USE_ARGV
-Application *head_app;
-static void
-process_app_class_options(const char *name)
-{
-	char *tmp;
-	Application *new = calloc(1, sizeof(Application));
-	if((tmp = strchr(name, '/')))
-	{
-		*(tmp++) = 0;
-		if(strlen(tmp) > 0)
-		{
-			new->res_class = malloc(strlen(tmp) + 1);
-			strcpy(new->res_class, tmp);
-		}
-	}
-	{
-		const size_t namelen = strlen(name);
-
-		if(namelen > 0)
-		{
-			new->res_name = malloc(namelen + 1);
-			strcpy(new->res_name, name);
-		}
-	}
-	new->next = head_app;
-	head_app = new;
-}
 
 /* Used for overriding the default WM modifiers */
 static unsigned int
 parse_modifiers(char *s)
 {
-	static struct
+	struct
 	{
 		const char *name;
 		unsigned int mask;
-	} modifiers[9] = { { "shift", ShiftMask}, { "lock", LockMask}, 
+	} modifiers[] = { { "shift", ShiftMask}, { "lock", LockMask}, 
 		{ "control", ControlMask}, { "mod", Mod1Mask}, 
 		{ "mod1", Mod1Mask}, { "mod2", Mod2Mask},
 		{ "mod3", Mod3Mask}, { "mod4", Mod4Mask},
@@ -81,23 +54,10 @@ parse_modifiers(char *s)
 }
 
 static void
-parse_geometry(const char *arg)
-{
-	XRectangle g;
-
-	if(!head_app)
-		return;
-	head_app->geometry_mask =
-		XParseGeometry(arg, (int *)&g.x, (int *)&g.y,
-		(unsigned int *)&g.width, (unsigned int *)&g.height);
-	head_app->geometry = g;
-}
-
-static void
 parse_argv(int argc, char **argv)
 {
 	char opt;
-	const char *optstring="1:2:A:d:g:V";
+	const char *optstring="1:2:d:V";
 
 	while((opt=getopt(argc, argv, optstring))!=-1)
 	{
@@ -109,22 +69,18 @@ parse_argv(int argc, char **argv)
 			case '2':
 				jbwm.keymasks.mod = parse_modifiers(optarg);
 				break;
-			case 'A':
-				process_app_class_options(optarg);
-				break;
 			case 'd':
 				setenv("DISPLAY", optarg, 1);
 				break;
-			case 'g':
-				parse_geometry(optarg);
-				break;
+#ifdef STDIO
 			case 'V':
 				puts(VERSION);
 				exit(0);
 			default: /* Usage */
-#ifdef STDIO
 				fprintf(stderr, "%s [%s]\n", argv[0],
 					optstring);
+#else//!STDIO
+			default:
 #endif//STDIO
 				exit(1);
 		}

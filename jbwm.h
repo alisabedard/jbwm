@@ -23,7 +23,6 @@ typedef unsigned char ubyte;
 
 #include "ScreenInfo.h"
 #include "client_t.h"
-#include "application_t.h"
 #include "jbwmenv.h"
 #include "jbwmmod.h"
 
@@ -48,9 +47,6 @@ jbwm_grab_button(Window w, unsigned int mask, unsigned int button);
 /* Main environment structure, to replace evilwm's
    large collection of global variables.  */
 extern JBWMEnvironment jbwm;
-
-/* Things that affect user interaction */
-extern Application *head_app;
 
 /* These will take some time to integrate into jbwm structure.  */
 /* Client tracking information */
