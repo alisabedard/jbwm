@@ -313,10 +313,10 @@ unhide(Client * c)
 	set_wm_state(c, NormalState);
 }
 
-void
+ubyte
 switch_vdesk(ScreenInfo * s, const ubyte v)
 {
-	if(v==s->vdesk || v>DESKTOPS) return;
+	if(v==s->vdesk || v>DESKTOPS) return s->vdesk;
 	for(Client *c=jbwm.head; c; c=c->next)
 	{
 		if(is_sticky(c))
@@ -335,5 +335,6 @@ switch_vdesk(ScreenInfo * s, const ubyte v)
 #ifdef EWMH
 	XPROP(s->root, ewmh.CURRENT_DESKTOP, XA_CARDINAL, &(s->vdesk), 1);
 #endif//EWMH
+	return s->vdesk;
 }
 

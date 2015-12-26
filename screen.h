@@ -16,7 +16,7 @@ void show_info(Client * c, KeySym key);
 void sweep(Client * c);
 void hide(Client * c);
 void unhide(Client * c);
-void switch_vdesk(ScreenInfo * s, const ubyte v);
+ubyte switch_vdesk(ScreenInfo * s, const ubyte v);
 void grab_keys_for_screen(ScreenInfo * s);
 void maximize(Client * c);
 void get_mouse_position(Window w, int *x, int *y);

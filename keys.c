@@ -18,8 +18,9 @@ moveresize_dir(Client * c, XKeyEvent * e, int *xy, int *wh, const byte sign)
 {
 	/* These operations invalid when maximized.  */
 	if(c->flags & JB_CLIENT_MAXIMIZED) return;
-	const byte mod = sign * JBWM_RESIZE_INCREMENT;
-	if((e->state & jbwm.keymasks.mod) && (*wh > JBWM_RESIZE_INCREMENT))
+	const byte inc = JBWM_RESIZE_INCREMENT;
+	const byte mod = sign * inc;
+	if((e->state & jbwm.keymasks.mod) && (*wh > inc))
 	{
 #ifdef USE_SHAPE
 		if(is_shaped(c))
@@ -30,7 +31,7 @@ moveresize_dir(Client * c, XKeyEvent * e, int *xy, int *wh, const byte sign)
 	else
 		*xy += mod;
 	moveresize(c);
-	point(c, JBWM_RESIZE_INCREMENT, JBWM_RESIZE_INCREMENT);
+	point(c, inc, inc);
 }
 
 static void
@@ -106,29 +107,52 @@ next(void)
 	XSync(D, False);
 }
 
+static void
+client_to_desk(Client *c, const ubyte d)
+{
+	c->vdesk=d;
+	c->vdesk=switch_vdesk(c->screen, d);
+}
+
+static void
+cond_client_to_desk(Client *c, ScreenInfo *s, const ubyte d, const bool mod)
+{
+	LOG("mod: %d, c valid? %d\n", mod, c?1:0);
+	if(mod&&c)
+		client_to_desk(c, d);
+	else 
+		switch_vdesk(s, d);
+}
+
+static void
+spawn(const char *cmd)
+{
+	const int r=system(cmd);
+	if(WIFEXITED(r) && WEXITSTATUS(r))
+		ERROR(cmd);
+}
 
 void
 jbwm_handle_key_event(XKeyEvent * e)
 {
 	KeySym key = XLookupKeysym(e, 0);
-
-	Client *c = find_client(e->window);
-	ScreenInfo *screen = c ? c->screen : jbwm.X.screens;
-
+	Client *c=jbwm.current;
+	ScreenInfo *s = c ? c->screen : jbwm.X.screens;
+	const bool mod=e->state&jbwm.keymasks.mod;
+	bool zero_desk=false;
+	ubyte new_desk;
 	switch (key)
 	{
 	case KEY_NEW:
-		{
-			const int r=system(TERMINAL_CMD);
-			if(WIFEXITED(r) && WEXITSTATUS(r))
-				ERROR(TERMINAL_CMD);
-		}
+		spawn(TERMINAL_CMD);
 		break;
 	case KEY_QUIT:
 		exit(0);
 	case KEY_NEXT:
 		next();
 		break;
+	case XK_0:
+		zero_desk=true;
 	case XK_1:
 	case XK_2:
 	case XK_3:
@@ -138,25 +162,17 @@ jbwm_handle_key_event(XKeyEvent * e)
 	case XK_7:
 	case XK_8:
 	case XK_9:
-		switch_vdesk(screen, key-XK_1);
-		break;
-	case XK_0:
-		switch_vdesk(screen, 10);
+		// First desktop 0, per wm-spec
+		new_desk=zero_desk?10:key-XK_1;
+		cond_client_to_desk(c, s, new_desk, mod);
 		break;
 	case KEY_PREVDESK:
-		// First desktop 0, per wm-spec
-		switch_vdesk(screen, screen->vdesk-1);
-#if 0
-		if(screen && screen->vdesk > 0)
-			switch_vdesk(screen, screen->vdesk-1);
-#endif//0
+		new_desk=s->vdesk-1;
+		cond_client_to_desk(c, s, new_desk, mod);
 		break;
 	case KEY_NEXTDESK:
-		switch_vdesk(screen, screen->vdesk+1);
-#if 0
-		if(screen && screen->vdesk < DESKTOPS)
-			switch_vdesk(screen, screen->vdesk);
-#endif//0
+		new_desk=s->vdesk+1;
+		cond_client_to_desk(c, s, new_desk, mod);
 		break;
 	default:
 		if(jbwm.current)
