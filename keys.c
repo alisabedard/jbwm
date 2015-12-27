@@ -108,18 +108,11 @@ next(void)
 }
 
 static void
-client_to_desk(Client *c, const ubyte d)
-{
-	c->vdesk=d;
-	c->vdesk=switch_vdesk(c->screen, d);
-}
-
-static void
 cond_client_to_desk(Client *c, ScreenInfo *s, const ubyte d, const bool mod)
 {
 	LOG("mod: %d, c valid? %d\n", mod, c?1:0);
 	if(mod&&c)
-		client_to_desk(c, d);
+		client_to_vdesk(c, d);
 	else 
 		switch_vdesk(s, d);
 }

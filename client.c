@@ -6,6 +6,13 @@
 #include "jbwm.h"
 
 void
+client_to_vdesk(Client *c, const ubyte d)
+{
+	c->vdesk=d;
+        c->vdesk=switch_vdesk(c->screen, d);
+}
+
+void
 configure(Client *c)
 {
 	XSizeHints *g=&(c->size);

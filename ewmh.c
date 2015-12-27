@@ -31,6 +31,7 @@ ewmh_init()
 	EA(MOVERESIZE_WINDOW);
 	EA(CLOSE_WINDOW);
 	EA(CLIENT_LIST);
+	EA(CLIENT_LIST_STACKING);
 	EA(RESTACK_WINDOW);
 	EA(REQUEST_FRAME_EXTENTS);
 	EA(VIRTUAL_ROOTS);
@@ -85,16 +86,20 @@ set_desktop_viewport()
 void
 ewmh_update_client_list()
 {
-	const unsigned short max = 1024;
-	Window wl[max];
+#define MAX_CLIENTS 1024
+	// Prevent data from disappearing after return.
+	static Window wl[MAX_CLIENTS];
 	unsigned short count=0;
-	for(Client *i=jbwm.head; i; i=i->next)
+	for(Client *i=jbwm.head; i&&(count<MAX_CLIENTS); i=i->next)
 	{
 		LOG("count:%d", count);
 		if(!i) break; // Prevent segfault
 		wl[count++]=i->window;
 	}
 	XPROP(jbwm.X.screens->root, ewmh.CLIENT_LIST, XA_WINDOW, &wl, count);
+	// FIXME: Does not correctly report stacking order.
+	XPROP(jbwm.X.screens->root, ewmh.CLIENT_LIST_STACKING, XA_WINDOW, 
+		&wl, count);
 }
 
 
@@ -121,62 +126,34 @@ ewmh_add_state(const Window w, const Atom state)
                         PropModePrepend, (unsigned char *)&state, 1);
 }
 
-void
-ewmh_client_message(XClientMessageEvent *e)
+static void
+set_number_of_desktops(const Window r)
 {
-	const Atom t=e->message_type;
-#ifdef DEBUG
-        puts("----CLIENTMESSAGE----");
-        print_atom(t, __LINE__);
-        print_atom(e->data.l[0], __LINE__);
-        print_atom(e->data.l[1], __LINE__);
-        print_atom(e->data.l[2], __LINE__);
-        print_atom(e->data.l[3], __LINE__);
-#endif//DEBUG
-        ScreenInfo *s = jbwm.X.screens;
-	const Window r=s->root;
-        if(t==ewmh.CURRENT_DESKTOP) switch_vdesk(s, e->data.l[0]);
-        Client *c=find_client(e->window);
-        if(t==ewmh.WM_DESKTOP && e->data.l[1]==2 && c) 
-        {
-                c->vdesk=e->data.l[0];
-                if(c->vdesk==c->screen->vdesk || c->flags&JB_CLIENT_IS_STICKY)
-                        unhide(c);
-                else
-                        hide(c);
-		XChangeProperty(D, c->window, ewmh.WM_DESKTOP, XA_CARDINAL, 32,
-			PropModeReplace, (unsigned char *)&(c->vdesk), 1);
-                select_client(jbwm.current);
-        }
-	else if(t==ewmh.DESKTOP_VIEWPORT)
+	static const long num=DESKTOPS;
+	XPROP(r, ewmh.NUMBER_OF_DESKTOPS, XA_CARDINAL, &num, 1);
+	set_desktop_viewport();
+	XPROP(r, ewmh.VIRTUAL_ROOTS, XA_WINDOW, &r, 1);
+}
+
+static void
+handle_moveresize_window(Client *c, XClientMessageEvent *e)
+{
+	// Only do this if it came from direct user action 
+	const int src = (e->data.l[0] >> 12) & 3;
+	if (src == 2) 
 	{
-		set_desktop_viewport();
+		c->size.x=e->data.l[1];
+		c->size.y=e->data.l[2];
+		c->size.width=e->data.l[3];
+		c->size.height=e->data.l[4];
+		moveresize(c);
 	}
-	else if(t==ewmh.NUMBER_OF_DESKTOPS)
-	{
-		long num=DESKTOPS;
-		XPROP(r, ewmh.NUMBER_OF_DESKTOPS, XA_CARDINAL, &num, 1);
-		set_desktop_viewport();
-		XPROP(r, ewmh.VIRTUAL_ROOTS, XA_WINDOW, &r, 1);
-	}
-        else if(t==ewmh.ACTIVE_WINDOW && e->data.l[0]==2 && c) select_client(c);
-	else if(t==ewmh.CLOSE_WINDOW && e->data.l[1]==2 && c) send_wm_delete(c);
-        else if(t==ewmh.MOVERESIZE_WINDOW && c)
-        {
-                 /* Only do this if it came from direct user action */
-                const int source_indication = (e->data.l[0] >> 12) & 3;
-                if (source_indication == 2) 
-                {
-                        c->size.x=e->data.l[1];
-                        c->size.y=e->data.l[2];
-                        c->size.width=e->data.l[3];
-                        c->size.height=e->data.l[4];
-                        moveresize(c);
-                }
-        }
-        else if(t==ewmh.WM_STATE)
-        {
-/* Reference, per wm-spec:
+}
+
+static void
+handle_wm_state_changes(Client *c, XClientMessageEvent *e)
+{
+/* 	Reference, per wm-spec:
   window  = the respective client window
   message_type = _NET_WM_STATE
   format = 32
@@ -214,7 +191,37 @@ ewmh_client_message(XClientMessageEvent *e)
 				maximize(c);
 			}
 		}
-        } 
+}
+
+void
+ewmh_client_message(XClientMessageEvent *e)
+{
+	const Atom t=e->message_type;
+#ifdef DEBUG
+        puts("----CLIENTMESSAGE----");
+        print_atom(t, __LINE__);
+        print_atom(e->data.l[0], __LINE__);
+        print_atom(e->data.l[1], __LINE__);
+        print_atom(e->data.l[2], __LINE__);
+        print_atom(e->data.l[3], __LINE__);
+#endif//DEBUG
+        ScreenInfo *s = jbwm.X.screens;
+        if(t==ewmh.CURRENT_DESKTOP) switch_vdesk(s, e->data.l[0]);
+        Client *c=find_client(e->window);
+	if(t==ewmh.WM_DESKTOP && c)
+		client_to_vdesk(c, e->data.l[0]);
+	else if(t==ewmh.DESKTOP_VIEWPORT)
+		set_desktop_viewport();
+	else if(t==ewmh.NUMBER_OF_DESKTOPS)
+		set_number_of_desktops(s->root);
+        else if(t==ewmh.ACTIVE_WINDOW && e->data.l[0]==2 && c)
+		select_client(c);
+	else if(t==ewmh.CLOSE_WINDOW && e->data.l[1]==2 && c)
+		send_wm_delete(c);
+        else if(t==ewmh.MOVERESIZE_WINDOW && c)
+		handle_moveresize_window(c, e);
+        else if(t==ewmh.WM_STATE)
+		handle_wm_state_changes(c, e);
 }
 
 void
