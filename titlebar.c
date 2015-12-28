@@ -26,7 +26,9 @@ new_titlebar(Client *c)
 	const Window w = c->titlebar = XCreateSimpleWindow(D, c->parent, 0, 0, 
 		c->size.width, TDIM, 0, 0, 0); 
 	XSelectInput(D, w, ExposureMask);
-	XSetWindowBackground(D, w, c->screen->bg.pixel);
+	XColor color=jbwm_color(TITLEBAR_BG);
+	XSetWindowBackground(D, w, color.pixel);
+	free_color(color);
 	XMapRaised(D, w);
 	jbwm_grab_button(w, 0, AnyButton);
 }
@@ -35,11 +37,11 @@ static unsigned int
 draw_title(Client * c, char *name)
 {
 	const int x = TDIM + 8;
-#ifdef USE_XPm
+#ifdef USE_XPM
 	const int y = 2*TDIM/3;
-#else /* USE_XPM */
+#else//!USE_XPM
 	const int y = jbwm.X.font->ascent-JBWM_BORDER;
-#endif
+#endif//USE_XPM
 	const Window w = c->titlebar;
 	if(!name)
 		return 0;
@@ -69,19 +71,11 @@ draw_title(Client * c, char *name)
 		XftColorFree(D, v, cm, &color);
 	}
 #else /* ! USE_XFT */
-	{
-		GC gc;
-		XGCValues v;
-		XFontStruct *f;
-		
-		f=jbwm.X.font;
-		v.font=f->fid;
-		v.foreground=c->screen->fg.pixel;
-		gc=XCreateGC(D, w, GCFont | GCForeground, &v);
-		XDrawString(D, w, gc, x, y, name, 
-			name_length);
-		XFreeGC(D, gc);
-	}
+	XFontStruct *f=jbwm.X.font;
+	XGCValues v={.font=f->fid, .foreground=c->screen->fg.pixel};
+	GC gc=XCreateGC(D, w, GCFont | GCForeground, &v);
+	XDrawString(D, w, gc, x, y, name, name_length);
+	XFreeGC(D, gc);
 #endif /* USE_XFT */
 	XFree(name);
 	return name_length;

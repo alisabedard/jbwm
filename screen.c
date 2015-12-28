@@ -91,7 +91,7 @@ sweep_loop:
 
 #ifdef USE_SNAP
 
-static inline void sborder(int *xy, const ubyte border)
+static inline void sborder(int *xy, const int border)
 {
 	if(abs(*xy+border)<JBWM_SNAP)
 		*xy=-border;	
@@ -105,8 +105,12 @@ snap_client_to_screen_border(Client * c)
 	const ubyte b = c->border;
 	sborder(&g->x, -b);
 	sborder(&g->x, g->width + b - c->screen->width);
+#ifdef USE_TBAR
+	sborder(&g->y, -b-((c->flags&JB_CLIENT_NO_TB)?0:TDIM));
+#else//!USE_TBAR
 	sborder(&g->y, -b);
-	sborder(&g->y, g->height + b - c->screen->height);
+#endif//USE_TBAR
+	sborder(&g->y, g->height + 2*b - c->screen->height);
 }
 
 static inline int 

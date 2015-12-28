@@ -6,43 +6,6 @@
 
 #include "jbwm.h"
 
-#ifdef USE_TBAR
-void
-shade(Client * c)
-{
-	/* This implements window shading, a substitute 
-	   for iconification.  */
-	if(c->flags & JB_CLIENT_SHADED)
-	{
-		c->size.height=c->shade_height;
-		c->flags &= ~JB_CLIENT_SHADED;
-		XMapWindow(D, c->window);
-		moveresize(c);
-#if 0 // FIXME: should be deleted from WM_STATE list
-#ifdef EWMH
-		XDeleteProperty(D, c->window, ewmh.WM_STATE_SHADED);
-#endif//EWMH
-#endif//0
-	}
-	else // Shade the client
-	{
-		c->shade_height = c->size.height;
-		c->ignore_unmap++;
-		XUnmapWindow(D, c->window);
-		const ubyte h=c->size.height=TDIM+1;
-		XResizeWindow(D, c->parent, c->size.width, h);
-		c->flags |= JB_CLIENT_SHADED;
-#if 0 // FIXME: Should be addded to WM_STATE list
-#ifdef EWMH
-		XPROP(c->window, ewmh.WM_STATE, XA_CARDINAL, 
-			&ewmh.WM_STATE_SHADED, 1);
-#endif//EWMH
-#endif//0
-		select_client(c);
-	}
-}
-#endif//USE_TBAR
-
 static void
 button1_event(XButtonEvent * e, Client * c)
 {

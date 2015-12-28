@@ -3,6 +3,9 @@
 #define JBWM_CLIENT_H
 
 void
+shade(Client *c);
+
+void
 client_to_vdesk(Client *c, const ubyte d);
 
 void

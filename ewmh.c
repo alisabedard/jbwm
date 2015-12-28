@@ -79,7 +79,7 @@ ewmh_init()
 static void
 set_desktop_viewport()
 {
-	const long vp[2]={0,0};
+	static const long vp[2]={0,0};
 	XPROP(jbwm.X.screens->root, ewmh.DESKTOP_VIEWPORT, XA_CARDINAL, &vp, 2);
 }
 

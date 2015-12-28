@@ -27,21 +27,13 @@
 #endif /* USE_XFT */
 
 /* Default colors */
-#ifdef USE_COLORS
-#define DEF_FG          "white"
-#define DEF_FC          "dark green"
-#define DEF_BG          "grey5"
-#define TITLEBAR_CLOSE_BG	"salmon"
-#define TITLEBAR_SHADE_BG	"light green"
-#define TITLEBAR_RESIZE_BG	"cadet blue"
-#else
-#define DEF_FG          "white"
-#define DEF_FC          "grey20"
-#define DEF_BG          "grey10"
-#define TITLEBAR_CLOSE_BG	"grey20"
-#define TITLEBAR_SHADE_BG	"grey30"
-#define TITLEBAR_RESIZE_BG	"grey40"
-#endif /* USE_COLORS */
+#define DEF_FG          	"#eef"
+#define DEF_FC          	"#686"
+#define DEF_BG          	"#445"
+#define TITLEBAR_BG		"grey10"
+#define TITLEBAR_CLOSE_BG	"#755"
+#define TITLEBAR_SHADE_BG	"#575"
+#define TITLEBAR_RESIZE_BG	"#557"
 
 #define GRAB_MASK Mod4Mask
 #define LOCK_MASK LockMask

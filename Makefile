@@ -1,8 +1,8 @@
 #CC = clang
 #CC=/opt/diet/bin/diet -Os gcc
-#CFLAGS=-Os -W -Wall
+CFLAGS=-Os -W -Wall
 # Debug and profile:
-#CFLAGS=-O0 -ggdb -DDEBUG -DSTDIO -W -Wall -pg
+CFLAGS=-O0 -ggdb -DDEBUG -DSTDIO -W -Wall -pg
 
 # Profile:
 #CFLAGS += -pg 
@@ -28,8 +28,8 @@ DEFINES  = $(EXTRA_DEFINES)
 # add options by setting EXTRA_DEFINES on the make(1) command line,
 
 # Uncomment to enable SHAPE extension support
-#DEFINES += -DUSE_SHAPE
-#LIBS += -lXext # Required for SHAPE extension
+DEFINES += -DUSE_SHAPE
+LIBS += -lXext # Required for SHAPE extension
 
 # XPM support is beautiful but substantially increases binary size.
 #DEFINES += -DUSE_XPM
@@ -37,27 +37,24 @@ DEFINES  = $(EXTRA_DEFINES)
 
 # Titlebar Xft support:
 # Warning, Xft impedes performance and leaks memory.
-#DEFINES += -DUSE_XFT
-#LIBS += -lXft
-#INCLUDES += `pkg-config --cflags xft`
+DEFINES += -DUSE_XFT
+LIBS += -lXft
+INCLUDES += `pkg-config --cflags xft`
 
 # Not necessary except on old NetBSD, for Xft support:
 INCLUDES += -I/usr/pkg/include/freetype2 -I/usr/X11R6/include/freetype2
 
 # Uncomment to enable colormap support
 # Saves 600 bytes
-#DEFINES += -DUSE_CMAP
+DEFINES += -DUSE_CMAP
 
 # Uncomment to enable parsing command line arguments.
 #  Saves ~2030 bytes
-DEFINES += -DUSE_ARGV
+DEFINES += -DUSE_ARGV 
 
 # Uncomment to enable titlebars
 DEFINES += -DUSE_TBAR
 SRCS += titlebar.c 
-
-# Uncomment to use a colored titlebar theme (no size difference):
-#DEFINES += -DUSE_COLORS
 
 # Uncomment to enable window snapping. (Adds 4k bytes)
 DEFINES += -DUSE_SNAP
@@ -74,7 +71,7 @@ DEFINES += -DMWM
 
 # ----- You shouldn't need to change anything under this line ------ #
 
-version = 1.38
+version = 1.39
 
 PROG=jbwm
 distname = $(PROG)-$(version)

@@ -5,6 +5,38 @@
 
 #include "jbwm.h"
 
+#ifdef USE_TBAR
+void
+shade(Client * c)
+{
+        /* This implements window shading, a substitute 
+           for iconification.  */
+        if(c->flags & JB_CLIENT_SHADED)
+        {
+                c->size.height=c->shade_height;
+                c->flags &= ~JB_CLIENT_SHADED;
+                XMapWindow(D, c->window);
+                moveresize(c);
+#ifdef EWMH
+		ewmh_remove_state(c->window, ewmh.WM_STATE_SHADED);
+#endif//EWMH
+        }
+        else // Shade the client
+        {
+                c->shade_height = c->size.height;
+                c->ignore_unmap++;
+                XUnmapWindow(D, c->window);
+                const ubyte h=c->size.height=TDIM;
+                XResizeWindow(D, c->parent, c->size.width, h);
+                c->flags |= JB_CLIENT_SHADED;
+#ifdef EWMH
+		ewmh_add_state(c->window, ewmh.WM_STATE_SHADED);
+#endif//EWMH
+                select_client(c);
+	}
+}
+#endif//USE_TBAR
+
 void
 client_to_vdesk(Client *c, const ubyte d)
 {
