@@ -104,7 +104,7 @@ snap_client_to_screen_border(Client * c)
 	/* snap to screen border */
 	const ubyte b = c->border;
 	sborder(&g->x, -b);
-	sborder(&g->x, g->width + b - c->screen->width);
+	sborder(&g->x, g->width + 2*b - c->screen->width);
 #ifdef USE_TBAR
 	sborder(&g->y, -b-((c->flags&JB_CLIENT_NO_TB)?0:TDIM));
 #else//!USE_TBAR
