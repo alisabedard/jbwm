@@ -18,7 +18,7 @@ moveresize_dir(Client * c, XKeyEvent * e, int *xy, int *wh, const byte sign)
 {
 	/* These operations invalid when maximized.  */
 	if(c->flags & JB_CLIENT_MAXIMIZED) return;
-	const byte inc = JBWM_RESIZE_INCREMENT;
+	const ubyte inc = JBWM_RESIZE_INCREMENT;
 	const byte mod = sign * inc;
 	if((e->state & jbwm.keymasks.mod) && (*wh > inc))
 	{
@@ -188,9 +188,8 @@ void
 grab_keys_for_screen(ScreenInfo * s)
 {
 	KeySym keys[] = JBWM_KEYS_TO_GRAB;
-	KeySym mod_keys[] = JBWM_ALT_KEYS_TO_GRAB;
-	
 	grab(s, keys, 0);
+	KeySym mod_keys[] = JBWM_ALT_KEYS_TO_GRAB;
 	grab(s, mod_keys, jbwm.keymasks.mod);
 }
 

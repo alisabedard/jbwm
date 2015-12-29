@@ -45,8 +45,7 @@ parse_argv(int argc, char **argv)
 	LOG("parse_argv(%d,%s...)", argc, argv[0]);
 	const char *optstring="1:2:d:V";
 
-	int opt;
-	while((opt=getopt(argc, argv, optstring))!=-1)
+	for(int opt;(opt=getopt(argc, argv, optstring))!=-1;)
 	{
 		switch(opt)
 		{

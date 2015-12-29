@@ -79,7 +79,7 @@ ewmh_init()
 static void
 set_desktop_viewport()
 {
-	static const long vp[2]={0,0};
+	const long vp[2]={0,0};
 	XPROP(jbwm.X.screens->root, ewmh.DESKTOP_VIEWPORT, XA_CARDINAL, &vp, 2);
 }
 
@@ -129,7 +129,7 @@ ewmh_add_state(const Window w, const Atom state)
 static void
 set_number_of_desktops(const Window r)
 {
-	static const long num=DESKTOPS;
+	const long num=DESKTOPS;
 	XPROP(r, ewmh.NUMBER_OF_DESKTOPS, XA_CARDINAL, &num, 1);
 	set_desktop_viewport();
 	XPROP(r, ewmh.VIRTUAL_ROOTS, XA_WINDOW, &r, 1);
