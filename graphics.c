@@ -7,9 +7,7 @@
 void
 free_color(XColor c)
 {
-        unsigned long p[1];
-        p[0]=c.pixel;
-	XFreeColors(D, CM, p, 1, AllPlanes);
+	XFreeColors(D, CM, &c.pixel, 1, AllPlanes);
 }
 
 XColor

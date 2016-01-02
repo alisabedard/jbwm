@@ -12,7 +12,7 @@ shade(Client * c)
         /* This implements window shading, a substitute 
            for iconification.  */
         if(c->flags & JB_CLIENT_SHADED)
-        {
+        { // Unshade
                 c->size.height=c->shade_height;
                 c->flags &= ~JB_CLIENT_SHADED;
                 XMapWindow(D, c->window);
@@ -131,8 +131,7 @@ unparent_window(Client * c)
 {
 	LOG("unparent_window()");
 	if(!c->parent) return;
-	XReparentWindow(D, c->window, c->screen->root, c->size.x, 
-		c->size.y);
+	XReparentWindow(D, c->window, c->screen->root, c->size.x, c->size.y);
 	XRemoveFromSaveSet(D, c->window);
 	if(c->parent) XDestroyWindow(D, c->parent);
 	c->parent=0;
@@ -177,8 +176,7 @@ send_wm_delete(Client * c)
 bool
 is_shaped(Client * c)
 {
-	int bounding_shaped;
-	int i;
+	int i, bounding_shaped;
 	unsigned int u;
 	return XShapeQueryExtents(D, c->window, &bounding_shaped,
 		&i, &i, &u, &u, &i, &i, &i, &u, &u)

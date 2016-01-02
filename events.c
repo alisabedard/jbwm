@@ -34,8 +34,6 @@ static void
 handle_unmap_event(XUnmapEvent * e)
 {
 	LOG("handle_unmap_event(e)");
-	LOG("send_event: %s", e->send_event?"true":"false");
-	LOG("from_configure: %s", e->from_configure?"true":"false");
 	Client *c=find_client(e->window);
 	if(!c) return;
 	LOG("%d ignores remaining", c->ignore_unmap);

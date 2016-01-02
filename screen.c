@@ -193,11 +193,25 @@ drag_event_loop(Client * c, int x1, int y1, int old_cx, int old_cy)
 	XEvent ev;
 drag_loop:
 	XMaskEvent(D, MouseMask, &ev);
+#ifdef USE_TBAR
+	const bool no_tb=c->flags&JB_CLIENT_NO_TB;
+#endif//USE_TBAR
 	if(ev.type == MotionNotify)
-		drag_motion(c, ev, x1, y1, old_cx, old_cy);
+	{
+#ifdef USE_TBAR
+		const int ny=y1+(no_tb?TDIM:0);
+#else//!USE_TBAR
+		const int ny=y1;
+#endif//USE_TBAR
+		drag_motion(c, ev, x1, ny, old_cx, old_cy);
+	}
 	else
 	{
 		XUngrabPointer(D, CurrentTime);
+#ifdef USE_TBAR
+		if(no_tb)
+			c->size.y+=TDIM;
+#endif//USE_TBAR
 		moveresize(c);
 		return;
 	}
@@ -282,6 +296,8 @@ maximize(Client * c)
 		c->flags &= ~ JB_CLIENT_MAXIMIZED;
 #ifdef EWMH
 		ewmh_remove_state(c->window, ewmh.WM_STATE_FULLSCREEN);
+		ewmh_remove_state(c->window, ewmh.WM_STATE_MAXIMIZED_HORZ);
+		ewmh_remove_state(c->window, ewmh.WM_STATE_MAXIMIZED_VERT);
 #endif//EWMH
 	}
 	else // maximize:
@@ -294,6 +310,8 @@ maximize(Client * c)
 		c->flags |= JB_CLIENT_MAXIMIZED;
 #ifdef EWMH
 		ewmh_add_state(c->window, ewmh.WM_STATE_FULLSCREEN);
+		ewmh_add_state(c->window, ewmh.WM_STATE_MAXIMIZED_HORZ);
+		ewmh_add_state(c->window, ewmh.WM_STATE_MAXIMIZED_VERT);
 #endif//EWMH
 	}
 	moveresize(c);

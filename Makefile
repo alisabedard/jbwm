@@ -2,7 +2,7 @@
 #CC=/opt/diet/bin/diet -Os gcc
 #CFLAGS=-Os -W -Wall
 # Debug and profile:
-#CFLAGS=-O0 -ggdb -DDEBUG -DSTDIO -W -Wall -pg
+CFLAGS=-O0 -ggdb -DDEBUG -DSTDIO -W -Wall -pg
 
 # Profile:
 #CFLAGS += -pg 

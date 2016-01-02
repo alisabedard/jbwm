@@ -15,6 +15,9 @@ EWMHEnvironment ewmh;
 void
 ewmh_init()
 {
+	// Non-ewmh atoms:
+	ewmh.WM_CHANGE_STATE=XA("WM_CHANGE_STATE");
+	// Ewmh atoms:
 	/* Initializing these elements with the preprocessor shortcut
 		below, and following a variable naming convention directly
 		corresponding to the atom name, allows further programatic
@@ -136,21 +139,6 @@ set_number_of_desktops(const Window r)
 }
 
 static void
-handle_moveresize_window(Client *c, XClientMessageEvent *e)
-{
-	// Only do this if it came from direct user action 
-	const int src = (e->data.l[0] >> 12) & 3;
-	if (src == 2) 
-	{
-		c->size.x=e->data.l[1];
-		c->size.y=e->data.l[2];
-		c->size.width=e->data.l[3];
-		c->size.height=e->data.l[4];
-		moveresize(c);
-	}
-}
-
-static void
 handle_wm_state_changes(Client *c, XClientMessageEvent *e)
 {
 /* 	Reference, per wm-spec:
@@ -175,7 +163,10 @@ handle_wm_state_changes(Client *c, XClientMessageEvent *e)
 		else if(state==ewmh.WM_STATE_SKIP_PAGER && c)
 			if(action) add_sticky(c);
 			else remove_sticky(c);
-                else if(state==ewmh.WM_STATE_FULLSCREEN && c)
+		// Only full maximization supported:
+                else if(c && (state==ewmh.WM_STATE_FULLSCREEN
+			|| ewmh.WM_STATE_MAXIMIZED_VERT
+			|| ewmh.WM_STATE_MAXIMIZED_HORZ))
 		{
 			// TODO: May need to add a FULLSCREEN flag
 			const bool maxed=c->flags&JB_CLIENT_MAXIMIZED;
@@ -206,22 +197,31 @@ ewmh_client_message(XClientMessageEvent *e)
         print_atom(e->data.l[3], __LINE__);
 #endif//DEBUG
         ScreenInfo *s = jbwm.X.screens;
-        if(t==ewmh.CURRENT_DESKTOP) switch_vdesk(s, e->data.l[0]);
+	const long val=e->data.l[0];
+        if(t==ewmh.CURRENT_DESKTOP) switch_vdesk(s, val);
         Client *c=find_client(e->window);
 	if(t==ewmh.WM_DESKTOP && c)
-		client_to_vdesk(c, e->data.l[0]);
+		client_to_vdesk(c, val);
 	else if(t==ewmh.DESKTOP_VIEWPORT)
 		set_desktop_viewport();
 	else if(t==ewmh.NUMBER_OF_DESKTOPS)
 		set_number_of_desktops(s->root);
-        else if(t==ewmh.ACTIVE_WINDOW && e->data.l[0]==2 && c)
+        else if(t==ewmh.ACTIVE_WINDOW && val==2 && c)
 		select_client(c);
 	else if(t==ewmh.CLOSE_WINDOW && e->data.l[1]==2 && c)
 		send_wm_delete(c);
-        else if(t==ewmh.MOVERESIZE_WINDOW && c)
-		handle_moveresize_window(c, e);
+        else if(t==ewmh.WM_MOVERESIZE && c)
+	{
+		XRaiseWindow(D, c->parent);
+		drag(c);
+	}
         else if(t==ewmh.WM_STATE)
 		handle_wm_state_changes(c, e);
+	else if(t==ewmh.WM_CHANGE_STATE && c)
+	{
+		if(val==3) // Minimize (lower)
+			XLowerWindow(D, c->parent);
+	}
 }
 
 void
