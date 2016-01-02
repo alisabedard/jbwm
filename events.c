@@ -33,15 +33,14 @@ cleanup()
 static void
 handle_unmap_event(XUnmapEvent * e)
 {
-	LOG("handle_unmap_event(e)");
 	Client *c=find_client(e->window);
 	if(!c) return;
-	LOG("%d ignores remaining", c->ignore_unmap);
+	LOG("handle_unmap_event(e): %d ignores remaining", c->ignore_unmap);
 	if(c->ignore_unmap<1)
 	{
 		LOG("!c->ignore_unmap");
 		c->flags |= JB_CLIENT_REMOVE;
-		jbwm.need_cleanup=1;
+		jbwm.need_cleanup=true;
 	}
 	else c->ignore_unmap--;
 }
@@ -86,13 +85,9 @@ print_atom(const Atom a, const unsigned int line)
 static void
 handle_property_change(XPropertyEvent * e)
 {
-	const Atom a=e->atom;
-	LOG("handle_property_change()");
-#ifdef DEBUG
-	print_atom(a, __LINE__);
-#endif//DEBUG
 	Client *c=find_client(e->window);
 	if(!c) return;
+	const Atom a=e->atom;
 	if(a==XA_WM_HINTS) handle_wm_hints(c);
 #ifdef USE_TBAR
 	else if(a==XA_WM_NAME) update_titlebar(c);
@@ -181,20 +176,6 @@ head:
 		ewmh_update_client_list();
 		break;
 #endif//EWMH
-#ifdef DEBUG
-	case MapNotify:
-		LOG("MapNotify");
-		break;
-	case KeyRelease:
-		LOG("KeyRelease");
-		break;
-	case MappingNotify:
-		LOG("MappingNotify");
-		break;
-	case ReparentNotify:
-		LOG("ReparentNotify");
-		break;
-#endif//DEBUG
 #ifdef USE_CMAP
 	case ColormapNotify:
 		handle_colormap_change(&ev.xcolormap);
@@ -212,8 +193,13 @@ head:
 		break;
 #endif /* USE_SHAPE */
 #ifdef DEBUG
+	case MapNotify:
+	case KeyRelease:
+	case MappingNotify:
+	case ReparentNotify:
+		break;
 	default:
-		LOG("Unhandled event (%d)!", ev.type);
+		LOG("Unhandled event (%d)", ev.type);
 #endif//DEBUG
 	}
 	if(jbwm.need_cleanup)

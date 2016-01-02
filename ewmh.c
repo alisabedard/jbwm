@@ -94,11 +94,7 @@ ewmh_update_client_list()
 	static Window wl[MAX_CLIENTS];
 	unsigned short count=0;
 	for(Client *i=jbwm.head; i&&(count<MAX_CLIENTS); i=i->next)
-	{
-		LOG("count:%d", count);
-		if(!i) break; // Prevent segfault
 		wl[count++]=i->window;
-	}
 	XPROP(jbwm.X.screens->root, ewmh.CLIENT_LIST, XA_WINDOW, &wl, count);
 	// FIXME: Does not correctly report stacking order.
 	XPROP(jbwm.X.screens->root, ewmh.CLIENT_LIST_STACKING, XA_WINDOW, 
@@ -110,9 +106,8 @@ ewmh_update_client_list()
 void
 ewmh_remove_state(const Window w, const Atom state)
 {
-	Atom *a;
 	unsigned long n;
-	a=get_property(w, ewmh.WM_STATE, XA_ATOM, &n);
+	Atom *a=get_property(w, ewmh.WM_STATE, XA_ATOM, &n);
 	if(!a) return;
 	const unsigned long nitems=n;
 	while(n--)
@@ -120,6 +115,20 @@ ewmh_remove_state(const Window w, const Atom state)
 			a[n]=0;
 	XPROP(w, ewmh.WM_STATE, XA_ATOM, &a, nitems);
 	XFree(a);
+}
+
+bool
+ewmh_get_state(const Window w, const Atom state)
+{
+	unsigned long n;
+	Atom *a=get_property(w, ewmh.WM_STATE, XA_ATOM, &n);
+	if(!a) return false; 
+	bool found=false;
+	while(n--)
+		if((found=(a[n]==state)))
+			break;
+	XFree(a);
+	return found;
 }
 
 void
@@ -138,9 +147,7 @@ set_number_of_desktops(const Window r)
 	XPROP(r, ewmh.VIRTUAL_ROOTS, XA_WINDOW, &r, 1);
 }
 
-static void
-handle_wm_state_changes(Client *c, XClientMessageEvent *e)
-{
+
 /* 	Reference, per wm-spec:
   window  = the respective client window
   message_type = _NET_WM_STATE
@@ -152,36 +159,214 @@ handle_wm_state_changes(Client *c, XClientMessageEvent *e)
         _NET_WM_STATE_REMOVE        0    remove/unset property 
         _NET_WM_STATE_ADD           1    add/set property 
         _NET_WM_STATE_TOGGLE        2    toggle property 
-  other data.l[] elements = 0
-*/     
-                const Atom state=(Atom)(e->data.l[1]);
-		const ubyte action=e->data.l[0];
-                if(state==ewmh.WM_STATE_ABOVE && action) 
-			XRaiseWindow(D, e->window);
-                else if(state==ewmh.WM_STATE_BELOW && action) 
-			XLowerWindow(D, e->window);
-		else if(state==ewmh.WM_STATE_SKIP_PAGER && c)
-			if(action) add_sticky(c);
-			else remove_sticky(c);
-		// Only full maximization supported:
-                else if(c && (state==ewmh.WM_STATE_FULLSCREEN
-			|| ewmh.WM_STATE_MAXIMIZED_VERT
-			|| ewmh.WM_STATE_MAXIMIZED_HORZ))
+  other data.l[] elements = 0 */ 
+
+static void
+check_state(XClientMessageEvent *e, // event data
+	const Atom state, // state to test
+	void *data, // user data
+	// callback:
+	void (*state_cb)(XClientMessageEvent *, // event data
+		bool, // add action if true, else remove action
+		void *)) // user data
+{
+	// 2 atoms can be set at once
+	const bool m1=e->data.l[1]==(long)state;
+	const bool m2=e->data.l[2]==(long)state;
+	if(m1||m2)
+	{
+		const Window w=e->window;
+		switch(e->data.l[0])
 		{
-			// TODO: May need to add a FULLSCREEN flag
-			const bool maxed=c->flags&JB_CLIENT_MAXIMIZED;
-			switch(action)
+		default:
+		case 0: // remove
+			state_cb(e, false, data);
+			ewmh_remove_state(w, state);
+			break;
+		case 1: // add 
+			state_cb(e, true, data);
+			ewmh_add_state(w, state);
+			break;
+		case 2: // toggle
 			{
-			case 0: //remove
-				if(maxed) maximize(c); // toggle off
-				break;
-			case 1: //add
-				if(!maxed) maximize(c); // toggle on
-				break;
-			case 2: //toggle
-				maximize(c);
+				const bool add=!ewmh_get_state(w, state);
+				state_cb(e, add, data);
+				if(add)
+					ewmh_add_state(w, state);
 			}
 		}
+	}
+}
+
+static void
+above_cb(XClientMessageEvent *e, bool add, void *data __attribute__((unused)))
+{
+	if(add) XRaiseWindow(D, e->window);
+}
+
+static void
+below_cb(XClientMessageEvent *e, bool add, void *data __attribute__((unused)))
+{
+	if(add) XLowerWindow(D, e->window);
+}
+
+static void
+skip_pager_cb(XClientMessageEvent *e __attribute__((unused)), bool add, 
+	void *data)
+{
+	if(!data) return;
+	Client *c=(Client *)data;
+	if(add) add_sticky(c);
+	else remove_sticky(c);
+}
+
+static void
+fullscreen_cb(XClientMessageEvent *e __attribute__((unused)), bool add, 
+	void *data)
+{
+	if(!data) return;
+	Client *c=data;
+	const bool is_max=c->flags&JB_CLIENT_MAXIMIZED;
+	if((add && !is_max) || (!add && is_max))
+		maximize(c);
+}
+    
+static void
+handle_wm_state_changes(XClientMessageEvent *e, Client *c)
+{
+	check_state(e, ewmh.WM_STATE_ABOVE, NULL, above_cb);
+	check_state(e, ewmh.WM_STATE_BELOW, NULL, below_cb);
+	check_state(e, ewmh.WM_STATE_SKIP_PAGER, c, skip_pager_cb);
+	check_state(e, ewmh.WM_STATE_FULLSCREEN, c, fullscreen_cb);
+	check_state(e, ewmh.WM_STATE_MAXIMIZED_HORZ, c, fullscreen_cb);
+	check_state(e, ewmh.WM_STATE_MAXIMIZED_VERT, c, fullscreen_cb);
+}
+
+static void
+gravitate_border(Client *c, int bw) {
+        int dx = 0, dy = 0;
+        switch (c->size.win_gravity) {
+        default:
+        case NorthWestGravity:
+                dx = bw;
+                dy = bw;
+                break;
+        case NorthGravity:
+                dy = bw;
+                break;
+        case NorthEastGravity:
+                dx = -bw;
+                dy = bw;
+                break;
+        case EastGravity:
+                dx = -bw;
+                break;
+        case CenterGravity:
+                break;
+        case WestGravity:
+                dx = bw;
+                break;
+        case SouthWestGravity:
+                dx = bw;
+                dy = -bw;
+                break;
+        case SouthGravity:
+                dy = -bw;
+                break;
+        case SouthEastGravity:
+                dx = -bw;
+                dy = -bw;
+                break;
+        }
+        if (c->size.x != 0 || c->size.width 
+		!= DisplayWidth(D, c->screen->screen)) 
+                c->size.x += dx;
+        if (c->size.y != 0 || c->size.height 
+		!= DisplayHeight(D, c->screen->screen))
+                c->size.y += dy;
+}
+
+static void
+do_window_changes(int value_mask, XWindowChanges *wc, Client *c, int gravity) 
+{
+        if (gravity == 0)
+                gravity = c->win_gravity_hint;
+        c->size.win_gravity = gravity;
+        if (value_mask & CWX) c->size.x = wc->x;
+        if (value_mask & CWY) c->size.y = wc->y;
+        if (value_mask & (CWWidth|CWHeight)) 
+	{
+                int dw = 0, dh = 0;
+                if (!(value_mask & (CWX|CWY))) 
+                        gravitate_border(c, -c->border);
+                if (value_mask & CWWidth) 
+		{
+                        int neww = wc->width;
+                        if (neww < c->size.min_width)
+                                neww = c->size.min_width;
+                        if (c->size.max_width && neww > c->size.max_width)
+                                neww = c->size.max_width;
+                        dw = neww - c->size.width;
+                        c->size.width = neww;
+                }
+                if (value_mask & CWHeight) 
+		{
+                        int newh = wc->height;
+                        if (newh < c->size.min_height)
+                                newh = c->size.min_height;
+                        if (c->size.max_height && newh > c->size.max_height)
+                                newh = c->size.max_height;
+                        dh = newh - c->size.height;
+                        c->size.height = newh;
+                }
+                /* only apply position fixes if not being explicitly moved */
+                if (!(value_mask & (CWX|CWY))) 
+		{
+                        switch (gravity) 
+			{
+                        default:
+                        case NorthWestGravity:
+                                break;
+                        case NorthGravity:
+                                c->size.x -= (dw / 2);
+                                break;
+                        case NorthEastGravity:
+                                c->size.x -= dw;
+                                break;
+                        case WestGravity:
+                                c->size.y -= (dh / 2);
+                                break;
+                        case CenterGravity:
+                                c->size.x -= (dw / 2);
+                                c->size.y -= (dh / 2);
+                                break;
+                        case EastGravity:
+                                c->size.x -= dw;
+                                c->size.y -= (dh / 2);
+                                break;
+                        case SouthWestGravity:
+                                c->size.y -= dh;
+                                break;
+                        case SouthGravity:
+                                c->size.x -= (dw / 2);
+                                c->size.y -= dh;
+                                break;
+                        case SouthEastGravity:
+                                c->size.x -= dw;
+                                c->size.y -= dh;
+                                break;
+                        }
+                        value_mask |= CWX|CWY;
+                        gravitate_border(c, c->border);
+                }
+        }
+        wc->x = c->size.x - c->border;
+        wc->y = c->size.y - c->border;
+        wc->border_width = c->border;
+        XConfigureWindow(D, c->parent, value_mask, wc);
+        XMoveResizeWindow(D, c->window, 0, 0, c->size.width, c->size.height);
+        if ((value_mask & (CWX|CWY)) && !(value_mask & (CWWidth|CWHeight))) 
+		configure(c);
 }
 
 void
@@ -207,16 +392,32 @@ ewmh_client_message(XClientMessageEvent *e)
 	else if(t==ewmh.NUMBER_OF_DESKTOPS)
 		set_number_of_desktops(s->root);
         else if(t==ewmh.ACTIVE_WINDOW && val==2 && c)
+	{
 		select_client(c);
+	}
 	else if(t==ewmh.CLOSE_WINDOW && e->data.l[1]==2 && c)
 		send_wm_delete(c);
+	// If something else moves the window:
+	else if(t==ewmh.MOVERESIZE_WINDOW)
+	{
+		int src=(val>>12) & 3;
+		if(src==2)
+		{
+			XWindowChanges wc={.x=e->data.l[1], .y=e->data.l[2],
+				.width=e->data.l[3], .height=e->data.l[4]};
+			int vm=(val>>8)&0x0f;
+			int grav=val&0xff;
+			do_window_changes(vm, &wc, c, grav);
+		}
+	}
+	// If user moves window (client-side titlebars):
         else if(t==ewmh.WM_MOVERESIZE && c)
 	{
 		XRaiseWindow(D, c->parent);
 		drag(c);
 	}
         else if(t==ewmh.WM_STATE)
-		handle_wm_state_changes(c, e);
+		handle_wm_state_changes(e, c);
 	else if(t==ewmh.WM_CHANGE_STATE && c)
 	{
 		if(val==3) // Minimize (lower)

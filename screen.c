@@ -42,7 +42,6 @@ recalculate_sweep(Client * c, Position p1, Position p2)
 	recalculate_size(c, p1, p2);
 	c->size.x = p1.x;
 	c->size.y = p1.y;
-	//configure(c);
 }
 
 static bool

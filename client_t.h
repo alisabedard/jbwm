@@ -34,6 +34,9 @@ struct Client
 	unsigned short flags;
 
 	// Optional fields:
+#ifdef EWMH
+	int win_gravity_hint;
+#endif//EWMH
 #ifdef USE_CMAP
 	Colormap cmap;
 #endif//USE_CMAP
