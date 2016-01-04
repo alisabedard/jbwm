@@ -1,4 +1,4 @@
-/* jbwm, Copyright 2015 Jeffrey E. Bedard */
+/* jbwm, Copyright 2016 Jeffrey E. Bedard */
 #ifndef JBWM_CLIENT_H
 #define JBWM_CLIENT_H
 

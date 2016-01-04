@@ -57,7 +57,8 @@ configure(Client *c)
 /*
  * used all over the place.  return the client that has specified window as
  * either window or parent
- */
+ */ 
+__attribute__((hot))
 Client *
 find_client(Window w)
 {

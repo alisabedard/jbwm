@@ -1,4 +1,4 @@
-// Copyright 2015, Jeffrey E. Bedard
+// Copyright 2016, Jeffrey E. Bedard
 // Convenience macros for dealing with X properties.  
 
 #ifndef ATOMS_H

@@ -1,6 +1,6 @@
 /*
  * jbwm - Restructuring, optimization, and feature fork
- *        Copyright 2007-2015, Jeffrey E. Bedard <jefbed@gmail.com>
+ *        Copyright 2007-2016, Jeffrey E. Bedard <jefbed@gmail.com>
  * evilwm - Minimalist Window Manager for X Copyright (C) 1999-2006 Ciaran
  * Anscomb <jbwm@6809.org.uk> see README for license and other details.
  */
@@ -20,6 +20,7 @@ JBWMEnvironment jbwm;
 #ifdef USE_ARGV
 
 /* Used for overriding the default WM modifiers */
+__attribute__((cold))
 static unsigned int
 parse_modifiers(char *arg)
 {

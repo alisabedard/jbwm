@@ -1,4 +1,4 @@
-/* Copyright 2008-2015, Jeffrey E. Bedard <jefbed@gmail.com> */
+/* Copyright 2008-2016, Jeffrey E. Bedard <jefbed@gmail.com> */
 
 #include "jbwm.h"
 

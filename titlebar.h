@@ -1,4 +1,4 @@
-/* jbwm, Copyright 2015 Jeffrey E. Bedard */
+/* jbwm, Copyright 2016 Jeffrey E. Bedard */
 #ifndef JBWM_TITLEBAR_H
 #define JBWM_TITLEBAR_H
 

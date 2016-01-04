@@ -1,4 +1,4 @@
-/* Copyright 2008-2015, Jeffrey Bedard <jefbed@gmail.com> */
+/* Copyright 2008-2016, Jeffrey Bedard <jefbed@gmail.com> */
 
 /* jbwm - Minimalist Window Manager for X
  * Copyright (C) 1999-2006 Ciaran Anscomb <jbwm@6809.org.uk>

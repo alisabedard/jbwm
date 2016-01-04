@@ -1,6 +1,6 @@
 /*
  * jbwm - Restructuring, optimization, and feature fork
- *        Copyright 2007-2015, Jeffrey E. Bedard <jefbed@gmail.com>
+ *        Copyright 2007-2016, Jeffrey E. Bedard <jefbed@gmail.com>
  * evilwm - Minimalist Window Manager for X Copyright (C) 1999-2006 Ciaran
  * Anscomb <jbwm@6809.org.uk> see README for license and other details.
  */
@@ -10,6 +10,7 @@
 
 #define MouseMask (ButtonPressMask|ButtonReleaseMask|PointerMotionMask)
 
+__attribute__((hot))
 static inline void
 draw_outline(Client * c)
 {
@@ -112,6 +113,7 @@ snap_client_to_screen_border(Client * c)
 	sborder(&g->y, g->height + 2*b - c->screen->height);
 }
 
+__attribute__((const))
 static inline int 
 absmin(const int a, const int b)
 {
@@ -135,12 +137,11 @@ snap_dim(int *cxy, int *cwh, int *cixy, int *ciwh,
 static void
 snap_client(Client * c)
 {
-	int dx, dy;
 #define S JBWM_SNAP
 	/* snap to other windows */
 	snap_client_to_screen_border(c);
-	dx = dy = S;
 	XSizeHints *g = &(c->size);
+	Position d = {S, S};
 	for(Client *ci = jbwm.head; ci; ci = ci->next)
 	{
 		XSizeHints *gi = &(ci->size);
@@ -150,22 +151,22 @@ snap_client(Client * c)
 		{
 			const ubyte border = c->border;
 
-			if(gi->y - g->height - g->y <= S
-				&& g->y - gi->height - gi->y <= S)
-				dx = snap_dim(&(g->x), &(g->width),
+			if((gi->y - g->height - g->y <= S)
+				&& (g->y - gi->height - gi->y <= S))
+				d.x = snap_dim(&(g->x), &(g->width),
 					&(gi->x), &(gi->width),
 					border, S);
-			if(gi->x - g->width - g->x <= S
-				&& g->x - gi->width - gi->x <= S)
-				dy = snap_dim(&(g->y), &(g->height),
+			if((gi->x - g->width - g->x <= S)
+				&& (g->x - gi->width - gi->x <= S))
+				d.y = snap_dim(&(g->y), &(g->height),
 					&(gi->y), &(gi->height),
 					border, S);
 		}
 	}
-	if(abs(dx) < S)
-		g->x += dx;
-	if(abs(dy) < S)
-		g->y += dy;
+	if(abs(d.x) < S)
+		g->x += d.x;
+	if(abs(d.y) < S)
+		g->y += d.y;
 }
 #endif /* USE_SNAP */
 

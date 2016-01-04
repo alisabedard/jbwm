@@ -1,6 +1,6 @@
 /*
  * jbwm - Restructuring, optimization, and feature fork
- *        Copyright 2007-2015, Jeffrey E. Bedard <jefbed@gmail.com>
+ *        Copyright 2007-2016, Jeffrey E. Bedard <jefbed@gmail.com>
  * evilwm - Minimalist Window Manager for X Copyright (C) 1999-2006 Ciaran
  * Anscomb <jbwm@6809.org.uk> see README for license and other details.
  */
@@ -392,9 +392,7 @@ ewmh_client_message(XClientMessageEvent *e)
 	else if(t==ewmh.NUMBER_OF_DESKTOPS)
 		set_number_of_desktops(s->root);
         else if(t==ewmh.ACTIVE_WINDOW && val==2 && c)
-	{
 		select_client(c);
-	}
 	else if(t==ewmh.CLOSE_WINDOW && e->data.l[1]==2 && c)
 		send_wm_delete(c);
 	// If something else moves the window:

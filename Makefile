@@ -28,8 +28,8 @@ DEFINES  = $(EXTRA_DEFINES)
 # add options by setting EXTRA_DEFINES on the make(1) command line,
 
 # Uncomment to enable SHAPE extension support
-#DEFINES += -DUSE_SHAPE
-#LIBS += -lXext # Required for SHAPE extension
+DEFINES += -DUSE_SHAPE
+LIBS += -lXext # Required for SHAPE extension
 
 # XPM support is beautiful but substantially increases binary size.
 #DEFINES += -DUSE_XPM

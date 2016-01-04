@@ -1,4 +1,4 @@
-/* Copyright 2007-2015, Jeffrey E. Bedard */
+/* Copyright 2007-2016, Jeffrey E. Bedard */
 /*
  * This file is ment to hold configuration values and to resolve
  * configuration dependencies.
