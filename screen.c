@@ -14,19 +14,18 @@ __attribute__((hot))
 static inline void
 draw_outline(Client * c)
 {
-	const bool no_tb=c->flags & JB_CLIENT_NO_TB;
-	if(!c->border && !no_tb)
+	if((c->flags & JB_CLIENT_NO_TB) || !c->border)
+	{
+		moveresize(c);
 		return;
+	}
 	ScreenInfo *s=c->screen;
 	const Window r=s->root;
 	XSizeHints *g=&(c->size);
-	XRectangle d={.x=g->x, .width=g->width};
+	XRectangle d={.x=g->x, .y=g->y, .width=g->width, .height=g->height};
 #ifdef USE_TBAR
-	d.y=g->y-(no_tb?0:TDIM);
-	d.height=g->height + (no_tb ? 0 : TDIM);
-#else//!USE_TBAR
-	d.y=g->y;
-	d.height=g->height;
+	d.y-=TDIM;
+	d.height+=TDIM;
 #endif//USE_TBAR
 	XDrawRectangle(D, r, s->gc, d.x, d.y, d.width, d.height);
 }
