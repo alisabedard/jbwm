@@ -16,6 +16,9 @@ button1_event(XButtonEvent * e, Client * c)
 	const Position p={.x=e->x,.y=e->y};
 	if((p.x < TDIM) && (p.y < TDIM)) // Close button
 	{
+		// Honor !MWM_FUNC_CLOSE
+		if(c->flags & JB_CLIENT_NO_CLOSE)
+			goto drag;
 		/* This fixes a bug where deleting a shaded window will cause
 		   the parent window to stick around as a ghost window. */
 		if(c->flags&JB_CLIENT_SHADED)
@@ -23,13 +26,21 @@ button1_event(XButtonEvent * e, Client * c)
 		send_wm_delete(c);
 	}
 	if(p.x > width - TDIM) // Resize button
+	{
+		if(c->flags & JB_CLIENT_NO_RESIZE)
+			goto drag;
 		sweep(c);	
+	}
 	else if(p.x > width - TDIM - TDIM && p.y < TDIM) // Shade button
+	{
+		if(c->flags & JB_CLIENT_NO_MIN)
+			goto drag;
 		shade(c);
-	else drag(c);	// Handle
-#else//!USE_TBAR
-	drag(c); // Move the window
+	}
+	else // Handle
+drag:
 #endif//USE_TBAR
+		drag(c); // Move the window
 }
 
 void

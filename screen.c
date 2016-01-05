@@ -14,33 +14,28 @@ __attribute__((hot))
 static inline void
 draw_outline(Client * c)
 {
-	if(!c->border)
+	const bool no_tb=c->flags & JB_CLIENT_NO_TB;
+	if(!c->border && !no_tb)
 		return;
-#ifdef USE_SHAPE
-	if(is_shaped(c))
-		return;
-#endif /* USE_SHAPE */
-	XSizeHints *g=&(c->size);
 	ScreenInfo *s=c->screen;
+	const Window r=s->root;
+	XSizeHints *g=&(c->size);
+	XRectangle d={.x=g->x, .width=g->width};
 #ifdef USE_TBAR
-	XDrawRectangle(D, s->root, s->gc, g->x, g->y-TDIM, g->width, 
-		g->height + (c->flags & JB_CLIENT_SHADED ?0:TDIM));
+	d.y=g->y-(no_tb?0:TDIM);
+	d.height=g->height + (no_tb ? 0 : TDIM);
 #else//!USE_TBAR
-	XDrawRectangle(D, s->root, s->gc, g->x, g->y, g->width, g->height);
+	d.y=g->y;
+	d.height=g->height;
 #endif//USE_TBAR
-}
-
-static inline void
-recalculate_size(Client * c, Position p1, Position p2)
-{
-	c->size.width = abs(p1.x - p2.x);
-	c->size.height = abs(p1.y - p2.y);
+	XDrawRectangle(D, r, s->gc, d.x, d.y, d.width, d.height);
 }
 
 static inline void
 recalculate_sweep(Client * c, Position p1, Position p2)
 {
-	recalculate_size(c, p1, p2);
+	c->size.width = abs(p1.x - p2.x);
+	c->size.height = abs(p1.y - p2.y);
 	c->size.x = p1.x;
 	c->size.y = p1.y;
 }
@@ -56,9 +51,9 @@ grab_pointer(Window w, Cursor cursor)
 static void
 handle_motion_notify(Client * c, XSizeHints * g, XMotionEvent * mev)
 {
-	draw_outline(c);
 	Position p1={.x=g->x, .y=g->y};
 	Position p2={.x=mev->x, .y=mev->y};
+	draw_outline(c); // clear
 	recalculate_sweep(c, p1, p2);
 	draw_outline(c);
 }
@@ -66,13 +61,12 @@ handle_motion_notify(Client * c, XSizeHints * g, XMotionEvent * mev)
 void
 sweep(Client * c)
 {
-
 	/* Resizing shaded windows yields undefined behavior.  */
 	if(!grab_pointer(c->screen->root, jbwm.X.cursor) 
-		|| c->flags & JB_CLIENT_SHADED) return;
+		|| c->flags & JB_CLIENT_NO_RESIZE || c->flags & JB_CLIENT_SHADED) 
+		return;
 	XSizeHints *g=&(c->size);
-	XWarpPointer(D, None, c->window, 0, 0, 0, 0, 
-		g->width, g->height);
+	XWarpPointer(D, None, c->window, 0, 0, 0, 0, g->width-1, g->height-1);
 	XEvent ev;
 sweep_loop:	
 	XMaskEvent(D, MouseMask, &ev);
@@ -231,6 +225,8 @@ get_mouse_position(Window w, int *x, int *y)
 void
 drag(Client * c)
 {
+	if((c->flags & JB_CLIENT_NO_RESIZE) && !(c->flags & JB_CLIENT_TEAROFF))
+		return;
 	const Window root=c->screen->root;
 	if(!grab_pointer(root, jbwm.X.cursor))
 		return;
@@ -252,10 +248,10 @@ moveresize(Client * c)
 	const bool max = c->flags & JB_CLIENT_MAXIMIZED;
 	const unsigned int parent_height = g->height + (max?0:TDIM);
 	const short y = g->y-b-(max?0:TDIM);
-#else
+#else//!USE_TBAR
 	const unsigned int parent_height = g->height;
 	const short y = g->y-b;
-#endif
+#endif//USE_TBAR
 	const unsigned short width = g->width;
 	const short x = g->x-b;
 
@@ -264,12 +260,14 @@ moveresize(Client * c)
 		XMoveWindow(D, c->parent, x, y);
 		return;
 	}
-		
-	XMoveResizeWindow(D, c->parent, x, y, width, parent_height);
 	/* Offset the child window within the parent window
-		to display titlebar */
+	 to display titlebar */
 	bool no_offset=(c->flags&JB_CLIENT_MAXIMIZED)
 		||(c->flags&JB_CLIENT_NO_TB);
+	/* The modifier to width enables correct display of the right-hand
+	 edge of shaped windows.  */
+	XMoveResizeWindow(D, c->parent, x, y, width+(no_offset?1:0), 
+		parent_height);
 #ifndef USE_TBAR
 	no_offset=true;
 #endif//USE_TBAR
@@ -283,12 +281,18 @@ moveresize(Client * c)
 	/* Store width value for above test.  */
 	c->exposed_width = width;
 #endif//USE_TBAR
+#ifdef USE_SHAPE
+	set_shape(c);
+#endif//USE_SHAPE
 }
 
 void
 maximize(Client * c)
 {
 	LOG("maximize()");
+	// Honor !MWM_FUNC_MAXIMIZE
+	if(c->flags & JB_CLIENT_NO_MAX)
+		return;
 	XSizeHints *g = &(c->size);
 	if(c->flags & JB_CLIENT_MAXIMIZED) // restore:
 	{

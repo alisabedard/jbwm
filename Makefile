@@ -2,7 +2,7 @@
 #CC=/opt/diet/bin/diet -Os gcc
 #CFLAGS=-Os -W -Wall
 # Debug and profile:
-#CFLAGS=-O0 -ggdb -DDEBUG -DSTDIO -W -Wall -pg
+CFLAGS=-O0 -ggdb -DDEBUG -DSTDIO -W -Wall -pg
 
 # Profile:
 #CFLAGS += -pg 
@@ -37,12 +37,12 @@ LIBS += -lXext # Required for SHAPE extension
 
 # Titlebar Xft support:
 # Warning, Xft impedes performance and leaks memory.
-DEFINES += -DUSE_XFT
-LIBS += -lXft
-INCLUDES += `pkg-config --cflags xft`
+#DEFINES += -DUSE_XFT
+#LIBS += -lXft
+#INCLUDES += `pkg-config --cflags xft`
 
 # Not necessary except on old NetBSD, for Xft support:
-INCLUDES += -I/usr/pkg/include/freetype2 -I/usr/X11R6/include/freetype2
+#INCLUDES += -I/usr/pkg/include/freetype2 -I/usr/X11R6/include/freetype2
 
 # Uncomment to enable colormap support
 # Saves 600 bytes

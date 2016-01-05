@@ -250,6 +250,11 @@ init_size(Client * c)
 static void
 reparent(Client *c)
 {
+	if(is_shaped(c->window))
+	{
+		c->border=0;
+		c->flags |= JB_CLIENT_NO_TB;
+	}
 	const unsigned long vm= CWOverrideRedirect | CWEventMask;
 	const ubyte s = c->screen->screen;
 	XSetWindowAttributes a={.override_redirect=true,
@@ -292,6 +297,15 @@ make_new_client(Window w, ScreenInfo * s)
 	XSelectInput(D, c->window, mask);
 #ifdef USE_SHAPE
 	set_shape(c);
+#if 0
+	if(set_shape(c))
+	{
+		c->border=0;
+		XSetWindowBorderWidth(D, c->parent, 0);
+		XSetWindowBorderWidth(D, c->parent, 0);
+		c->flags |= JB_CLIENT_NO_TB;
+	}
+#endif
 #endif /* USE_SHAPE */
 	reparent(c);
 	unhide(c);

@@ -9,6 +9,9 @@
 void
 shade(Client * c)
 {
+	// Honor !MWM_FUNC_MINIMIZE
+	if(c->flags & JB_CLIENT_NO_MIN)
+		return;
         /* This implements window shading, a substitute 
            for iconification.  */
         if(c->flags & JB_CLIENT_SHADED)
@@ -175,32 +178,32 @@ send_wm_delete(Client * c)
 
 #ifdef USE_SHAPE
 bool
-is_shaped(Client * c)
+is_shaped(const Window w)
 {
 	int i, bounding_shaped;
 	unsigned int u;
-	return XShapeQueryExtents(D, c->window, &bounding_shaped,
+	/* Logic to decide if we have a shaped window cribbed from
+		fvwm-2.5.10. Previous method (more than one rectangle returned
+		from XShapeGetRectangles) worked _most_ of the time. */
+	return XShapeQueryExtents(D, w, &bounding_shaped,
 		&i, &i, &u, &u, &i, &i, &i, &u, &u)
 		&& bounding_shaped;
 }
 
-void
+bool
 set_shape(Client * c)
 {
-	/* Validate inputs:  Make sure that the SHAPE extension is
-	   available, and make sure that C is initialized.  */
 	if(!jbwm.X.have_shape || !c)
-		return;
-	/*
-	 * Logic to decide if we have a shaped window cribbed from
-	 * fvwm-2.5.10. Previous method (more than one rectangle returned
-	 * from XShapeGetRectangles) worked _most_ of the time.
-	 */
-	if(is_shaped(c))
+		return false;
+	/* Validate inputs:  Make sure that the SHAPE extension is available, 
+		and make sure that C is initialized.  */
+	if(jbwm.X.have_shape && c && is_shaped(c->window))
 	{
-		XShapeCombineShape(D, c->parent,
-			ShapeBounding, 0, TDIM, c->window, 
-			ShapeBounding, ShapeSet);
+		const byte x=1,y=1;
+		XShapeCombineShape(D, c->parent, ShapeBounding, x, y, 
+			c->window, ShapeBounding, ShapeSet);
+		return true;
 	}
+	return false;
 }
 #endif//USE_SHAPE
