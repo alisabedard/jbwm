@@ -65,7 +65,10 @@ jbwm_handle_button_event(XButtonEvent * e)
 		   users especially, where it is difficult
 		   to register a middle button press, even
 		   with X Emulate3Buttons enabled.  */
-		sweep(c);
+		if(c->flags&JB_CLIENT_SHADED)
+			drag(c);
+		else
+			sweep(c);
 		break;
 	}
 }
