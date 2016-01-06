@@ -31,6 +31,7 @@ struct Client
 #define JB_CLIENT_NO_MAX		(1<<12)
 #define JB_CLIENT_NO_MOVE		(1<<13)
 #define JB_CLIENT_MODAL			(1<<14)
+#define JB_CLIENT_SHAPED		(1<<15)
 	unsigned short flags;
 
 	// Optional fields:

@@ -20,7 +20,7 @@ new_titlebar(Client *c)
 	if(c->flags&JB_CLIENT_NO_TB)
 		return;
 #ifdef USE_SHAPE
-	if(is_shaped(c->window))
+	if(c->flags&JB_CLIENT_SHAPED)
 		return;
 #endif /* USE_SHAPE */
 	const Window w = c->titlebar = XCreateSimpleWindow(D, c->parent, 0, 0, 

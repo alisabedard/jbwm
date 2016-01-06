@@ -194,9 +194,16 @@ head:
 #endif /* USE_SHAPE */
 #ifdef DEBUG
 	case MapNotify:
-	case KeyRelease:
+		LOG("MapNotify");
+		break;
 	case MappingNotify:
+		LOG("MappingNotify");
+		break;
+	case KeyRelease:
+		LOG("KeyRelease");
+		break;
 	case ReparentNotify:
+		LOG("ReparentNotify");
 		break;
 	default:
 		LOG("Unhandled event (%d)", ev.type);

@@ -11,6 +11,7 @@
 void *
 get_property(Window w, Atom property, Atom type, unsigned long *num_items)
 {
+	assert(num_items);
 	int actual_format;
 	unsigned long bytes_after;
 	unsigned char *prop;
@@ -27,6 +28,7 @@ get_property(Window w, Atom property, Atom type, unsigned long *num_items)
 static void
 handle_mwm_hints(Client * c)
 {
+	assert(c);
 	const Atom mwm_hints = XA("_MOTIF_WM_HINTS");
 	struct { unsigned long flags, functions, 
 		decor, input_mode, status; } *m;
@@ -247,14 +249,33 @@ init_size(Client * c)
 		c->ignore_unmap++;
 }
 
+#ifdef USE_SHAPE
+static bool
+is_shaped(Client *c)
+{
+        int i, bounding_shaped;
+        unsigned int u;
+        /* Logic to decide if we have a shaped window cribbed from
+                fvwm-2.5.10. Previous method (more than one rectangle returned
+                from XShapeGetRectangles) worked _most_ of the time. */
+        return XShapeQueryExtents(D, c->window, &bounding_shaped,
+                &i, &i, &u, &u, &i, &i, &i, &u, &u)
+                && bounding_shaped;
+}
+#endif//USE_SHAPE
+
 static void
 reparent(Client *c)
 {
-	if(is_shaped(c->window))
+	LOG("reparent()");
+#ifdef USE_SHAPE
+	if(is_shaped(c))
 	{
+		LOG("Window %d is shaped", (int)c->window);
 		c->border=0;
-		c->flags |= JB_CLIENT_NO_TB;
+		c->flags |= JB_CLIENT_NO_TB | JB_CLIENT_SHAPED;
 	}
+#endif//USE_SHAPE
 	const unsigned long vm= CWOverrideRedirect | CWEventMask;
 	const ubyte s = c->screen->screen;
 	XSetWindowAttributes a={.override_redirect=true,
@@ -274,6 +295,7 @@ static Client *
 Client_new(Window w, ScreenInfo * s)
 {
 	Client *c = calloc(1, sizeof(Client));
+	assert(c);
 	c->next = jbwm.head;
 	jbwm.head = c;
 	c->screen = s;
@@ -297,15 +319,6 @@ make_new_client(Window w, ScreenInfo * s)
 	XSelectInput(D, c->window, mask);
 #ifdef USE_SHAPE
 	set_shape(c);
-#if 0
-	if(set_shape(c))
-	{
-		c->border=0;
-		XSetWindowBorderWidth(D, c->parent, 0);
-		XSetWindowBorderWidth(D, c->parent, 0);
-		c->flags |= JB_CLIENT_NO_TB;
-	}
-#endif
 #endif /* USE_SHAPE */
 	reparent(c);
 	unhide(c);

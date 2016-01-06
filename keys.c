@@ -23,14 +23,20 @@ moveresize_dir(Client * c, XKeyEvent * e, int *xy, int *wh, const byte sign)
 	if((e->state & jbwm.keymasks.mod) && (*wh > inc))
 	{
 #ifdef USE_SHAPE
+#endif//USE_SHAPE
+#if 0
+#ifdef USE_SHAPE
+		
 		if(is_shaped(c->window))
 			return;
 #endif /* USE_SHAPE */
+#endif//0
 		*wh += mod;
 	}
 	else
 		*xy += mod;
 	moveresize(c);
+	set_shape(c);
 	point(c, inc, inc);
 }
 

@@ -1,11 +1,9 @@
 #CC = clang
 #CC=/opt/diet/bin/diet -Os gcc
 #CFLAGS=-Os -W -Wall
+
 # Debug and profile:
 CFLAGS=-O0 -ggdb -DDEBUG -DSTDIO -W -Wall -pg
-
-# Profile:
-#CFLAGS += -pg 
 
 # Edit this line if you don't want jbwm to install under /usr.
 PREFIX=/usr
@@ -26,6 +24,9 @@ DEFINES  = $(EXTRA_DEFINES)
 
 # Configure jbwm by editing the following DEFINES lines.  You can also
 # add options by setting EXTRA_DEFINES on the make(1) command line,
+
+# Comment out to enable assertions
+#DEFINES += -DNDEBUG
 
 # Uncomment to enable SHAPE extension support
 DEFINES += -DUSE_SHAPE

@@ -9,6 +9,7 @@
 void
 shade(Client * c)
 {
+	assert(c);
 	// Honor !MWM_FUNC_MINIMIZE
 	if(c->flags & JB_CLIENT_NO_MIN)
 		return;
@@ -20,6 +21,7 @@ shade(Client * c)
                 c->flags &= ~JB_CLIENT_SHADED;
                 XMapWindow(D, c->window);
                 moveresize(c);
+		set_wm_state(c, NormalState);
 #ifdef EWMH
 		ewmh_remove_state(c->window, ewmh.WM_STATE_SHADED);
 #endif//EWMH
@@ -32,6 +34,7 @@ shade(Client * c)
                 const ubyte h=c->size.height=TDIM;
                 XResizeWindow(D, c->parent, c->size.width, h);
                 c->flags |= JB_CLIENT_SHADED;
+		set_wm_state(c, IconicState);
 #ifdef EWMH
 		ewmh_add_state(c->window, ewmh.WM_STATE_SHADED);
 #endif//EWMH
@@ -43,6 +46,7 @@ shade(Client * c)
 void
 client_to_vdesk(Client *c, const ubyte d)
 {
+	assert(c);
 	c->vdesk=d;
         c->vdesk=switch_vdesk(c->screen, d);
 }
@@ -50,6 +54,7 @@ client_to_vdesk(Client *c, const ubyte d)
 void
 configure(Client *c)
 {
+	assert(c);
 	XSizeHints *g=&(c->size);
 	const Window w=c->window;
 	XConfigureEvent e={.x=g->x, .y=g->y, .width=g->width, 
@@ -77,10 +82,24 @@ find_client(Window w)
 void
 set_wm_state(Client * c, int state)
 {
+//	unsigned char data[2];		// = { state, None }; 
+
+//	data[0] = state;
+#if 0
+	const unsigned char data[]={state,0};
+	XPROP(c->window, XA("WM_STATE"), XA_CARDINAL, data, 2);
+#endif//0
+#if 0
 	unsigned char data[2];		// = { state, None }; 
 
 	data[0] = state;
 	XPROP(c->window, XA("WM_STATE"), XA_CARDINAL, data, 2);
+#endif//0
+//#if 0
+	assert(c);
+	LOG("set_wm_state(%d, %d)", (int)c->window, state);
+	XPROP(c->window, XA("WM_STATE"), XA_CARDINAL, &state, 1);
+//#endif//0
 }
 
 void
@@ -177,27 +196,13 @@ send_wm_delete(Client * c)
 }
 
 #ifdef USE_SHAPE
-bool
-is_shaped(const Window w)
-{
-	int i, bounding_shaped;
-	unsigned int u;
-	/* Logic to decide if we have a shaped window cribbed from
-		fvwm-2.5.10. Previous method (more than one rectangle returned
-		from XShapeGetRectangles) worked _most_ of the time. */
-	return XShapeQueryExtents(D, w, &bounding_shaped,
-		&i, &i, &u, &u, &i, &i, &i, &u, &u)
-		&& bounding_shaped;
-}
 
 bool
 set_shape(Client * c)
 {
-	if(!jbwm.X.have_shape || !c)
-		return false;
 	/* Validate inputs:  Make sure that the SHAPE extension is available, 
 		and make sure that C is initialized.  */
-	if(jbwm.X.have_shape && c && is_shaped(c->window))
+	if(jbwm.X.have_shape && c && (c->flags & JB_CLIENT_SHAPED))
 	{
 		const byte x=1,y=1;
 		XShapeCombineShape(D, c->parent, ShapeBounding, x, y, 

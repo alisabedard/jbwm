@@ -36,9 +36,6 @@ void
 set_wm_state(Client * c, int state);
 
 #ifdef USE_SHAPE
-bool 
-is_shaped(const Window w);
-
 bool
 set_shape(Client * c);
 #endif//USE_SHAPE
