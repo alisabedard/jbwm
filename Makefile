@@ -2,8 +2,12 @@
 #CC=/opt/diet/bin/diet -Os gcc
 #CFLAGS=-Os -W -Wall
 
-# Debug and profile:
-CFLAGS=-O0 -ggdb -DDEBUG -DSTDIO -W -Wall -pg
+# Debug
+CFLAGS=-O0 -ggdb -DDEBUG -DSTDIO
+# Profile
+#CFLAGS+=-pg
+# Enable all warnings
+CFLAGS+=-W -Wall -Wextra
 
 # Edit this line if you don't want jbwm to install under /usr.
 PREFIX=/usr

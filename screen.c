@@ -10,7 +10,9 @@
 
 #define MouseMask (ButtonPressMask|ButtonReleaseMask|PointerMotionMask)
 
-#if 0
+static void
+snap_client(Client * c);
+
 __attribute__((hot))
 static inline void
 draw_outline(Client * c)
@@ -31,7 +33,6 @@ draw_outline(Client * c)
 #endif//USE_TBAR
 	XDrawRectangle(D, r, s->gc, d.x, d.y, d.width, d.height);
 }
-#endif//0
 
 static inline void
 recalculate_sweep(Client * c, Position p1, Position p2)
@@ -54,13 +55,22 @@ grab_pointer(Window w, Cursor cursor)
 static void
 handle_motion_notify(Client * c, XSizeHints * g, XMotionEvent * mev)
 {
-//	const bool shaped=is_shaped(c->window);
 	Position p1={.x=g->x, .y=g->y};
 	Position p2={.x=mev->x, .y=mev->y};
-//	draw_outline(c); // clear
+#ifdef USE_SHAPE
+	const bool s=(c->flags&JB_CLIENT_SHAPED);
+	if(!s)
+		draw_outline(c); //clear
 	recalculate_sweep(c, p1, p2);
-//	draw_outline(c);
-	moveresize(c);
+	if(!s)
+		draw_outline(c);
+	else
+		moveresize(c);
+#else//!USE_SHAPE
+	draw_outline(c);
+	recalculate_sweep(c, p1, p2);
+	draw_outline(c);
+#endif//USE_SHAPE
 }
 
 void
@@ -70,9 +80,13 @@ sweep(Client * c)
 	/* Resizing shaded windows yields undefined behavior.  */
 	if(!grab_pointer(c->screen->root, jbwm.X.cursor) 
 		|| c->flags & JB_CLIENT_NO_RESIZE 
-		|| c->flags & JB_CLIENT_SHADED) 
+		|| c->flags & JB_CLIENT_SHADED)
 		return;
 	XSizeHints *g=&(c->size);
+#ifdef USE_SHAPE
+	if(c->flags & JB_CLIENT_SHAPED) // Bugfix for offset issue
+		g->height+=TDIM;
+#endif//USE_SHAPE
 	XWarpPointer(D, None, c->window, 0, 0, 0, 0, g->width-1, g->height-1);
 	XEvent ev;
 sweep_loop:	
@@ -253,6 +267,9 @@ void
 moveresize(Client * c)
 {
 	assert(c);
+#ifdef USE_SNAP
+	snap_client(c);
+#endif//USE_SNAP
 	XSizeHints *g = &(c->size);
 	const ubyte b = c->border;
 #ifdef USE_TBAR
@@ -265,16 +282,17 @@ moveresize(Client * c)
 #endif//USE_TBAR
 	const unsigned short width = g->width;
 	const short x = g->x-b;
-
+#if 0
 	if(c->flags & JB_CLIENT_SHADED)
 	{
 		XMoveWindow(D, c->parent, x, y);
 		return;
 	}
+#endif//0
 	/* Offset the child window within the parent window
 	 to display titlebar */
 	bool no_offset=(c->flags&JB_CLIENT_MAXIMIZED)
-		||(c->flags&JB_CLIENT_NO_TB);
+		||(c->flags&JB_CLIENT_NO_TB) || (c->flags&JB_CLIENT_SHAPED);
 	/* The modifier to width enables correct display of the right-hand
 	 edge of shaped windows.  */
 	XMoveResizeWindow(D, c->parent, x, y, width+(no_offset?1:0), 
@@ -287,7 +305,7 @@ moveresize(Client * c)
 	configure(c);
 #ifdef USE_TBAR
 	/* Only update the titlebar if the width has changed.  */
-	if(g->width != c->exposed_width)
+	if(!no_offset && (g->width != c->exposed_width))
 		update_titlebar(c);
 	/* Store width value for above test.  */
 	c->exposed_width = width;

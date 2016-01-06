@@ -14,30 +14,24 @@ point(Client *c, const int x, const int y)
 }
 
 static void
-moveresize_dir(Client * c, XKeyEvent * e, int *xy, int *wh, const byte sign)
+keymv(Client * c, XKeyEvent * e, int *xy, int *wh, const byte sign)
 {
 	/* These operations invalid when maximized.  */
 	if(c->flags & JB_CLIENT_MAXIMIZED) return;
-	const ubyte inc = JBWM_RESIZE_INCREMENT;
-	const byte mod = sign * inc;
-	if((e->state & jbwm.keymasks.mod) && (*wh > inc))
+	const byte d=sign*JBWM_RESIZE_INCREMENT;
+	if((e->state & jbwm.keymasks.mod) && (*wh > 0))
 	{
 #ifdef USE_SHAPE
+		if(c->flags&JB_CLIENT_SHAPED)
+			goto move;
 #endif//USE_SHAPE
-#if 0
-#ifdef USE_SHAPE
-		
-		if(is_shaped(c->window))
-			return;
-#endif /* USE_SHAPE */
-#endif//0
-		*wh += mod;
+		*wh += d;
 	}
 	else
-		*xy += mod;
+move:
+		*xy += d;
 	moveresize(c);
-	set_shape(c);
-	point(c, inc, inc);
+	point(c, 1, 1);
 }
 
 static void
@@ -48,16 +42,16 @@ handle_client_key_event(XKeyEvent * e, Client * c, KeySym key)
 	switch (key)
 	{
 	case KEY_LEFT:
-		moveresize_dir(c, e, &(g->x), &(g->width), -1);
+		keymv(c, e, &(g->x), &(g->width), -1);
 		break;
 	case KEY_DOWN:
-		moveresize_dir(c, e, &(g->y), &(g->height), 1);
+		keymv(c, e, &(g->y), &(g->height), 1);
 		break;
 	case KEY_UP:
-		moveresize_dir(c, e, &(g->y), &(g->height), -1);
+		keymv(c, e, &(g->y), &(g->height), -1);
 		break;
 	case KEY_RIGHT:
-		moveresize_dir(c, e, &(g->x), &(g->width), 1);
+		keymv(c, e, &(g->x), &(g->width), 1);
 		break;
 	case KEY_KILL:
 		send_wm_delete(c);
