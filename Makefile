@@ -77,6 +77,9 @@ version = 1.39
 PROG=jbwm
 distname = $(PROG)-$(version)
 
+# Uncomment to enable X11 miscellaneous debugging (events)
+#DEFINES += -DXDEBUG
+
 DEFINES += -DVERSION=\"$(version)\" $(DEBIAN)
 CFLAGS  += $(INCLUDES) $(DEFINES) 
 CFLAGS += -D_XOPEN_SOURCE=700 -std=c99

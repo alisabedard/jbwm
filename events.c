@@ -192,7 +192,7 @@ head:
 		set_shape(find_client(ev.xany.window));
 		break;
 #endif /* USE_SHAPE */
-#ifdef DEBUG
+#if defined(DEBUG) && defined(XDEBUG)
 	case MapNotify:
 		LOG("MapNotify");
 		break;
@@ -207,7 +207,7 @@ head:
 		break;
 	default:
 		LOG("Unhandled event (%d)", ev.type);
-#endif//DEBUG
+#endif//DEBUG&&XDEBUG
 	}
 	if(jbwm.need_cleanup)
 		cleanup();
