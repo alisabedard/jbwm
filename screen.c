@@ -329,6 +329,11 @@ maximize(Client * c)
 	// Honor !MWM_FUNC_MAXIMIZE
 	if(c->flags & JB_CLIENT_NO_MAX)
 		return;
+#ifdef  USE_SHAPE
+	// Currently buggy, so return.
+	if(c->flags & JB_CLIENT_SHAPED)
+		return;
+#endif//USE_SHAPE
 	XSizeHints *g = &(c->size);
 	if(c->flags & JB_CLIENT_MAXIMIZED) // restore:
 	{
@@ -356,6 +361,11 @@ maximize(Client * c)
 	}
 	moveresize(c);
 	XRaiseWindow(D, c->parent);
+#if 0
+#ifdef USE_SHAPE
+	set_shape(c);
+#endif//USE_SHAPE
+#endif//0
 }
 
 void
