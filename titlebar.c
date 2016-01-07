@@ -110,6 +110,7 @@ draw_titlebar(Client * c, char *name)
 void
 update_titlebar(Client * c)
 {
+	assert(c);
 	if(c->flags & JB_CLIENT_NO_TB)
 		return;
 #ifdef USE_SHAPE
@@ -120,11 +121,11 @@ update_titlebar(Client * c)
 	{
 		/* May generate BadWindow on subsequent invocations,
 		   however the error handler makes such irrelevant.  */
-		delete_titlebar(c);
+		XDestroyWindow(D, c->titlebar);
+		c->titlebar=0;
 		return;
 	}
-	const Window tb = c->titlebar;
-	if(!tb)
+	if(!c->titlebar)
 	{
 		new_titlebar(c);
 		/* Return here to prevent BadWindow/BadDrawable errors */
@@ -132,17 +133,9 @@ update_titlebar(Client * c)
 	}
 
 	/* Expand/Contract the titlebar width as necessary:  */
-	XMoveResizeWindow(D, tb, 0, 0, c->size.width, TDIM);
+	XMoveResizeWindow(D, c->titlebar, 0, 0, c->size.width, TDIM);
 	XTextProperty p;
 	XGetTextProperty(D, c->window, &p, XA_WM_NAME);
 	draw_titlebar(c, (char *)p.value);
-}
-
-void
-delete_titlebar(Client * c)
-{
-	if(c && c->titlebar)
-		XDestroyWindow(D, c->titlebar);
-	c->titlebar = 0;
 }
 

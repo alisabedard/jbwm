@@ -7,9 +7,6 @@
 void 
 update_titlebar(Client * c);
 
-void 
-delete_titlebar(Client * c);
-
 /* Ensure that the title text fits within the titlebar.  */
 #ifdef USE_TBAR
 #define TDIM (jbwm.X.font->ascent+jbwm.X.font->descent)
