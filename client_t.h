@@ -2,6 +2,8 @@
 #ifndef JBWM_CLIENT_STRUCT_H
 #define JBWM_CLIENT_STRUCT_H
 
+#include <stdint.h>
+
 /* client structure */
 
 typedef struct Client Client; 
@@ -32,7 +34,11 @@ struct Client
 #define JB_CLIENT_NO_MOVE		(1<<13)
 #define JB_CLIENT_MODAL			(1<<14)
 #define JB_CLIENT_SHAPED		(1<<15)
-	unsigned short flags;
+#define JB_CLIENT_NO_RESIZE_DECOR	(1<<16)
+#define JB_CLIENT_NO_CLOSE_DECOR	(1<<17)
+#define JB_CLIENT_NO_MIN_DECOR		(1<<18)
+#define JB_CLIENT_NO_MAX_DECOR		(1<<19)
+	uint32_t flags;
 
 	// Optional fields:
 #ifdef EWMH

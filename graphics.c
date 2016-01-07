@@ -35,20 +35,3 @@ draw(Window w, XRectangle *g, const char *color)
 	free_color(c);
 }
 
-#ifdef USE_XPM
-#include <X11/xpm.h>
-
-void
-draw_xpm(Window w, XRectangle *g, char **xpm)
-{
-	XImage *i;
-	GC gc;
-	XpmAttributes a;
-	a.valuemask=XpmSize;
-	XpmCreateImageFromData(D, xpm, &i, NULL, &a);
-	gc=XCreateGC(D, w, 0, NULL);
-	XPutImage(D, w, gc, i, 0, 0, g->x, g->y, a.width, a.height);
-	XFreeGC(D, gc);
-	XDestroyImage(i);
-}
-#endif /* USE_XPM */

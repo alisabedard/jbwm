@@ -16,9 +16,5 @@ delete_titlebar(Client * c);
 #else /* !USE_TBAR */
 #define TDIM 16
 #endif
-#ifdef USE_XPM
-#undef TDIM
-#define TDIM 24
-#endif
 
 #endif /* JBWM_TITLEBAR_H */

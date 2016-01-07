@@ -3,7 +3,7 @@
 [Screenshot](/images/screensot.png?raw=true "Screenshot")
 
 ## FEATURES of JBWM
-* ~20K binary size (with gcc 5.3.0 on linux/amd64) for minimal configuration
+* 16K binary size (with gcc 5.3.0 on linux/amd64) for minimal configuration
 	- Takes only 13kb on a Raspberry PI, minimal configuration
 * Titlebar support if wanted
 * Xft support if wanted

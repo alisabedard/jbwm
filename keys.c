@@ -28,7 +28,9 @@ keymv(Client * c, XKeyEvent * e, int *xy, int *wh, const byte sign)
 		*wh += d;
 	}
 	else
+#ifdef USE_SHAPE
 move:
+#endif//USE_SHAPE
 		*xy += d;
 	moveresize(c);
 	point(c, 1, 1);

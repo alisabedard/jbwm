@@ -10,8 +10,10 @@
 
 #define MouseMask (ButtonPressMask|ButtonReleaseMask|PointerMotionMask)
 
+#ifdef USE_SNAP
 static void
 snap_client(Client * c);
+#endif//USE_SNAP
 
 __attribute__((hot))
 static inline void
@@ -248,9 +250,13 @@ get_mouse_position(Window w, int *x, int *y)
 void
 drag(Client * c)
 {
+	LOG("drag()");
 	assert(c);
 	if((c->flags & JB_CLIENT_NO_RESIZE) && !(c->flags & JB_CLIENT_TEAROFF))
+	{
+		LOG("NO_RESIZE or TEAROFF!");
 		return;
+	}
 	const Window root=c->screen->root;
 	if(!grab_pointer(root, jbwm.X.cursor))
 		return;

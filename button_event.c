@@ -7,13 +7,16 @@
 #include "jbwm.h"
 
 static void
-button1_event(XButtonEvent * e, Client * c)
+button1_event(XButtonEvent * e
+#ifndef USE_TBAR
+	__attribute__((unused))
+#endif//!USE_TBAR
+	, Client * c)
 {
-	const int width = c->size.width;
-
 	XRaiseWindow(D, c->parent);
 #ifdef USE_TBAR
 	const Position p={.x=e->x,.y=e->y};
+	const int width = c->size.width;
 	if((p.x < TDIM) && (p.y < TDIM)) // Close button
 	{
 		// Honor !MWM_FUNC_CLOSE

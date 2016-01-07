@@ -1,7 +1,10 @@
 #CC = clang
 #CC=/opt/diet/bin/diet -Os gcc
-#CFLAGS=-Os -W -Wall
 
+# Compile for minimum size
+CFLAGS=-Os
+# Compile for current machine
+CFLAGS+=-march=native
 # Debug
 CFLAGS=-O0 -ggdb -DDEBUG -DSTDIO
 # Profile
@@ -34,24 +37,20 @@ DEFINES  = $(EXTRA_DEFINES)
 
 # Uncomment to enable SHAPE extension support
 DEFINES += -DUSE_SHAPE
-LIBS += -lXext # Required for SHAPE extension
-
-# XPM support is beautiful but substantially increases binary size.
-#DEFINES += -DUSE_XPM
-#LIBS	+= -lXpm
+EXTRALIBS += -lXext # Required for SHAPE extension
 
 # Titlebar Xft support:
 # Warning, Xft impedes performance and leaks memory.
 #DEFINES += -DUSE_XFT
-#LIBS += -lXft
-#INCLUDES += `pkg-config --cflags xft`
+#EXTRALIBS += -lXft
+#EXTRAINCLUDES += `pkg-config --cflags xft`
 
 # Not necessary except on old NetBSD, for Xft support:
-#INCLUDES += -I/usr/pkg/include/freetype2 -I/usr/X11R6/include/freetype2
+#EXTRAINCLUDES += -I/usr/pkg/include/freetype2 -I/usr/X11R6/include/freetype2
 
 # Uncomment to enable colormap support
 # Saves 600 bytes
-#DEFINES += -DUSE_CMAP
+DEFINES+= -DUSE_CMAP
 
 # Uncomment to enable parsing command line arguments.
 #  Saves ~2030 bytes
@@ -59,7 +58,7 @@ DEFINES += -DUSE_ARGV
 
 # Uncomment to enable titlebars
 DEFINES += -DUSE_TBAR
-SRCS += titlebar.c 
+EXTRASRCS += titlebar.c 
 
 # Uncomment to enable window snapping. (Adds 4k bytes)
 DEFINES += -DUSE_SNAP
@@ -69,10 +68,17 @@ DEFINES += -DSTDIO
 
 # Uncomment to enable EWMH (Adds ~4k bytes)
 DEFINES += -DEWMH
-SRCS += ewmh.c
+EXTRASRCS += ewmh.c
 
 # Uncomment to enable MWM hints
 DEFINES += -DMWM
+
+# Uncomment to disable everything for minimal configuration 
+#CFLAGS=-Os
+#DEFINES=-DNDEBUG
+#EXTRASRCS=
+#EXTRALIBS=
+#EXTRAINCLUDES=
 
 # ----- You shouldn't need to change anything under this line ------ #
 
@@ -80,6 +86,10 @@ version = 1.39
 
 PROG=jbwm
 distname = $(PROG)-$(version)
+
+SRCS+=$(EXTRASRCS)
+INCLUDES+=$(EXTRAINCLUDES)
+LIBS+=$(EXTRALIBS)
 
 # Uncomment to enable X11 miscellaneous debugging (events)
 #DEFINES += -DXDEBUG
