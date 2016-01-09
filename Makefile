@@ -4,20 +4,18 @@
 # Compile for minimum size
 CFLAGS=-Os
 # Compile for current machine
-CFLAGS+=-march=native
+#CFLAGS+=-march=native
 # Debug
-CFLAGS=-O0 -ggdb -DDEBUG -DSTDIO
+#CFLAGS=-O0 -ggdb -DDEBUG -DSTDIO
 # Profile
 #CFLAGS+=-pg
 # Enable all warnings
 CFLAGS+=-W -Wall -Wextra
 
-# Edit this line if you don't want jbwm to install under /usr.
+# Edit/override this line if you don't want jbwm to install under /usr.
 PREFIX=/usr
 # Note that $(DESTDIR) is used by the Debian build process.
 prefix = $(DESTDIR)/$(PREFIX)
-# For typical manually built package:
-#prefix = /usr/local
 
 # Fix build on NetBSD and older systems:
 INCLUDES+=-I/usr/X11R6/include
@@ -50,11 +48,11 @@ EXTRALIBS += -lXext # Required for SHAPE extension
 
 # Uncomment to enable colormap support
 # Saves 600 bytes
-DEFINES+= -DUSE_CMAP
+#DEFINES+= -DUSE_CMAP
 
 # Uncomment to enable parsing command line arguments.
 #  Saves ~2030 bytes
-DEFINES += -DUSE_ARGV 
+#DEFINES += -DUSE_ARGV 
 
 # Uncomment to enable titlebars
 DEFINES += -DUSE_TBAR
@@ -63,7 +61,7 @@ EXTRASRCS += titlebar.c
 # Uncomment to enable window snapping. (Adds 4k bytes)
 DEFINES += -DUSE_SNAP
 
-# Uncomment to enable STDIO (Adds 16 bytes)
+# Uncomment to enable STDIO
 DEFINES += -DSTDIO
 
 # Uncomment to enable EWMH (Adds ~4k bytes)

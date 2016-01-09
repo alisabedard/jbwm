@@ -9,6 +9,7 @@
 void
 shade(Client * c)
 {
+	LOG("shade");
 	assert(c);
 	// Honor !MWM_FUNC_MINIMIZE
 	if(c->flags & JB_CLIENT_NO_MIN)
@@ -31,8 +32,7 @@ shade(Client * c)
                 c->shade_height = c->size.height;
                 c->ignore_unmap++;
                 XUnmapWindow(D, c->window);
-                const ubyte h=c->size.height=TDIM;
-                XResizeWindow(D, c->parent, c->size.width, h);
+                c->size.height=1;
                 c->flags |= JB_CLIENT_SHADED;
 		set_wm_state(c, IconicState);
 #ifdef EWMH
@@ -46,6 +46,7 @@ shade(Client * c)
 void
 client_to_vdesk(Client *c, const ubyte d)
 {
+	LOG("client_to_vdesk");
 	assert(c);
 	c->vdesk=d;
         c->vdesk=switch_vdesk(c->screen, d);
@@ -54,11 +55,14 @@ client_to_vdesk(Client *c, const ubyte d)
 void
 configure(Client *c)
 {
+	XLOG("configure");
 	assert(c);
 	XSizeHints *g=&(c->size);
 	const Window w=c->window;
 	XConfigureEvent e={.x=g->x, .y=g->y, .width=g->width, 
 		.height=g->height, .event=w};
+	if((e.width==0)||(e.height==0))
+		return;
 	XSendEvent(D, w, false, StructureNotifyMask, (XEvent *)&e);
 }
 
@@ -82,29 +86,15 @@ find_client(Window w)
 void
 set_wm_state(Client * c, int state)
 {
-//	unsigned char data[2];		// = { state, None }; 
-
-//	data[0] = state;
-#if 0
-	const unsigned char data[]={state,0};
-	XPROP(c->window, XA("WM_STATE"), XA_CARDINAL, data, 2);
-#endif//0
-#if 0
-	unsigned char data[2];		// = { state, None }; 
-
-	data[0] = state;
-	XPROP(c->window, XA("WM_STATE"), XA_CARDINAL, data, 2);
-#endif//0
-//#if 0
 	assert(c);
 	LOG("set_wm_state(%d, %d)", (int)c->window, state);
 	XPROP(c->window, XA("WM_STATE"), XA_CARDINAL, &state, 1);
-//#endif//0
 }
 
 void
 select_client(Client * c)
 {
+	LOG("select_client");
 	if(jbwm.current)
 	{
 		XSetWindowBorder(D, jbwm.current->parent,
@@ -131,6 +121,7 @@ select_client(Client * c)
 void
 stick(Client * c)
 {
+	LOG("stick");
 	c->vdesk=c->screen->vdesk;
 	toggle_sticky(c);
 	select_client(c);
@@ -139,7 +130,7 @@ stick(Client * c)
 static inline void
 relink_window_list(Client * c)
 {
-	LOG("relink_window_list()");
+	LOG("relink_window_list");
 	if(jbwm.head == c) jbwm.head = c->next;
 	else for(Client *p = jbwm.head; p && p->next; p = p->next)
 		if(p->next == c)
@@ -152,7 +143,7 @@ relink_window_list(Client * c)
 static void
 unparent_window(Client * c)
 {
-	LOG("unparent_window()");
+	LOG("unparent_window");
 	if(!c->parent) return;
 	XReparentWindow(D, c->window, c->screen->root, c->size.x, c->size.y);
 	XRemoveFromSaveSet(D, c->window);
@@ -163,6 +154,7 @@ unparent_window(Client * c)
 void
 remove_client(Client * c)
 {
+	LOG("remove_client");
 	if(c->flags&JB_CLIENT_REMOVE)
 	{
 #ifdef EWMH
@@ -183,6 +175,7 @@ remove_client(Client * c)
 void
 xmsg(Window w, Atom a, long x)
 {
+	LOG("xmsg");
 	XEvent ev = {.xclient.type=ClientMessage, .xclient.window=w, 
 		.xclient.message_type=a, .xclient.format=32, 
 		.xclient.data.l[0]=x, .xclient.data.l[1]=CurrentTime};
@@ -192,6 +185,7 @@ xmsg(Window w, Atom a, long x)
 void
 send_wm_delete(Client * c)
 {
+	LOG("send_wm_delete");
 	xmsg(c->window, XA("WM_PROTOCOLS"), XA("WM_DELETE_WINDOW"));
 }
 
@@ -200,6 +194,7 @@ send_wm_delete(Client * c)
 bool
 set_shape(Client * c)
 {
+	XLOG("set_shape");
 	/* Validate inputs:  Make sure that the SHAPE extension is available, 
 		and make sure that C is initialized.  */
 	if(jbwm.X.have_shape && c && (c->flags & JB_CLIENT_SHAPED))

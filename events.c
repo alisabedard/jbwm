@@ -62,6 +62,7 @@ handle_colormap_change(XColormapEvent * e)
 static void
 handle_wm_hints(Client *c)
 {
+	LOG("handle_wm_hints");
 	XWMHints *h=XGetWMHints(D, c->window);
 	if(h->flags & XUrgencyHint)
 	{
@@ -109,6 +110,7 @@ handle_expose_event(XEvent * ev)
 	// Ignore extra expose events
 	if(ev->xexpose.count == 0)
 	{
+		LOG("handle_expose_event");
 		/* xproperty was used instead of xexpose, previously.  */
 		const Window w = ev->xexpose.window;
 		Client *c=find_client(w);
@@ -119,8 +121,9 @@ handle_expose_event(XEvent * ev)
 #endif//USE_TBAR
 
 static void
-jbwm_handle_configure_request(XConfigureRequestEvent * e)
+handle_configure_request(XConfigureRequestEvent * e)
 {
+	LOG("handle_configure_request");
 	XWindowChanges wc={.x=e->x, .y=e->y, .width=e->width, .height=e->height,
 		.border_width=e->border_width, .sibling=e->above, 
 		.stack_mode=e->detail};
@@ -161,7 +164,7 @@ head:
 		jbwm_handle_button_event(&ev.xbutton);
 		break;
 	case ConfigureRequest:
-		jbwm_handle_configure_request(&ev.xconfigurerequest);
+		handle_configure_request(&ev.xconfigurerequest);
 		break;
 	case ConfigureNotify:
 		if(!ev.xconfigure.override_redirect)
@@ -204,6 +207,9 @@ head:
 		break;
 	case ReparentNotify:
 		LOG("ReparentNotify");
+		break;
+	case ButtonRelease:
+		LOG("ButtonRelease");
 		break;
 	default:
 		LOG("Unhandled event (%d)", ev.type);

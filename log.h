@@ -26,6 +26,12 @@
 #define MARK()
 #endif // DEBUG && STDIO
 
+#ifdef XDEBUG
+#define XLOG(...) LOG(__VA_ARGS__)
+#else//!XDEBUG
+#define XLOG(...)
+#endif//XDEBUG
+
 #define UNUSED(x)
 
 #endif /* JBWM__LOG_H__ */

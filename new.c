@@ -141,7 +141,7 @@ set_size(Client * c, const unsigned int width, const unsigned int height)
 }
 
 static void
-init_size_size(Client * c, XWindowAttributes * attr)
+init_size(Client * c, XWindowAttributes * attr)
 {
 	const int dim[]={attr->width, attr->height};
 	if((dim[0] >= c->size.min_width)
@@ -152,36 +152,15 @@ init_size_size(Client * c, XWindowAttributes * attr)
 }
 
 static void
-set_position(Client * c, const int x, const int y)
+init_position(Client * c, XWindowAttributes * attr)
 {
-	c->size.x = x;
-	c->size.y = y;
+	Position p;
+	get_mouse_position(c->screen->root, &p);
+	XSizeHints *g = &(c->size);
+	const bool a=(attr->map_state==IsViewable) || (g->flags & USPosition);
+	g->x=a?attr->x:p.x;
+	g->y=a?attr->y:p.y;
 	configure(c);
-}
-
-static void
-init_size_position(Client * c, XWindowAttributes * attr)
-{
-	if(!c->size.flags) return;
-	if((attr->map_state == IsViewable)
-		|| c->size.flags & USPosition)
-		set_position(c, attr->x, attr->y);
-	else
-	{
-		const ScreenInfo *s = c->screen;
-
-		if(s)
-		{
-			Position p;
-			get_mouse_position(s->root, (int *)&p.x, (int *)&p.y);
-			const short mx = s->width;
-			const short my = s->height;
-			const ubyte b = c->border;
-			const XSizeHints *g = &(c->size);
-			set_position(c, (p.x * (mx - b - g->width)) / mx,
-				(p.y * (my - b - g->height)) / my);
-		}
-	}
 }
 
 #ifdef EWMH
@@ -236,17 +215,17 @@ init_properties(Client * c)
 }
 
 static void
-init_size(Client * c)
+init_geometry(Client * c)
 {
 	XWindowAttributes attr;
 	XGetWindowAttributes(D, c->window, &attr);
 #ifdef USE_CMAP
 	c->cmap = attr.colormap;
-#endif /* USE_CMAP */
-	XGetWMNormalHints(D, c->window, &(c->size), 
-		&(attr.all_event_masks) /* dummy */);
-	init_size_size(c, &attr);
-	init_size_position(c, &attr);
+#endif//USE_CMAP
+	long d; // dummy var
+	XGetWMNormalHints(D, c->window, &(c->size), &d);
+	init_size(c, &attr);
+	init_position(c, &attr);
 	/* Test if the reparent that is to come 
 	   would trigger an unmap event. */
 	if(attr.map_state == IsViewable)
@@ -257,14 +236,10 @@ init_size(Client * c)
 static bool
 is_shaped(Client *c)
 {
-        int i, bounding_shaped;
-        unsigned int u;
-        /* Logic to decide if we have a shaped window cribbed from
-                fvwm-2.5.10. Previous method (more than one rectangle returned
-                from XShapeGetRectangles) worked _most_ of the time. */
-        return XShapeQueryExtents(D, c->window, &bounding_shaped,
-                &i, &i, &u, &u, &i, &i, &i, &u, &u)
-                && bounding_shaped;
+	int d, s;
+#define U (unsigned int *)
+	return XShapeQueryExtents(D, c->window, &s, &d, &d, U&d, 
+		U&d, &d, &d, &d, U&d, U&d) && s;
 }
 #endif//USE_SHAPE
 
@@ -298,6 +273,7 @@ reparent(Client *c)
 static Client *
 Client_new(Window w, ScreenInfo * s)
 {
+	LOG("Client_new(%d,s)", (int)w);
 	Client *c = calloc(1, sizeof(Client));
 	assert(c);
 	c->next = jbwm.head;
@@ -306,7 +282,7 @@ Client_new(Window w, ScreenInfo * s)
 	c->window = w;
 	c->border = JBWM_BORDER;
 	init_properties(c);
-	init_size(c);
+	init_geometry(c);
 	return c;
 }
 

@@ -11,7 +11,7 @@ update_titlebar(Client * c);
 #ifdef USE_TBAR
 #define TDIM (jbwm.X.font->ascent+jbwm.X.font->descent)
 #else /* !USE_TBAR */
-#define TDIM 16
+#define TDIM 0
 #endif
 
 #endif /* JBWM_TITLEBAR_H */

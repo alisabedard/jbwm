@@ -19,6 +19,6 @@ void unhide(Client * c);
 ubyte switch_vdesk(ScreenInfo * s, const ubyte v);
 void grab_keys_for_screen(ScreenInfo * s);
 void maximize(Client * c);
-void get_mouse_position(Window w, int *x, int *y);
+void get_mouse_position(Window w, Position *p);
 
 #endif /* JBWM_SCREEN_H */

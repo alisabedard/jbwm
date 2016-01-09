@@ -20,10 +20,8 @@
 #define DEF_FONT "Sans"
 #define FONT_SIZE 10.0
 #else /* ! USE_XFT */
-#if 0
-#define DEF_FONT "fixed"
-#endif
 #define DEF_FONT "-*-lucida-*-r-*-*-14-*-*-*-*-*-iso10646-*"
+#define FALLBACK_FONT "fixed"
 #endif /* USE_XFT */
 
 /* Default colors */

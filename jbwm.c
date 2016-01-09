@@ -86,6 +86,8 @@ setup_fonts(void)
 		FONT_SIZE, NULL);
 #else//!USE_XFT
 	jbwm.X.font=XLoadQueryFont(d, DEF_FONT);
+	if(!jbwm.X.font)
+		jbwm.X.font=XLoadQueryFont(d, FALLBACK_FONT);
 #endif//USE_XFT
 	if(!jbwm.X.font) ERROR("bad font");
 }
@@ -120,7 +122,7 @@ allocate_colors(const ubyte i)
 	jbwm.X.screens[i].fc=jbwm_color(DEF_FC);
 }
 
-static void
+static inline void
 setup_each_client(const ubyte i, const ubyte j, Window *wins)
 {
 	XWindowAttributes winattr;
@@ -129,7 +131,7 @@ setup_each_client(const ubyte i, const ubyte j, Window *wins)
 		make_new_client(wins[j], &jbwm.X.screens[i]);
 }
 
-static void
+static inline void
 setup_clients(const ubyte i)
 {
 	unsigned int nwins;
@@ -142,7 +144,7 @@ setup_clients(const ubyte i)
 	XFree(wins);
 }
 
-static void
+static inline void
 setup_screen_elements(const ubyte i)
 {
 	jbwm.X.screens[i].screen = i;
@@ -152,7 +154,7 @@ setup_screen_elements(const ubyte i)
 	jbwm.X.screens[i].height = DisplayHeight(D, i);
 }
 
-static void
+static inline void
 setup_gc(const ubyte i)
 {
 	allocate_colors(i);
@@ -187,7 +189,7 @@ setup_display_per_screen(const ubyte i)
 }
 
 #ifdef USE_SHAPE
-static void
+static inline void
 setup_shape(void)
 {
 	int __attribute__((unused)) e_dummy;
@@ -198,7 +200,7 @@ setup_shape(void)
 }
 #endif /* USE_SHAPE */
 
-static void
+static inline void
 setup_screens(void)
 {
 	/* Now set up each screen in turn: jbwm.X.num_screens is used 
@@ -218,7 +220,7 @@ handle_xerror(Display * dpy __attribute__((unused)), XErrorEvent * e)
         return 0; // Ignore everything else.         
 }
 
-static void
+static inline void
 setup_display(void)
 {
 	if(!(D=XOpenDisplay(NULL)))

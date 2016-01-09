@@ -16,7 +16,7 @@ snap_client(Client * c);
 #endif//USE_SNAP
 
 __attribute__((hot))
-static inline void
+static void
 draw_outline(Client * c)
 {
 	assert(c);
@@ -36,9 +36,10 @@ draw_outline(Client * c)
 	XDrawRectangle(D, r, s->gc, d.x, d.y, d.width, d.height);
 }
 
-static inline void
+static void
 recalculate_sweep(Client * c, Position p1, Position p2)
 {
+	LOG("recalculate_sweep");
 	assert(c);
 	c->size.width = abs(p1.x - p2.x);
 	c->size.height = abs(p1.y - p2.y);
@@ -78,6 +79,7 @@ handle_motion_notify(Client * c, XSizeHints * g, XMotionEvent * mev)
 void
 sweep(Client * c)
 {
+	LOG("sweep");
 	assert(c);
 	/* Resizing shaded windows yields undefined behavior.  */
 	if(!grab_pointer(c->screen->root, jbwm.X.cursor) 
@@ -110,7 +112,7 @@ sweep_loop:
 
 //__attribute__((const,hot))
 __attribute__((hot))
-static inline void
+static void
 sborder(int *xy, const int border)
 {
 	if(abs(*xy+border)<JBWM_SNAP)
@@ -130,7 +132,7 @@ snap_client_to_screen_border(Client * c)
 }
 
 __attribute__((const,hot))
-static inline int 
+static int 
 absmin(const int a, const int b)
 {
 	return abs(a)<abs(b)?a:b;
@@ -153,11 +155,10 @@ snap_dim(int *cxy, int *cwh, int *cixy, int *ciwh,
 static void
 snap_client(Client * c)
 {
+	XLOG("snap_client");
 	assert(c);
 #define S JBWM_SNAP
 	snap_client_to_screen_border(c);
-	//if(snap_client_to_screen_border(c))
-	//	return;
 	// Snap to other windows:
 	XSizeHints *g = &(c->size);
 	Position d = {S, S};
@@ -168,18 +169,15 @@ snap_client(Client * c)
 		if(ci != c && (ci->screen == c->screen)
 			&& (ci->vdesk == c->vdesk))
 		{
-			const ubyte border = c->border;
-
+			const ubyte b = c->border;
 			if((gi->y - g->height - g->y <= S)
 				&& (g->y - gi->height - gi->y <= S))
 				d.x = snap_dim(&(g->x), &(g->width),
-					&(gi->x), &(gi->width),
-					border, S);
+					&(gi->x), &(gi->width), b, S);
 			if((gi->x - g->width - g->x <= S)
 				&& (g->x - gi->width - gi->x <= S))
 				d.y = snap_dim(&(g->y), &(g->height),
-					&(gi->y), &(gi->height),
-					border, S);
+					&(gi->y), &(gi->height), b, S);
 		}
 	}
 	if(abs(d.x) < S)
@@ -189,7 +187,7 @@ snap_client(Client * c)
 }
 #endif /* USE_SNAP */
 
-static inline void
+static void
 drag_motion(Client * c, XEvent ev, int x1, int y1, int old_cx,
 	int old_cy)
 {
@@ -207,30 +205,19 @@ drag_motion(Client * c, XEvent ev, int x1, int y1, int old_cx,
 }
 
 static void
-drag_event_loop(Client * c, int x1, int y1, int old_cx, int old_cy)
+drag_event_loop(Client * c, const int x1, int y1, const int oldx, const int oldy)
 {
 	XEvent ev;
+#ifdef USE_TBAR
+	y1+=c->flags&JB_CLIENT_NO_TB?TDIM:0;
+#endif//USE_TBAR
 drag_loop:
 	XMaskEvent(D, MouseMask, &ev);
-#ifdef USE_TBAR
-	const bool no_tb=c->flags&JB_CLIENT_NO_TB;
-#endif//USE_TBAR
 	if(ev.type == MotionNotify)
-	{
-#ifdef USE_TBAR
-		const int ny=y1+(no_tb?TDIM:0);
-#else//!USE_TBAR
-		const int ny=y1;
-#endif//USE_TBAR
-		drag_motion(c, ev, x1, ny, old_cx, old_cy);
-	}
+		drag_motion(c, ev, x1, y1, oldx, oldy);
 	else
 	{
 		XUngrabPointer(D, CurrentTime);
-#ifdef USE_TBAR
-		if(no_tb)
-			c->size.y+=TDIM;
-#endif//USE_TBAR
 		moveresize(c);
 		return;
 	}
@@ -238,83 +225,60 @@ drag_loop:
 }
 
 void
-get_mouse_position(Window w, int *x, int *y)
+get_mouse_position(Window w, Position *p)
 {
-	/* Dummy variables to satisfy required arguments.  */
-	int __attribute__((unused)) d;
-	unsigned int __attribute__((unused)) u;
-
-	XQueryPointer(D, w, &w, &w, x, y, &d, &d, &u);
+	XQueryPointer(D, w, &w, &w, &p->x, &p->y, 
+		(int*)&w, (int*)&w, (unsigned int*)&w);
 }
 
 void
 drag(Client * c)
 {
-	LOG("drag()");
+	LOG("drag");
 	assert(c);
-	if((c->flags & JB_CLIENT_NO_RESIZE) && !(c->flags & JB_CLIENT_TEAROFF))
+	const Window root=c->screen->root;
+	if(((c->flags & JB_CLIENT_NO_RESIZE) && !(c->flags & JB_CLIENT_TEAROFF))
+		|| !grab_pointer(root, jbwm.X.cursor))
 	{
-		LOG("NO_RESIZE or TEAROFF!");
+		LOG("NO_RESIZE, TEAROFF, or mouse grab failed");
 		return;
 	}
-	const Window root=c->screen->root;
-	if(!grab_pointer(root, jbwm.X.cursor))
-		return;
 	XSizeHints *g=&(c->size);
-	Position old_p;
-	old_p.x = g->x;
-	old_p.y = g->y;
+	Position old_p={.x=g->x, .y=g->y};
 	Position p;
-	get_mouse_position(root, &(p.x), &(p.y));
+	get_mouse_position(root, &p);
 	drag_event_loop(c, p.x, p.y, old_p.x, old_p.y);
 }
 
 void
 moveresize(Client * c)
 {
+	LOG("moveresize");
 	assert(c);
+	const uint32_t f=c->flags;
+	const bool shaped=f&JB_CLIENT_SHAPED;
+	const bool no_tb=f&JB_CLIENT_NO_TB;
+	const bool maximized=f&JB_CLIENT_MAXIMIZED;
+	const ubyte offset=(shaped||no_tb||maximized)?0:TDIM;
+	const ubyte b = c->border;
 #ifdef USE_SNAP
-	snap_client(c);
+	if(!shaped) // Buggy if shaped
+		snap_client_to_screen_border(c);
 #endif//USE_SNAP
 	XSizeHints *g = &(c->size);
-	const ubyte b = c->border;
-#ifdef USE_TBAR
-	const bool max = c->flags & JB_CLIENT_MAXIMIZED;
-	const unsigned int parent_height = g->height + (max?0:TDIM);
-	const short y = g->y-b-(max?0:TDIM);
-#else//!USE_TBAR
-	const unsigned int parent_height = g->height;
-	const short y = g->y-b;
-#endif//USE_TBAR
-	const unsigned short width = g->width;
-	const short x = g->x-b;
-#if 0
-	if(c->flags & JB_CLIENT_SHADED)
-	{
-		XMoveWindow(D, c->parent, x, y);
-		return;
-	}
-#endif//0
-	/* Offset the child window within the parent window
-	 to display titlebar */
-	bool no_offset=(c->flags&JB_CLIENT_MAXIMIZED)
-		||(c->flags&JB_CLIENT_NO_TB) || (c->flags&JB_CLIENT_SHAPED);
+	XRectangle d={.x=g->x-b, .y=g->y-b-offset, .width=g->width, 
+		.height=g->height+offset};
+	XMoveResizeWindow(D, c->parent, d.x, d.y, d.width, d.height);
 	/* The modifier to width enables correct display of the right-hand
 	 edge of shaped windows.  */
-	XMoveResizeWindow(D, c->parent, x, y, width+(no_offset?1:0), 
-		parent_height);
-#ifndef USE_TBAR
-	no_offset=true;
-#endif//USE_TBAR
-	XMoveResizeWindow(D, c->window, 0, no_offset ? 0 : TDIM, 
-		width, g->height);
+	XMoveResizeWindow(D, c->window, 0, offset, d.width-(shaped?4:0), g->height);
 	configure(c);
 #ifdef USE_TBAR
 	/* Only update the titlebar if the width has changed.  */
-	if(!no_offset && (g->width != c->exposed_width))
+	if(offset && (d.width != c->exposed_width))
 		update_titlebar(c);
 	/* Store width value for above test.  */
-	c->exposed_width = width;
+	c->exposed_width = d.width;
 #endif//USE_TBAR
 #ifdef USE_SHAPE
 	set_shape(c);
@@ -324,7 +288,7 @@ moveresize(Client * c)
 void
 maximize(Client * c)
 {
-	LOG("maximize()");
+	LOG("maximize");
 	assert(c);
 	// Honor !MWM_FUNC_MAXIMIZE
 	if(c->flags & JB_CLIENT_NO_MAX)
@@ -361,16 +325,12 @@ maximize(Client * c)
 	}
 	moveresize(c);
 	XRaiseWindow(D, c->parent);
-#if 0
-#ifdef USE_SHAPE
-	set_shape(c);
-#endif//USE_SHAPE
-#endif//0
 }
 
 void
 hide(Client * c)
 {
+	LOG("hide");
 	assert(c);
 	/* This will generate an unmap event.  Tell event handler
 	 * to ignore it.  */
@@ -382,6 +342,7 @@ hide(Client * c)
 void
 unhide(Client * c)
 {
+	LOG("unhide");
 	assert(c);
 	XMapWindow(D, c->parent);
 	set_wm_state(c, NormalState);
@@ -390,6 +351,7 @@ unhide(Client * c)
 ubyte
 switch_vdesk(ScreenInfo * s, const ubyte v)
 {
+	LOG("switch_vdesk");
 	assert(s);
 	if(v==s->vdesk || v>DESKTOPS) return s->vdesk;
 	for(Client *c=jbwm.head; c; c=c->next)
