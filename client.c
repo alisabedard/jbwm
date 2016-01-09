@@ -12,14 +12,14 @@ shade(Client * c)
 	LOG("shade");
 	assert(c);
 	// Honor !MWM_FUNC_MINIMIZE
-	if(c->flags & JB_CLIENT_NO_MIN)
+	if(c->flags & JB_NO_MIN)
 		return;
         /* This implements window shading, a substitute 
            for iconification.  */
-        if(c->flags & JB_CLIENT_SHADED)
+        if(c->flags & JB_SHADED)
         { // Unshade
                 c->size.height=c->shade_height;
-                c->flags &= ~JB_CLIENT_SHADED;
+                c->flags &= ~JB_SHADED;
                 XMapWindow(D, c->window);
                 moveresize(c);
 		set_wm_state(c, NormalState);
@@ -32,8 +32,8 @@ shade(Client * c)
                 c->shade_height = c->size.height;
                 c->ignore_unmap++;
                 XUnmapWindow(D, c->window);
-                c->size.height=1;
-                c->flags |= JB_CLIENT_SHADED;
+                c->size.height=0;
+                c->flags |= JB_SHADED;
 		set_wm_state(c, IconicState);
 #ifdef EWMH
 		ewmh_add_state(c->window, ewmh.WM_STATE_SHADED);
@@ -99,11 +99,11 @@ select_client(Client * c)
 	{
 		XSetWindowBorder(D, jbwm.current->parent,
 			jbwm.current->screen->bg.pixel);
-		jbwm.current->flags &= ~JB_CLIENT_ACTIVE;
+		jbwm.current->flags &= ~JB_ACTIVE;
 	}
 	if(c)
 	{
-		c->flags |= JB_CLIENT_ACTIVE;
+		c->flags |= JB_ACTIVE;
 		XSetWindowBorder(D, c->parent, !is_sticky(c) 
 			? c->screen->fg.pixel : c->screen->fc.pixel);
 #ifdef USE_CMAP
@@ -125,6 +125,9 @@ stick(Client * c)
 	c->vdesk=c->screen->vdesk;
 	toggle_sticky(c);
 	select_client(c);
+#ifdef USE_TBAR
+	update_titlebar(c);
+#endif//USE_TBAR
 }
 
 static inline void
@@ -155,7 +158,7 @@ void
 remove_client(Client * c)
 {
 	LOG("remove_client");
-	if(c->flags&JB_CLIENT_REMOVE)
+	if(c->flags&JB_REMOVE)
 	{
 #ifdef EWMH
 		XDeleteProperty(D, c->window, ewmh.WM_DESKTOP);
@@ -197,7 +200,7 @@ set_shape(Client * c)
 	XLOG("set_shape");
 	/* Validate inputs:  Make sure that the SHAPE extension is available, 
 		and make sure that C is initialized.  */
-	if(jbwm.X.have_shape && c && (c->flags & JB_CLIENT_SHAPED))
+	if(jbwm.X.have_shape && c && (c->flags & JB_SHAPED))
 	{
 		const byte x=1,y=1;
 		XShapeCombineShape(D, c->parent, ShapeBounding, x, y, 

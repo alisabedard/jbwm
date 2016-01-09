@@ -76,24 +76,24 @@ handle_mwm_hints(Client * c)
 		if(f & MWM_DECOR_ALL)
 			goto mwm_decor_all;
 		if(!(f & MWM_DECOR_BORDER))
-			c->flags|=JB_CLIENT_NO_BORDER;
+			c->flags|=JB_NO_BORDER;
 		if(!(f & MWM_DECOR_RESIZEH))
-			c->flags|=JB_CLIENT_NO_RESIZE_DECOR;
+			c->flags|=JB_NO_RESIZE_DECOR;
 		if(!(f & MWM_DECOR_TITLE))
-			c->flags|=JB_CLIENT_NO_TB;
+			c->flags|=JB_NO_TB;
 		if(!(f & MWM_DECOR_MENU))
-			c->flags|=JB_CLIENT_NO_CLOSE_DECOR;
+			c->flags|=JB_NO_CLOSE_DECOR;
 		if(!(f & MWM_DECOR_MINIMIZE))
-			c->flags|=JB_CLIENT_NO_MIN_DECOR;
+			c->flags|=JB_NO_MIN_DECOR;
 		if(!(f & MWM_DECOR_MAXIMIZE))
-			c->flags|=JB_CLIENT_NO_MAX_DECOR;
+			c->flags|=JB_NO_MAX_DECOR;
 	}
 	if(m->flags & MWM_HINTS_STATUS)
 	{
 		LOG("MWM_HINTS_STATUS");
 		f=m->status;
 		if(f & MWM_TEAROFF_WINDOW)
-			c->flags|=JB_CLIENT_TEAROFF;
+			c->flags|=JB_TEAROFF;
 	}
 	if(m->flags & MWM_HINTS_FUNCTIONS)
 	{
@@ -102,32 +102,32 @@ handle_mwm_hints(Client * c)
 		if(f & MWM_FUNC_ALL)
 			goto mwm_func_all;
                 if(!(f & MWM_FUNC_RESIZE))
-                        c->flags|=JB_CLIENT_NO_RESIZE|JB_CLIENT_NO_RESIZE_DECOR;
+                        c->flags|=JB_NO_RESIZE|JB_NO_RESIZE_DECOR;
                 if(!(f & MWM_FUNC_RESIZE))
-                        c->flags|=JB_CLIENT_NO_MOVE;
+                        c->flags|=JB_NO_MOVE;
                 if(!(f & MWM_FUNC_CLOSE))
-                        c->flags|=JB_CLIENT_NO_CLOSE|JB_CLIENT_NO_CLOSE_DECOR;
+                        c->flags|=JB_NO_CLOSE|JB_NO_CLOSE_DECOR;
                 if(!(f & MWM_FUNC_MINIMIZE))
-                        c->flags|=JB_CLIENT_NO_MIN|JB_CLIENT_NO_MIN_DECOR;
+                        c->flags|=JB_NO_MIN|JB_NO_MIN_DECOR;
                 if(!(f & MWM_FUNC_MAXIMIZE))
-                        c->flags|=JB_CLIENT_NO_MAX|JB_CLIENT_NO_MAX_DECOR;
+                        c->flags|=JB_NO_MAX|JB_NO_MAX_DECOR;
 	}
 	if(m->flags & MWM_HINTS_INPUT_MODE)
 	{
 		LOG("MWM_HINTS_INPUT_MODE");
 		if(m->input_mode)
-			c->flags|=JB_CLIENT_MODAL;
+			c->flags|=JB_MODAL;
 	}
 mwm_decor_all:
 mwm_func_all:
 	XFree(m);
-	if(c->flags&JB_CLIENT_NO_BORDER)
+	if(c->flags&JB_NO_BORDER)
 		c->border=0;
-	if(c->flags&JB_CLIENT_TEAROFF)
+	if(c->flags&JB_TEAROFF)
 	{
 		c->border=0;
-		c->flags|=JB_CLIENT_NO_RESIZE|JB_CLIENT_NO_MIN
-			|JB_CLIENT_NO_MAX;
+		c->flags|=JB_NO_RESIZE|JB_NO_MIN
+			|JB_NO_MAX;
 	}
 }
 #endif//MWM
@@ -252,7 +252,7 @@ reparent(Client *c)
 	{
 		LOG("Window %d is shaped", (int)c->window);
 		c->border=0;
-		c->flags |= JB_CLIENT_NO_TB | JB_CLIENT_SHAPED;
+		c->flags |= JB_NO_TB | JB_SHAPED;
 	}
 #endif//USE_SHAPE
 	const unsigned long vm= CWOverrideRedirect | CWEventMask;
@@ -290,7 +290,7 @@ void
 make_new_client(Window w, ScreenInfo * s)
 {
 	Client *c=Client_new(w, s);
-	if(c->flags & JB_CLIENT_DONT_MANAGE)
+	if(c->flags & JB_DONT_MANAGE)
 		return;
 	long mask=EnterWindowMask|PropertyChangeMask;
 #ifdef USE_CMAP

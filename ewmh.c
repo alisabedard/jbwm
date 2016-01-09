@@ -226,7 +226,7 @@ fullscreen_cb(XClientMessageEvent *e __attribute__((unused)), bool add,
 {
 	if(!data) return;
 	Client *c=data;
-	const bool is_max=c->flags&JB_CLIENT_MAXIMIZED;
+	const bool is_max=c->flags&JB_MAXIMIZED;
 	if((add && !is_max) || (!add && is_max))
 		maximize(c);
 }

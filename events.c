@@ -23,7 +23,7 @@ cleanup()
 	for(Client *c = jbwm.head; c; c = i)
 	{
 		i = c->next;
-		if(c->flags & JB_CLIENT_REMOVE)
+		if(c->flags & JB_REMOVE)
 			remove_client(c);
 		if(!i)
 			return;
@@ -39,7 +39,7 @@ handle_unmap_event(XUnmapEvent * e)
 	if(c->ignore_unmap<1)
 	{
 		LOG("!c->ignore_unmap");
-		c->flags |= JB_CLIENT_REMOVE;
+		c->flags |= JB_REMOVE;
 		jbwm.need_cleanup=true;
 	}
 	else c->ignore_unmap--;

@@ -20,7 +20,7 @@ static void
 draw_outline(Client * c)
 {
 	assert(c);
-	if((c->flags & JB_CLIENT_NO_TB) || !c->border)
+	if((c->flags & JB_NO_TB) || !c->border)
 	{
 		moveresize(c);
 		return;
@@ -61,7 +61,7 @@ handle_motion_notify(Client * c, XSizeHints * g, XMotionEvent * mev)
 	Position p1={.x=g->x, .y=g->y};
 	Position p2={.x=mev->x, .y=mev->y};
 #ifdef USE_SHAPE
-	const bool s=(c->flags&JB_CLIENT_SHAPED);
+	const bool s=(c->flags&JB_SHAPED);
 	if(!s)
 		draw_outline(c); //clear
 	recalculate_sweep(c, p1, p2);
@@ -83,12 +83,12 @@ sweep(Client * c)
 	assert(c);
 	/* Resizing shaded windows yields undefined behavior.  */
 	if(!grab_pointer(c->screen->root, jbwm.X.cursor) 
-		|| c->flags & JB_CLIENT_NO_RESIZE 
-		|| c->flags & JB_CLIENT_SHADED)
+		|| c->flags & JB_NO_RESIZE 
+		|| c->flags & JB_SHADED)
 		return;
 	XSizeHints *g=&(c->size);
 #ifdef USE_SHAPE
-	if(c->flags & JB_CLIENT_SHAPED) // Bugfix for offset issue
+	if(c->flags & JB_SHAPED) // Bugfix for offset issue
 		g->height+=TDIM;
 #endif//USE_SHAPE
 	XWarpPointer(D, None, c->window, 0, 0, 0, 0, g->width-1, g->height-1);
@@ -127,7 +127,7 @@ snap_client_to_screen_border(Client * c)
 	const ubyte b = c->border;
 	sborder(&g->x, -b);
 	sborder(&g->x, g->width - c->screen->width + 2*b);
-	sborder(&g->y, -b-((c->flags&JB_CLIENT_NO_TB)?0:TDIM));
+	sborder(&g->y, -b-((c->flags&JB_NO_TB)?0:TDIM));
 	sborder(&g->y, g->height + 2*b - c->screen->height);
 }
 
@@ -199,7 +199,7 @@ drag_motion(Client * c, XEvent ev, int x1, int y1, int old_cx,
 #endif//USE_SNAP
 	XMoveWindow(D, c->parent, g->x, g->y
 #ifdef USE_TBAR
-		-(!(c->flags&JB_CLIENT_NO_TB)?TDIM:0)
+		-(!(c->flags&JB_NO_TB)?TDIM:0)
 #endif//USE_TBAR
 		);
 }
@@ -209,7 +209,7 @@ drag_event_loop(Client * c, const int x1, int y1, const int oldx, const int oldy
 {
 	XEvent ev;
 #ifdef USE_TBAR
-	y1+=c->flags&JB_CLIENT_NO_TB?TDIM:0;
+	y1+=c->flags&JB_NO_TB?TDIM:0;
 #endif//USE_TBAR
 drag_loop:
 	XMaskEvent(D, MouseMask, &ev);
@@ -237,7 +237,7 @@ drag(Client * c)
 	LOG("drag");
 	assert(c);
 	const Window root=c->screen->root;
-	if(((c->flags & JB_CLIENT_NO_RESIZE) && !(c->flags & JB_CLIENT_TEAROFF))
+	if(((c->flags & JB_NO_RESIZE) && !(c->flags & JB_TEAROFF))
 		|| !grab_pointer(root, jbwm.X.cursor))
 	{
 		LOG("NO_RESIZE, TEAROFF, or mouse grab failed");
@@ -256,9 +256,9 @@ moveresize(Client * c)
 	LOG("moveresize");
 	assert(c);
 	const uint32_t f=c->flags;
-	const bool shaped=f&JB_CLIENT_SHAPED;
-	const bool no_tb=f&JB_CLIENT_NO_TB;
-	const bool maximized=f&JB_CLIENT_MAXIMIZED;
+	const bool shaped=f&JB_SHAPED;
+	const bool no_tb=f&JB_NO_TB;
+	const bool maximized=f&JB_MAXIMIZED;
 	const ubyte offset=(shaped||no_tb||maximized)?0:TDIM;
 	const ubyte b = c->border;
 #ifdef USE_SNAP
@@ -291,18 +291,18 @@ maximize(Client * c)
 	LOG("maximize");
 	assert(c);
 	// Honor !MWM_FUNC_MAXIMIZE
-	if(c->flags & JB_CLIENT_NO_MAX)
+	if(c->flags & JB_NO_MAX)
 		return;
 #ifdef  USE_SHAPE
 	// Currently buggy, so return.
-	if(c->flags & JB_CLIENT_SHAPED)
+	if(c->flags & JB_SHAPED)
 		return;
 #endif//USE_SHAPE
 	XSizeHints *g = &(c->size);
-	if(c->flags & JB_CLIENT_MAXIMIZED) // restore:
+	if(c->flags & JB_MAXIMIZED) // restore:
 	{
 		memcpy(g, &(c->old_size), sizeof(XSizeHints));
-		c->flags &= ~ JB_CLIENT_MAXIMIZED;
+		c->flags &= ~ JB_MAXIMIZED;
 #ifdef EWMH
 		ewmh_remove_state(c->window, ewmh.WM_STATE_FULLSCREEN);
 		ewmh_remove_state(c->window, ewmh.WM_STATE_MAXIMIZED_HORZ);
@@ -316,7 +316,7 @@ maximize(Client * c)
 		ScreenInfo *s = c->screen;
 		g->width = s->width;
 		g->height = s->height;
-		c->flags |= JB_CLIENT_MAXIMIZED;
+		c->flags |= JB_MAXIMIZED;
 #ifdef EWMH
 		ewmh_add_state(c->window, ewmh.WM_STATE_FULLSCREEN);
 		ewmh_add_state(c->window, ewmh.WM_STATE_MAXIMIZED_HORZ);

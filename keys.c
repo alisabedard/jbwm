@@ -17,12 +17,12 @@ static void
 keymv(Client * c, XKeyEvent * e, int *xy, int *wh, const byte sign)
 {
 	/* These operations invalid when maximized.  */
-	if(c->flags & JB_CLIENT_MAXIMIZED) return;
+	if(c->flags & JB_MAXIMIZED) return;
 	const byte d=sign*JBWM_RESIZE_INCREMENT;
 	if((e->state & jbwm.keymasks.mod) && (*wh > 0))
 	{
 #ifdef USE_SHAPE
-		if(c->flags&JB_CLIENT_SHAPED)
+		if(c->flags&JB_SHAPED)
 			goto move;
 #endif//USE_SHAPE
 		*wh += d;

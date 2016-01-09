@@ -20,23 +20,23 @@ button1_event(XButtonEvent * e
 	if((p.x < TDIM) && (p.y < TDIM)) // Close button
 	{
 		// Honor !MWM_FUNC_CLOSE
-		if(c->flags & JB_CLIENT_NO_CLOSE)
+		if(c->flags & JB_NO_CLOSE)
 			goto drag;
 		/* This fixes a bug where deleting a shaded window will cause
 		   the parent window to stick around as a ghost window. */
-		if(c->flags&JB_CLIENT_SHADED)
+		if(c->flags&JB_SHADED)
 			shade(c);		
 		send_wm_delete(c);
 	}
 	if(p.x > width - TDIM) // Resize button
 	{
-		if(c->flags & JB_CLIENT_NO_RESIZE)
+		if(c->flags & JB_NO_RESIZE)
 			goto drag;
 		sweep(c);	
 	}
 	else if(p.x > width - TDIM - TDIM && p.y < TDIM) // Shade button
 	{
-		if(c->flags & JB_CLIENT_NO_MIN)
+		if(c->flags & JB_NO_MIN)
 			goto drag;
 		shade(c);
 	}
@@ -53,7 +53,7 @@ jbwm_handle_button_event(XButtonEvent * e)
 	// Return if invalid event.  
 	if(!c) return;
 	/* Move/Resize operations invalid on maximized windows.  */
-	if(c->flags & JB_CLIENT_MAXIMIZED) return;
+	if(c->flags & JB_MAXIMIZED) return;
 	switch (e->button)
 	{
 	case Button1:
@@ -68,7 +68,7 @@ jbwm_handle_button_event(XButtonEvent * e)
 		   users especially, where it is difficult
 		   to register a middle button press, even
 		   with X Emulate3Buttons enabled.  */
-		if(c->flags&JB_CLIENT_SHADED)
+		if(c->flags&JB_SHADED)
 			drag(c);
 		else
 			sweep(c);

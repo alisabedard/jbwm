@@ -5,9 +5,9 @@
 #define S DefaultScreen(D)
 #define CM DefaultColormap(D, S)
 void
-free_color(XColor c)
+free_color(XColor *c)
 {
-	XFreeColors(D, CM, &c.pixel, 1, AllPlanes);
+	XFreeColors(D, CM, &c->pixel, 1, AllPlanes);
 }
 
 XColor
@@ -19,19 +19,19 @@ jbwm_color(const char *name)
 }
 
 GC
-jbwm_new_gc(XColor color)
+jbwm_new_gc(XColor *color)
 {
-	XGCValues values={.foreground=color.pixel};
+	XGCValues values={.foreground=color->pixel};
 	return XCreateGC(D, jbwm.X.screens->root, GCForeground, &values);
 }
 
 void
-draw(Window w, XRectangle *g, const char *color)
+draw_rectangle(Window w, XRectangle *g, const char *color)
 {
 	XColor c=jbwm_color(color);
-	GC gc=jbwm_new_gc(c);
+	GC gc=jbwm_new_gc(&c);
 	XFillRectangle(D, w, gc, g->x, g->y, g->width, g->height);
 	XFreeGC(D, gc);
-	free_color(c);
+	free_color(&c);
 }
 

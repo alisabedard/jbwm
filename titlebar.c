@@ -9,10 +9,10 @@
 static void
 new_titlebar(Client *c)
 {
-	if(c->flags&JB_CLIENT_NO_TB)
+	if(c->flags&JB_NO_TB)
 		return;
 #ifdef USE_SHAPE
-	if(c->flags&JB_CLIENT_SHAPED)
+	if(c->flags&JB_SHAPED)
 		return;
 #endif /* USE_SHAPE */
 	const Window w = c->titlebar = XCreateSimpleWindow(D, c->parent, 0, 0, 
@@ -20,7 +20,7 @@ new_titlebar(Client *c)
 	XSelectInput(D, w, ExposureMask);
 	XColor color=jbwm_color(TITLEBAR_BG);
 	XSetWindowBackground(D, w, color.pixel);
-	free_color(color);
+	free_color(&color);
 	XMapRaised(D, w);
 	jbwm_grab_button(w, 0, AnyButton);
 }
@@ -57,53 +57,61 @@ draw_title(Client * c, char *name)
 #ifdef USE_XFT
 	draw_xft(c, &p, name, l);
 #else//!USE_XFT
-	XFontStruct *f=jbwm.X.font;
-	XGCValues v={.font=f->fid, .foreground=c->screen->fg.pixel};
 	const Window w = c->titlebar;
-	GC gc=XCreateGC(D, w, GCFont | GCForeground, &v);
+	GC gc=jbwm_new_gc(&c->screen->fg);
+	XGCValues v={.font=jbwm.X.font->fid};
+	XChangeGC(D, gc, GCFont, &v);
 	XDrawString(D, w, gc, p.x, p.y, name, l);
 	XFreeGC(D, gc);
 #endif//USE_XFT
 	XFree(name);
 }
 
-static inline void
-draw_close(const uint32_t f, const Window t, XRectangle *g)
+static void
+draw(const Window t, const int x, const char *color)
 {
-	if(!(f&JB_CLIENT_NO_CLOSE_DECOR))
-		draw(t, g, TITLEBAR_CLOSE_BG);
+	XRectangle g={.x=x, .y=0, .width=TDIM, .height=TDIM};
+	draw_rectangle(t, &g, color);
 }
 
 static inline void
-draw_shade(const uint32_t f, const Window t, XRectangle *g)
+draw_close(const uint32_t f, const Window t)
 {
-	if(!(f&JB_CLIENT_NO_MIN_DECOR))
-		draw(t, g, TITLEBAR_SHADE_BG);
+	if(!(f&JB_NO_CLOSE_DECOR))
+		draw(t, 0, TITLEBAR_CLOSE_BG);
 }
 
 static inline void
-draw_resize(const uint32_t f, const Window t, XRectangle *g)
+draw_shade(const uint32_t f, const Window t, const int x)
 {
-	if(!(f&JB_CLIENT_NO_MIN_DECOR))
-		draw(t, g, TITLEBAR_RESIZE_BG);
+	if(!(f&JB_NO_MIN_DECOR))
+		draw(t, x, TITLEBAR_SHADE_BG);
+}
+
+static inline void
+draw_resize(const uint32_t f, const Window t, const int x)
+{
+	if(!(f&JB_NO_MIN_DECOR))
+		draw(t, x, TITLEBAR_RESIZE_BG);
+}
+
+static inline int
+tboffset(const int w, const int n)
+{
+	return w-n*TDIM;
 }
 
 static void
 draw_titlebar(Client * c, char *name)
 {
-	const unsigned short width = c->size.width;
-	const unsigned short resize_offset = width - TDIM;
-	const unsigned short shade_offset = resize_offset - TDIM;
-	XRectangle g={.x=0,.y=0,.width=TDIM,.height=TDIM};
+	const unsigned short w = c->size.width;
 	const Window t=c->titlebar;
 	XClearWindow(D, t);
 	const uint32_t f=c->flags;
-	draw_close(f, t, &g);
-	g.x=shade_offset;
-	draw_shade(f, t, &g);
-	g.x=resize_offset;
-	draw_resize(f, t, &g);
-	if(!(c->flags&JB_CLIENT_TEAROFF))
+	draw_close(f, t);
+	draw_resize(f, t, tboffset(w, 1));
+	draw_shade(f, t, tboffset(w, 2));
+	if(!(c->flags&JB_TEAROFF))
 		draw_title(c, name);
 }
 
@@ -111,13 +119,13 @@ void
 update_titlebar(Client * c)
 {
 	assert(c);
-	if(c->flags & JB_CLIENT_NO_TB)
+	if(c->flags & JB_NO_TB)
 		return;
 #ifdef USE_SHAPE
-	if(c->flags & JB_CLIENT_SHAPED)
+	if(c->flags & JB_SHAPED)
 		return;
 #endif//USE_SHAPE
-	if(c->flags & JB_CLIENT_MAXIMIZED)
+	if(c->flags & JB_MAXIMIZED)
 	{
 		/* May generate BadWindow on subsequent invocations,
 		   however the error handler makes such irrelevant.  */

@@ -9,9 +9,8 @@ typedef struct ScreenInfo
 	Window supporting;
 #endif//EWMH
 	GC gc;
-	XColor fg, bg;
+	XColor fg, bg, fc;
 	ubyte vdesk;
-	XColor fc;
 	char *display;
 	unsigned short width, height;
 } ScreenInfo;
