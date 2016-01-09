@@ -1,12 +1,16 @@
 #CC = clang
 #CC=/opt/diet/bin/diet -Os gcc
-
 # Compile for minimum size
-CFLAGS=-Os
+#CFLAGS=-Os
 # Compile for current machine
 #CFLAGS+=-march=native
+# Tuning
+#CFLAGS+=-fomit-frame-pointer -pipe -flto
+# No optimizatio
+CFLAGS=-O0
 # Debug
-#CFLAGS=-O0 -ggdb -DDEBUG -DSTDIO
+#CFLAGS=-O0 -ggdb 
+#CFLAGS+=-DDEBUG -DSTDIO
 # Profile
 #CFLAGS+=-pg
 # Enable all warnings

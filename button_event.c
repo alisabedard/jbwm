@@ -17,31 +17,24 @@ button1_event(XButtonEvent * e
 #ifdef USE_TBAR
 	const Position p={.x=e->x,.y=e->y};
 	const int width = c->size.width;
-	if((p.x < TDIM) && (p.y < TDIM)) // Close button
+	const uint32_t f=c->flags;
+	if(!(f&JB_NO_CLOSE) && (p.x < TDIM) && (p.y < TDIM)) // Close button
 	{
-		// Honor !MWM_FUNC_CLOSE
-		if(c->flags & JB_NO_CLOSE)
-			goto drag;
 		/* This fixes a bug where deleting a shaded window will cause
 		   the parent window to stick around as a ghost window. */
 		if(c->flags&JB_SHADED)
 			shade(c);		
 		send_wm_delete(c);
 	}
-	if(p.x > width - TDIM) // Resize button
+	else if(!(f&JB_NO_RESIZE) && (p.x > width - TDIM)) // Resize button
 	{
-		if(c->flags & JB_NO_RESIZE)
-			goto drag;
 		sweep(c);	
 	}
-	else if(p.x > width - TDIM - TDIM && p.y < TDIM) // Shade button
-	{
-		if(c->flags & JB_NO_MIN)
-			goto drag;
+	else if(!(f&JB_NO_MIN) && (p.x > width - TDIM - TDIM && p.y < TDIM))
+	{ // Shade button
 		shade(c);
 	}
 	else // Handle
-drag:
 #endif//USE_TBAR
 		drag(c); // Move the window
 }

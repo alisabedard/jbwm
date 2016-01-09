@@ -136,7 +136,7 @@ setup_clients(const ubyte i)
 {
 	unsigned int nwins;
 	Window *wins;
-	Window d __attribute__((unused));
+	Window d;
 	if(XQueryTree(D, jbwm.X.screens[i].root, &d, &d, &wins, 
 		&nwins)==0) return;
 	for(unsigned int j = 0; j < nwins; j++) 

@@ -50,10 +50,9 @@ draw_xft(Client *c, const Position *p, char *name, const size_t l)
 static void
 draw_title(Client * c, char *name)
 {
-	if(!name) // Nothing to display
-		return;
+	assert(name);
 	const size_t l = strlen(name);
-	const Position p = {.x=TDIM+8, .y=jbwm.X.font->ascent-JBWM_BORDER};
+	const Position p = {.x=TDIM+4, .y=jbwm.X.font->ascent-JBWM_BORDER};
 #ifdef USE_XFT
 	draw_xft(c, &p, name, l);
 #else//!USE_XFT
@@ -143,7 +142,7 @@ update_titlebar(Client * c)
 	/* Expand/Contract the titlebar width as necessary:  */
 	XMoveResizeWindow(D, c->titlebar, 0, 0, c->size.width, TDIM);
 	XTextProperty p;
-	XGetTextProperty(D, c->window, &p, XA_WM_NAME);
-	draw_titlebar(c, (char *)p.value);
+	if(XGetWMName(D, c->window, &p))
+		draw_titlebar(c, (char *)p.value);
 }
 

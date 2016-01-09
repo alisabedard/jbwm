@@ -11,7 +11,6 @@ typedef struct ScreenInfo
 	GC gc;
 	XColor fg, bg, fc;
 	ubyte vdesk;
-	char *display;
 	unsigned short width, height;
 } ScreenInfo;
 
