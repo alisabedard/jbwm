@@ -82,9 +82,10 @@ sweep(Client * c)
 	LOG("sweep");
 	assert(c);
 	/* Resizing shaded windows yields undefined behavior.  */
-	if(!grab_pointer(c->screen->root, jbwm.X.cursor) 
-		|| c->flags & JB_NO_RESIZE 
-		|| c->flags & JB_SHADED)
+	const uint32_t f=c->flags;
+	if(f&JB_NO_RESIZE||f&JB_SHADED)
+		return;
+	if(!grab_pointer(c->screen->root, jbwm.X.cursor))
 		return;
 	XSizeHints *g=&(c->size);
 #ifdef USE_SHAPE
@@ -236,13 +237,11 @@ drag(Client * c)
 {
 	LOG("drag");
 	assert(c);
-	const Window root=c->screen->root;
-	if(((c->flags & JB_NO_RESIZE) && !(c->flags & JB_TEAROFF))
-		|| !grab_pointer(root, jbwm.X.cursor))
-	{
-		LOG("NO_RESIZE, TEAROFF, or mouse grab failed");
+	if(c->flags & JB_NO_MOVE)
 		return;
-	}
+	const Window root=c->screen->root;
+	if(!grab_pointer(root, jbwm.X.cursor))
+		return;
 	XSizeHints *g=&(c->size);
 	Position old_p={.x=g->x, .y=g->y};
 	Position p;

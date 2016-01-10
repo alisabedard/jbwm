@@ -103,7 +103,7 @@ handle_mwm_hints(Client * c)
 			goto mwm_func_all;
                 if(!(f & MWM_FUNC_RESIZE))
                         c->flags|=JB_NO_RESIZE|JB_NO_RESIZE_DECOR;
-                if(!(f & MWM_FUNC_RESIZE))
+                if(!(f & MWM_FUNC_MOVE))
                         c->flags|=JB_NO_MOVE;
                 if(!(f & MWM_FUNC_CLOSE))
                         c->flags|=JB_NO_CLOSE|JB_NO_CLOSE_DECOR;
