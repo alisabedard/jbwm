@@ -270,7 +270,7 @@ moveresize(Client * c)
 	XMoveResizeWindow(D, c->parent, d.x, d.y, d.width, d.height);
 	/* The modifier to width enables correct display of the right-hand
 	 edge of shaped windows.  */
-	XMoveResizeWindow(D, c->window, 0, offset, d.width-(shaped?4:0), g->height);
+	XMoveResizeWindow(D, c->window, 0, offset, d.width, g->height);
 	configure(c);
 #ifdef USE_TBAR
 	/* Only update the titlebar if the width has changed.  */

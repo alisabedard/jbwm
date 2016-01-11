@@ -202,8 +202,7 @@ set_shape(Client * c)
 		and make sure that C is initialized.  */
 	if(jbwm.X.have_shape && c && (c->flags & JB_SHAPED))
 	{
-		const byte x=1,y=1;
-		XShapeCombineShape(D, c->parent, ShapeBounding, x, y, 
+		XShapeCombineShape(D, c->parent, ShapeBounding, 0, 0, 
 			c->window, ShapeBounding, ShapeSet);
 		return true;
 	}
