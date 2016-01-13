@@ -272,7 +272,7 @@ handle_configure_request(XConfigureRequestEvent * e)
 	else 
 	{
                 LOG("XConfigureWindow(window=%lx, value_mask=%lx)", 
-			(unsigned int)e->window, e->value_mask);
+			(long unsigned int)e->window, e->value_mask);
                 XConfigureWindow(D, e->window, e->value_mask, &wc);
         }
 }

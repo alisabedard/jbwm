@@ -41,11 +41,9 @@ struct Client
 	int ignore_unmap;
 	ubyte border;
 	uint32_t flags;
+	int win_gravity_hint;
 
 	// Optional fields:
-#ifdef EWMH
-	int win_gravity_hint;
-#endif//EWMH
 #ifdef USE_CMAP
 	Colormap cmap;
 #endif//USE_CMAP
