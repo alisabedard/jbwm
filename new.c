@@ -148,7 +148,7 @@ init_size(Client * c, XWindowAttributes * attr)
 		&& (dim[1] >= c->size.min_height))
 		set_size(c, dim[0], dim[1]);
 	else
-		set_size(c, c->size.base_width, c->size.base_height);
+		set_size(c, c->size.min_width, c->size.min_height);
 }
 
 static void
@@ -160,7 +160,6 @@ init_position(Client * c, XWindowAttributes * attr)
 	const bool a=(attr->map_state==IsViewable) || (g->flags & USPosition);
 	g->x=a?attr->x:p.x;
 	g->y=a?attr->y:p.y;
-	configure(c);
 }
 
 #ifdef EWMH
@@ -305,6 +304,6 @@ make_new_client(Window w, ScreenInfo * s)
 	jbwm_grab_button(w, jbwm.keymasks.grab, AnyButton);
 #ifdef EWMH
 	set_ewmh_allowed_actions(w);
-#endif//EWMH	
+#endif//EWMH
 }
 

@@ -6,7 +6,6 @@ CFLAGS+=-fomit-frame-pointer -pipe -flto
 CFLAGS+=-W -Wall -Wextra
 
 # Uncomment to disable everything for minimal configuration 
-CFLAGS=-Os
 DEFINES=-DNDEBUG
 EXTRASRCS=
 EXTRALIBS=

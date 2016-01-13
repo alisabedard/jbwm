@@ -1,4 +1,4 @@
-version = 1.39
+version = 1.40
 
 PROG=jbwm
 distname = $(PROG)-$(version)

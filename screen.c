@@ -33,7 +33,7 @@ draw_outline(Client * c)
 	d.y-=TDIM;
 	d.height+=TDIM;
 #endif//USE_TBAR
-	XDrawRectangle(D, r, s->gc, d.x, d.y, d.width, d.height);
+	XDrawRectangles(D, r, s->gc, &d, 1);
 }
 
 static void
@@ -45,6 +45,7 @@ recalculate_sweep(Client * c, Position p1, Position p2)
 	c->size.height = abs(p1.y - p2.y);
 	c->size.x = p1.x;
 	c->size.y = p1.y;
+	configure(c);
 }
 
 static bool
@@ -94,6 +95,7 @@ sweep(Client * c)
 #endif//USE_SHAPE
 	XWarpPointer(D, None, c->window, 0, 0, 0, 0, g->width-1, g->height-1);
 	XEvent ev;
+	XGrabServer(D);
 sweep_loop:	
 	XMaskEvent(D, MouseMask, &ev);
 	switch (ev.type)
@@ -102,6 +104,7 @@ sweep_loop:
 		handle_motion_notify(c, g, &(ev.xmotion));
 		break;
 	case ButtonRelease:
+		XUngrabServer(D);
 		XUngrabPointer(D, CurrentTime);
 		moveresize(c);
 		return;
@@ -203,6 +206,10 @@ drag_motion(Client * c, XEvent ev, int x1, int y1, int old_cx,
 		-(!(c->flags&JB_NO_TB)?TDIM:0)
 #endif//USE_TBAR
 		);
+//	configure(c);
+	XConfigureEvent ce={.type=ConfigureNotify, .event=c->window, 
+		.x=g->x, .y=g->y, .width=g->width, .height=g->height};
+	XSendEvent(D, c->window, true, StructureNotifyMask, (XEvent *)&ce);
 }
 
 static void
@@ -212,6 +219,7 @@ drag_event_loop(Client * c, const int x1, int y1, const int oldx, const int oldy
 #ifdef USE_TBAR
 	y1+=c->flags&JB_NO_TB?TDIM:0;
 #endif//USE_TBAR
+	XGrabServer(D);
 drag_loop:
 	XMaskEvent(D, MouseMask, &ev);
 	if(ev.type == MotionNotify)
@@ -220,6 +228,7 @@ drag_loop:
 	{
 		XUngrabPointer(D, CurrentTime);
 		moveresize(c);
+		XUngrabServer(D);
 		return;
 	}
 	goto drag_loop;
@@ -254,27 +263,34 @@ moveresize(Client * c)
 {
 	LOG("moveresize");
 	assert(c);
+	XSizeHints *g = &(c->size);
+#ifdef USE_TBAR
 	const uint32_t f=c->flags;
-	const bool shaped=f&JB_SHAPED;
-	const bool no_tb=f&JB_NO_TB;
-	const bool maximized=f&JB_MAXIMIZED;
-	const ubyte offset=(shaped||no_tb||maximized)?0:TDIM;
-	const ubyte b = c->border;
+	bool no_offset=f&JB_MAXIMIZED||f&JB_NO_TB;
+#ifdef USE_SHAPE
+	no_offset|=f&JB_SHAPED;
+#endif//USE_SHAPE
+	const ubyte offset=no_offset?0:TDIM;
 #ifdef USE_SNAP
-	if(!shaped) // Buggy if shaped
+#ifdef USE_SHAPE
+	if(!(f&JB_SHAPED)) // Buggy if shaped
+#endif//USE_SHAPE
 		snap_client_to_screen_border(c);
 #endif//USE_SNAP
-	XSizeHints *g = &(c->size);
+#else//!USE_TBAR
+#define offset 0
+#endif//USE_TBAR
+	const ubyte b=c->border;
 	XRectangle d={.x=g->x-b, .y=g->y-b-offset, .width=g->width, 
 		.height=g->height+offset};
 	XMoveResizeWindow(D, c->parent, d.x, d.y, d.width, d.height);
 	/* The modifier to width enables correct display of the right-hand
 	 edge of shaped windows.  */
 	XMoveResizeWindow(D, c->window, 0, offset, d.width, g->height);
-	configure(c);
 #ifdef USE_TBAR
-	/* Only update the titlebar if the width has changed.  */
-	if(offset && (d.width != c->exposed_width))
+	/* Only update the titlebar if the width has changed or if the
+	 titlebar must be removed */
+	if(no_offset || (d.width != c->exposed_width))
 		update_titlebar(c);
 	/* Store width value for above test.  */
 	c->exposed_width = d.width;
@@ -307,6 +323,7 @@ maximize(Client * c)
 		ewmh_remove_state(c->window, ewmh.WM_STATE_MAXIMIZED_HORZ);
 		ewmh_remove_state(c->window, ewmh.WM_STATE_MAXIMIZED_VERT);
 #endif//EWMH
+		XSetWindowBorderWidth(D, c->parent, c->border);
 	}
 	else // maximize:
 	{
@@ -321,6 +338,7 @@ maximize(Client * c)
 		ewmh_add_state(c->window, ewmh.WM_STATE_MAXIMIZED_HORZ);
 		ewmh_add_state(c->window, ewmh.WM_STATE_MAXIMIZED_VERT);
 #endif//EWMH
+		XSetWindowBorderWidth(D, c->parent, 0);
 	}
 	moveresize(c);
 	XRaiseWindow(D, c->parent);

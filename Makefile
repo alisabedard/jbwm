@@ -19,7 +19,7 @@ DEFINES += -DUSE_SHAPE
 EXTRALIBS += -lXext # Required for SHAPE extension
 
 # Titlebar Xft support:
-include xft.mk
+#include xft.mk
 
 # Uncomment to enable colormap support
 # Saves 600 bytes

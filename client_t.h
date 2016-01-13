@@ -17,6 +17,7 @@ struct Client
 	ubyte vdesk;
 	int ignore_unmap;
 	ubyte border;
+	XConfigureEvent ce;
 
 #define JB_STICKY 		1
 #define JB_REMOVE		(1<<1)
