@@ -1,12 +1,9 @@
-/*
- * jbwm - Restructuring, optimization, and feature fork
- *        Copyright 2007-2016, Jeffrey E. Bedard <jefbed@gmail.com>
- * evilwm - Minimalist Window Manager for X Copyright (C) 1999-2006 Ciaran
- * Anscomb <jbwm@6809.org.uk> see README for license and other details.
- */
+// jbwm - Minimalist Window Manager for X
+// Copyright 2008-2016, Jeffrey E. Bedard <jefbed@gmail.com> 
+// Copyright 1999-2015, Ciaran Anscomb <jbwm@6809.org.uk>
+// See README for license and other details.
+
 #include "jbwm.h"
-#include <string.h>
-#include "screen.h"
 
 #define MouseMask (ButtonPressMask|ButtonReleaseMask|PointerMotionMask)
 
@@ -45,7 +42,9 @@ recalculate_sweep(Client * c, Position p1, Position p2)
 	c->size.height = abs(p1.y - p2.y);
 	c->size.x = p1.x;
 	c->size.y = p1.y;
-	configure(c);
+	XConfigureEvent ce={.type=ConfigureNotify, .event=c->window, .x=p1.x, 
+		.y=p1.y, .width=c->size.width, .height=c->size.height};
+	XSendEvent(D, c->window, true, StructureNotifyMask, (XEvent *)&ce);
 }
 
 static bool
@@ -206,7 +205,6 @@ drag_motion(Client * c, XEvent ev, int x1, int y1, int old_cx,
 		-(!(c->flags&JB_NO_TB)?TDIM:0)
 #endif//USE_TBAR
 		);
-//	configure(c);
 	XConfigureEvent ce={.type=ConfigureNotify, .event=c->window, 
 		.x=g->x, .y=g->y, .width=g->width, .height=g->height};
 	XSendEvent(D, c->window, true, StructureNotifyMask, (XEvent *)&ce);

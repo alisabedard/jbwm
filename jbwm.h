@@ -1,11 +1,25 @@
-
+// jbwm - Minimalist Window Manager for X
+// Copyright 2008-2016, Jeffrey E. Bedard <jefbed@gmail.com> 
+// Copyright 1999-2015, Ciaran Anscomb <jbwm@6809.org.uk>
+// See README for license and other details.
 #ifndef JBWM_H
 #define JBWM_H
 
-#include <stdlib.h>
-#include <stdbool.h>
-#include <assert.h>
+// Common types:
+typedef char byte;
+typedef unsigned char ubyte;
 
+// Standard Library:
+#include <assert.h>
+#include <signal.h>
+#include <stdbool.h>
+#include <stdlib.h>
+#include <string.h>
+#include <sys/wait.h>
+#include <unistd.h>
+
+// X11:
+#include <X11/cursorfont.h>
 #include <X11/X.h>
 #include <X11/Xatom.h>
 #include <X11/Xlib.h>
@@ -15,39 +29,38 @@
 #include <X11/extensions/shape.h>
 #endif /* USE_SHAPE */
 
+// Xft:
 #ifdef USE_XFT
 #include <X11/Xft/Xft.h>
 #endif
 
-typedef char byte;
-typedef unsigned char ubyte;
-
+// JBWM:
 #include "ScreenInfo.h"
 #include "client_t.h"
 #include "jbwmenv.h"
-#include "jbwmmod.h"
+#include "config.h"
+#include "keys.h"
+#include "screen.h"
+#include "client.h"
+#include "new.h"
+#include "events.h"
+#include "graphics.h"
+#include "button_event.h"
+#include "atoms.h"
+#include "screen.h"
+#include "log.h"
 
-#ifdef MWM
-/* Required for interpreting MWM hints: */
-#define _XA_MWM_HINTS           "_MOTIF_WM_HINTS"
-#define PROP_MWM_HINTS_ELEMENTS 3
-#define MWM_HINTS_DECORATIONS   (1L << 1)
-#define MWM_DECOR_ALL           (1L << 0)
-#define MWM_DECOR_BORDER        (1L << 1)
-typedef struct
-{
-	unsigned long flags;
-	unsigned long functions;
-	unsigned long decorations;
-} PropMwmHints;
-#endif//MWM
-
-void 
-jbwm_grab_button(Window w, unsigned int mask, unsigned int button);
+// Optional modules:
+#ifdef USE_TBAR
+#include "titlebar.h"
+#endif//USE_TBAR 
 
 #ifdef EWMH
-void
-set_ewmh_allowed_actions(const Window w);
+#include "ewmh.h"
 #endif//EWMH
+
+// jbwm.c:
+void 
+jbwm_grab_button(Window w, unsigned int mask, unsigned int button);
 
 #endif /* not JBWM_JBWM_H */

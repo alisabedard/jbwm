@@ -1,10 +1,8 @@
-/*
- * jbwm - Minimalist Window Manager for X Copyright (C) 1999-2006 Ciaran
- * Anscomb <jbwm@6809.org.uk> see README for license and other details.
- */
+// jbwm - Minimalist Window Manager for X
+// Copyright 2008-2016, Jeffrey E. Bedard <jefbed@gmail.com> 
+// Copyright 1999-2015, Ciaran Anscomb <jbwm@6809.org.uk>
+// See README for license and other details.
 
-#include <stdlib.h>
-#include <string.h>
 #include "jbwm.h"
 
 #if defined(EWMH) || defined(MWM)
@@ -133,22 +131,20 @@ mwm_func_all:
 #endif//MWM
 
 static void
-set_size(Client * c, const unsigned int width, const unsigned int height)
-{
-	c->size.width = width;
-	c->size.height = height;
-	configure(c);
-}
-
-static void
 init_size(Client * c, XWindowAttributes * attr)
 {
 	const int dim[]={attr->width, attr->height};
 	if((dim[0] >= c->size.min_width)
 		&& (dim[1] >= c->size.min_height))
-		set_size(c, dim[0], dim[1]);
+	{
+		c->size.width=dim[0];
+		c->size.height=dim[1];
+	}
 	else
-		set_size(c, c->size.min_width, c->size.min_height);
+	{
+		c->size.width=c->size.min_width;
+		c->size.height=c->size.min_height;
+	}
 }
 
 static void

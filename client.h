@@ -1,4 +1,8 @@
-/* jbwm, Copyright 2016 Jeffrey E. Bedard */
+// jbwm - Minimalist Window Manager for X
+// Copyright 2008-2016, Jeffrey E. Bedard <jefbed@gmail.com> 
+// Copyright 1999-2015, Ciaran Anscomb <jbwm@6809.org.uk>
+// See README for license and other details.
+
 #ifndef JBWM_CLIENT_H
 #define JBWM_CLIENT_H
 
@@ -7,9 +11,6 @@ shade(Client *c);
 
 void
 client_to_vdesk(Client *c, const ubyte d);
-
-void
-configure(Client *c);
 
 void 
 xmsg(Window w, Atom a, long x);

@@ -1,23 +1,12 @@
+// jbwm - Minimalist Window Manager for X
+// Copyright 2008-2016, Jeffrey E. Bedard <jefbed@gmail.com> 
+// Copyright 1999-2015, Ciaran Anscomb <jbwm@6809.org.uk>
+// See README for license and other details.
 
 #ifndef JBWM_CLIENT_STRUCT_H
 #define JBWM_CLIENT_STRUCT_H
 
 #include <stdint.h>
-
-/* client structure */
-
-typedef struct Client Client; 
-struct Client
-{
-	Client *next;
-	Window window;
-	Window parent;
-	ScreenInfo *screen;
-	XSizeHints size, old_size;
-	ubyte vdesk;
-	int ignore_unmap;
-	ubyte border;
-	XConfigureEvent ce;
 
 #define JB_STICKY 		1
 #define JB_REMOVE		(1<<1)
@@ -33,12 +22,24 @@ struct Client
 #define JB_NO_CLOSE		(1<<11)
 #define JB_NO_MAX		(1<<12)
 #define JB_NO_MOVE		(1<<13)
-#define JB_MODAL			(1<<14)
+#define JB_MODAL		(1<<14)
 #define JB_SHAPED		(1<<15)
 #define JB_NO_RESIZE_DECOR	(1<<16)
 #define JB_NO_CLOSE_DECOR	(1<<17)
 #define JB_NO_MIN_DECOR		(1<<18)
 #define JB_NO_MAX_DECOR		(1<<19)
+
+typedef struct Client Client; 
+struct Client
+{
+	Client *next;
+	Window window;
+	Window parent;
+	ScreenInfo *screen;
+	XSizeHints size, old_size;
+	ubyte vdesk;
+	int ignore_unmap;
+	ubyte border;
 	uint32_t flags;
 
 	// Optional fields:

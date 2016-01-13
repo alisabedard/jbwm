@@ -1,8 +1,7 @@
-/* Copyright 2007-2016, Jeffrey E. Bedard */
-/*
- * This file is ment to hold configuration values and to resolve
- * configuration dependencies.
- */
+// jbwm - Minimalist Window Manager for X
+// Copyright 2008-2016, Jeffrey E. Bedard <jefbed@gmail.com> 
+// Copyright 1999-2015, Ciaran Anscomb <jbwm@6809.org.uk>
+// See README for license and other details.
 
 #ifndef JBWM_CONFIG_H
 #define JBWM_CONFIG_H

@@ -1,8 +1,8 @@
-/* jbwm - Minimalist Window Manager for X
- * Copyright (C) 1999-2006 Ciaran Anscomb <jbwm@6809.org.uk>
- * see README for license and other details. */
+// jbwm - Minimalist Window Manager for X
+// Copyright 2008-2016, Jeffrey E. Bedard <jefbed@gmail.com> 
+// Copyright 1999-2015, Ciaran Anscomb <jbwm@6809.org.uk>
+// See README for license and other details.
 
-#include <stdlib.h>
 #include "jbwm.h"
 
 static ScreenInfo *
@@ -243,8 +243,10 @@ do_window_changes(int value_mask, XWindowChanges *wc, Client *c, int gravity)
         wc->border_width = c->border;
         XConfigureWindow(D, c->parent, value_mask, wc);
         XMoveResizeWindow(D, c->window, 0, 0, c->size.width, c->size.height);
+#if 0
        if ((value_mask & (CWX|CWY)) && !(value_mask & (CWWidth|CWHeight))) 
                 configure(c);
+#endif//0
 }
 
 static void

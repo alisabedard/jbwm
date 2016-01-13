@@ -1,7 +1,7 @@
-/*
- * jbwm - Minimalist Window Manager for X Copyright (C) 1999-2006 Ciaran
- * Anscomb <jbwm@6809.org.uk> see README for license and other details.
- */
+// jbwm - Minimalist Window Manager for X
+// Copyright 2008-2016, Jeffrey E. Bedard <jefbed@gmail.com> 
+// Copyright 1999-2015, Ciaran Anscomb <jbwm@6809.org.uk>
+// See README for license and other details.
 
 #include "jbwm.h"
 
@@ -50,39 +50,6 @@ client_to_vdesk(Client *c, const ubyte d)
 	assert(c);
 	c->vdesk=d;
         c->vdesk=switch_vdesk(c->screen, d);
-}
-
-void
-configure(Client *c)
-{
-//#if 0 // FIXME: Is this function necessary?	
-	XLOG("configure");
-	assert(c);
-	XSizeHints *g=&(c->size);
-#if 0
-	if(!g->width||!g->height)
-		return;
-#endif
-	XConfigureEvent *e=&(c->ce);
-	e->type=ConfigureNotify;
-	e->border_width=0;
-	e->above=None;
-	e->override_redirect=false;
-	e->x=g->x;
-	e->x=g->x;
-	e->width=g->width;
-	e->height=g->height;
-	const Window w=c->window;
-	e->event=w;
-	XSendEvent(D, w, false, StructureNotifyMask, (XEvent *)&(c->ce));
-#if 0
-	XConfigureEvent e={.x=g->x, .y=g->y, .width=g->width, 
-		.height=g->height, .event=w};
-	if((e.width==0)||(e.height==0))
-		return;
-	XSendEvent(D, w, false, StructureNotifyMask, (XEvent *)&e);
-#endif
-//#endif
 }
 
 /*
