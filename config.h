@@ -26,8 +26,7 @@
 /* Default colors */
 #define DEF_FG          	"#eef"
 #define DEF_FC          	"#7a7"
-#define DEF_BG          	"#779"
-#define TITLEBAR_BG		"#111"
+#define DEF_BG          	"#222"
 #define TITLEBAR_CLOSE_BG	"#977"
 #define TITLEBAR_SHADE_BG	"#797"
 #define TITLEBAR_RESIZE_BG	"#779"

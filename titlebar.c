@@ -5,6 +5,27 @@
 #include "jbwm.h"
 
 static void
+setup_gcs(const Window w)
+{
+	XColor c=jbwm_color(TITLEBAR_CLOSE_BG);
+	XGCValues v;
+	v.foreground=c.pixel;
+	jbwm.gc.close=XCreateGC(D, w, GCForeground, &v);
+	c=jbwm_color(TITLEBAR_SHADE_BG);
+	v.foreground=c.pixel;
+	jbwm.gc.shade=XCreateGC(D, w, GCForeground, &v);
+	c=jbwm_color(TITLEBAR_RESIZE_BG);
+	v.foreground=c.pixel;
+	jbwm.gc.resize=XCreateGC(D, w, GCForeground, &v);
+	jbwm.gc.tb_initialized=true;
+#ifndef USE_XFT
+	v.font=jbwm.X.font->fid;
+	v.function=GXinvert;
+	jbwm.gc.handle=XCreateGC(D, w, GCFont|GCFunction, &v);
+#endif//USE_XFT
+}
+
+static void
 new_titlebar(Client *c)
 {
 	if(c->flags&JB_NO_TB)
@@ -15,10 +36,10 @@ new_titlebar(Client *c)
 #endif /* USE_SHAPE */
 	const Window w = c->titlebar = XCreateSimpleWindow(D, c->parent, 0, 0, 
 		c->size.width, TDIM, 0, 0, 0); 
+	if(!jbwm.gc.tb_initialized)
+		setup_gcs(w);
 	XSelectInput(D, w, ExposureMask);
-	XColor color=jbwm_color(TITLEBAR_BG);
-	XSetWindowBackground(D, w, color.pixel);
-	free_color(&color);
+	XSetWindowBackground(D, w, c->screen->bg.pixel);
 	XMapRaised(D, w);
 	jbwm_grab_button(w, 0, AnyButton);
 }
@@ -45,6 +66,8 @@ draw_xft(Client *c, const Position *p, char *name, const size_t l)
 }
 #endif//USE_XFT
 
+GC tbgc;
+
 static void
 draw_title(Client * c, char *name)
 {
@@ -54,42 +77,36 @@ draw_title(Client * c, char *name)
 #ifdef USE_XFT
 	draw_xft(c, &p, name, l);
 #else//!USE_XFT
-	const Window w = c->titlebar;
-	GC gc=jbwm_new_gc(&c->screen->fg);
-	XGCValues v={.font=jbwm.X.font->fid};
-	XChangeGC(D, gc, GCFont, &v);
-	XDrawString(D, w, gc, p.x, p.y, name, l);
-	XFreeGC(D, gc);
+	XDrawString(D, c->titlebar, jbwm.gc.handle, p.x, p.y, name, l);
 #endif//USE_XFT
 	XFree(name);
 }
 
 static void
-draw(const Window t, const int x, const char *color)
+draw(const Window t, GC gc, const int x)
 {
-	XRectangle g={.x=x, .y=0, .width=TDIM, .height=TDIM};
-	draw_rectangle(t, &g, color);
+	XFillRectangle(D, t, gc, x, 0, TDIM, TDIM);
 }
 
 static inline void
 draw_close(const uint32_t f, const Window t)
 {
 	if(!(f&JB_NO_CLOSE_DECOR))
-		draw(t, 0, TITLEBAR_CLOSE_BG);
+		draw(t, jbwm.gc.close, 0);
 }
 
 static inline void
 draw_shade(const uint32_t f, const Window t, const int x)
 {
 	if(!(f&JB_NO_MIN_DECOR))
-		draw(t, x, TITLEBAR_SHADE_BG);
+		draw(t, jbwm.gc.shade, x);
 }
 
 static inline void
 draw_resize(const uint32_t f, const Window t, const int x)
 {
 	if(!(f&JB_NO_MIN_DECOR))
-		draw(t, x, TITLEBAR_RESIZE_BG);
+		draw(t, jbwm.gc.resize, x);
 }
 
 static inline int

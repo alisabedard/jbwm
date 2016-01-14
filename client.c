@@ -164,7 +164,7 @@ remove_client(Client * c)
 void
 xmsg(Window w, Atom a, long x)
 {
-	LOG("xmsg");
+	XLOG("xmsg");
 	XEvent ev = {.xclient.type=ClientMessage, .xclient.window=w, 
 		.xclient.message_type=a, .xclient.format=32, 
 		.xclient.data.l[0]=x, .xclient.data.l[1]=CurrentTime};

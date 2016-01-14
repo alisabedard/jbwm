@@ -12,6 +12,16 @@ typedef struct
 	{
 		unsigned int grab, mod;
 	} keymasks;
+#ifdef USE_TBAR
+	struct
+	{
+		bool tb_initialized;
+#ifndef USE_XFT
+		GC handle;
+#endif//!USE_XFT
+		GC close, shade, resize;
+	} gc;
+#endif//USE_TBAR
 	struct
 	{
 		/* Commonly used X information */

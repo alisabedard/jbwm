@@ -314,13 +314,11 @@ maximize(Client * c)
 	// Honor !MWM_FUNC_MAXIMIZE
 	if(c->flags & JB_NO_MAX)
 		return;
-#if 0
 #ifdef  USE_SHAPE
 	// Currently buggy, so return.
 	if(c->flags & JB_SHAPED)
 		return;
 #endif//USE_SHAPE
-#endif
 	XSizeHints *g = &(c->size);
 	if(c->flags & JB_MAXIMIZED) // restore:
 	{

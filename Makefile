@@ -14,7 +14,7 @@ CFLAGS+=-fomit-frame-pointer -pipe -flto
 # Debug
 #CFLAGS=-O0 -ggdb -DDEBUG -DSTDIO -pg -Werror
 # Enable all warnings
-#CFLAGS+=-W -Wall -Wextra
+CFLAGS+=-W -Wall -Wextra
 
 # Comment out to enable assertions
 #DEFINES += -DNDEBUG
