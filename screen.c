@@ -181,12 +181,16 @@ snap_client(Client * c)
 		const ubyte b = c->border;
 		if((gi->y - g->height - g->y <= s) 
 			&& (g->y - gi->height - gi->y <= s))
+		{
 			d.x = snap_dim(&(g->x), &(g->width), &(gi->x), 
 				&(gi->width), b, s);
+		}
 		if((gi->x - g->width - g->x <= s) 
 			&& (g->x - gi->width - gi->x <= s))
+		{
 			d.y = snap_dim(&(g->y), &(g->height), &(gi->y), 
 				&(gi->height), b, s);
+		}
 	}
 	if(abs(d.x) < s)
 		g->x += d.x;
@@ -196,12 +200,11 @@ snap_client(Client * c)
 #endif /* USE_SNAP */
 
 static void
-drag_motion(Client * c, XEvent ev, int x1, int y1, int old_cx,
-	int old_cy)
+drag_motion(Client * c, XEvent ev, const Position p, const Position oldp)
 {
 	XSizeHints *g=&(c->size);
-	g->x = old_cx + (ev.xmotion.x - x1);
-	g->y = old_cy + (ev.xmotion.y - y1);
+	g->x = oldp.x + (ev.xmotion.x - p.x);
+	g->y = oldp.y + (ev.xmotion.y - p.y);
 #ifdef USE_SNAP
 	snap_client(c);
 #endif//USE_SNAP
@@ -216,17 +219,17 @@ drag_motion(Client * c, XEvent ev, int x1, int y1, int old_cx,
 }
 
 static void
-drag_event_loop(Client * c, const int x1, int y1, const int oldx, const int oldy)
+drag_event_loop(Client * c, Position p, const Position oldp)
 {
 	XEvent ev;
 #ifdef USE_TBAR
-	y1+=c->flags&JB_NO_TB?TDIM:0;
+	p.y+=c->flags&JB_NO_TB?TDIM:0;
 #endif//USE_TBAR
 	XGrabServer(D);
 drag_loop:
 	XMaskEvent(D, MouseMask, &ev);
 	if(ev.type == MotionNotify)
-		drag_motion(c, ev, x1, y1, oldx, oldy);
+		drag_motion(c, ev, p, oldp);
 	else
 	{
 		XUngrabPointer(D, CurrentTime);
@@ -255,10 +258,10 @@ drag(Client * c)
 	if(!grab_pointer(root, jbwm.X.cursor))
 		return;
 	XSizeHints *g=&(c->size);
-	Position old_p={.x=g->x, .y=g->y};
+	Position oldp={.x=g->x, .y=g->y};
 	Position p;
 	get_mouse_position(root, &p);
-	drag_event_loop(c, p.x, p.y, old_p.x, old_p.y);
+	drag_event_loop(c, p, oldp);
 }
 
 void
