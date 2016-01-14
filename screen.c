@@ -154,10 +154,12 @@ snap_dim(int *cxy, int *cwh, int *cixy, int *ciwh,
 	const ubyte border, const ubyte snap)
 {
 	int d = snap;
-
-	d = absmin(d, *cixy + *ciwh - *cxy + 2 * border);
+	const ubyte b=2*border;
+	//d = absmin(d, *cixy + *ciwh - *cxy + 2 * border);
+	d = absmin(d, *cixy + *ciwh - *cxy+b);
 	d = absmin(d, *cixy + *ciwh - *cxy - *cwh);
-	d = absmin(d, *cixy - *cxy - *cwh - 2 * border);
+	//d = absmin(d, *cixy - *cxy - *cwh - 2 * border);
+	d = absmin(d, *cixy - *cxy - *cwh-b);
 	d = absmin(d, *cixy - *cxy);
 
 	return d;
@@ -168,32 +170,29 @@ snap_client(Client * c)
 {
 	XLOG("snap_client");
 	assert(c);
-#define S JBWM_SNAP
 	snap_client_to_screen_border(c);
 	// Snap to other windows:
 	XSizeHints *g = &(c->size);
-	Position d = {S, S};
+	const ubyte s=JBWM_SNAP;
+	Position d = {s, s};
 	for(Client *ci = jbwm.head; ci; ci = ci->next)
 	{
+		if((ci==c)||(ci->screen!=c->screen)||(ci->vdesk!=c->vdesk))
+			continue;
 		XSizeHints *gi = &(ci->size);
-
-		if(ci != c && (ci->screen == c->screen)
-			&& (ci->vdesk == c->vdesk))
-		{
-			const ubyte b = c->border;
-			if((gi->y - g->height - g->y <= S)
-				&& (g->y - gi->height - gi->y <= S))
-				d.x = snap_dim(&(g->x), &(g->width),
-					&(gi->x), &(gi->width), b, S);
-			if((gi->x - g->width - g->x <= S)
-				&& (g->x - gi->width - gi->x <= S))
-				d.y = snap_dim(&(g->y), &(g->height),
-					&(gi->y), &(gi->height), b, S);
-		}
+		const ubyte b = c->border;
+		if((gi->y - g->height - g->y <= s) 
+			&& (g->y - gi->height - gi->y <= s))
+			d.x = snap_dim(&(g->x), &(g->width), &(gi->x), 
+				&(gi->width), b, s);
+		if((gi->x - g->width - g->x <= s) 
+			&& (g->x - gi->width - gi->x <= s))
+			d.y = snap_dim(&(g->y), &(g->height), &(gi->y), 
+				&(gi->height), b, s);
 	}
-	if(abs(d.x) < S)
+	if(abs(d.x) < s)
 		g->x += d.x;
-	if(abs(d.y) < S)
+	if(abs(d.y) < s)
 		g->y += d.y;
 }
 #endif /* USE_SNAP */
