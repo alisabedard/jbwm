@@ -151,16 +151,14 @@ absmin(const int a, const int b)
 
 static int
 snap_dim(int *cxy, int *cwh, int *cixy, int *ciwh, 
-	const ubyte border, const ubyte snap)
+	const ubyte border, int d)
 {
-	int d = snap;
-	const ubyte b=2*border;
-	//d = absmin(d, *cixy + *ciwh - *cxy + 2 * border);
-	d = absmin(d, *cixy + *ciwh - *cxy+b);
-	d = absmin(d, *cixy + *ciwh - *cxy - *cwh);
-	//d = absmin(d, *cixy - *cxy - *cwh - 2 * border);
-	d = absmin(d, *cixy - *cxy - *cwh-b);
-	d = absmin(d, *cixy - *cxy);
+	int s=*cixy+*ciwh;
+	d = absmin(d, s - *cxy+border);
+	d = absmin(d, s - *cxy - *cwh);
+	s=*cixy-*cxy;
+	d = absmin(d, s - *cwh-border);
+	d = absmin(d, s);
 
 	return d;
 }
