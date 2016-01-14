@@ -89,11 +89,16 @@ sweep(Client * c)
 		return;
 	XSizeHints *g=&(c->size);
 #ifdef USE_SHAPE
-	if(c->flags & JB_SHAPED) // Bugfix for offset issue
+	const bool shaped=f&JB_SHAPED;
+	if(shaped) // Bugfix for offset issue
 		g->height+=TDIM;
 #endif//USE_SHAPE
 	XWarpPointer(D, None, c->window, 0, 0, 0, 0, g->width-1, g->height-1);
 	XEvent ev;
+#ifdef USE_SHAPE
+	if(shaped)
+		goto sweep_loop;
+#endif//USE_SHAPE
 	XGrabServer(D);
 sweep_loop:	
 	XMaskEvent(D, MouseMask, &ev);
@@ -103,6 +108,9 @@ sweep_loop:
 		handle_motion_notify(c, g, &(ev.xmotion));
 		break;
 	case ButtonRelease:
+#ifdef USE_SHAPE
+		if(!shaped)
+#endif//USE_SHAPE
 		XUngrabServer(D);
 		XUngrabPointer(D, CurrentTime);
 		moveresize(c);
@@ -306,11 +314,13 @@ maximize(Client * c)
 	// Honor !MWM_FUNC_MAXIMIZE
 	if(c->flags & JB_NO_MAX)
 		return;
+#if 0
 #ifdef  USE_SHAPE
 	// Currently buggy, so return.
 	if(c->flags & JB_SHAPED)
 		return;
 #endif//USE_SHAPE
+#endif
 	XSizeHints *g = &(c->size);
 	if(c->flags & JB_MAXIMIZED) // restore:
 	{
