@@ -162,42 +162,15 @@ drag(Client * c)
 }
 
 void
-moveresize(Client * c)
+moveresize(Client *restrict c)
 {
-	LOG("moveresize");
-	assert(c);
-	XSizeHints *g = &(c->size);
-#ifdef USE_TBAR
-	const uint32_t f=c->flags;
-	bool no_offset=f&JB_MAXIMIZED||f&JB_NO_TB;
-#ifdef USE_SHAPE
-	no_offset|=f&JB_SHAPED;
-#endif//USE_SHAPE
-	const uint8_t offset=no_offset?0:TDIM;
-#ifdef USE_SNAP
-#ifdef USE_SHAPE
-	if(!(f&JB_SHAPED)) // Buggy if shaped
-#endif//USE_SHAPE
-		snap_client_to_screen_border(c);
-#endif//USE_SNAP
-#else//!USE_TBAR
-#define offset 0
-#endif//USE_TBAR
-	const uint8_t b=c->border;
-	XRectangle d={.x=g->x-b, .y=g->y-b-offset, .width=g->width, 
-		.height=g->height+offset};
-	XMoveResizeWindow(D, c->parent, d.x, d.y, d.width, d.height);
-	/* The modifier to width enables correct display of the right-hand
-	 edge of shaped windows.  */
-	XMoveResizeWindow(D, c->window, 0, offset, d.width, g->height);
-#ifdef USE_TBAR
-	/* Only update the titlebar if the width has changed or if the
-	 titlebar must be removed */
-	if(no_offset || (d.width != c->exposed_width))
-		update_titlebar(c);
-	/* Store width value for above test.  */
-	c->exposed_width = d.width;
-#endif//USE_TBAR
+	const bool no_tb=c->flags&JB_NO_TB||c->flags&JB_MAXIMIZED;
+	const uint8_t offset=no_tb?0:TDIM;
+	XMoveResizeWindow(D, c->parent, c->size.x, c->size.y-offset, 
+		c->size.width, c->size.height+offset);
+	XMoveResizeWindow(D, c->window, 0, offset, c->size.width, 
+		c->size.height);
+	if(!no_tb) update_titlebar(c);
 #ifdef USE_SHAPE
 	set_shape(c);
 #endif//USE_SHAPE
