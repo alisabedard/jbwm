@@ -130,7 +130,7 @@ setup_clients(const uint8_t i)
 	Window d;
 	if(XQueryTree(D, jbwm.X.screens[i].root, &d, &d, &wins, 
 		&nwins)==0) return;
-	for(unsigned int j = 0; j < nwins; j++) 
+	for(uint8_t j = 0; j < nwins; j++) 
 		setup_each_client(i, j, wins);
 	XFree(wins);
 }
@@ -179,18 +179,6 @@ setup_display_per_screen(const uint8_t i)
 #endif//EWMH
 }
 
-#ifdef USE_SHAPE
-static inline void
-setup_shape(void)
-{
-	int __attribute__((unused)) e_dummy;
-
-	jbwm.X.have_shape =
-		XShapeQueryExtension(D, &jbwm.X.shape_event,
-		&e_dummy);
-}
-#endif /* USE_SHAPE */
-
 static inline void
 setup_screens(void)
 {
@@ -225,9 +213,6 @@ setup_display(void)
 	setup_fonts();
 #endif /* USE_TBAR */
 	jbwm.X.cursor = XCreateFontCursor(D, XC_fleur);
-#ifdef USE_SHAPE
-	setup_shape();
-#endif /* USE_SHAPE */
 	setup_screens();
 }
 

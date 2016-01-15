@@ -243,10 +243,7 @@ do_window_changes(int value_mask, XWindowChanges *wc, Client *c, int gravity)
         wc->border_width = c->border;
         XConfigureWindow(D, c->parent, value_mask, wc);
         XMoveResizeWindow(D, c->window, 0, 0, c->size.width, c->size.height);
-#if 0
-       if ((value_mask & (CWX|CWY)) && !(value_mask & (CWWidth|CWHeight))) 
-                configure(c);
-#endif//0
+	// Note: call to configure() was here.  
 }
 
 static void

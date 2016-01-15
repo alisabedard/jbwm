@@ -36,10 +36,6 @@ typedef struct
 		uint8_t num_screens;
 		ScreenInfo *screens;
 		Cursor cursor;
-#ifdef USE_SHAPE
-		uint8_t have_shape;
-		int shape_event;
-#endif				/* USE_SHAPE */
 	} X;
 	bool need_cleanup;
 	// Client tracking:

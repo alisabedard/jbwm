@@ -89,7 +89,7 @@ ewmh_update_client_list()
 #define MAX_CLIENTS 1024
 	// Prevent data from disappearing after return.
 	static Window wl[MAX_CLIENTS];
-	unsigned short count=0;
+	uint16_t count=0;
 	for(Client *i=jbwm.head; i&&(count<MAX_CLIENTS); i=i->next)
 		wl[count++]=i->window;
 	XPROP(jbwm.X.screens->root, ewmh.CLIENT_LIST, XA_WINDOW, &wl, count);
@@ -168,9 +168,9 @@ check_state(XClientMessageEvent *e, // event data
 		void *)) // user data
 {
 	// 2 atoms can be set at once
-	const bool m1=e->data.l[1]==(long)state;
-	const bool m2=e->data.l[2]==(long)state;
-	if(m1||m2)
+	bool is_set=e->data.l[1]==(long)state;
+	is_set|=e->data.l[2]==(long)state;
+	if(is_set)
 	{
 		const Window w=e->window;
 		switch(e->data.l[0])
@@ -196,19 +196,21 @@ check_state(XClientMessageEvent *e, // event data
 }
 
 static void
-above_cb(XClientMessageEvent *e, bool add, void *data __attribute__((unused)))
+above_cb(XClientMessageEvent *e, const bool add, 
+	void *data __attribute__((unused)))
 {
 	if(add) XRaiseWindow(D, e->window);
 }
 
 static void
-below_cb(XClientMessageEvent *e, bool add, void *data __attribute__((unused)))
+below_cb(XClientMessageEvent *e, const bool add, 
+	void *data __attribute__((unused)))
 {
 	if(add) XLowerWindow(D, e->window);
 }
 
 static void
-skip_pager_cb(XClientMessageEvent *e __attribute__((unused)), bool add, 
+skip_pager_cb(XClientMessageEvent *e __attribute__((unused)), const bool add, 
 	void *data)
 {
 	if(!data) return;
@@ -218,7 +220,7 @@ skip_pager_cb(XClientMessageEvent *e __attribute__((unused)), bool add,
 }
 
 static void
-fullscreen_cb(XClientMessageEvent *e __attribute__((unused)), bool add, 
+fullscreen_cb(XClientMessageEvent *e __attribute__((unused)), const bool add, 
 	void *data)
 {
 	if(!data) return;
@@ -268,13 +270,13 @@ ewmh_client_message(XClientMessageEvent *e)
 	// If something else moves the window:
 	else if(t==ewmh.MOVERESIZE_WINDOW)
 	{
-		int src=(val>>12) & 3;
+		const uint8_t src=(val>>12) & 3;
 		if(src==2)
 		{
 			XWindowChanges wc={.x=e->data.l[1], .y=e->data.l[2],
 				.width=e->data.l[3], .height=e->data.l[4]};
-			int vm=(val>>8)&0x0f;
-			int grav=val&0xff;
+			const int vm=(val>>8)&0x0f;
+			const int grav=val&0xff;
 			do_window_changes(vm, &wc, c, grav);
 		}
 	}

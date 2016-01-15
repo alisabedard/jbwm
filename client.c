@@ -179,14 +179,13 @@ send_wm_delete(Client * c)
 }
 
 #ifdef USE_SHAPE
-
 bool
 set_shape(Client * c)
 {
 	XLOG("set_shape");
 	/* Validate inputs:  Make sure that the SHAPE extension is available, 
 		and make sure that C is initialized.  */
-	if(jbwm.X.have_shape && c && (c->flags & JB_SHAPED))
+	if(c && (c->flags & JB_SHAPED))
 	{
 		XShapeCombineShape(D, c->parent, ShapeBounding, 0, 0, 
 			c->window, ShapeBounding, ShapeSet);
