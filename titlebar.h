@@ -8,11 +8,8 @@
 void 
 update_titlebar(Client * c);
 
+#undef TDIM
 /* Ensure that the title text fits within the titlebar.  */
-#ifdef USE_TBAR
 #define TDIM (jbwm.X.font->ascent+jbwm.X.font->descent)
-#else /* !USE_TBAR */
-#define TDIM 0
-#endif
 
 #endif /* JBWM_TITLEBAR_H */

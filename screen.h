@@ -25,4 +25,8 @@ void grab_keys_for_screen(ScreenInfo * s);
 void maximize(Client * c);
 void get_mouse_position(Window w, Position *p);
 
+#ifndef USE_TBAR
+#define TDIM 0
+#endif//!USE_TBAR
+
 #endif /* JBWM_SCREEN_H */

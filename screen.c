@@ -170,7 +170,9 @@ moveresize(Client *restrict c)
 		c->size.width, c->size.height+offset);
 	XMoveResizeWindow(D, c->window, 0, offset, c->size.width, 
 		c->size.height);
+#ifdef USE_TBAR
 	if(!no_tb) update_titlebar(c);
+#endif//USE_TBAR
 #ifdef USE_SHAPE
 	set_shape(c);
 #endif//USE_SHAPE
