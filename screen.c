@@ -17,20 +17,18 @@ static void
 draw_outline(Client * c)
 {
 	assert(c);
-	if((c->flags & JB_NO_TB) || !c->border)
-	{
-		moveresize(c);
-		return;
-	}
-	ScreenInfo *s=c->screen;
-	const Window r=s->root;
 	XSizeHints *g=&(c->size);
 	XRectangle d={.x=g->x, .y=g->y, .width=g->width, .height=g->height};
-#ifdef USE_TBAR
-	d.y-=TDIM;
-	d.height+=TDIM;
-#endif//USE_TBAR
-	XDrawRectangles(D, r, s->gc, &d, 1);
+	ScreenInfo *s=c->screen;
+	XDrawRectangles(D, s->root, s->gc, &d, 1);
+}
+
+static void
+configure(XSizeHints *g, const Window w)
+{
+	XConfigureEvent ce={.x=g->x, .y=g->y, .width=g->width,
+		.height=g->height, .type=ConfigureNotify, .event=w};
+	XSendEvent(D, w, true, StructureNotifyMask, (XEvent *)&ce);
 }
 
 static void
@@ -42,17 +40,13 @@ recalculate_sweep(Client * c, Position p1, Position p2)
 	c->size.height = abs(p1.y - p2.y);
 	c->size.x = p1.x;
 	c->size.y = p1.y;
-	XConfigureEvent ce={.type=ConfigureNotify, .event=c->window, .x=p1.x, 
-		.y=p1.y, .width=c->size.width, .height=c->size.height};
-	XSendEvent(D, c->window, true, StructureNotifyMask, (XEvent *)&ce);
 }
 
 static bool
 grab_pointer(Window w, Cursor cursor)
 {
-	const int gm=GrabModeAsync;
-	return XGrabPointer(D, w, false, MouseMask, gm, gm, None, 
-		cursor, CurrentTime) == GrabSuccess;
+	return XGrabPointer(D, w, false, MouseMask, GrabModeAsync, 
+		GrabModeAsync, None, cursor, CurrentTime) == GrabSuccess;
 }
 
 static void
@@ -60,20 +54,13 @@ handle_motion_notify(Client * c, XSizeHints * g, XMotionEvent * mev)
 {
 	Position p1={.x=g->x, .y=g->y};
 	Position p2={.x=mev->x, .y=mev->y};
-#ifdef USE_SHAPE
-	const bool s=(c->flags&JB_SHAPED);
-	if(!s)
-		draw_outline(c); //clear
+	if(c->border)
+		draw_outline(c); // clear outline
 	recalculate_sweep(c, p1, p2);
-	if(!s)
+	if(c->border)
 		draw_outline(c);
 	else
 		moveresize(c);
-#else//!USE_SHAPE
-	draw_outline(c);
-	recalculate_sweep(c, p1, p2);
-	draw_outline(c);
-#endif//USE_SHAPE
 }
 
 void
@@ -89,17 +76,13 @@ sweep(Client * c)
 		return;
 	XSizeHints *g=&(c->size);
 #ifdef USE_SHAPE
-	const bool shaped=f&JB_SHAPED;
-	if(shaped) // Bugfix for offset issue
+	if(f&JB_SHAPED) // Bugfix for offset issue
 		g->height+=TDIM;
 #endif//USE_SHAPE
 	XWarpPointer(D, None, c->window, 0, 0, 0, 0, g->width-1, g->height-1);
 	XEvent ev;
-#ifdef USE_SHAPE
-	if(shaped)
-		goto sweep_loop;
-#endif//USE_SHAPE
-	XGrabServer(D);
+	if(c->border)
+		XGrabServer(D);
 sweep_loop:	
 	XMaskEvent(D, MouseMask, &ev);
 	switch (ev.type)
@@ -108,10 +91,9 @@ sweep_loop:
 		handle_motion_notify(c, g, &(ev.xmotion));
 		break;
 	case ButtonRelease:
-#ifdef USE_SHAPE
-		if(!shaped)
-#endif//USE_SHAPE
-		XUngrabServer(D);
+		configure(&(c->size), c->window);
+		if(c->border)
+			XUngrabServer(D);
 		XUngrabPointer(D, CurrentTime);
 		moveresize(c);
 		return;
@@ -121,7 +103,6 @@ sweep_loop:
 
 #ifdef USE_SNAP
 
-//__attribute__((const,hot))
 __attribute__((hot))
 static void
 sborder(int *xy, const int border)
@@ -203,19 +184,18 @@ static void
 drag_motion(Client * c, XEvent ev, const Position p, const Position oldp)
 {
 	XSizeHints *g=&(c->size);
+	const bool outline=c->border && !(c->flags&JB_SHADED);
+	if(outline)
+		draw_outline(c);
 	g->x = oldp.x + (ev.xmotion.x - p.x);
 	g->y = oldp.y + (ev.xmotion.y - p.y);
 #ifdef USE_SNAP
 	snap_client(c);
 #endif//USE_SNAP
-	XMoveWindow(D, c->parent, g->x, g->y
-#ifdef USE_TBAR
-		-(!(c->flags&JB_NO_TB)?TDIM:0)
-#endif//USE_TBAR
-		);
-	XConfigureEvent ce={.type=ConfigureNotify, .event=c->window, 
-		.x=g->x, .y=g->y, .width=g->width, .height=g->height};
-	XSendEvent(D, c->window, true, StructureNotifyMask, (XEvent *)&ce);
+	if(outline)
+		draw_outline(c);
+	else
+		moveresize(c);
 }
 
 static void
@@ -235,6 +215,7 @@ drag_loop:
 		XUngrabPointer(D, CurrentTime);
 		moveresize(c);
 		XUngrabServer(D);
+		configure(&(c->size), c->window);
 		return;
 	}
 	goto drag_loop;

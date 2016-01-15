@@ -69,11 +69,14 @@ draw_xft(Client *c, const Position *p, char *name, const size_t l)
 GC tbgc;
 
 static void
-draw_title(Client * c, char *name)
+draw_title(Client * c)
 {
-	assert(name);
+	XTextProperty tp;
+	if(!XGetWMName(D, c->window, &tp))
+		return;
+	char *name=(char*)tp.value;
 	const size_t l = strlen(name);
-	const Position p = {.x=TDIM+4, .y=jbwm.X.font->ascent-JBWM_BORDER};
+	const Position p = {TDIM+4, jbwm.X.font->ascent-JBWM_BORDER};
 #ifdef USE_XFT
 	draw_xft(c, &p, name, l);
 #else//!USE_XFT
@@ -116,7 +119,7 @@ tboffset(const int w, const int n)
 }
 
 static void
-draw_titlebar(Client * c, char *name)
+draw_titlebar(Client * c)
 {
 	const unsigned short w = c->size.width;
 	const Window t=c->titlebar;
@@ -126,7 +129,7 @@ draw_titlebar(Client * c, char *name)
 	draw_resize(f, t, tboffset(w, 1));
 	draw_shade(f, t, tboffset(w, 2));
 	if(!(c->flags&JB_TEAROFF))
-		draw_title(c, name);
+		draw_title(c);
 }
 
 void
@@ -156,8 +159,6 @@ update_titlebar(Client * c)
 
 	/* Expand/Contract the titlebar width as necessary:  */
 	XMoveResizeWindow(D, c->titlebar, 0, 0, c->size.width, TDIM);
-	XTextProperty p;
-	if(XGetWMName(D, c->window, &p))
-		draw_titlebar(c, (char *)p.value);
+	draw_titlebar(c);
 }
 
