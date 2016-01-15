@@ -63,7 +63,7 @@ static void
 handle_wm_hints(Client *c)
 {
 	LOG("handle_wm_hints");
-	XWMHints *h=XGetWMHints(D, c->window);
+	XWMHints *restrict h=XGetWMHints(D, c->window);
 	if(h->flags & XUrgencyHint)
 	{
 		switch_vdesk(c->screen, c->screen->vdesk);
@@ -77,7 +77,7 @@ handle_wm_hints(Client *c)
 void
 print_atom(const Atom a, const unsigned int line)
 {
-        char *an=XGetAtomName(D, a);
+        char *restrict an=XGetAtomName(D, a);
         fprintf(stderr, "\t%s:%d %s(%lu)\n", __FILE__, line, an, a);
         XFree(an);
 }       
@@ -99,7 +99,7 @@ handle_property_change(XPropertyEvent * e)
 static void
 handle_enter_event(XCrossingEvent * e)
 {
-	Client *c=find_client(e->window);
+	Client *restrict c=find_client(e->window);
 	if(c) select_client(c);
 }
 
@@ -122,46 +122,46 @@ handle_expose_event(XEvent * ev)
 
 static void
 gravitate_border(Client *c, int bw) {
-        int dx = 0, dy = 0;
+	Position d={0,0};
         switch (c->size.win_gravity) {
         default:
         case NorthWestGravity:
-                dx = bw;
-                dy = bw;
+                d.x = bw;
+                d.y = bw;
                 break;
         case NorthGravity:
-                dy = bw;
+                d.y = bw;
                 break;
         case NorthEastGravity:
-                dx = -bw;
-                dy = bw;
+                d.x = -bw;
+                d.y = bw;
                 break;
         case EastGravity:
-                dx = -bw;
+                d.x = -bw;
                 break;
         case CenterGravity:
                 break;
         case WestGravity:
-                dx = bw;
+                d.x = bw;
                 break;
         case SouthWestGravity:
-                dx = bw;
-                dy = -bw;
+                d.x = bw;
+                d.y = -bw;
                 break;
         case SouthGravity:
-                dy = -bw;
+                d.y = -bw;
                 break;
         case SouthEastGravity:
-                dx = -bw;
-                dy = -bw;
+                d.x = -bw;
+                d.y = -bw;
                 break;
         }
         if (c->size.x != 0 || c->size.width 
                 != DisplayWidth(D, c->screen->screen)) 
-                c->size.x += dx;
+                c->size.x += d.x;
         if (c->size.y != 0 || c->size.height 
                 != DisplayHeight(D, c->screen->screen))
-                c->size.y += dy;
+                c->size.y += d.y;
 }      
 
 void
@@ -260,9 +260,7 @@ handle_configure_request(XConfigureRequestEvent * e)
 		{
                         Client *sibling = find_client(e->above);
                         if (sibling) 
-			{
                                 wc.sibling = sibling->parent;
-                        }
                 }
                 do_window_changes(e->value_mask, &wc, c, 0);
         } 

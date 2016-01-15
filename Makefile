@@ -35,7 +35,7 @@ DEFINES += -DUSE_TBAR
 EXTRASRCS += titlebar.c 
 
 # Uncomment to enable window snapping. (Adds 4k int8_ts)
-DEFINES += -DUSE_SNAP
+include snap.mk
 
 # Uncomment to enable STDIO
 DEFINES += -DSTDIO

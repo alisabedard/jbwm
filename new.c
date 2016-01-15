@@ -217,12 +217,13 @@ init_geometry(Client * c)
 #ifdef USE_CMAP
 	c->cmap = attr.colormap;
 #endif//USE_CMAP
-	long d; // dummy var
-	XGetWMNormalHints(D, c->window, &(c->size), &d);
+	{
+		long d; // dummy var
+		XGetWMNormalHints(D, c->window, &(c->size), &d);
+	}
 	init_size(c, &attr);
 	init_position(c, &attr);
-	/* Test if the reparent that is to come 
-	   would trigger an unmap event. */
+	// Test if the reparent that is to come would trigger an unmap event.
 	if(attr.map_state == IsViewable)
 		c->ignore_unmap++;
 }
@@ -239,7 +240,7 @@ is_shaped(Client *c)
 #endif//USE_SHAPE
 
 static void
-reparent(Client *c)
+reparent(Client *restrict c)
 {
 	LOG("reparent()");
 #ifdef USE_SHAPE
@@ -255,7 +256,7 @@ reparent(Client *c)
 	XSetWindowAttributes a={.override_redirect=true,
 		.event_mask=SubstructureRedirectMask | SubstructureNotifyMask 
 		| ButtonPressMask | EnterWindowMask};
-	XSizeHints *g=&(c->size);
+	XSizeHints *restrict g=&(c->size);
 	c->parent=XCreateWindow(D, c->screen->root, g->x, g->y, g->width,
 		g->height, c->border, DefaultDepth(D, s), CopyFromParent, 
 		DefaultVisual(D, s), vm, &a);
@@ -266,7 +267,7 @@ reparent(Client *c)
 }
 
 static Client *
-Client_new(Window w, ScreenInfo * s)
+Client_new(Window w, ScreenInfo *restrict s)
 {
 	LOG("Client_new(%d,s)", (int)w);
 	Client *c = calloc(1, sizeof(Client));
@@ -282,7 +283,7 @@ Client_new(Window w, ScreenInfo * s)
 }
 
 void
-make_new_client(Window w, ScreenInfo * s)
+make_new_client(Window w, ScreenInfo *restrict s)
 {
 	Client *c=Client_new(w, s);
 	if(c->flags & JB_DONT_MANAGE)

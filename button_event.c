@@ -14,8 +14,8 @@ button1_event(XButtonEvent * e
 {
 	XRaiseWindow(D, c->parent);
 #ifdef USE_TBAR
-	const Position p={.x=e->x,.y=e->y};
-	const int width = c->size.width;
+	const Position p={e->x,e->y};
+	const uint16_t w = c->size.width;
 	const uint32_t f=c->flags;
 	if(!(f&JB_NO_CLOSE) && (p.x < TDIM) && (p.y < TDIM)) // Close button
 	{
@@ -25,11 +25,11 @@ button1_event(XButtonEvent * e
 			shade(c);		
 		send_wm_delete(c);
 	}
-	else if(!(f&JB_NO_RESIZE) && (p.x > width - TDIM)) // Resize button
+	else if(!(f&JB_NO_RESIZE) && (p.x > w - TDIM)) // Resize button
 	{
 		sweep(c);	
 	}
-	else if(!(f&JB_NO_MIN) && (p.x > width - TDIM - TDIM && p.y < TDIM))
+	else if(!(f&JB_NO_MIN) && (p.x > w - TDIM - TDIM && p.y < TDIM))
 	{ // Shade button
 		shade(c);
 	}
@@ -42,10 +42,8 @@ void
 jbwm_handle_button_event(XButtonEvent * e)
 {
 	Client *c=find_client(e->window);
-	// Return if invalid event.  
-	if(!c) return;
-	/* Move/Resize operations invalid on maximized windows.  */
-	if(c->flags & JB_MAXIMIZED) return;
+	// Return if invalid event or maximized
+	if(!c || c->flags & JB_MAXIMIZED) return;
 	switch (e->button)
 	{
 	case Button1:
@@ -60,10 +58,7 @@ jbwm_handle_button_event(XButtonEvent * e)
 		   users especially, where it is difficult
 		   to register a middle button press, even
 		   with X Emulate3Buttons enabled.  */
-		if(c->flags&JB_SHADED)
-			drag(c);
-		else
-			sweep(c);
+		c->flags&JB_SHADED?drag(c):sweep(c);
 		break;
 	}
 }

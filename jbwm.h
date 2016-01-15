@@ -56,6 +56,10 @@
 #include "ewmh.h"
 #endif//EWMH
 
+#ifdef USE_SNAP
+#include "snap.h"
+#endif//USE_SNAP
+
 // jbwm.c:
 void 
 jbwm_grab_button(Window w, unsigned int mask, unsigned int button);

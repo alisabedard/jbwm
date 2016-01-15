@@ -105,7 +105,6 @@ next(void)
 	select_client(c);
 	point(c, 0, 0);
 	point(c, c->size.width, c->size.height);
-	XSync(D, False);
 }
 
 static void
@@ -175,7 +174,7 @@ jbwm_handle_key_event(XKeyEvent * e)
 }
 
 static void
-grab(ScreenInfo * s, KeySym * ks, const unsigned int mask)
+grab(ScreenInfo *restrict s, KeySym *restrict ks, const unsigned int mask)
 {
 	for(;*ks; ks++)
 	{
@@ -186,7 +185,7 @@ grab(ScreenInfo * s, KeySym * ks, const unsigned int mask)
 }
 
 void
-grab_keys_for_screen(ScreenInfo * s)
+grab_keys_for_screen(ScreenInfo *restrict s)
 {
 	KeySym keys[] = JBWM_KEYS_TO_GRAB;
 	grab(s, keys, 0);
