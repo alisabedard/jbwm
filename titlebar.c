@@ -50,7 +50,7 @@ draw_xft(Client *c, const Position *p, char *name, const size_t l)
 {
 	XGlyphInfo e;
 	XftTextExtentsUtf8(D, jbwm.X.font, (XftChar8 *) name, l, &e);
-	const ubyte s=c->screen->screen;
+	const uint8_t s=c->screen->screen;
 	Visual *v=DefaultVisual(D, s);
 	const Colormap cm=DefaultColormap(D, s);
 	XftDraw *xd=XftDrawCreate(D, c->titlebar, v, cm);

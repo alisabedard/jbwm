@@ -37,9 +37,9 @@ struct Client
 	Window parent;
 	ScreenInfo *screen;
 	XSizeHints size, old_size;
-	ubyte vdesk;
+	uint8_t vdesk;
 	int ignore_unmap;
-	ubyte border;
+	uint8_t border;
 	uint32_t flags;
 	int win_gravity_hint;
 

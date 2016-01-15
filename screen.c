@@ -116,7 +116,7 @@ snap_client_to_screen_border(Client * c)
 {
 	XSizeHints *g = &(c->size);
 	/* snap to screen border */
-	const ubyte b = c->border;
+	const uint8_t b = c->border;
 	sborder(&g->x, -b);
 	sborder(&g->x, g->width - c->screen->width + 2*b);
 	sborder(&g->y, -b-((c->flags&JB_NO_TB)?0:TDIM));
@@ -131,18 +131,19 @@ absmin(const int a, const int b)
 }
 
 static int
-snap_dim(int *cxy, int *cwh, int *cixy, int *ciwh, 
-	const ubyte border, int d)
+snap_dim(const int cxy, const uint16_t cwh, const int cixy, 
+	const uint16_t ciwh, const uint8_t border, int d)
 {
-	int s=*cixy+*ciwh;
-	d = absmin(d, s - *cxy+border);
-	d = absmin(d, s - *cxy - *cwh);
-	s=*cixy-*cxy;
-	d = absmin(d, s - *cwh-border);
+	int s=cixy+ciwh;
+	d = absmin(d, s - cxy+border);
+	d = absmin(d, s - cxy - cwh);
+	s=cixy-cxy;
+	d = absmin(d, s - cwh-border);
 	d = absmin(d, s);
 
 	return d;
 }
+
 
 static void
 snap_client(Client * c)
@@ -152,25 +153,24 @@ snap_client(Client * c)
 	snap_client_to_screen_border(c);
 	// Snap to other windows:
 	XSizeHints *g = &(c->size);
-	const ubyte s=JBWM_SNAP;
+	const uint8_t s=JBWM_SNAP;
 	Position d = {s, s};
 	for(Client *ci = jbwm.head; ci; ci = ci->next)
 	{
 		if((ci==c)||(ci->screen!=c->screen)||(ci->vdesk!=c->vdesk))
 			continue;
 		XSizeHints *gi = &(ci->size);
-		const ubyte b = c->border;
+		const uint8_t b = c->border;
 		if((gi->y - g->height - g->y <= s) 
 			&& (g->y - gi->height - gi->y <= s))
 		{
-			d.x = snap_dim(&(g->x), &(g->width), &(gi->x), 
-				&(gi->width), b, s);
+			d.x = snap_dim(g->x, g->width, gi->x, gi->width, b, s);
 		}
 		if((gi->x - g->width - g->x <= s) 
 			&& (g->x - gi->width - gi->x <= s))
 		{
-			d.y = snap_dim(&(g->y), &(g->height), &(gi->y), 
-				&(gi->height), b, s);
+			d.y = snap_dim(g->y, g->height, gi->y, gi->height, b, 
+				s);
 		}
 	}
 	if(abs(d.x) < s)
@@ -257,7 +257,7 @@ moveresize(Client * c)
 #ifdef USE_SHAPE
 	no_offset|=f&JB_SHAPED;
 #endif//USE_SHAPE
-	const ubyte offset=no_offset?0:TDIM;
+	const uint8_t offset=no_offset?0:TDIM;
 #ifdef USE_SNAP
 #ifdef USE_SHAPE
 	if(!(f&JB_SHAPED)) // Buggy if shaped
@@ -267,7 +267,7 @@ moveresize(Client * c)
 #else//!USE_TBAR
 #define offset 0
 #endif//USE_TBAR
-	const ubyte b=c->border;
+	const uint8_t b=c->border;
 	XRectangle d={.x=g->x-b, .y=g->y-b-offset, .width=g->width, 
 		.height=g->height+offset};
 	XMoveResizeWindow(D, c->parent, d.x, d.y, d.width, d.height);
@@ -352,8 +352,8 @@ unhide(Client * c)
 	set_wm_state(c, NormalState);
 }
 
-ubyte
-switch_vdesk(ScreenInfo * s, const ubyte v)
+uint8_t
+switch_vdesk(ScreenInfo * s, const uint8_t v)
 {
 	LOG("switch_vdesk");
 	assert(s);

@@ -35,7 +35,7 @@ typedef struct {
 		WM_STATE_SKIP_PAGER;
 
 	Atom supported[50]; //42 taken so far.
-	ubyte count;
+	uint8_t count;
 } EWMHEnvironment;
 
 extern EWMHEnvironment ewmh;

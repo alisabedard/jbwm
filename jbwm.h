@@ -5,10 +5,6 @@
 #ifndef JBWM_H
 #define JBWM_H
 
-// Common types:
-typedef char byte;
-typedef unsigned char ubyte;
-
 // Standard Library:
 #include <assert.h>
 #include <signal.h>
@@ -17,6 +13,7 @@ typedef unsigned char ubyte;
 #include <string.h>
 #include <sys/wait.h>
 #include <unistd.h>
+#include <stdint.h>
 
 // X11:
 #include <X11/cursorfont.h>

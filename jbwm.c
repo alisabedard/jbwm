@@ -25,7 +25,7 @@ parse_modifiers(char *arg)
 		{ "mod1", Mod1Mask}, { "mod2", Mod2Mask},
 		{ "mod3", Mod3Mask}, { "mod4", Mod4Mask},
 		{ "mod5", Mod5Mask}};
-	for(ubyte i=0; i<9; i++)
+	for(uint8_t i=0; i<9; i++)
 		if(!strcmp(m[i].name, arg))
 			return m[i].mask;
 	return 0;
@@ -93,7 +93,7 @@ jbwm_grab_button(Window w, unsigned int mask, unsigned int btn)
 }
 
 static void
-setup_event_listeners(const ubyte i)
+setup_event_listeners(const uint8_t i)
 {
 	XSetWindowAttributes attr={.event_mask=SubstructureRedirectMask
 		|SubstructureNotifyMask|EnterWindowMask|PropertyChangeMask
@@ -106,7 +106,7 @@ setup_event_listeners(const ubyte i)
 }
 
 static inline void
-allocate_colors(const ubyte i)
+allocate_colors(const uint8_t i)
 {
 	jbwm.X.screens[i].fg=jbwm_color(DEF_FG);
 	jbwm.X.screens[i].bg=jbwm_color(DEF_BG);
@@ -114,7 +114,7 @@ allocate_colors(const ubyte i)
 }
 
 static inline void
-setup_each_client(const ubyte i, const ubyte j, Window *wins)
+setup_each_client(const uint8_t i, const uint8_t j, Window *wins)
 {
 	XWindowAttributes winattr;
 	XGetWindowAttributes(D, wins[j], &winattr);
@@ -123,7 +123,7 @@ setup_each_client(const ubyte i, const ubyte j, Window *wins)
 }
 
 static inline void
-setup_clients(const ubyte i)
+setup_clients(const uint8_t i)
 {
 	unsigned int nwins;
 	Window *wins;
@@ -136,7 +136,7 @@ setup_clients(const ubyte i)
 }
 
 static inline void
-setup_screen_elements(const ubyte i)
+setup_screen_elements(const uint8_t i)
 {
 	jbwm.X.screens[i].screen = i;
 	jbwm.X.screens[i].root = RootWindow(D, i);
@@ -146,7 +146,7 @@ setup_screen_elements(const ubyte i)
 }
 
 static inline void
-setup_gc(const ubyte i)
+setup_gc(const uint8_t i)
 {
 	allocate_colors(i);
 	XGCValues gv={.foreground=jbwm.X.screens[i].fg.pixel, 
@@ -166,7 +166,7 @@ setup_gc(const ubyte i)
 }
 
 static void
-setup_display_per_screen(const ubyte i)
+setup_display_per_screen(const uint8_t i)
 {
 	setup_screen_elements(i);
 	setup_gc(i);
@@ -196,7 +196,7 @@ setup_screens(void)
 {
 	/* Now set up each screen in turn: jbwm.X.num_screens is used 
 	   in scanning windows (XQueryTree) */
-	ubyte i = jbwm.X.num_screens = ScreenCount(D);
+	uint8_t i = jbwm.X.num_screens = ScreenCount(D);
 	jbwm.X.screens = malloc(i * sizeof(ScreenInfo));
 	while(i--) setup_display_per_screen(i);
 }

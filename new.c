@@ -11,12 +11,12 @@ get_property(Window w, Atom property, Atom type, unsigned long *num_items)
 {
 	assert(num_items);
 	int actual_format;
-	unsigned long bytes_after;
+	unsigned long int8_ts_after;
 	unsigned char *prop;
 
 	if(XGetWindowProperty(D, w, property, 0L, 1024, false, 
 		property, &type, &actual_format, num_items, 
-		&bytes_after, &prop) == Success)
+		&int8_ts_after, &prop) == Success)
 		return prop;
 	return NULL;
 }
@@ -181,7 +181,7 @@ init_atom_properties(Client * c)
 	if((aprop = get_property(c->window, XA("WM_STATE"), 
 		XA_ATOM, &nitems)))
 	{
-		for(ubyte i = 0; i < nitems; i++)
+		for(uint8_t i = 0; i < nitems; i++)
 		{
 			if(aprop[i] == ewmh.WM_STATE_STICKY)
 				add_sticky(c);
@@ -251,7 +251,7 @@ reparent(Client *c)
 	}
 #endif//USE_SHAPE
 	const unsigned long vm= CWOverrideRedirect | CWEventMask;
-	const ubyte s = c->screen->screen;
+	const uint8_t s = c->screen->screen;
 	XSetWindowAttributes a={.override_redirect=true,
 		.event_mask=SubstructureRedirectMask | SubstructureNotifyMask 
 		| ButtonPressMask | EnterWindowMask};

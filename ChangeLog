@@ -153,7 +153,7 @@ Tue Feb 21 12:12:18 GMT 2006  Ciaran Anscomb <evilwm@6809.org.uk>
 2000-11-07
 	Divide XxY display by increments if bit set whilst resizing/moving.
 	Released version 0.3.5.
-	Shaved some bytes off by grabbing keys in a loop.
+	Shaved some int8_ts off by grabbing keys in a loop.
 	-bw option to change border width.
 	Also changed all other options to single - due to making more sense
 
@@ -179,7 +179,7 @@ Tue Feb 21 12:12:18 GMT 2006  Ciaran Anscomb <evilwm@6809.org.uk>
 
 2001-01-31
 	-DSTDIO is needed to include various error/help messages.  Basically
-	I looked at swm and saw one of its methods of shaving bytes.
+	I looked at swm and saw one of its methods of shaving int8_ts.
 	INSTALL file provided to explain all the -Ds.
 	If a window tries to start itself iconised, map it.  That way we
 	shouldn't get some weirdnesses (tho it might be rude).

@@ -13,11 +13,11 @@ point(Client *c, const int x, const int y)
 }
 
 static void
-keymv(Client * c, XKeyEvent * e, int *xy, int *wh, const byte sign)
+keymv(Client * c, XKeyEvent * e, int *xy, int *wh, const int8_t sign)
 {
 	/* These operations invalid when maximized.  */
 	if(c->flags & JB_MAXIMIZED) return;
-	const byte d=sign*JBWM_RESIZE_INCREMENT;
+	const int8_t d=sign*JBWM_RESIZE_INCREMENT;
 	if((e->state & jbwm.keymasks.mod) && (*wh > 0))
 	{
 #ifdef USE_SHAPE
@@ -109,7 +109,7 @@ next(void)
 }
 
 static void
-cond_client_to_desk(Client *c, ScreenInfo *s, const ubyte d, const bool mod)
+cond_client_to_desk(Client *c, ScreenInfo *s, const uint8_t d, const bool mod)
 {
 	LOG("mod: %d, c valid? %d\n", mod, c?1:0);
 	if(mod&&c)
@@ -134,7 +134,7 @@ jbwm_handle_key_event(XKeyEvent * e)
 	ScreenInfo *s = c ? c->screen : jbwm.X.screens;
 	const bool mod=e->state&jbwm.keymasks.mod;
 	bool zero_desk=false;
-	ubyte new_desk;
+	uint8_t new_desk;
 	switch (key)
 	{
 	case KEY_NEW:

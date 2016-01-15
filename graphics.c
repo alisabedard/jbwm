@@ -9,7 +9,7 @@ XColor
 jbwm_color(const char *name)
 {
 	XColor c, none;
-	const ubyte s=DefaultScreen(D);
+	const uint8_t s=DefaultScreen(D);
 	XAllocNamedColor(D, DefaultColormap(D, s), name, &c, &none);
 	return c;
 }

@@ -33,11 +33,11 @@ typedef struct
 		XFontStruct *font;
 #endif				/* USE_XFT */
 #endif /* USE_TBAR */
-		ubyte num_screens;
+		uint8_t num_screens;
 		ScreenInfo *screens;
 		Cursor cursor;
 #ifdef USE_SHAPE
-		ubyte have_shape;
+		uint8_t have_shape;
 		int shape_event;
 #endif				/* USE_SHAPE */
 	} X;

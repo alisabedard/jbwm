@@ -8,7 +8,7 @@
 static ScreenInfo *
 find_screen(Window root)
 {
-	for(ubyte i = 0; i < jbwm.X.num_screens; i++)
+	for(uint8_t i = 0; i < jbwm.X.num_screens; i++)
 		if(jbwm.X.screens[i].root == root)
 			return &jbwm.X.screens[i];
 	return NULL;

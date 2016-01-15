@@ -10,7 +10,7 @@ void
 shade(Client *c);
 
 void
-client_to_vdesk(Client *c, const ubyte d);
+client_to_vdesk(Client *c, const uint8_t d);
 
 void 
 xmsg(Window w, Atom a, long x);

@@ -8,14 +8,14 @@
 
 typedef struct ScreenInfo
 {
-	ubyte screen;
+	uint8_t screen;
 	Window root;
 #ifdef EWMH
 	Window supporting;
 #endif//EWMH
 	GC gc;
 	XColor fg, bg, fc;
-	ubyte vdesk;
+	uint8_t vdesk;
 	unsigned short width, height;
 } ScreenInfo;
 

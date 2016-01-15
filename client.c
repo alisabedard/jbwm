@@ -44,7 +44,7 @@ shade(Client * c)
 #endif//USE_TBAR
 
 void
-client_to_vdesk(Client *c, const ubyte d)
+client_to_vdesk(Client *c, const uint8_t d)
 {
 	LOG("client_to_vdesk");
 	assert(c);
