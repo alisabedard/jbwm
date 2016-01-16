@@ -156,11 +156,9 @@ gravitate_border(Client *c, int bw) {
                 d.y = -bw;
                 break;
         }
-        if (c->size.x != 0 || c->size.width 
-                != DisplayWidth(D, c->screen->screen)) 
+        if (c->size.x != 0 || c->size.width != c->screen->size.w)
                 c->size.x += d.x;
-        if (c->size.y != 0 || c->size.height 
-                != DisplayHeight(D, c->screen->screen))
+        if (c->size.y != 0 || c->size.height != c->screen->size.h)
                 c->size.y += d.y;
 }      
 

@@ -6,14 +6,6 @@
 #ifndef JBWM_SCREEN_H
 #define JBWM_SCREEN_H
 
-// Used by vdesk switching and EWMH
-#define DESKTOPS 10
-
-typedef struct
-{
-	int x, y;
-} Position;
-
 void drag(Client * c);
 void moveresize(Client * c);
 void show_info(Client * c, KeySym key);
@@ -25,8 +17,7 @@ void grab_keys_for_screen(ScreenInfo * s);
 void maximize(Client * c);
 void get_mouse_position(Window w, Position *p);
 
-#ifndef USE_TBAR
-#define TDIM 0
-#endif//!USE_TBAR
+// Used by vdesk switching and EWMH
+#define DESKTOPS 10
 
 #endif /* JBWM_SCREEN_H */

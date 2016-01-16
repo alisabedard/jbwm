@@ -142,8 +142,8 @@ setup_screen_elements(const uint8_t i)
 	s->screen = i;
 	s->root = RootWindow(D, i);
 	s->vdesk = 0;
-	s->width = DisplayWidth(D, i);
-	s->height = DisplayHeight(D, i);
+	s->size.w=DisplayWidth(D, i);
+	s->size.h=DisplayHeight(D, i);
 }
 
 __attribute__((cold))
@@ -165,7 +165,7 @@ setup_gc(ScreenInfo *s)
 
 __attribute__((cold))
 static void
-setup_display_per_screen(const uint8_t i)
+setup_screen(const uint8_t i)
 {
 	ScreenInfo *s=&jbwm.X.screens[i];
 	setup_screen_elements(i);
@@ -187,7 +187,7 @@ setup_screens(void)
 	   in scanning windows (XQueryTree) */
 	uint8_t i = jbwm.X.num_screens = ScreenCount(D);
 	jbwm.X.screens = malloc(i * sizeof(ScreenInfo));
-	while(i--) setup_display_per_screen(i);
+	while(i--) setup_screen(i);
 }
 
 int

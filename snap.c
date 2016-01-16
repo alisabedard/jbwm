@@ -20,9 +20,9 @@ snap_client_to_screen_border(Client * c)
         /* snap to screen border */
         const uint8_t b = c->border;
         sborder(&g->x, -b);
-        sborder(&g->x, g->width - c->screen->width + 2*b);
+        sborder(&g->x, g->width - c->screen->size.w + 2*b);
         sborder(&g->y, -b-((c->flags&JB_NO_TB)?0:TDIM));
-        sborder(&g->y, g->height + 2*b - c->screen->height);
+        sborder(&g->y, g->height + 2*b - c->screen->size.h);
 }
  
 __attribute__((const,hot))

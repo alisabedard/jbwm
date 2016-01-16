@@ -6,4 +6,4 @@
 void
 handle_mwm_hints(Client *c);
 
-#endif//MWM_H
+#endif//!MWM_H

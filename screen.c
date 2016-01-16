@@ -27,14 +27,14 @@ configure(XSizeHints *g, const Window w)
 }
 
 static void
-recalculate_sweep(Client * c, Position p1, Position p2)
+recalculate_sweep(XSizeHints *g, Position p1, Position p2)
 {
 	LOG("recalculate_sweep");
 	assert(c);
-	c->size.width = abs(p1.x - p2.x);
-	c->size.height = abs(p1.y - p2.y);
-	c->size.x = p1.x;
-	c->size.y = p1.y;
+	g->width = abs(p1.x - p2.x);
+	g->height = abs(p1.y - p2.y);
+	g->x = p1.x;
+	g->y = p1.y;
 }
 
 static bool
@@ -51,7 +51,7 @@ handle_motion_notify(Client * c, XSizeHints * g, XMotionEvent * mev)
 	Position p2={.x=mev->x, .y=mev->y};
 	if(c->border)
 		draw_outline(c); // clear outline
-	recalculate_sweep(c, p1, p2);
+	recalculate_sweep(&c->size, p1, p2);
 	if(c->border)
 		draw_outline(c);
 	else
@@ -207,9 +207,9 @@ maximize(Client * c)
 	{
 		memcpy(&(c->old_size), g, sizeof(XSizeHints));
 		g->x = g->y = 0;
-		ScreenInfo *s = c->screen;
-		g->width = s->width;
-		g->height = s->height;
+		Dim *ssz=&c->screen->size;
+		g->width = ssz->w;
+		g->height = ssz->h;
 		c->flags |= JB_MAXIMIZED;
 #ifdef EWMH
 		ewmh_add_state(c->window, ewmh.WM_STATE_FULLSCREEN);

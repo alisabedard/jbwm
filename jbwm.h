@@ -33,6 +33,7 @@
 #endif
 
 // JBWM:
+#include "geometry.h"
 #include "ScreenInfo.h"
 #include "client_t.h"
 #include "jbwmenv.h"

@@ -16,7 +16,7 @@ typedef struct ScreenInfo
 	GC gc;
 	XColor fg, bg, fc;
 	uint8_t vdesk;
-	uint16_t width, height;
+	Dim size;
 } ScreenInfo;
 
 #endif /* not SCREENINFO_H */

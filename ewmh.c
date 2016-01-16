@@ -314,8 +314,7 @@ setup_ewmh_for_screen(ScreenInfo *s)
 {      
 	const Window r=s->root;
 	XPROP(r, ewmh.supported[0], XA_ATOM, ewmh.supported, ewmh.count);
-        const unsigned long workarea[4] = { 0, 0, DisplayWidth(D, s->screen),
-                DisplayHeight(D, s->screen)};
+        const unsigned long workarea[4] = {0, 0, s->size.w, s->size.h};
         XPROP(r, ewmh.DESKTOP_VIEWPORT, XA_CARDINAL, &workarea[0], 2);
         XPROP(r, ewmh.DESKTOP_GEOMETRY, XA_CARDINAL, &workarea[2], 2);
         const unsigned long vdesk = s->vdesk;
