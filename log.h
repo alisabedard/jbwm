@@ -8,8 +8,7 @@
 
 #ifdef STDIO
 #include <stdio.h>
-#define ERROR(...) {fprintf(stderr, __VA_ARGS__); putc('\n', stderr); \
-	exit(1);}
+#define ERROR(msg) {fprintf(stderr, "%s\n", msg); exit(1);}
 #else//!STDIO
 #define ERROR(...) exit(1)
 #endif//STDIO

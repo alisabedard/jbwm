@@ -69,11 +69,13 @@ ewmh_init()
 	EA(WM_STATE_FOCUSED);
 	EA(WM_STATE_SKIP_PAGER);
 
+#ifdef DEBUG
 	LOG("Added %d _NET atoms, %lu allowed", ewmh.count, 
 		sizeof(ewmh.supported)/sizeof(Atom));
 	// Quit if overflow, sanity check.  
 	if(ewmh.count>sizeof(ewmh.supported)/sizeof(Atom))
-		ERROR("BufferOverflow");
+		ERROR("Buffer Overflow!!!");
+#endif//DEBUG
 }
 
 static void

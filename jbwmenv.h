@@ -16,9 +16,6 @@ typedef struct
 	struct
 	{
 		bool tb_initialized;
-#ifndef USE_XFT
-		GC handle;
-#endif//!USE_XFT
 		GC close, shade, resize;
 	} gc;
 #endif//USE_TBAR

@@ -4,6 +4,7 @@
 // See README for license and other details.
 #include "jbwm.h"
 
+__attribute__((cold))
 static void
 setup_gcs(const Window w)
 {
@@ -18,11 +19,6 @@ setup_gcs(const Window w)
 	v.foreground=c.pixel;
 	jbwm.gc.resize=XCreateGC(D, w, GCForeground, &v);
 	jbwm.gc.tb_initialized=true;
-#ifndef USE_XFT
-	v.font=jbwm.X.font->fid;
-	v.function=GXinvert;
-	jbwm.gc.handle=XCreateGC(D, w, GCFont|GCFunction, &v);
-#endif//USE_XFT
 }
 
 static void
@@ -80,7 +76,7 @@ draw_title(Client * c)
 #ifdef USE_XFT
 	draw_xft(c, &p, name, l);
 #else//!USE_XFT
-	XDrawString(D, c->titlebar, jbwm.gc.handle, p.x, p.y, name, l);
+	XDrawString(D, c->titlebar, c->screen->gc, p.x, p.y, name, l);
 #endif//USE_XFT
 	XFree(name);
 }

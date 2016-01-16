@@ -3,11 +3,12 @@
 # Copyright 1999-2015, Ciaran Anscomb <jbwm@6809.org.uk>
 # See README for license and other details.
 
+CC=clang
 CFLAGS=-Os
 # Compile for current machine
 CFLAGS+=-march=native
 # Tuning
-CFLAGS+=-fomit-frame-pointer -pipe -flto
+CFLAGS+=-fomit-frame-pointer -pipe
 # Enable all warnings
 CFLAGS+=-W -Wall -Wextra
 
