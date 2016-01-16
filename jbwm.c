@@ -5,7 +5,7 @@
 
 #include "jbwm.h"
 
-/* Main application data structure.  */
+// Main application data structure.  
 JBWMEnvironment jbwm;
 
 /* Several following functions are declared cold as they are only used on
@@ -124,12 +124,12 @@ setup_clients(ScreenInfo *s)
 	Window d;
 	if(!XQueryTree(D, s->root, &d, &d, &wins, &nwins)) 
 		return;
-	for(uint8_t j = 0; j < nwins; j++) 
+	while(nwins--)
 	{
 		XWindowAttributes a;
-		XGetWindowAttributes(D, wins[j], &a);
+		XGetWindowAttributes(D, wins[nwins], &a);
 		if(!a.override_redirect && (a.map_state==IsViewable))
-			make_new_client(wins[j], s);
+			make_new_client(wins[nwins], s);
 	}
 	XFree(wins);
 }
@@ -198,10 +198,19 @@ handle_xerror(Display * dpy __attribute__((unused)), XErrorEvent * e)
         return 0; // Ignore everything else.         
 }
 
-__attribute__((cold))
-static inline void
-setup_display(void)
+int
+main(
+#ifdef USE_ARGV
+	int argc, char **argv)
+#else//!USE_ARGV
+	void)
+#endif//USE_ARGV
 {
+	jbwm.keymasks.grab=GRAB_MASK;
+	jbwm.keymasks.mod=MOD_MASK;
+#ifdef USE_ARGV
+	parse_argv(argc, argv);
+#endif//USE_ARGV
 	if(!(D=XOpenDisplay(NULL)))
 		ERROR("DISPLAY");
 	XSetErrorHandler(handle_xerror);
@@ -214,22 +223,6 @@ setup_display(void)
 #endif /* USE_TBAR */
 	jbwm.X.cursor = XCreateFontCursor(D, XC_fleur);
 	setup_screens();
-}
-
-int
-main(
-#ifdef USE_ARGV
-	int argc, char **argv)
-#else//!USE_ARGV
-	void)
-#endif//USE_ARGV
-{
-	jbwm.keymasks.grab = GRAB_MASK;
-	jbwm.keymasks.mod = MOD_MASK;
-#ifdef USE_ARGV
-	parse_argv(argc, argv);
-#endif//USE_ARGV
-	setup_display();
 	main_event_loop();
 	return 0;
 }
