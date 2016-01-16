@@ -1,23 +1,25 @@
-// jbwm - Minimalist Window Manager for X
+// jbwm - Minimalist Windmt not recognized linking clang -fltow Manager for X
 // Copyright 2008-2016, Jeffrey E. Bedard <jefbed@gmail.com> 
 // Copyright 1999-2015, Ciaran Anscomb <jbwm@6809.org.uk>
 // See README for license and other details.
 #include "jbwm.h"
 
-__attribute__((cold))
-static void
-setup_gcs(const Window w)
+static GC
+colorgc(ScreenInfo *s, const char *colorname)
 {
-	XColor c=jbwm_color(TITLEBAR_CLOSE_BG);
-	XGCValues v;
-	v.foreground=c.pixel;
-	jbwm.gc.close=XCreateGC(D, w, GCForeground, &v);
-	c=jbwm_color(TITLEBAR_SHADE_BG);
-	v.foreground=c.pixel;
-	jbwm.gc.shade=XCreateGC(D, w, GCForeground, &v);
-	c=jbwm_color(TITLEBAR_RESIZE_BG);
-	v.foreground=c.pixel;
-	jbwm.gc.resize=XCreateGC(D, w, GCForeground, &v);
+	XColor c, nullc;
+	XAllocNamedColor(D, DefaultColormap(D, s->screen), colorname,
+		&c, &nullc);
+	XGCValues v={.foreground=c.pixel};
+	return XCreateGC(D, s->root, GCForeground, &v);
+}
+
+static void
+setup_gcs(ScreenInfo *s)
+{
+	jbwm.gc.close=colorgc(s, TITLEBAR_CLOSE_BG);
+	jbwm.gc.shade=colorgc(s, TITLEBAR_SHADE_BG);
+	jbwm.gc.resize=colorgc(s, TITLEBAR_RESIZE_BG);
 	jbwm.gc.tb_initialized=true;
 }
 
@@ -33,7 +35,7 @@ new_titlebar(Client *c)
 	const Window w = c->titlebar = XCreateSimpleWindow(D, c->parent, 0, 0, 
 		c->size.width, TDIM, 0, 0, 0); 
 	if(!jbwm.gc.tb_initialized)
-		setup_gcs(w);
+		setup_gcs(c->screen);
 	XSelectInput(D, w, ExposureMask);
 	XSetWindowBackground(D, w, c->screen->bg.pixel);
 	XMapRaised(D, w);
