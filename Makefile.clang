@@ -45,6 +45,6 @@ DEFINES += -DEWMH
 EXTRASRCS += ewmh.c
 
 # Uncomment to enable MWM hints
-DEFINES += -DMWM
+include mwm.mk
 
 include jbwm.mk

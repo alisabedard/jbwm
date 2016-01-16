@@ -5,7 +5,7 @@
 #include "jbwm.h"
 
 static GC
-colorgc(ScreenInfo *restrict s, const char *restrict colorname)
+colorgc(ScreenInfo * s, const char * colorname)
 {
 	XColor c, nullc;
 	XAllocNamedColor(D, DefaultColormap(D, s->screen), colorname,
@@ -15,7 +15,7 @@ colorgc(ScreenInfo *restrict s, const char *restrict colorname)
 }
 
 static void
-setup_gcs(ScreenInfo *restrict s)
+setup_gcs(ScreenInfo * s)
 {
 	jbwm.gc.close=colorgc(s, TITLEBAR_CLOSE_BG);
 	jbwm.gc.shade=colorgc(s, TITLEBAR_SHADE_BG);
@@ -24,7 +24,7 @@ setup_gcs(ScreenInfo *restrict s)
 }
 
 static void
-new_titlebar(Client *c)
+new_titlebar(Client * c)
 {
 	if(c->flags&JB_NO_TB)
 		return;
@@ -72,7 +72,7 @@ draw_title(Client * c)
 	XTextProperty tp;
 	if(!XGetWMName(D, c->window, &tp))
 		return;
-	char *name=(char*)tp.value;
+	char * name=(char*)tp.value;
 	const size_t l = strlen(name);
 	const Position p = {TDIM+4, jbwm.X.font->ascent-JBWM_BORDER};
 #ifdef USE_XFT

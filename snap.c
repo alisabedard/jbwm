@@ -7,7 +7,7 @@
 
 __attribute__((hot))
 static void
-sborder(int *xy, const int border)
+sborder(int *xy, const uint8_t border)
 {
         if(abs(*xy+border)<JBWM_SNAP)
                 *xy=-border;
@@ -31,6 +31,7 @@ absmin(const int a, const int b)
 {
         return abs(a)<abs(b)?a:b;
 }
+
 static int
 snap_dim(const int cxy, const uint16_t cwh, const int cixy, 
         const uint16_t ciwh, const uint8_t border, int d)
@@ -41,10 +42,8 @@ snap_dim(const int cxy, const uint16_t cwh, const int cixy,
         s=cixy-cxy;
         d = absmin(d, s - cwh-border);
         d = absmin(d, s);
-
         return d;
 }
- 
  
 void
 snap_client(Client * c)

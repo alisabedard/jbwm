@@ -52,6 +52,10 @@
 #include "titlebar.h"
 #endif//USE_TBAR 
 
+#ifdef MWM
+#include "mwm.h"
+#endif//MWM
+
 #ifdef EWMH
 #include "ewmh.h"
 #endif//EWMH

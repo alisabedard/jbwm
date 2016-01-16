@@ -63,7 +63,7 @@ static void
 handle_wm_hints(Client *c)
 {
 	LOG("handle_wm_hints");
-	XWMHints *restrict h=XGetWMHints(D, c->window);
+	XWMHints * h=XGetWMHints(D, c->window);
 	if(h->flags & XUrgencyHint)
 	{
 		switch_vdesk(c->screen, c->screen->vdesk);
@@ -77,7 +77,7 @@ handle_wm_hints(Client *c)
 void
 print_atom(const Atom a, const unsigned int line)
 {
-        char *restrict an=XGetAtomName(D, a);
+        char * an=XGetAtomName(D, a);
         fprintf(stderr, "\t%s:%d %s(%lu)\n", __FILE__, line, an, a);
         XFree(an);
 }       
@@ -99,7 +99,7 @@ handle_property_change(XPropertyEvent * e)
 static void
 handle_enter_event(XCrossingEvent * e)
 {
-	Client *restrict c=find_client(e->window);
+	Client * c=find_client(e->window);
 	if(c) select_client(c);
 }
 

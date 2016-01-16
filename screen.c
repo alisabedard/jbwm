@@ -162,7 +162,7 @@ drag(Client * c)
 }
 
 void
-moveresize(Client *restrict c)
+moveresize(Client * c)
 {
 	const bool no_tb=c->flags&JB_NO_TB||c->flags&JB_MAXIMIZED;
 	const uint8_t offset=no_tb?0:TDIM;

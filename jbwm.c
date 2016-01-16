@@ -138,7 +138,7 @@ __attribute__((cold))
 static inline void
 setup_screen_elements(const uint8_t i)
 {
-	ScreenInfo *restrict s=&jbwm.X.screens[i];
+	ScreenInfo * s=&jbwm.X.screens[i];
 	s->screen = i;
 	s->root = RootWindow(D, i);
 	s->vdesk = 0;

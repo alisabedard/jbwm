@@ -6,6 +6,8 @@
 CFLAGS=-Os
 # Compile for current machine
 CFLAGS+=-march=native
+CFLAGS+=-ffast-math
+CFLAGS+=-fstrict-aliasing 
 # Tuning
 CFLAGS+=-fomit-frame-pointer -pipe -flto
 # Enable all warnings
@@ -44,6 +46,6 @@ DEFINES += -DEWMH
 EXTRASRCS += ewmh.c
 
 # Uncomment to enable MWM hints
-DEFINES += -DMWM
+include mwm.mk
 
 include jbwm.mk

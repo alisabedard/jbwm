@@ -174,7 +174,7 @@ jbwm_handle_key_event(XKeyEvent * e)
 }
 
 static void
-grab(ScreenInfo *restrict s, KeySym *restrict ks, const unsigned int mask)
+grab(ScreenInfo * s, KeySym * ks, const unsigned int mask)
 {
 	for(;*ks; ks++)
 	{
@@ -185,7 +185,7 @@ grab(ScreenInfo *restrict s, KeySym *restrict ks, const unsigned int mask)
 }
 
 void
-grab_keys_for_screen(ScreenInfo *restrict s)
+grab_keys_for_screen(ScreenInfo * s)
 {
 	KeySym keys[] = JBWM_KEYS_TO_GRAB;
 	grab(s, keys, 0);
