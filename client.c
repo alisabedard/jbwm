@@ -187,7 +187,7 @@ set_shape(Client * c)
 		and make sure that C is initialized.  */
 	if(c && (c->flags & JB_SHAPED))
 	{
-		XShapeCombineShape(D, c->parent, ShapeBounding, 0, 0, 
+		XShapeCombineShape(D, c->parent, ShapeBounding, 1, 1, 
 			c->window, ShapeBounding, ShapeSet);
 		return true;
 	}

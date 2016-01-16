@@ -255,10 +255,10 @@ ewmh_client_message(XClientMessageEvent *e)
         print_atom(e->data.l[2], __LINE__);
         print_atom(e->data.l[3], __LINE__);
 #endif//DEBUG
-        ScreenInfo *s = jbwm.X.screens;
+        Client *c=find_client(e->window);
+        ScreenInfo *s = c?c->screen:jbwm.X.screens;
 	const long val=e->data.l[0];
         if(t==ewmh.CURRENT_DESKTOP) switch_vdesk(s, val);
-        Client *c=find_client(e->window);
 	if(t==ewmh.WM_DESKTOP && c)
 		client_to_vdesk(c, val);
 	else if(t==ewmh.DESKTOP_VIEWPORT)
@@ -300,7 +300,7 @@ ewmh_client_message(XClientMessageEvent *e)
 void
 set_ewmh_allowed_actions(const Window w)
 {
-	Atom a[]={ewmh.WM_ALLOWED_ACTIONS, ewmh.WM_ACTION_MOVE,
+	const Atom a[]={ewmh.WM_ALLOWED_ACTIONS, ewmh.WM_ACTION_MOVE,
 		ewmh.WM_ACTION_RESIZE, ewmh.WM_ACTION_CLOSE,
 		ewmh.WM_ACTION_SHADE, ewmh.WM_ACTION_FULLSCREEN,
 		ewmh.WM_ACTION_CHANGE_DESKTOP, ewmh.WM_ACTION_ABOVE,
@@ -320,7 +320,7 @@ setup_ewmh_for_screen(ScreenInfo *s)
         XPROP(r, ewmh.DESKTOP_GEOMETRY, XA_CARDINAL, &workarea[2], 2);
         const unsigned long vdesk = s->vdesk;
  	XPROP(r, ewmh.CURRENT_DESKTOP, XA_CARDINAL, &vdesk, 1);
-        const unsigned char n=1;
+        static const unsigned char n=DESKTOPS;
         XPROP(r, ewmh.NUMBER_OF_DESKTOPS, XA_CARDINAL, &n, 1);
         XPROP(r, ewmh.WM_NAME, XA_STRING, "jbwm", 4);
         s->supporting=XCreateSimpleWindow(D, s->root, 0, 0, 1, 1, 0, 0, 0);

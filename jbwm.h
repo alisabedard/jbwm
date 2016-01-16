@@ -42,7 +42,6 @@
 #include "client.h"
 #include "new.h"
 #include "events.h"
-#include "graphics.h"
 #include "button_event.h"
 #include "atoms.h"
 #include "screen.h"

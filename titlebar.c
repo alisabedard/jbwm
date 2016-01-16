@@ -5,7 +5,7 @@
 #include "jbwm.h"
 
 static GC
-colorgc(ScreenInfo *s, const char *colorname)
+colorgc(ScreenInfo *restrict s, const char *restrict colorname)
 {
 	XColor c, nullc;
 	XAllocNamedColor(D, DefaultColormap(D, s->screen), colorname,
@@ -15,7 +15,7 @@ colorgc(ScreenInfo *s, const char *colorname)
 }
 
 static void
-setup_gcs(ScreenInfo *s)
+setup_gcs(ScreenInfo *restrict s)
 {
 	jbwm.gc.close=colorgc(s, TITLEBAR_CLOSE_BG);
 	jbwm.gc.shade=colorgc(s, TITLEBAR_SHADE_BG);
