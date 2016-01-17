@@ -1,4 +1,3 @@
-# jbwm - Minimalist Window Manager for X
 # Copyright 2008-2016, Jeffrey E. Bedard <jefbed@gmail.com> 
 # Copyright 1999-2015, Ciaran Anscomb <jbwm@6809.org.uk>
 # See README for license and other details.
@@ -49,5 +48,10 @@ EXTRASRCS += ewmh.c
 
 # Uncomment to enable MWM hints
 include mwm.mk
+
+# Uncomment to disable window outlines, and use solid drag/resize.
+# Saves ~300 bytes
+# Caveat: Slow
+DEFINES += -DSOLID
 
 include jbwm.mk

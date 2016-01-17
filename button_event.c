@@ -27,7 +27,7 @@ button1_event(XButtonEvent * e
 	}
 	else if(!(f&JB_NO_RESIZE) && (p.x > w - TDIM)) // Resize button
 	{
-		sweep(c);	
+		resize(c);	
 	}
 	else if(!(f&JB_NO_MIN) && (p.x > w - TDIM - TDIM && p.y < TDIM))
 	{ // Shade button
@@ -58,7 +58,7 @@ jbwm_handle_button_event(XButtonEvent * e)
 		   users especially, where it is difficult
 		   to register a middle button press, even
 		   with X Emulate3Buttons enabled.  */
-		c->flags&JB_SHADED?drag(c):sweep(c);
+		c->flags&JB_SHADED?drag(c):resize(c);
 		break;
 	}
 }

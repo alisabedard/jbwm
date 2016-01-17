@@ -7,6 +7,7 @@
 
 #define MouseMask (ButtonPressMask|ButtonReleaseMask|PointerMotionMask)
 
+#ifndef SOLID
 __attribute__((hot))
 static void
 draw_outline(Client * c)
@@ -17,6 +18,7 @@ draw_outline(Client * c)
 	ScreenInfo *s=c->screen;
 	XDrawRectangles(D, s->root, s->gc, &d, 1);
 }
+#endif//!SOLID
 
 static void
 configure(XSizeHints *g, const Window w)
@@ -27,9 +29,9 @@ configure(XSizeHints *g, const Window w)
 }
 
 static void
-recalculate_sweep(XSizeHints *g, Position p1, Position p2)
+recalculate_resize(XSizeHints *g, Position p1, Position p2)
 {
-	LOG("recalculate_sweep");
+	LOG("recalculate_resize");
 	assert(c);
 	g->width = abs(p1.x - p2.x);
 	g->height = abs(p1.y - p2.y);
@@ -49,19 +51,23 @@ handle_motion_notify(Client * c, XSizeHints * g, XMotionEvent * mev)
 {
 	Position p1={.x=g->x, .y=g->y};
 	Position p2={.x=mev->x, .y=mev->y};
+#ifndef SOLID
 	if(c->border)
 		draw_outline(c); // clear outline
-	recalculate_sweep(&c->size, p1, p2);
+#endif//!SOLID
+	recalculate_resize(&c->size, p1, p2);
+#ifndef SOLID
 	if(c->border)
 		draw_outline(c);
 	else
+#endif//!SOLID
 		moveresize(c);
 }
 
 void
-sweep(Client * c)
+resize(Client * c)
 {
-	LOG("sweep");
+	LOG("resize");
 	assert(c);
 	/* Resizing shaded windows yields undefined behavior.  */
 	const uint32_t f=c->flags;
@@ -76,9 +82,11 @@ sweep(Client * c)
 #endif//USE_SHAPE
 	XWarpPointer(D, None, c->window, 0, 0, 0, 0, g->width-1, g->height-1);
 	XEvent ev;
+#ifndef SOLID
 	if(c->border)
 		XGrabServer(D);
-sweep_loop:	
+#endif//!SOLID
+resize_loop:	
 	XMaskEvent(D, MouseMask, &ev);
 	switch (ev.type)
 	{
@@ -87,30 +95,36 @@ sweep_loop:
 		break;
 	case ButtonRelease:
 		configure(&(c->size), c->window);
+#ifndef SOLID
 		if(c->border)
 			XUngrabServer(D);
+#endif//!SOLID
 		XUngrabPointer(D, CurrentTime);
 		moveresize(c);
 		return;
 	}
-	goto sweep_loop;
+	goto resize_loop;
 }
 
 static void
 drag_motion(Client * c, XEvent ev, const Position p, const Position oldp)
 {
 	XSizeHints *g=&(c->size);
+#ifndef SOLID
 	const bool outline=c->border && !(c->flags&JB_SHADED);
 	if(outline)
 		draw_outline(c);
+#endif//!SOLID
 	g->x = oldp.x + (ev.xmotion.x - p.x);
 	g->y = oldp.y + (ev.xmotion.y - p.y);
 #ifdef USE_SNAP
 	snap_client(c);
 #endif//USE_SNAP
+#ifndef SOLID
 	if(outline)
 		draw_outline(c);
 	else
+#endif//!SOLID
 		moveresize(c);
 }
 
@@ -164,14 +178,22 @@ drag(Client * c)
 void
 moveresize(Client * c)
 {
+#ifdef USE_TBAR
 	const bool no_tb=c->flags&JB_NO_TB||c->flags&JB_MAXIMIZED;
 	const uint8_t offset=no_tb?0:TDIM;
-	XMoveResizeWindow(D, c->parent, c->size.x, c->size.y-offset, 
-		c->size.width, c->size.height+offset);
-	XMoveResizeWindow(D, c->window, 0, offset, c->size.width, 
-		c->size.height);
+#else//!USE_TBAR
+#define offset 0
+#endif//USE_TBAR
+	const uint16_t w=c->size.width;
+	XMoveResizeWindow(D, c->parent, c->size.x, c->size.y-offset, w, 
+		c->size.height+offset);
+	XMoveResizeWindow(D, c->window, 0, offset, w, c->size.height);
 #ifdef USE_TBAR
-	if(!no_tb) update_titlebar(c);
+	if(!no_tb && (c->exposed_width!=w))
+	{
+		update_titlebar(c);
+		c->exposed_width=w;
+	}
 #endif//USE_TBAR
 #ifdef USE_SHAPE
 	set_shape(c);
