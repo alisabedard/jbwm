@@ -3,13 +3,15 @@
 # Copyright 1999-2015, Ciaran Anscomb <jbwm@6809.org.uk>
 # See README for license and other details.
 
+#CFLAGS=-Ofast
 CFLAGS=-Os
 # Compile for current machine
 CFLAGS+=-march=native
-CFLAGS+=-ffast-math
-CFLAGS+=-fstrict-aliasing 
+# Link time optimization greatly reduces binary size:
+# However, it may not work correctly with clang.
+CFLAGS+=-flto
 # Tuning
-CFLAGS+=-fomit-frame-pointer -pipe -flto
+CFLAGS+=-fomit-frame-pointer
 # Enable all warnings
 CFLAGS+=-W -Wall -Wextra
 

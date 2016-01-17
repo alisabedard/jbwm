@@ -7,27 +7,27 @@
 
 __attribute__((hot))
 static void
-sborder(int *xy, const uint8_t border)
+sborder(int *restrict xy, const int edge)
 {
-        if(abs(*xy+border)<JBWM_SNAP)
-                *xy=-border;
+        if(abs(*xy+edge)<JBWM_SNAP)
+                *xy=-edge;
 }
  
 void
 snap_client_to_screen_border(Client * c)
 {
-        XSizeHints *g = &(c->size);
+        XSizeHints *restrict g = &(c->size);
         /* snap to screen border */
-        const uint8_t b = c->border;
+        const uint8_t b = 2*c->border;
         sborder(&g->x, -b);
-        sborder(&g->x, g->width - c->screen->size.w + 2*b);
+        sborder(&g->x, g->width - c->screen->size.w + b);
         sborder(&g->y, -b-((c->flags&JB_NO_TB)?0:TDIM));
-        sborder(&g->y, g->height + 2*b - c->screen->size.h);
+        sborder(&g->y, g->height + b - c->screen->size.h);
 }
  
 __attribute__((const,hot))
 static int 
-absmin(const int a, const int b)
+absmin(const int16_t a, const int16_t b)
 {
         return abs(a)<abs(b)?a:b;
 }
@@ -44,7 +44,7 @@ snap_dim(const int cxy, const uint16_t cwh, const int cixy,
         d = absmin(d, s);
         return d;
 }
- 
+
 void
 snap_client(Client * c)
 {
@@ -52,29 +52,30 @@ snap_client(Client * c)
         assert(c);
         snap_client_to_screen_border(c);
         // Snap to other windows:
-        XSizeHints *g = &(c->size);
-        const uint8_t s=JBWM_SNAP;
-        Position d = {s, s};
+        XSizeHints *restrict g = &(c->size);
+        Position d = {JBWM_SNAP, JBWM_SNAP};
         for(Client *ci = jbwm.head; ci; ci = ci->next)
         {
+		// This test qualifies 'restrict'
                 if((ci==c)||(ci->screen!=c->screen)||(ci->vdesk!=c->vdesk))
                         continue;
-                XSizeHints *gi = &(ci->size);
+                XSizeHints *restrict gi = &(ci->size);
                 const uint8_t b = c->border;
-                if((gi->y - g->height - g->y <= s) 
-                        && (g->y - gi->height - gi->y <= s))
+                if((gi->y - g->height - g->y <= d.x) 
+                        && (g->y - gi->height - gi->y <= d.x))
                 {
-                        d.x = snap_dim(g->x, g->width, gi->x, gi->width, b, s);
+                        d.x = snap_dim(g->x, g->width, gi->x, gi->width, 
+				b, d.x);
                 }
-                if((gi->x - g->width - g->x <= s) 
-                        && (g->x - gi->width - gi->x <= s))
+                if((gi->x - g->width - g->x <= d.y) 
+                        && (g->x - gi->width - gi->x <= d.y))
                 {
-                        d.y = snap_dim(g->y, g->height, gi->y, gi->height, b, 
-                                s);
+                        d.y = snap_dim(g->y, g->height, gi->y, gi->height, 
+				b, d.y);
                 }
 	}
-        if(abs(d.x) < s)
-                g->x += d.x;
-        if(abs(d.y) < s)
-                g->y += d.y;
+        if(abs(d.x) < JBWM_SNAP)
+        	g->x += d.x;
+	if(abs(d.y) < JBWM_SNAP)
+		g->y += d.y;
 }
