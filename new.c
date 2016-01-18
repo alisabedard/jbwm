@@ -42,12 +42,10 @@ init_size(Client * c, XWindowAttributes * attr)
 static void
 init_position(Client * c, XWindowAttributes * attr)
 {
-	Position p;
-	get_mouse_position(c->screen->root, &p);
-	XSizeHints *g = &(c->size);
+	XSizeHints *g=&(c->size);
 	const bool a=(attr->map_state==IsViewable) || (g->flags & USPosition);
-	g->x=a?attr->x:p.x;
-	g->y=a?attr->y:p.y;
+	g->x=a?attr->x:0;
+	g->y=a?attr->y:TDIM;
 }
 
 #ifdef EWMH
