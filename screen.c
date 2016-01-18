@@ -243,10 +243,10 @@ maximize(Client * c)
 		ewmh_add_state(c->window, ewmh.WM_STATE_MAXIMIZED_VERT);
 #endif//EWMH
 		XSetWindowBorderWidth(D, c->parent, 0);
-#ifdef USE_TBAR
-		update_titlebar(c);
-#endif//0
 	}
+#ifdef USE_TBAR
+	update_titlebar(c);
+#endif//USE_TBAR
 	moveresize(c);
 	XRaiseWindow(D, c->parent);
 }
