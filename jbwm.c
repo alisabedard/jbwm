@@ -161,6 +161,8 @@ setup_gc(ScreenInfo *s)
 	vm|=GCFont;
 #endif//USE_TBAR&&!USE_XFT
 	s->gc = XCreateGC(D, s->root, vm, &gv);
+	gv.foreground=s->fc.pixel;
+	s->fc_gc= XCreateGC(D, s->root, vm, &gv);
 }
 
 __attribute__((cold))

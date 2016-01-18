@@ -90,7 +90,7 @@ select_client(Client * c)
 	if(c)
 	{
 		c->flags |= JB_ACTIVE;
-		XSetWindowBorder(D, c->parent, !is_sticky(c) 
+		XSetWindowBorder(D, c->parent, c->flags^JB_STICKY 
 			? c->screen->fg.pixel : c->screen->fc.pixel);
 #ifdef USE_CMAP
 		XInstallColormap(D, c->cmap);
@@ -109,7 +109,7 @@ stick(Client * c)
 {
 	LOG("stick");
 	c->vdesk=c->screen->vdesk;
-	toggle_sticky(c);
+	c->flags^=JB_STICKY;
 	select_client(c);
 #ifdef USE_TBAR
 	update_titlebar(c);

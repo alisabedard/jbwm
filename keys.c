@@ -31,6 +31,9 @@ keymv(Client * c, XKeyEvent * e, int *xy, int *wh, const int8_t sign)
 move:
 #endif//USE_SHAPE
 		*xy += d;
+#ifdef USE_SNAP
+	snap_border(c);
+#endif//USE_SNAP
 	moveresize(c);
 	point(c, 1, 1);
 }

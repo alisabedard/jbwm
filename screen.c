@@ -14,9 +14,13 @@ draw_outline(Client * c)
 {
 	assert(c);
 	XSizeHints *g=&(c->size);
-	XRectangle d={.x=g->x, .y=g->y, .width=g->width, .height=g->height};
+	const bool tb=c->flags^JB_NO_TB;
+	XRectangle r[]={{.x=g->x, .y=g->y, .width=g->width, 
+		.height=g->height}, {.x=g->x, .y=g->y-(tb?TDIM:0), 
+		.width=g->width, .height=(tb?TDIM:0)-c->border}};
 	ScreenInfo *s=c->screen;
-	XDrawRectangles(D, s->root, s->gc, &d, 1);
+	XDrawRectangles(D, s->root, c->flags^JB_STICKY?s->gc:s->fc_gc, r, 
+		tb?2:1);
 }
 #endif//!SOLID
 
@@ -273,7 +277,7 @@ switch_vdesk(ScreenInfo * s, const uint8_t v)
 	if(v==s->vdesk || v>DESKTOPS) return s->vdesk;
 	for(Client *c=jbwm.head; c; c=c->next)
 	{
-		if(is_sticky(c))
+		if(c->flags&JB_STICKY)
 		{
 			unhide(c);
 			continue;

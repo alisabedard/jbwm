@@ -57,9 +57,4 @@ struct Client
 /* This is to initialize the above CE.  */
 void initialize_client_ce(Client * c);
 
-#define is_sticky(c) (c->flags & JB_STICKY)
-#define add_sticky(c) c->flags |= JB_STICKY
-#define remove_sticky(c) c->flags &= ~JB_STICKY
-#define toggle_sticky(c) c->flags ^= JB_STICKY
-
 #endif /* JBWM_CLIENT_STRUCT_H */

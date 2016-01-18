@@ -13,7 +13,7 @@ typedef struct ScreenInfo
 #ifdef EWMH
 	Window supporting;
 #endif//EWMH
-	GC gc;
+	GC gc, fc_gc;
 	XColor fg, bg, fc;
 	uint8_t vdesk;
 	Dim size;

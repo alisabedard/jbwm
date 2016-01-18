@@ -217,8 +217,8 @@ skip_pager_cb(XClientMessageEvent *e __attribute__((unused)), const bool add,
 {
 	if(!data) return;
 	Client *c=(Client *)data;
-	if(add) add_sticky(c);
-	else remove_sticky(c);
+	if(add) c->flags|=JB_STICKY;
+	else c->flags &=~JB_STICKY;
 }
 
 static void

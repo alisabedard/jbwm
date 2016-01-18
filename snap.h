@@ -6,7 +6,7 @@
 #ifndef SNAP_H
 #define SNAP_H
 void
-snap_client_to_screen_border(Client *c);
+snap_border(Client *c);
 void
 snap_client(Client *c);
 #endif//SNAP_H

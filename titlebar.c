@@ -92,21 +92,21 @@ draw(const Window t, GC gc, const int x)
 static inline void
 draw_close(const uint32_t f, const Window t)
 {
-	if(!(f&JB_NO_CLOSE_DECOR))
+	if(f^JB_NO_CLOSE_DECOR)
 		draw(t, jbwm.gc.close, 0);
 }
 
 static inline void
 draw_shade(const uint32_t f, const Window t, const int x)
 {
-	if(!(f&JB_NO_MIN_DECOR))
+	if(f^JB_NO_MIN_DECOR)
 		draw(t, jbwm.gc.shade, x);
 }
 
 static inline void
 draw_resize(const uint32_t f, const Window t, const int x)
 {
-	if(!(f&JB_NO_MIN_DECOR))
+	if(f^JB_NO_MIN_DECOR)
 		draw(t, jbwm.gc.resize, x);
 }
 
@@ -126,7 +126,7 @@ draw_titlebar(Client * c)
 	draw_close(f, t);
 	draw_resize(f, t, tboffset(w, 1));
 	draw_shade(f, t, tboffset(w, 2));
-	if(!(c->flags&JB_TEAROFF))
+	if(c->flags^JB_TEAROFF)
 		draw_title(c);
 }
 

@@ -52,6 +52,6 @@ include mwm.mk
 # Uncomment to disable window outlines, and use solid drag/resize.
 # Saves ~300 bytes
 # Caveat: Slow
-DEFINES += -DSOLID
+#DEFINES += -DSOLID
 
 include jbwm.mk

@@ -74,7 +74,7 @@ init_atom_properties(Client * c)
 		for(uint8_t i = 0; i < nitems; i++)
 		{
 			if(aprop[i] == ewmh.WM_STATE_STICKY)
-				add_sticky(c);
+				c->flags|=JB_STICKY;
 #ifdef USE_TBAR
 			else if(aprop[i] == ewmh.WM_STATE_SHADED)
 				shade(c);
