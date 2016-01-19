@@ -5,10 +5,11 @@
 
 #include "jbwm.h"
 
-static ScreenInfo *
-find_screen(Window root)
+static inline ScreenInfo *
+find_screen(const Window root)
 {
-	for(uint8_t i = 0; i < jbwm.X.num_screens; i++)
+	uint8_t i = ScreenCount(jbwm.X.dpy);
+	while(i--)
 		if(jbwm.X.screens[i].root == root)
 			return &jbwm.X.screens[i];
 	return NULL;
@@ -290,7 +291,7 @@ head:
 	case MapRequest:
 		if(!find_client(ev.xmaprequest.window))
 			make_new_client(ev.xmaprequest.window, 
-			find_screen(ev.xmaprequest.parent));
+				find_screen(ev.xmaprequest.parent));
 		break;
 	case KeyPress:
 		jbwm_handle_key_event(&ev.xkey);

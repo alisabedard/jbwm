@@ -100,7 +100,6 @@ ewmh_update_client_list()
 		&wl, count);
 }
 
-
 // Remove specified atom from WM_STATE
 void
 ewmh_remove_state(const Window w, const Atom state)

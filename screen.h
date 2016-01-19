@@ -15,7 +15,6 @@ void unhide(Client * c);
 uint8_t switch_vdesk(ScreenInfo * s, const uint8_t v);
 void grab_keys_for_screen(ScreenInfo * s);
 void maximize(Client * c);
-void get_mouse_position(Window w, Position *p);
 
 // Used by vdesk switching and EWMH
 #define DESKTOPS 10

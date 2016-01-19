@@ -8,15 +8,11 @@
 
 typedef struct 
 {
-	struct
-	{
-		unsigned int grab, mod;
-	} keymasks;
 #ifdef USE_TBAR
 	struct
 	{
-		bool tb_initialized;
 		GC close, shade, resize;
+		bool tb_initialized;
 	} gc;
 #endif//USE_TBAR
 	struct
@@ -26,35 +22,29 @@ typedef struct
 #ifdef USE_TBAR
 #ifdef USE_XFT
 		XftFont *font;
-#else				/* ! USE_XFT */
+#else//! USE_XFT 
 		XFontStruct *font;
-#endif				/* USE_XFT */
-#endif /* USE_TBAR */
-		uint8_t num_screens;
+#endif//USE_XFT
+#endif//USE_TBAR 
 		ScreenInfo *screens;
 		Cursor cursor;
 	} X;
-	bool need_cleanup;
+	struct
+	{
+		unsigned int grab, mod;
+	} keymasks;
 	// Client tracking:
 	Client *current;
 	Client *head;
-} JBWMEnvironment;
+	bool need_cleanup;
+} JBWMEnvironment; 
 
-typedef struct
-{
-	char *font;
-	struct
-	{
-		char *fg;
-		char *bg;
-		char *fc;
-	} color;
-	char *term;
-} GlobalOptions;
-
-extern GlobalOptions opt;
 extern JBWMEnvironment jbwm;
 
+// Convenience reference to display, ensure unique:
+#ifdef D
+#undef D
+#endif//D
 #define D jbwm.X.dpy
 
 #endif /* not JBWM_ENVIRONMENT_H */

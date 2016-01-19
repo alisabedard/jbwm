@@ -25,11 +25,11 @@ EXTRALIBS += -lXext # Required for SHAPE extension
 #include xft.mk
 
 # Uncomment to enable colormap support
-# Saves 600 int8_ts
+# Saves ~600 bytes
 #DEFINES+= -DUSE_CMAP
 
 # Uncomment to enable parsing command line arguments.
-#  Saves ~2030 int8_ts
+#  Saves ~2030 bytes
 DEFINES += -DUSE_ARGV 
 
 # Uncomment to enable titlebars

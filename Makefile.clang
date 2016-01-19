@@ -6,9 +6,9 @@
 CC=clang
 CFLAGS=-Os
 # Compile for current machine
-CFLAGS+=-march=native
+#CFLAGS+=-march=native
 # Tuning
-CFLAGS+=-fomit-frame-pointer -pipe
+#CFLAGS+=-fomit-frame-pointer -pipe
 # Enable all warnings
 CFLAGS+=-W -Wall -Wextra
 
@@ -23,11 +23,9 @@ EXTRALIBS += -lXext # Required for SHAPE extension
 #include xft.mk
 
 # Uncomment to enable colormap support
-# Saves 600 int8_ts
 #DEFINES+= -DUSE_CMAP
 
 # Uncomment to enable parsing command line arguments.
-#  Saves ~2030 int8_ts
 DEFINES += -DUSE_ARGV 
 
 # Uncomment to enable titlebars

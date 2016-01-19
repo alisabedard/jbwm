@@ -10,10 +10,11 @@
 #ifndef SOLID
 __attribute__((hot))
 static void
-draw_outline(Client * c)
+draw_outline(Client *c)
 {
 	assert(c);
-	XSizeHints *g=&(c->size);
+	/* restrict, as all changes will occur through g */
+	XSizeHints *restrict g=&(c->size);
 	const bool tb=c->flags^JB_NO_TB;
 	XRectangle r[]={{.x=g->x, .y=g->y, .width=g->width, 
 		.height=g->height}, {.x=g->x, .y=g->y-(tb?TDIM:0), 
@@ -25,7 +26,7 @@ draw_outline(Client * c)
 #endif//!SOLID
 
 static void
-configure(XSizeHints *g, const Window w)
+configure(XSizeHints *restrict g, const Window w)
 {
 	XConfigureEvent ce={.x=g->x, .y=g->y, .width=g->width,
 		.height=g->height, .type=ConfigureNotify, .event=w};
@@ -33,12 +34,12 @@ configure(XSizeHints *g, const Window w)
 }
 
 static void
-recalculate_resize(XSizeHints *g, Position p1, Position p2)
+recalculate_resize(XSizeHints *restrict g, Position p1, Position p2)
 {
 	LOG("recalculate_resize");
-	assert(c);
 	g->width = abs(p1.x - p2.x);
 	g->height = abs(p1.y - p2.y);
+
 	g->x = p1.x;
 	g->y = p1.y;
 }
@@ -51,15 +52,15 @@ grab_pointer(Window w, Cursor cursor)
 }
 
 static void
-handle_motion_notify(Client * c, XSizeHints * g, XMotionEvent * mev)
+handle_motion_notify(Client *restrict c, XMotionEvent *restrict mev)
 {
-	Position p1={.x=g->x, .y=g->y};
-	Position p2={.x=mev->x, .y=mev->y};
+	XSizeHints *g=&c->size;
 #ifndef SOLID
 	if(c->border)
 		draw_outline(c); // clear outline
 #endif//!SOLID
-	recalculate_resize(&c->size, p1, p2);
+	recalculate_resize(&c->size, (Position){g->x, g->y}, 
+		(Position){mev->x, mev->y});
 #ifndef SOLID
 	if(c->border)
 		draw_outline(c);
@@ -69,7 +70,7 @@ handle_motion_notify(Client * c, XSizeHints * g, XMotionEvent * mev)
 }
 
 void
-resize(Client * c)
+resize(Client *restrict c)
 {
 	LOG("resize");
 	assert(c);
@@ -79,6 +80,7 @@ resize(Client * c)
 		return;
 	if(!grab_pointer(c->screen->root, jbwm.X.cursor))
 		return;
+	// Valid with restricted c, as it is derived from c:
 	XSizeHints *g=&(c->size);
 #ifdef USE_SHAPE
 	if(f&JB_SHAPED) // Bugfix for offset issue
@@ -95,7 +97,7 @@ resize_loop:
 	switch (ev.type)
 	{
 	case MotionNotify:
-		handle_motion_notify(c, g, &(ev.xmotion));
+		handle_motion_notify(c, &(ev.xmotion));
 		break;
 	case ButtonRelease:
 		configure(&(c->size), c->window);
@@ -111,7 +113,8 @@ resize_loop:
 }
 
 static void
-drag_motion(Client * c, XEvent ev, const Position p, const Position oldp)
+drag_motion(Client *restrict c, XEvent ev, const Position p, 
+	const Position oldp)
 {
 	XSizeHints *g=&(c->size);
 #ifndef SOLID
@@ -133,11 +136,12 @@ drag_motion(Client * c, XEvent ev, const Position p, const Position oldp)
 }
 
 static void
-drag_event_loop(Client * c, Position p, const Position oldp)
+drag_event_loop(Client *restrict c, Position p, const Position oldp)
 {
 	XEvent ev;
 #ifdef USE_TBAR
-	p.y+=c->flags&JB_NO_TB?TDIM:0;
+	// Put most likely occurance first.
+	p.y+=c->flags^JB_NO_TB?0:TDIM;
 #endif//USE_TBAR
 	XGrabServer(D);
 drag_loop:
@@ -155,11 +159,13 @@ drag_loop:
 	goto drag_loop;
 }
 
-void
-get_mouse_position(Window w, Position *p)
+static inline Position
+get_mouse_position(Window w)
 {
-	XQueryPointer(D, w, &w, &w, &p->x, &p->y, 
+	Position p;
+	XQueryPointer(D, w, &w, &w, &p.x, &p.y, 
 		(int*)&w, (int*)&w, (unsigned int*)&w);
+	return p;
 }
 
 void
@@ -173,18 +179,14 @@ drag(Client * c)
 	if(!grab_pointer(root, jbwm.X.cursor))
 		return;
 	XSizeHints *g=&(c->size);
-	Position oldp={.x=g->x, .y=g->y};
-	Position p;
-	get_mouse_position(root, &p);
-	drag_event_loop(c, p, oldp);
+	drag_event_loop(c, get_mouse_position(root), (Position){g->x, g->y});
 }
 
 void
-moveresize(Client * c)
+moveresize(Client *restrict c)
 {
 #ifdef USE_TBAR
-	const bool no_tb=c->flags&JB_NO_TB||c->flags&JB_MAXIMIZED;
-	const uint8_t offset=no_tb?0:TDIM;
+	const uint8_t offset=(c->flags&JB_NO_TB||c->flags&JB_MAXIMIZED)?0:TDIM;
 #else//!USE_TBAR
 #define offset 0
 #endif//USE_TBAR
@@ -193,7 +195,7 @@ moveresize(Client * c)
 		c->size.height+offset);
 	XMoveResizeWindow(D, c->window, 0, offset, w, c->size.height);
 #ifdef USE_TBAR
-	if(!no_tb && (c->exposed_width!=w))
+	if(offset && (c->exposed_width!=w))
 	{
 		update_titlebar(c);
 		c->exposed_width=w;
@@ -252,7 +254,7 @@ maximize(Client * c)
 }
 
 void
-hide(Client * c)
+hide(Client *restrict c)
 {
 	LOG("hide");
 	assert(c);
@@ -264,7 +266,7 @@ hide(Client * c)
 }
 
 void
-unhide(Client * c)
+unhide(Client *restrict c)
 {
 	LOG("unhide");
 	assert(c);
@@ -273,7 +275,7 @@ unhide(Client * c)
 }
 
 uint8_t
-switch_vdesk(ScreenInfo * s, const uint8_t v)
+switch_vdesk(ScreenInfo *s, const uint8_t v)
 {
 	LOG("switch_vdesk");
 	assert(s);

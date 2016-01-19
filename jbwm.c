@@ -55,14 +55,14 @@ parse_argv(int argc, char **argv)
 #ifdef STDIO
 			case 'V':
 				puts(VERSION);
-				exit(0);
+				exit(EX_OK);
 			default: /* Usage */
 				fprintf(stderr, "%s [%s]\n", argv[0],
 					optstring);
 #else//!STDIO
 			default:
 #endif//STDIO
-				exit(1);
+				exit(EX_USAGE);
 		}
 	}
 }
@@ -138,7 +138,7 @@ __attribute__((cold))
 static inline void
 setup_screen_elements(const uint8_t i)
 {
-	ScreenInfo * s=&jbwm.X.screens[i];
+	ScreenInfo *restrict s=&jbwm.X.screens[i];
 	s->screen = i;
 	s->root = RootWindow(D, i);
 	s->vdesk = 0;
@@ -187,7 +187,7 @@ setup_screens(void)
 {
 	/* Now set up each screen in turn: jbwm.X.num_screens is used 
 	   in scanning windows (XQueryTree) */
-	uint8_t i = jbwm.X.num_screens = ScreenCount(D);
+	uint8_t i = ScreenCount(D);
 	jbwm.X.screens = malloc(i * sizeof(ScreenInfo));
 	while(i--) setup_screen(i);
 }

@@ -14,6 +14,10 @@
 #include <sys/wait.h>
 #include <unistd.h>
 #include <stdint.h>
+#include <sysexits.h>
+#ifdef STDIO
+#include <stdio.h>
+#endif//STDIO
 
 // X11:
 #include <X11/cursorfont.h>
