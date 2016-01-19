@@ -32,26 +32,25 @@
 typedef struct Client Client; 
 struct Client
 {
-	Client *next;
-	Window window;
-	Window parent;
-	ScreenInfo *screen;
-	XSizeHints size, old_size;
 	uint8_t vdesk;
-	int ignore_unmap;
+	uint8_t ignore_unmap;
 	uint8_t border;
+#ifdef USE_TBAR
+	uint16_t exposed_width;
+	uint16_t shade_height;
+#endif//USE_TBAR
 	uint32_t flags;
 	int win_gravity_hint;
-
-	// Optional fields:
 #ifdef USE_CMAP
 	Colormap cmap;
 #endif//USE_CMAP
+	Window window, parent;
 #ifdef USE_TBAR
 	Window titlebar;
-	int exposed_width;
-	unsigned short shade_height;
 #endif//USE_TBAR
+	ScreenInfo *screen;
+	Client *next;
+	XSizeHints size, old_size;
 };
 
 /* This is to initialize the above CE.  */

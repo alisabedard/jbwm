@@ -8,15 +8,14 @@
 
 typedef struct ScreenInfo
 {
-	uint8_t screen;
+	uint8_t screen, vdesk;
+	Dim size;
 	Window root;
 #ifdef EWMH
 	Window supporting;
 #endif//EWMH
 	GC gc, fc_gc;
 	XColor fg, bg, fc;
-	uint8_t vdesk;
-	Dim size;
 } ScreenInfo;
 
 #endif /* not SCREENINFO_H */

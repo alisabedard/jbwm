@@ -8,16 +8,24 @@
 
 typedef struct 
 {
+	bool need_cleanup;
+	// Client tracking:
+	Client *current;
+	Client *head;
+	struct
+	{
+		unsigned int grab, mod;
+	} keymasks;
 #ifdef USE_TBAR
 	struct
 	{
-		GC close, shade, resize;
 		bool tb_initialized;
+		GC close, shade, resize;
 	} gc;
 #endif//USE_TBAR
 	struct
-	{
-		/* Commonly used X information */
+	{ // Commonly used X information:
+		Cursor cursor;
 		Display *dpy;
 #ifdef USE_TBAR
 #ifdef USE_XFT
@@ -27,16 +35,7 @@ typedef struct
 #endif//USE_XFT
 #endif//USE_TBAR 
 		ScreenInfo *screens;
-		Cursor cursor;
 	} X;
-	struct
-	{
-		unsigned int grab, mod;
-	} keymasks;
-	// Client tracking:
-	Client *current;
-	Client *head;
-	bool need_cleanup;
 } JBWMEnvironment; 
 
 extern JBWMEnvironment jbwm;

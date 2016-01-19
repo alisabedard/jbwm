@@ -10,6 +10,7 @@ void
 ewmh_init();
 
 typedef struct {
+	uint8_t count;
 	// All Atoms with the "_NET" prefix enumerated here:
 	Atom SUPPORTED, CURRENT_DESKTOP, NUMBER_OF_DESKTOPS, DESKTOP_VIEWPORT, 
 		DESKTOP_GEOMETRY, SUPPORTING_WM_CHECK, ACTIVE_WINDOW,
@@ -35,7 +36,6 @@ typedef struct {
 		WM_STATE_SKIP_PAGER;
 
 	Atom supported[50]; //42 taken so far.
-	uint8_t count;
 } EWMHEnvironment;
 
 extern EWMHEnvironment ewmh;
