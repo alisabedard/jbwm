@@ -90,8 +90,8 @@ select_client(Client * c)
 	if(c)
 	{
 		c->flags |= JB_ACTIVE;
-		XSetWindowBorder(D, c->parent, (c->flags&JB_STICKY)
-			? c->screen->fg.pixel : c->screen->fc.pixel);
+		XSetWindowBorder(D, c->parent, c->flags&JB_STICKY
+			? c->screen->fc.pixel : c->screen->fg.pixel);
 #ifdef USE_CMAP
 		XInstallColormap(D, c->cmap);
 #endif /* USE_CMAP */

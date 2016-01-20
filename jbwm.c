@@ -100,7 +100,8 @@ setup_fonts(void)
 #endif//USE_TBAR 
 
 void
-jbwm_grab_button(Window w, unsigned int mask, unsigned int btn)
+jbwm_grab_button(const Window w, const unsigned int mask, 
+	const unsigned int btn)
 {
 	XGrabButton(D, btn, mask, w, false, 
 		ButtonPressMask|ButtonReleaseMask, GrabModeAsync, 
@@ -128,7 +129,7 @@ allocate_colors(ScreenInfo *restrict s)
 #ifdef USE_ARGV
 	XAllocNamedColor(D, cm, jbwmopt.fg?jbwmopt.fg:DEF_FG, &s->fg, &nullc);
 	XAllocNamedColor(D, cm, jbwmopt.bg?jbwmopt.bg:DEF_BG, &s->bg, &nullc);
-	XAllocNamedColor(D, cm, jbwmopt.bg?jbwmopt.fc:DEF_FC, &s->fc, &nullc);
+	XAllocNamedColor(D, cm, jbwmopt.fc?jbwmopt.fc:DEF_FC, &s->fc, &nullc);
 #else//!USE_ARGV
 	XAllocNamedColor(D, cm, DEF_FG, &s->fg, &nullc);
 	XAllocNamedColor(D, cm, DEF_BG, &s->bg, &nullc);
@@ -137,7 +138,7 @@ allocate_colors(ScreenInfo *restrict s)
 }
 
 static inline void
-setup_clients(ScreenInfo *s)
+setup_clients(ScreenInfo *restrict s)
 {
 	unsigned int nwins;
 	Window *wins;
@@ -187,7 +188,7 @@ __attribute__((cold))
 static void
 setup_screen(const uint8_t i)
 {
-	ScreenInfo *restrict s=&jbwm.X.screens[i];
+	ScreenInfo *s=&jbwm.X.screens[i];
 	setup_screen_elements(i);
 	setup_gc(s);
 	setup_event_listeners(s->root);
