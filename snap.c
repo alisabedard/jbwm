@@ -21,7 +21,7 @@ snap_border(Client * c)
         const uint8_t b = 2*c->border;
         sborder(&g->x, 0-b);
         sborder(&g->x, g->width - c->screen->size.w + b);
-        sborder(&g->y, 0-(c->flags^JB_NO_TB?TDIM:0));
+        sborder(&g->y, 0-(c->flags&JB_NO_TB?0:TDIM));
         sborder(&g->y, g->height + b - c->screen->size.h);
 }
  
@@ -53,7 +53,7 @@ snap_client(Client * c)
         snap_border(c);
         // Snap to other windows:
         XSizeHints *restrict g = &(c->size);
-        Position d = {JBWM_SNAP, JBWM_SNAP};
+        XPoint d = {JBWM_SNAP, JBWM_SNAP};
         for(Client *ci = jbwm.head; ci; ci = ci->next)
         {
 		// This test qualifies 'restrict'

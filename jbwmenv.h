@@ -19,7 +19,6 @@ typedef struct
 #ifdef USE_TBAR
 	struct
 	{
-		bool tb_initialized;
 		GC close, shade, resize;
 	} gc;
 #endif//USE_TBAR

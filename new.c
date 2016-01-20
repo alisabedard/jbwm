@@ -25,12 +25,12 @@ get_property(Window w, Atom property, Atom type, unsigned long *num_items)
 static void
 init_size(Client * c, XWindowAttributes * attr)
 {
-	const int dim[]={attr->width, attr->height};
-	if((dim[0] >= c->size.min_width)
-		&& (dim[1] >= c->size.min_height))
+	const Dim dim={attr->width, attr->height};
+	if((dim.w >= c->size.min_width)
+		&& (dim.h >= c->size.min_height))
 	{
-		c->size.width=dim[0];
-		c->size.height=dim[1];
+		c->size.width=dim.w;
+		c->size.height=dim.h;
 	}
 	else
 	{
@@ -40,9 +40,9 @@ init_size(Client * c, XWindowAttributes * attr)
 }
 
 static void
-init_position(Client * c, XWindowAttributes * attr)
+init_position(Client *restrict c, XWindowAttributes *restrict attr)
 {
-	XSizeHints *g=&(c->size);
+	XSizeHints *restrict g=&(c->size);
 	const bool a=(attr->map_state==IsViewable) || (g->flags & USPosition);
 	g->x=a?attr->x:0;
 	g->y=a?attr->y:TDIM;

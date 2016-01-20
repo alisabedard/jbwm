@@ -123,7 +123,7 @@ handle_expose_event(XEvent * ev)
 
 static void
 gravitate_border(Client *c, int bw) {
-	Position d={0,0};
+	XPoint d={0,0};
         switch (c->size.win_gravity) {
         default:
         case NorthWestGravity:

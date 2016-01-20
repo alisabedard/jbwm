@@ -4,11 +4,6 @@
 
 typedef struct
 {
-        int x, y;
-} Position;
-
-typedef struct
-{
         uint16_t w, h;
 } Dim;
 

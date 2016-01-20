@@ -90,7 +90,7 @@ select_client(Client * c)
 	if(c)
 	{
 		c->flags |= JB_ACTIVE;
-		XSetWindowBorder(D, c->parent, c->flags^JB_STICKY 
+		XSetWindowBorder(D, c->parent, (c->flags&JB_STICKY)
 			? c->screen->fg.pixel : c->screen->fc.pixel);
 #ifdef USE_CMAP
 		XInstallColormap(D, c->cmap);
@@ -109,7 +109,7 @@ stick(Client * c)
 {
 	LOG("stick");
 	c->vdesk=c->screen->vdesk;
-	c->flags^=JB_STICKY;
+	c->flags^=JB_STICKY; // toggle
 	select_client(c);
 #ifdef USE_TBAR
 	update_titlebar(c);
@@ -187,7 +187,7 @@ set_shape(Client * c)
 		and make sure that C is initialized.  */
 	if(c && (c->flags & JB_SHAPED))
 	{
-		XShapeCombineShape(D, c->parent, ShapeBounding, 1, 1, 
+		XShapeCombineShape(D, c->parent, ShapeBounding, 0, 0, 
 			c->window, ShapeBounding, ShapeSet);
 		return true;
 	}

@@ -14,10 +14,10 @@ button1_event(XButtonEvent * e
 {
 	XRaiseWindow(D, c->parent);
 #ifdef USE_TBAR
-	const Position p={e->x,e->y};
 	const uint16_t w = c->size.width;
+	const XPoint p={e->x,e->y};
 	const uint32_t f=c->flags;
-	if(f^JB_NO_CLOSE && (p.x < TDIM) && (p.y < TDIM)) // Close button
+	if(!(f&JB_NO_CLOSE) && (p.x < TDIM) && (p.y < TDIM)) // Close button
 	{
 		/* This fixes a bug where deleting a shaded window will cause
 		   the parent window to stick around as a ghost window. */
@@ -25,11 +25,11 @@ button1_event(XButtonEvent * e
 			shade(c);		
 		send_wm_delete(c);
 	}
-	else if(f^JB_NO_RESIZE && (p.x > w - TDIM)) // Resize button
+	else if(f&JB_NO_RESIZE && (p.x > w - TDIM)) // Resize button
 	{
 		resize(c);	
 	}
-	else if(f^JB_NO_MIN && (p.x > w - TDIM - TDIM && p.y < TDIM))
+	else if(!(f&JB_NO_MIN) && (p.x > w - TDIM - TDIM && p.y < TDIM))
 	{ // Shade button
 		shade(c);
 	}

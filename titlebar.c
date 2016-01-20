@@ -5,7 +5,7 @@
 #include "jbwm.h"
 
 static GC
-colorgc(ScreenInfo * s, const char * colorname)
+colorgc(ScreenInfo *restrict s, const char *restrict colorname)
 {
 	XColor c, nullc;
 	XAllocNamedColor(D, DefaultColormap(D, s->screen), colorname,
@@ -14,17 +14,16 @@ colorgc(ScreenInfo * s, const char * colorname)
 	return XCreateGC(D, s->root, GCForeground, &v);
 }
 
-static void
-setup_gcs(ScreenInfo * s)
+static inline void
+setup_gcs(ScreenInfo *restrict s)
 {
 	jbwm.gc.close=colorgc(s, TITLEBAR_CLOSE_BG);
 	jbwm.gc.shade=colorgc(s, TITLEBAR_SHADE_BG);
 	jbwm.gc.resize=colorgc(s, TITLEBAR_RESIZE_BG);
-	jbwm.gc.tb_initialized=true;
 }
 
 static void
-new_titlebar(Client * c)
+new_titlebar(Client *restrict c)
 {
 	if(c->flags&JB_NO_TB)
 		return;
@@ -34,7 +33,7 @@ new_titlebar(Client * c)
 #endif /* USE_SHAPE */
 	const Window w = c->titlebar = XCreateSimpleWindow(D, c->parent, 0, 0, 
 		c->size.width, TDIM, 0, 0, 0); 
-	if(!jbwm.gc.tb_initialized)
+	if(!jbwm.gc.close)
 		setup_gcs(c->screen);
 	XSelectInput(D, w, ExposureMask);
 	XSetWindowBackground(D, w, c->screen->bg.pixel);
@@ -44,7 +43,7 @@ new_titlebar(Client * c)
 
 #ifdef USE_XFT
 static void
-draw_xft(Client *c, const Position *p, char *name, const size_t l)
+draw_xft(Client *c, const XPoint *p, char *name, const size_t l)
 {
 	XGlyphInfo e;
 	XftTextExtentsUtf8(D, jbwm.X.font, (XftChar8 *) name, l, &e);
@@ -67,14 +66,14 @@ draw_xft(Client *c, const Position *p, char *name, const size_t l)
 GC tbgc;
 
 static void
-draw_title(Client * c)
+draw_title(Client *restrict c)
 {
 	XTextProperty tp;
 	if(!XGetWMName(D, c->window, &tp))
 		return;
 	char * name=(char*)tp.value;
 	const size_t l = strlen(name);
-	const Position p = {TDIM+4, jbwm.X.font->ascent-JBWM_BORDER};
+	const XPoint p = {TDIM+4, jbwm.X.font->ascent-JBWM_BORDER};
 #ifdef USE_XFT
 	draw_xft(c, &p, name, l);
 #else//!USE_XFT
@@ -92,21 +91,21 @@ draw(const Window t, GC gc, const int x)
 static inline void
 draw_close(const uint32_t f, const Window t)
 {
-	if(f^JB_NO_CLOSE_DECOR)
+	if(!(f&JB_NO_CLOSE_DECOR))
 		draw(t, jbwm.gc.close, 0);
 }
 
 static inline void
 draw_shade(const uint32_t f, const Window t, const int x)
 {
-	if(f^JB_NO_MIN_DECOR)
+	if(!(f&JB_NO_MIN_DECOR))
 		draw(t, jbwm.gc.shade, x);
 }
 
 static inline void
 draw_resize(const uint32_t f, const Window t, const int x)
 {
-	if(f^JB_NO_MIN_DECOR)
+	if(!(f&JB_NO_MIN_DECOR))
 		draw(t, jbwm.gc.resize, x);
 }
 
@@ -126,7 +125,7 @@ draw_titlebar(Client * c)
 	draw_close(f, t);
 	draw_resize(f, t, tboffset(w, 1));
 	draw_shade(f, t, tboffset(w, 2));
-	if(c->flags^JB_TEAROFF)
+	if(!(c->flags&JB_TEAROFF))
 		draw_title(c);
 }
 

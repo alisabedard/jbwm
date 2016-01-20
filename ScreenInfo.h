@@ -14,7 +14,7 @@ typedef struct ScreenInfo
 #ifdef EWMH
 	Window supporting;
 #endif//EWMH
-	GC gc, fc_gc;
+	GC gc;
 	XColor fg, bg, fc;
 } ScreenInfo;
 

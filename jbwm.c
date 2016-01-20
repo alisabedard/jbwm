@@ -21,7 +21,7 @@ parse_modifiers(char *arg)
 	struct
 	{
 		const char *name;
-		unsigned int mask;
+		const unsigned int mask;
 	} m[] = { { "shift", ShiftMask}, { "lock", LockMask}, 
 		{ "control", ControlMask}, { "mod", Mod1Mask}, 
 		{ "mod1", Mod1Mask}, { "mod2", Mod2Mask},
@@ -33,11 +33,16 @@ parse_modifiers(char *arg)
 	return 0;
 }
 
+static struct 
+{
+	char *fg, *bg, *fc;
+} jbwmopt;
+
 static void
 parse_argv(int argc, char **argv)
 {
 	LOG("parse_argv(%d,%s...)", argc, argv[0]);
-	const char *optstring="1:2:d:V";
+	const char *optstring="1:2:b:d:f:s:V";
 
 	for(int opt;(opt=getopt(argc, argv, optstring))!=-1;)
 	{
@@ -49,8 +54,17 @@ parse_argv(int argc, char **argv)
 			case '2':
 				jbwm.keymasks.mod = parse_modifiers(optarg);
 				break;
+			case 'b':
+				jbwmopt.bg=optarg;
+				break;
 			case 'd':
 				setenv("DISPLAY", optarg, 1);
+				break;
+			case 'f':
+				jbwmopt.fg=optarg;
+				break;
+			case 's':
+				jbwmopt.fc=optarg;
 				break;
 #ifdef STDIO
 			case 'V':
@@ -107,13 +121,19 @@ setup_event_listeners(const Window root)
 
 __attribute__((cold))
 static inline void
-allocate_colors(ScreenInfo *s)
+allocate_colors(ScreenInfo *restrict s)
 {
 	XColor nullc; 
 	const Colormap cm=DefaultColormap(D, s->screen);
+#ifdef USE_ARGV
+	XAllocNamedColor(D, cm, jbwmopt.fg?jbwmopt.fg:DEF_FG, &s->fg, &nullc);
+	XAllocNamedColor(D, cm, jbwmopt.bg?jbwmopt.bg:DEF_BG, &s->bg, &nullc);
+	XAllocNamedColor(D, cm, jbwmopt.bg?jbwmopt.fc:DEF_FC, &s->fc, &nullc);
+#else//!USE_ARGV
 	XAllocNamedColor(D, cm, DEF_FG, &s->fg, &nullc);
 	XAllocNamedColor(D, cm, DEF_BG, &s->bg, &nullc);
 	XAllocNamedColor(D, cm, DEF_FC, &s->fc, &nullc);
+#endif//USE_ARGV
 }
 
 static inline void
@@ -161,15 +181,13 @@ setup_gc(ScreenInfo *s)
 	vm|=GCFont;
 #endif//USE_TBAR&&!USE_XFT
 	s->gc = XCreateGC(D, s->root, vm, &gv);
-	gv.foreground=s->fc.pixel;
-	s->fc_gc= XCreateGC(D, s->root, vm, &gv);
 }
 
 __attribute__((cold))
 static void
 setup_screen(const uint8_t i)
 {
-	ScreenInfo *s=&jbwm.X.screens[i];
+	ScreenInfo *restrict s=&jbwm.X.screens[i];
 	setup_screen_elements(i);
 	setup_gc(s);
 	setup_event_listeners(s->root);

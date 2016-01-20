@@ -15,13 +15,12 @@ draw_outline(Client *c)
 	assert(c);
 	/* restrict, as all changes will occur through g */
 	XSizeHints *restrict g=&(c->size);
-	const bool tb=c->flags^JB_NO_TB;
+	const bool tb=!(c->flags&JB_NO_TB);
 	XRectangle r[]={{.x=g->x, .y=g->y, .width=g->width, 
 		.height=g->height}, {.x=g->x, .y=g->y-(tb?TDIM:0), 
 		.width=g->width, .height=(tb?TDIM:0)-c->border}};
 	ScreenInfo *s=c->screen;
-	XDrawRectangles(D, s->root, c->flags^JB_STICKY?s->gc:s->fc_gc, r, 
-		tb?2:1);
+	XDrawRectangles(D, s->root, s->gc, r, tb?2:1);
 }
 #endif//!SOLID
 
@@ -34,7 +33,7 @@ configure(XSizeHints *restrict g, const Window w)
 }
 
 static void
-recalculate_resize(XSizeHints *restrict g, Position p1, Position p2)
+recalculate_resize(XSizeHints *restrict g, XPoint p1, XPoint p2)
 {
 	LOG("recalculate_resize");
 	g->width = abs(p1.x - p2.x);
@@ -54,13 +53,12 @@ grab_pointer(Window w, Cursor cursor)
 static void
 handle_motion_notify(Client *restrict c, XMotionEvent *restrict mev)
 {
-	XSizeHints *g=&c->size;
 #ifndef SOLID
 	if(c->border)
 		draw_outline(c); // clear outline
 #endif//!SOLID
-	recalculate_resize(&c->size, (Position){g->x, g->y}, 
-		(Position){mev->x, mev->y});
+	recalculate_resize(&c->size, (XPoint){c->size.x, c->size.y}, 
+		(XPoint){mev->x, mev->y});
 #ifndef SOLID
 	if(c->border)
 		draw_outline(c);
@@ -113,8 +111,8 @@ resize_loop:
 }
 
 static void
-drag_motion(Client *restrict c, XEvent ev, const Position p, 
-	const Position oldp)
+drag_motion(Client *restrict c, XEvent ev, const XPoint p, 
+	const XPoint oldp)
 {
 	XSizeHints *g=&(c->size);
 #ifndef SOLID
@@ -136,12 +134,11 @@ drag_motion(Client *restrict c, XEvent ev, const Position p,
 }
 
 static void
-drag_event_loop(Client *restrict c, Position p, const Position oldp)
+drag_event_loop(Client *restrict c, XPoint p, const XPoint oldp)
 {
 	XEvent ev;
 #ifdef USE_TBAR
-	// Put most likely occurance first.
-	p.y+=c->flags^JB_NO_TB?0:TDIM;
+	p.y+=c->flags&JB_NO_TB?TDIM:0;
 #endif//USE_TBAR
 	XGrabServer(D);
 drag_loop:
@@ -159,11 +156,11 @@ drag_loop:
 	goto drag_loop;
 }
 
-static inline Position
+static inline XPoint
 get_mouse_position(Window w)
 {
-	Position p;
-	XQueryPointer(D, w, &w, &w, &p.x, &p.y, 
+	XPoint p;
+	XQueryPointer(D, w, &w, &w, (int*)&p.x, (int*)&p.y, 
 		(int*)&w, (int*)&w, (unsigned int*)&w);
 	return p;
 }
@@ -179,7 +176,7 @@ drag(Client * c)
 	if(!grab_pointer(root, jbwm.X.cursor))
 		return;
 	XSizeHints *g=&(c->size);
-	drag_event_loop(c, get_mouse_position(root), (Position){g->x, g->y});
+	drag_event_loop(c, get_mouse_position(root), (XPoint){g->x, g->y});
 }
 
 void
@@ -223,7 +220,6 @@ maximize(Client * c)
 	if(c->flags & JB_MAXIMIZED) // restore:
 	{
 		memcpy(g, &(c->old_size), sizeof(XSizeHints));
-		c->flags &= ~ JB_MAXIMIZED;
 #ifdef EWMH
 		ewmh_remove_state(c->window, ewmh.WM_STATE_FULLSCREEN);
 		ewmh_remove_state(c->window, ewmh.WM_STATE_MAXIMIZED_HORZ);
@@ -238,7 +234,6 @@ maximize(Client * c)
 		Dim *ssz=&c->screen->size;
 		g->width = ssz->w;
 		g->height = ssz->h;
-		c->flags |= JB_MAXIMIZED;
 #ifdef EWMH
 		ewmh_add_state(c->window, ewmh.WM_STATE_FULLSCREEN);
 		ewmh_add_state(c->window, ewmh.WM_STATE_MAXIMIZED_HORZ);
@@ -246,6 +241,7 @@ maximize(Client * c)
 #endif//EWMH
 		XSetWindowBorderWidth(D, c->parent, 0);
 	}
+	c->flags^=JB_MAXIMIZED; // toggle
 #ifdef USE_TBAR
 	update_titlebar(c);
 #endif//USE_TBAR
