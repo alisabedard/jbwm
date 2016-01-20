@@ -8,7 +8,9 @@ jbwm \- Minimalist Window Manager
 .LP
 If you have enabled ARGV support in the Makefile:
 .LP
-.B jbwm [ \-d
+.B jbwm [ \-{f,b,s}
+.I color
+.B ] [ \-d
 .I display
 .B ] [ \-1
 .I keymask for primary modifier (Default: Windows/Meta key)
@@ -80,6 +82,8 @@ and
 .B \-2 
 options are 
 control, alt, mod1, mod2, mod3, mod4, mod5.
+.B \-b \-f \-s
+Set the background, foreground and sticky colors, respectively.  
 .B \-V
 displays the jbwm version number.  
 
@@ -88,8 +92,7 @@ displays the jbwm version number.
 DISPLAY should be set, otherwise default of :0 will be used.  
 
 .SH BUGS
-EWMH support not fully implemented.  
-More complete support of MWM hints is needed.  
+EWMH support is a work in progress.  
 
 .SH AUTHOR
 Jeffrey Bedard <jefbed@gmail.com>
