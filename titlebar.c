@@ -43,7 +43,7 @@ new_titlebar(Client *restrict c)
 
 #ifdef USE_XFT
 static void
-draw_xft(Client *c, const XPoint *p, char *name, const size_t l)
+draw_xft(Client *restrict c, const XPoint *restrict p, char *restrict name, const size_t l)
 {
 	XGlyphInfo e;
 	XftTextExtentsUtf8(D, jbwm.X.font, (XftChar8 *) name, l, &e);
@@ -125,7 +125,7 @@ draw_titlebar(Client * c)
 	draw_close(f, t);
 	draw_resize(f, t, tboffset(w, 1));
 	draw_shade(f, t, tboffset(w, 2));
-	if(!(c->flags&JB_TEAROFF))
+	if(!(f&JB_TEAROFF))
 		draw_title(c);
 }
 
