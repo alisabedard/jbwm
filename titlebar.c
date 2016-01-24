@@ -46,7 +46,7 @@ static void
 draw_xft(Client *restrict c, const XPoint *restrict p, char *restrict name, const size_t l)
 {
 	XGlyphInfo e;
-	XftTextExtentsUtf8(D, jbwm.X.font, (XftChar8 *) name, l, &e);
+	XftTextExtentsUtf8(D, jbwm.font, (XftChar8 *) name, l, &e);
 	const uint8_t s=c->screen->screen;
 	Visual *v=DefaultVisual(D, s);
 	const Colormap cm=DefaultColormap(D, s);
@@ -55,7 +55,7 @@ draw_xft(Client *restrict c, const XPoint *restrict p, char *restrict name, cons
 	XftColorAllocName(D, v, cm, DEF_FG, &color);
 	/* Prevent the text from going over the resize button.  */
 	const unsigned short max_width = c->size.width - 3 * TDIM;
-	XftDrawStringUtf8(xd, &color, jbwm.X.font, p->x, p->y, 
+	XftDrawStringUtf8(xd, &color, jbwm.font, p->x, p->y, 
 		(XftChar8 *) name, e.width > max_width && e.width > 0 
 		? l * max_width / e.width : l);
 	XftDrawDestroy(xd);
@@ -73,7 +73,7 @@ draw_title(Client *restrict c)
 		return;
 	char * name=(char*)tp.value;
 	const size_t l = strlen(name);
-	const XPoint p = {TDIM+4, jbwm.X.font->ascent-JBWM_BORDER};
+	const XPoint p = {TDIM+4, jbwm.font->ascent-JBWM_BORDER};
 #ifdef USE_XFT
 	draw_xft(c, &p, name, l);
 #else//!USE_XFT
@@ -116,7 +116,7 @@ tboffset(const int w, const int n)
 }
 
 static void
-draw_titlebar(Client * c)
+draw_titlebar(Client *restrict c)
 {
 	const unsigned short w = c->size.width;
 	const Window t=c->titlebar;

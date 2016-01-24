@@ -133,7 +133,7 @@ jbwm_handle_key_event(XKeyEvent * e)
 {
 	KeySym key = XLookupKeysym(e, 0);
 	Client *c=jbwm.current;
-	ScreenInfo *s = c ? c->screen : jbwm.X.screens;
+	ScreenInfo *s = c ? c->screen : jbwm.screens;
 	const bool mod=e->state&jbwm.keymasks.mod;
 	bool zero_desk=false;
 	uint8_t new_desk;
@@ -181,7 +181,7 @@ grab(ScreenInfo * s, KeySym * ks, const unsigned int mask)
 {
 	for(;*ks; ks++)
 	{
-		XGrabKey(D, XKeysymToKeycode(jbwm.X.dpy, *ks), 
+		XGrabKey(D, XKeysymToKeycode(jbwm.dpy, *ks), 
 			jbwm.keymasks.grab| mask, s->root, true, GrabModeAsync, 
 			GrabModeAsync); 
 	}

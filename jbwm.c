@@ -87,15 +87,15 @@ static void
 setup_fonts(void)
 {
 #ifdef USE_XFT
-	jbwm.X.font=XftFontOpen(D, DefaultScreen(D), XFT_FAMILY, 
+	jbwm.font=XftFontOpen(D, DefaultScreen(D), XFT_FAMILY, 
 		XftTypeString, DEF_FONT, XFT_SIZE, XftTypeDouble, 
 		FONT_SIZE, NULL);
 #else//!USE_XFT
-	jbwm.X.font=XLoadQueryFont(D, DEF_FONT);
-	if(!jbwm.X.font)
-		jbwm.X.font=XLoadQueryFont(D, FALLBACK_FONT);
+	jbwm.font=XLoadQueryFont(D, DEF_FONT);
+	if(!jbwm.font)
+		jbwm.font=XLoadQueryFont(D, FALLBACK_FONT);
 #endif//USE_XFT
-	if(!jbwm.X.font) ERROR("FONT");
+	if(!jbwm.font) ERROR("FONT");
 }
 #endif//USE_TBAR 
 
@@ -159,7 +159,7 @@ __attribute__((cold))
 static inline void
 setup_screen_elements(const uint8_t i)
 {
-	ScreenInfo *restrict s=&jbwm.X.screens[i];
+	ScreenInfo *restrict s=&jbwm.screens[i];
 	s->screen = i;
 	s->root = RootWindow(D, i);
 	s->vdesk = 0;
@@ -178,7 +178,7 @@ setup_gc(ScreenInfo *s)
 		.function=GXinvert, .subwindow_mode=IncludeInferiors, 
 		.line_width=JBWM_BORDER };
 #if defined(USE_TBAR) && !defined(USE_XFT)
-	gv.font=jbwm.X.font->fid;
+	gv.font=jbwm.font->fid;
 	vm|=GCFont;
 #endif//USE_TBAR&&!USE_XFT
 	s->gc = XCreateGC(D, s->root, vm, &gv);
@@ -188,7 +188,7 @@ __attribute__((cold))
 static void
 setup_screen(const uint8_t i)
 {
-	ScreenInfo *s=&jbwm.X.screens[i];
+	ScreenInfo *s=&jbwm.screens[i];
 	setup_screen_elements(i);
 	setup_gc(s);
 	setup_event_listeners(s->root);
@@ -204,10 +204,10 @@ __attribute__((cold))
 static inline void
 setup_screens(void)
 {
-	/* Now set up each screen in turn: jbwm.X.num_screens is used 
+	/* Now set up each screen in turn: jbwm.num_screens is used 
 	   in scanning windows (XQueryTree) */
 	uint8_t i = ScreenCount(D);
-	jbwm.X.screens = malloc(i * sizeof(ScreenInfo));
+	jbwm.screens = malloc(i * sizeof(ScreenInfo));
 	while(i--) setup_screen(i);
 }
 
@@ -242,7 +242,7 @@ main(
 	/* Fonts only needed with title bars */
 	setup_fonts();
 #endif /* USE_TBAR */
-	jbwm.X.cursor = XCreateFontCursor(D, XC_fleur);
+	jbwm.cursor = XCreateFontCursor(D, XC_fleur);
 	setup_screens();
 	main_event_loop();
 	return 0;

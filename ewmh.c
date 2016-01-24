@@ -82,7 +82,7 @@ static void
 set_desktop_viewport()
 {
 	const long vp[2]={0,0};
-	XPROP(jbwm.X.screens->root, ewmh.DESKTOP_VIEWPORT, XA_CARDINAL, &vp, 2);
+	XPROP(jbwm.screens->root, ewmh.DESKTOP_VIEWPORT, XA_CARDINAL, &vp, 2);
 }
 
 void
@@ -94,9 +94,9 @@ ewmh_update_client_list()
 	uint16_t count=0;
 	for(Client *i=jbwm.head; i&&(count<MAX_CLIENTS); i=i->next)
 		wl[count++]=i->window;
-	XPROP(jbwm.X.screens->root, ewmh.CLIENT_LIST, XA_WINDOW, &wl, count);
+	XPROP(jbwm.screens->root, ewmh.CLIENT_LIST, XA_WINDOW, &wl, count);
 	// FIXME: Does not correctly report stacking order.
-	XPROP(jbwm.X.screens->root, ewmh.CLIENT_LIST_STACKING, XA_WINDOW, 
+	XPROP(jbwm.screens->root, ewmh.CLIENT_LIST_STACKING, XA_WINDOW, 
 		&wl, count);
 }
 
@@ -255,7 +255,7 @@ ewmh_client_message(XClientMessageEvent *e)
         print_atom(e->data.l[3], __LINE__);
 #endif//DEBUG
         Client *c=find_client(e->window);
-        ScreenInfo *s = c?c->screen:jbwm.X.screens;
+        ScreenInfo *s = c?c->screen:jbwm.screens;
 	const long val=e->data.l[0];
         if(t==ewmh.CURRENT_DESKTOP) switch_vdesk(s, val);
 	if(t==ewmh.WM_DESKTOP && c)

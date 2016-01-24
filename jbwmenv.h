@@ -9,32 +9,30 @@
 typedef struct 
 {
 	bool need_cleanup;
+	struct
+	{
+		uint16_t grab, mod;
+	} keymasks;
+	Cursor cursor;
+	Display *restrict dpy;
 	// Client tracking:
 	Client *current;
 	Client *head;
-	struct
-	{
-		unsigned int grab, mod;
-	} keymasks;
+	ScreenInfo *screens;
+#ifdef USE_TBAR
+#ifdef USE_XFT
+	XftFont *font;
+#else//! USE_XFT 
+	XFontStruct *font;
+#endif//USE_XFT
+#endif//USE_TBAR 
+	
 #ifdef USE_TBAR
 	struct
 	{
 		GC close, shade, resize;
 	} gc;
 #endif//USE_TBAR
-	struct
-	{ // Commonly used X information:
-		Cursor cursor;
-		Display *dpy;
-#ifdef USE_TBAR
-#ifdef USE_XFT
-		XftFont *font;
-#else//! USE_XFT 
-		XFontStruct *font;
-#endif//USE_XFT
-#endif//USE_TBAR 
-		ScreenInfo *screens;
-	} X;
 } JBWMEnvironment; 
 
 extern JBWMEnvironment jbwm;
@@ -43,6 +41,6 @@ extern JBWMEnvironment jbwm;
 #ifdef D
 #undef D
 #endif//D
-#define D jbwm.X.dpy
+#define D jbwm.dpy
 
 #endif /* not JBWM_ENVIRONMENT_H */

@@ -8,10 +8,10 @@
 static inline ScreenInfo *
 find_screen(const Window root)
 {
-	uint8_t i = ScreenCount(jbwm.X.dpy);
+	uint8_t i = ScreenCount(jbwm.dpy);
 	while(i--)
-		if(jbwm.X.screens[i].root == root)
-			return &jbwm.X.screens[i];
+		if(jbwm.screens[i].root == root)
+			return &jbwm.screens[i];
 	return NULL;
 }
 

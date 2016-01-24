@@ -76,7 +76,7 @@ resize(Client *restrict c)
 	const uint32_t f=c->flags;
 	if(f&JB_NO_RESIZE||f&JB_SHADED)
 		return;
-	if(!grab_pointer(c->screen->root, jbwm.X.cursor))
+	if(!grab_pointer(c->screen->root, jbwm.cursor))
 		return;
 	// Valid with restricted c, as it is derived from c:
 	XSizeHints *g=&(c->size);
@@ -173,7 +173,7 @@ drag(Client *restrict c)
 	if(c->flags & JB_NO_MOVE)
 		return;
 	const Window root=c->screen->root;
-	if(!grab_pointer(root, jbwm.X.cursor))
+	if(!grab_pointer(root, jbwm.cursor))
 		return;
 	XSizeHints *g=&(c->size);
 	drag_event_loop(c, get_mouse_position(root), (XPoint){g->x, g->y});

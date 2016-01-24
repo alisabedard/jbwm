@@ -71,6 +71,7 @@
 
 // jbwm.c:
 void 
-jbwm_grab_button(const Window w, const unsigned int mask, const unsigned int button);
+jbwm_grab_button(const Window w, const unsigned int mask, 
+	const unsigned int button);
 
 #endif /* not JBWM_JBWM_H */
