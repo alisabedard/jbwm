@@ -181,14 +181,14 @@ grab(ScreenInfo * s, KeySym * ks, const unsigned int mask)
 {
 	for(;*ks; ks++)
 	{
-		const int gm=GrabModeAsync;
 		XGrabKey(D, XKeysymToKeycode(jbwm.X.dpy, *ks), 
-			jbwm.keymasks.grab| mask, s->root, true, gm, gm); 
+			jbwm.keymasks.grab| mask, s->root, true, GrabModeAsync, 
+			GrabModeAsync); 
 	}
 }
 
 void
-grab_keys_for_screen(ScreenInfo * s)
+grab_keys_for_screen(ScreenInfo *restrict s)
 {
 	KeySym keys[] = JBWM_KEYS_TO_GRAB;
 	grab(s, keys, 0);

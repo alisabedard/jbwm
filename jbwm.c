@@ -18,7 +18,7 @@ static unsigned int
 parse_modifiers(char *arg)
 {
 	LOG("parse_modifiers()");
-	struct
+	const struct
 	{
 		const char *name;
 		const unsigned int mask;

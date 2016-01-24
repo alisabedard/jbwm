@@ -16,7 +16,7 @@ draw_outline(Client *c)
 	/* restrict, as all changes will occur through g */
 	XSizeHints *restrict g=&(c->size);
 	const bool tb=!(c->flags&JB_NO_TB);
-	XRectangle r[]={{.x=g->x, .y=g->y, .width=g->width, 
+	XRectangle r[]={{.x=g->x, .y=g->y, .width=g->width,
 		.height=g->height}, {.x=g->x, .y=g->y-(tb?TDIM:0), 
 		.width=g->width, .height=(tb?TDIM:0)-c->border}};
 	ScreenInfo *s=c->screen;
@@ -44,7 +44,7 @@ recalculate_resize(XSizeHints *restrict g, XPoint p1, XPoint p2)
 }
 
 static bool
-grab_pointer(Window w, Cursor cursor)
+grab_pointer(const Window w, const Cursor cursor)
 {
 	return XGrabPointer(D, w, false, MouseMask, GrabModeAsync, 
 		GrabModeAsync, None, cursor, CurrentTime) == GrabSuccess;
@@ -84,7 +84,7 @@ resize(Client *restrict c)
 	if(f&JB_SHAPED) // Bugfix for offset issue
 		g->height+=TDIM;
 #endif//USE_SHAPE
-	XWarpPointer(D, None, c->window, 0, 0, 0, 0, g->width-1, g->height-1);
+	XWarpPointer(D, None, c->window, 0, 0, 0, 0, g->width, g->height);
 	XEvent ev;
 #ifndef SOLID
 	if(c->border)
@@ -98,7 +98,7 @@ resize_loop:
 		handle_motion_notify(c, &(ev.xmotion));
 		break;
 	case ButtonRelease:
-		configure(&(c->size), c->window);
+		configure(g, c->window);
 #ifndef SOLID
 		if(c->border)
 			XUngrabServer(D);
@@ -166,7 +166,7 @@ get_mouse_position(Window w)
 }
 
 void
-drag(Client * c)
+drag(Client *restrict c)
 {
 	LOG("drag");
 	assert(c);
@@ -204,7 +204,7 @@ moveresize(Client *restrict c)
 }
 
 void
-maximize(Client * c)
+maximize(Client *restrict c)
 {
 	LOG("maximize");
 	assert(c);

@@ -70,6 +70,7 @@ void jbwm_handle_key_event(XKeyEvent * e);
 	KEY_KILL, JBWM_DIRECTION_KEYS, JBWM_VWM_KEYS, 0\
 }
 
-void grab_keys_for_screen(ScreenInfo * s);
+void 
+grab_keys_for_screen(ScreenInfo *restrict s);
 
 #endif /* __KEYS_H */

@@ -7,7 +7,7 @@
 
 #ifdef USE_TBAR
 void
-shade(Client * c)
+shade(Client *restrict c)
 {
 	LOG("shade");
 	assert(c);
@@ -44,7 +44,7 @@ shade(Client * c)
 #endif//USE_TBAR
 
 void
-client_to_vdesk(Client *c, const uint8_t d)
+client_to_vdesk(Client *restrict c, const uint8_t d)
 {
 	LOG("client_to_vdesk");
 	assert(c);
@@ -69,8 +69,9 @@ find_client(const Window w)
 		c=c->next;
 	return c;
 }
+
 void
-set_wm_state(Client * c, int state)
+set_wm_state(Client *restrict c, const int state)
 {
 	assert(c);
 	LOG("set_wm_state(%d, %d)", (int)c->window, state);
@@ -78,7 +79,7 @@ set_wm_state(Client * c, int state)
 }
 
 void
-select_client(Client * c)
+select_client(Client *restrict c)
 {
 	LOG("select_client");
 	if(jbwm.current)
@@ -133,7 +134,6 @@ static void
 unparent_window(Client * c)
 {
 	LOG("unparent_window");
-	if(!c->parent) return;
 	XReparentWindow(D, c->window, c->screen->root, c->size.x, c->size.y);
 	XRemoveFromSaveSet(D, c->window);
 	if(c->parent) XDestroyWindow(D, c->parent);
@@ -162,7 +162,7 @@ remove_client(Client * c)
 }
 
 void
-xmsg(Window w, Atom a, long x)
+xmsg(const Window w, const Atom a, const long x)
 {
 	XLOG("xmsg");
 	XEvent ev = {.xclient.type=ClientMessage, .xclient.window=w, 
@@ -172,7 +172,7 @@ xmsg(Window w, Atom a, long x)
 }
 
 void
-send_wm_delete(Client * c)
+send_wm_delete(const Client *restrict c)
 {
 	LOG("send_wm_delete");
 	xmsg(c->window, XA("WM_PROTOCOLS"), XA("WM_DELETE_WINDOW"));
@@ -180,7 +180,7 @@ send_wm_delete(Client * c)
 
 #ifdef USE_SHAPE
 bool
-set_shape(Client * c)
+set_shape(Client *restrict c)
 {
 	XLOG("set_shape");
 	/* Validate inputs:  Make sure that the SHAPE extension is available, 

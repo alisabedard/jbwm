@@ -64,3 +64,5 @@ distclean: clean
 archive: distclean
 	cd ..;  tar cJf $(PROG)-$(version).tar.xz $(PROG)
 
+tags:
+	ctags *
