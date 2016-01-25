@@ -59,7 +59,7 @@ clean:
 	rm -f $(PROG) *.o
 
 distclean: clean
-	rm -f *~ *.out .*.swp .*.swn
+	rm -f *~ *.out .*.swp .*.swn *.orig
 
 archive: distclean
 	cd ..;  tar cJf $(PROG)-$(version).tar.xz $(PROG)
