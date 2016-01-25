@@ -6,7 +6,7 @@
 #ifndef JBWM_ENVIRONMENT_H
 #define JBWM_ENVIRONMENT_H
 
-typedef struct 
+typedef struct
 {
 	bool need_cleanup;
 	struct
@@ -22,25 +22,25 @@ typedef struct
 #ifdef USE_TBAR
 #ifdef USE_XFT
 	XftFont *font;
-#else//! USE_XFT 
+#else //! USE_XFT
 	XFontStruct *font;
-#endif//USE_XFT
-#endif//USE_TBAR 
-	
+#endif //USE_XFT
+#endif //USE_TBAR
+
 #ifdef USE_TBAR
 	struct
 	{
 		GC close, shade, resize;
 	} gc;
-#endif//USE_TBAR
-} JBWMEnvironment; 
+#endif //USE_TBAR
+} JBWMEnvironment;
 
 extern JBWMEnvironment jbwm;
 
 // Convenience reference to display, ensure unique:
 #ifdef D
 #undef D
-#endif//D
+#endif //D
 #define D jbwm.dpy
 
 #endif /* not JBWM_ENVIRONMENT_H */

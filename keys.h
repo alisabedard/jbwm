@@ -50,7 +50,6 @@ void jbwm_handle_key_event(XKeyEvent * e);
 #define KEY_KILL	XK_q
 #endif
 
-
 #define JBWM_NUM_KEYS XK_0, XK_1, XK_2, XK_3, XK_4, XK_5, XK_6, XK_7,\
 	 XK_8, XK_9
 
@@ -70,7 +69,6 @@ void jbwm_handle_key_event(XKeyEvent * e);
 	KEY_KILL, JBWM_DIRECTION_KEYS, JBWM_VWM_KEYS, 0\
 }
 
-void 
-grab_keys_for_screen(ScreenInfo *restrict s);
+void grab_keys_for_screen(ScreenInfo * restrict s);
 
 #endif /* __KEYS_H */

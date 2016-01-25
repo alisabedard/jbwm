@@ -7,71 +7,70 @@
 
 #ifdef USE_TBAR
 void
-shade(Client *restrict c)
+shade(Client * restrict c)
 {
 	LOG("shade");
 	assert(c);
 	// Honor !MWM_FUNC_MINIMIZE
 	if(c->flags & JB_NO_MIN)
 		return;
-        /* This implements window shading, a substitute 
-           for iconification.  */
-        if(c->flags & JB_SHADED)
-        { // Unshade
-                c->size.height=c->shade_height;
-                c->flags &= ~JB_SHADED;
-                XMapWindow(D, c->window);
-                moveresize(c);
+	/* This implements window shading, a substitute 
+	   for iconification.  */
+	if(c->flags & JB_SHADED)
+	{	// Unshade
+		c->size.height = c->shade_height;
+		c->flags &= ~JB_SHADED;
+		XMapWindow(D, c->window);
+		moveresize(c);
 		set_wm_state(c, NormalState);
 #ifdef EWMH
 		ewmh_remove_state(c->window, ewmh.WM_STATE_SHADED);
-#endif//EWMH
-        }
-        else // Shade the client
-        {
-                c->shade_height = c->size.height;
-                c->ignore_unmap++;
-                XUnmapWindow(D, c->window);
-                c->size.height=0;
-                c->flags |= JB_SHADED;
+#endif //EWMH
+	} else	// Shade the client
+	{
+		c->shade_height = c->size.height;
+		c->ignore_unmap++;
+		XUnmapWindow(D, c->window);
+		c->size.height = 0;
+		c->flags |= JB_SHADED;
 		set_wm_state(c, IconicState);
 #ifdef EWMH
 		ewmh_add_state(c->window, ewmh.WM_STATE_SHADED);
-#endif//EWMH
-                select_client(c);
+#endif //EWMH
+		select_client(c);
 	}
 }
-#endif//USE_TBAR
+#endif //USE_TBAR
 
 void
-client_to_vdesk(Client *restrict c, const uint8_t d)
+client_to_vdesk(Client * restrict c, const uint8_t d)
 {
 	LOG("client_to_vdesk");
 	assert(c);
-	c->vdesk=d;
-        c->vdesk=switch_vdesk(c->screen, d);
+	c->vdesk = d;
+	c->vdesk = switch_vdesk(c->screen, d);
 }
 
 /*
  * used all over the place.  return the client that has specified window as
  * either window or parent
  */
-__attribute__((hot))
+__attribute__ ((hot))
 Client *
 find_client(const Window w)
 {
-	Client *c=jbwm.head;
+	Client *c = jbwm.head;
 #ifdef USE_TBAR
-	while(c&&c->parent!=w&&c->window!=w&&c->titlebar!=w)
-#else//!USE_TBAR
-	while(c&&c->parent!=w&&c->window!=w)
-#endif//USE_TBAR
-		c=c->next;
+	while(c && c->parent != w && c->window != w && c->titlebar != w)
+#else //!USE_TBAR
+	while(c && c->parent != w && c->window != w)
+#endif //USE_TBAR
+		c = c->next;
 	return c;
 }
 
 void
-set_wm_state(Client *restrict c, const int state)
+set_wm_state(Client * restrict c, const int state)
 {
 	assert(c);
 	LOG("set_wm_state(%d, %d)", (int)c->window, state);
@@ -79,7 +78,7 @@ set_wm_state(Client *restrict c, const int state)
 }
 
 void
-select_client(Client *restrict c)
+select_client(Client * restrict c)
 {
 	LOG("select_client");
 	if(jbwm.current)
@@ -91,8 +90,9 @@ select_client(Client *restrict c)
 	if(c)
 	{
 		c->flags |= JB_ACTIVE;
-		XSetWindowBorder(D, c->parent, c->flags&JB_STICKY
-			? c->screen->fc.pixel : c->screen->fg.pixel);
+		XSetWindowBorder(D, c->parent,
+			c->flags & JB_STICKY ? c->screen->fc.pixel : c->
+			screen->fg.pixel);
 #ifdef USE_CMAP
 		XInstallColormap(D, c->cmap);
 #endif /* USE_CMAP */
@@ -100,7 +100,7 @@ select_client(Client *restrict c)
 #ifdef EWMH
 		XPROP(c->screen->root, ewmh.ACTIVE_WINDOW, XA_WINDOW,
 			&(c->window), 1);
-#endif//EWMH
+#endif //EWMH
 	}
 	jbwm.current = c;
 }
@@ -109,25 +109,27 @@ void
 stick(Client * c)
 {
 	LOG("stick");
-	c->vdesk=c->screen->vdesk;
-	c->flags^=JB_STICKY; // toggle
+	c->vdesk = c->screen->vdesk;
+	c->flags ^= JB_STICKY;	// toggle
 	select_client(c);
 #ifdef USE_TBAR
 	update_titlebar(c);
-#endif//USE_TBAR
+#endif //USE_TBAR
 }
 
 static inline void
 relink_window_list(Client * c)
 {
 	LOG("relink_window_list");
-	if(jbwm.head == c) jbwm.head = c->next;
-	else for(Client *p = jbwm.head; p && p->next; p = p->next)
-		if(p->next == c)
-		{
-			p->next = c->next;
-			return;
-		}
+	if(jbwm.head == c)
+		jbwm.head = c->next;
+	else
+		for(Client * p = jbwm.head; p && p->next; p = p->next)
+			if(p->next == c)
+			{
+				p->next = c->next;
+				return;
+			}
 }
 
 static void
@@ -136,28 +138,31 @@ unparent_window(Client * c)
 	LOG("unparent_window");
 	XReparentWindow(D, c->window, c->screen->root, c->size.x, c->size.y);
 	XRemoveFromSaveSet(D, c->window);
-	if(c->parent) XDestroyWindow(D, c->parent);
-	c->parent=0;
+	if(c->parent)
+		XDestroyWindow(D, c->parent);
+	c->parent = 0;
 }
 
 void
 remove_client(Client * c)
 {
 	LOG("remove_client");
-	if(c->flags&JB_REMOVE)
+	if(c->flags & JB_REMOVE)
 	{
 #ifdef EWMH
 		XDeleteProperty(D, c->window, ewmh.WM_DESKTOP);
 		XDeleteProperty(D, c->window, ewmh.WM_STATE);
-#endif//EWMH
+#endif //EWMH
 		set_wm_state(c, WithdrawnState);
 	}
 #ifdef EWMH
-	else XDeleteProperty(D, c->window, ewmh.WM_ALLOWED_ACTIONS);
-#endif//EWMH
+	else
+		XDeleteProperty(D, c->window, ewmh.WM_ALLOWED_ACTIONS);
+#endif //EWMH
 	unparent_window(c);
 	relink_window_list(c);
-	if(jbwm.current==c) jbwm.current=NULL;
+	if(jbwm.current == c)
+		jbwm.current = NULL;
 	free(c);
 }
 
@@ -165,14 +170,15 @@ void
 xmsg(const Window w, const Atom a, const long x)
 {
 	XLOG("xmsg");
-	XEvent ev = {.xclient.type=ClientMessage, .xclient.window=w, 
-		.xclient.message_type=a, .xclient.format=32, 
-		.xclient.data.l[0]=x, .xclient.data.l[1]=CurrentTime};
+	XEvent ev = {.xclient.type = ClientMessage,.xclient.window = w,
+		.xclient.message_type = a,.xclient.format = 32,
+		.xclient.data.l[0] = x,.xclient.data.l[1] = CurrentTime
+	};
 	XSendEvent(D, w, false, NoEventMask, &ev);
 }
 
 void
-send_wm_delete(const Client *restrict c)
+send_wm_delete(const Client * restrict c)
 {
 	LOG("send_wm_delete");
 	xmsg(c->window, XA("WM_PROTOCOLS"), XA("WM_DELETE_WINDOW"));
@@ -180,17 +186,17 @@ send_wm_delete(const Client *restrict c)
 
 #ifdef USE_SHAPE
 bool
-set_shape(Client *restrict c)
+set_shape(Client * restrict c)
 {
 	XLOG("set_shape");
 	/* Validate inputs:  Make sure that the SHAPE extension is available, 
-		and make sure that C is initialized.  */
+	   and make sure that C is initialized.  */
 	if(c && (c->flags & JB_SHAPED))
 	{
-		XShapeCombineShape(D, c->parent, ShapeBounding, 0, 0, 
+		XShapeCombineShape(D, c->parent, ShapeBounding, 0, 0,
 			c->window, ShapeBounding, ShapeSet);
 		return true;
 	}
 	return false;
 }
-#endif//USE_SHAPE
+#endif //USE_SHAPE

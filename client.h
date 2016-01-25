@@ -6,39 +6,28 @@
 #ifndef JBWM_CLIENT_H
 #define JBWM_CLIENT_H
 
-void
-shade(Client *restrict c);
+void shade(Client * restrict c);
 
-void
-client_to_vdesk(Client *restrict c, const uint8_t d);
+void client_to_vdesk(Client * restrict c, const uint8_t d);
 
-void 
-xmsg(const Window w, const Atom a, const long x);
+void xmsg(const Window w, const Atom a, const long x);
 
-void
-send_wm_delete(const Client *restrict c);
+void send_wm_delete(const Client * restrict c);
 
-Client *
-find_client(Window w);
+Client *find_client(Window w);
 
-void 
-select_client(Client *restrict c);
+void select_client(Client * restrict c);
 
-void 
-stick(Client * c);
+void stick(Client * c);
 
-void 
-remove_client(Client * c);
+void remove_client(Client * c);
 
-void 
-send_config(Client * c);
+void send_config(Client * c);
 
-void 
-set_wm_state(Client *restrict c, const int state);
+void set_wm_state(Client * restrict c, const int state);
 
 #ifdef USE_SHAPE
-bool
-set_shape(Client *restrict c);
-#endif//USE_SHAPE
+bool set_shape(Client * restrict c);
+#endif //USE_SHAPE
 
 #endif /* JBWM_CLIENT_H */

@@ -8,42 +8,40 @@
 static void
 button1_event(XButtonEvent * e
 #ifndef USE_TBAR
-	__attribute__((unused))
-#endif//!USE_TBAR
+	__attribute__ ((unused))
+#endif //!USE_TBAR
 	, Client * c)
 {
 	XRaiseWindow(D, c->parent);
 #ifdef USE_TBAR
 	const uint16_t w = c->size.width;
-	const XPoint p={e->x,e->y};
-	const uint32_t f=c->flags;
-	if(!(f&JB_NO_CLOSE) && (p.x < TDIM) && (p.y < TDIM)) // Close button
+	const XPoint p = { e->x, e->y };
+	const uint32_t f = c->flags;
+	if(!(f & JB_NO_CLOSE) && (p.x < TDIM) && (p.y < TDIM))	// Close button
 	{
 		/* This fixes a bug where deleting a shaded window will cause
 		   the parent window to stick around as a ghost window. */
-		if(c->flags&JB_SHADED)
-			shade(c);		
+		if(c->flags & JB_SHADED)
+			shade(c);
 		send_wm_delete(c);
-	}
-	else if(f&JB_NO_RESIZE && (p.x > w - TDIM)) // Resize button
+	} else if(f & JB_NO_RESIZE && (p.x > w - TDIM))	// Resize button
 	{
-		resize(c);	
-	}
-	else if(!(f&JB_NO_MIN) && (p.x > w - TDIM - TDIM && p.y < TDIM))
-	{ // Shade button
+		resize(c);
+	} else if(!(f & JB_NO_MIN) && (p.x > w - TDIM - TDIM && p.y < TDIM))
+	{	// Shade button
 		shade(c);
-	}
-	else // Handle
-#endif//USE_TBAR
-		drag(c); // Move the window
+	} else	// Handle
+#endif //USE_TBAR
+		drag(c);	// Move the window
 }
 
 void
 jbwm_handle_button_event(XButtonEvent * e)
 {
-	Client *c=find_client(e->window);
+	Client *c = find_client(e->window);
 	// Return if invalid event or maximized
-	if(!c || c->flags & JB_MAXIMIZED) return;
+	if(!c || c->flags & JB_MAXIMIZED)
+		return;
 	switch (e->button)
 	{
 	case Button1:
@@ -58,7 +56,7 @@ jbwm_handle_button_event(XButtonEvent * e)
 		   users especially, where it is difficult
 		   to register a middle button press, even
 		   with X Emulate3Buttons enabled.  */
-		c->flags&JB_SHADED?drag(c):resize(c);
+		c->flags & JB_SHADED ? drag(c) : resize(c);
 		break;
 	}
 }

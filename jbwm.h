@@ -17,7 +17,7 @@
 #include <sysexits.h>
 #ifdef STDIO
 #include <stdio.h>
-#endif//STDIO
+#endif //STDIO
 
 // X11:
 #include <X11/cursorfont.h>
@@ -55,23 +55,22 @@
 // Optional modules:
 #ifdef USE_TBAR
 #include "titlebar.h"
-#endif//USE_TBAR 
+#endif //USE_TBAR
 
 #ifdef MWM
 #include "mwm.h"
-#endif//MWM
+#endif //MWM
 
 #ifdef EWMH
 #include "ewmh.h"
-#endif//EWMH
+#endif //EWMH
 
 #ifdef USE_SNAP
 #include "snap.h"
-#endif//USE_SNAP
+#endif //USE_SNAP
 
 // jbwm.c:
-void 
-jbwm_grab_button(const Window w, const unsigned int mask, 
+void jbwm_grab_button(const Window w, const unsigned int mask,
 	const unsigned int button);
 
 #endif /* not JBWM_JBWM_H */

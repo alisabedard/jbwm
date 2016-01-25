@@ -29,7 +29,7 @@
 #define JB_NO_MIN_DECOR		(1<<18)
 #define JB_NO_MAX_DECOR		(1<<19)
 
-typedef struct Client Client; 
+typedef struct Client Client;
 struct Client
 {
 	uint8_t vdesk;
@@ -38,16 +38,16 @@ struct Client
 #ifdef USE_TBAR
 	uint16_t exposed_width;
 	uint16_t shade_height;
-#endif//USE_TBAR
+#endif //USE_TBAR
 	uint32_t flags;
 	int win_gravity_hint;
 #ifdef USE_CMAP
 	Colormap cmap;
-#endif//USE_CMAP
+#endif //USE_CMAP
 	Window window, parent;
 #ifdef USE_TBAR
 	Window titlebar;
-#endif//USE_TBAR
+#endif //USE_TBAR
 	ScreenInfo *screen;
 	Client *next;
 	XSizeHints size, old_size;

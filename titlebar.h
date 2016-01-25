@@ -5,10 +5,10 @@
 #ifndef JBWM_TITLEBAR_H
 #define JBWM_TITLEBAR_H
 
-void 
-update_titlebar(Client * c);
+void update_titlebar(Client * c);
 
 #undef TDIM
+
 /* Ensure that the title text fits within the titlebar.  */
 #define TDIM (jbwm.font->ascent+jbwm.font->descent)
 

@@ -6,13 +6,13 @@
 #ifndef JBWM_SCREEN_H
 #define JBWM_SCREEN_H
 
-void drag(Client *restrict c);
-void moveresize(Client *restrict c);
-void resize(Client *restrict c);
-void hide(Client *restrict c);
-void unhide(Client *restrict c);
+void drag(Client * restrict c);
+void moveresize(Client * restrict c);
+void resize(Client * restrict c);
+void hide(Client * restrict c);
+void unhide(Client * restrict c);
 uint8_t switch_vdesk(ScreenInfo * s, const uint8_t v);
-void maximize(Client *restrict c);
+void maximize(Client * restrict c);
 
 // Used by vdesk switching and EWMH
 #define DESKTOPS 10

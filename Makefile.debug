@@ -1,33 +1,18 @@
 # Debug
 CFLAGS=-O0 -ggdb -DDEBUG -DSTDIO -pg -Werror
 # Enable all warnings
-CFLAGS+=-W -Wall -Wextra
+CFLAGS+=-W -Wall -Wextra -Werror
 
 # Uncomment to enable SHAPE extension support
 DEFINES += -DUSE_SHAPE
 EXTRALIBS += -lXext # Required for SHAPE extension
-
-#include xft.mk
-
-# Uncomment to enable colormap support
-# Saves 600 int8_ts
+include xft.mk
 DEFINES+= -DUSE_CMAP
-
-# Uncomment to enable parsing command line arguments.
-#  Saves ~2030 int8_ts
 DEFINES += -DUSE_ARGV 
-
-# Uncomment to enable titlebars
 DEFINES += -DUSE_TBAR
 EXTRASRCS += titlebar.c 
-
-# Uncomment to enable window snapping. (Adds 4k int8_ts)
-DEFINES += -DUSE_SNAP
-
-# Uncomment to enable STDIO
+include snap.mk
 DEFINES += -DSTDIO
-
-# Uncomment to enable EWMH (Adds ~4k int8_ts)
 DEFINES += -DEWMH
 EXTRASRCS += ewmh.c
 
