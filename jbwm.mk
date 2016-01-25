@@ -56,7 +56,7 @@ install: strip
 	$(INSTALL) $(PROG).1 $(prefix)/share/man/man1
 
 clean:
-	rm -f $(PROG) *.o *~
+	rm -f $(PROG) *.o
 
 distclean: clean
 	rm -f *~ *.out .*.swp .*.swn
