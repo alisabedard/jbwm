@@ -11,32 +11,25 @@ get_property(Window w, Atom property, Atom type, unsigned long *num_items)
 {
 	assert(num_items);
 	int actual_format;
-	unsigned long int8_ts_after;
+	unsigned long bytes_after;
 	unsigned char *prop;
 
-	if(XGetWindowProperty(D, w, property, 0L, 1024, false, 
-		property, &type, &actual_format, num_items, 
-		&int8_ts_after, &prop) == Success)
+	if(XGetWindowProperty(D, w, property, 0L, 1024, false, property, 
+		&type, &actual_format, num_items, &bytes_after, &prop) 
+		== Success)
 		return prop;
 	return NULL;
 }
 #endif//EWMH||MWM
 
 static void
-init_size(Client * c, XWindowAttributes * attr)
+init_size(Client *restrict c, XWindowAttributes *restrict attr)
 {
 	const Dim dim={attr->width, attr->height};
-	if((dim.w >= c->size.min_width)
-		&& (dim.h >= c->size.min_height))
-	{
-		c->size.width=dim.w;
-		c->size.height=dim.h;
-	}
-	else
-	{
-		c->size.width=c->size.min_width;
-		c->size.height=c->size.min_height;
-	}
+	const bool valid= (dim.w >= c->size.min_width) 
+		&& (dim.h >= c->size.min_height);
+	c->size.width=valid?dim.w:c->size.min_width;
+	c->size.height=valid?dim.h:c->size.min_height;
 }
 
 static void
@@ -58,7 +51,8 @@ init_long_properties(Client * c)
 	if(lprop && nitems && (lprop[0]<9))
 		c->vdesk=lprop[0];
 	if(!lprop)
-		XPROP(c->window, ewmh.WM_DESKTOP, XA_CARDINAL, &(c->vdesk), 1);
+		XPROP(c->window, ewmh.WM_DESKTOP, XA_CARDINAL,
+			&(c->vdesk), 1);
 	else
 		XFree(lprop);
 }
@@ -155,7 +149,7 @@ reparent(Client * c)
 }
 
 static Client *
-Client_new(Window w, ScreenInfo * s)
+Client_new(Window w, ScreenInfo *restrict s)
 {
 	LOG("Client_new(%d,s)", (int)w);
 	Client *c = calloc(1, sizeof(Client));
