@@ -23,26 +23,10 @@ parse_modifiers(char *arg)
 	{
 		const char *name;
 		const unsigned int mask;
-	} m[] =
-	{
-		{
-		"shift", ShiftMask},
-		{
-		"lock", LockMask},
-		{
-		"control", ControlMask},
-		{
-		"mod", Mod1Mask},
-		{
-		"mod1", Mod1Mask},
-		{
-		"mod2", Mod2Mask},
-		{
-		"mod3", Mod3Mask},
-		{
-		"mod4", Mod4Mask},
-		{
-	"mod5", Mod5Mask}};
+	} m[] = { { "shift", ShiftMask}, { "lock", LockMask}, 
+		{ "control", ControlMask}, { "mod", Mod1Mask}, { "mod1", Mod1Mask},
+		{ "mod2", Mod2Mask}, { "mod3", Mod3Mask}, { "mod4", Mod4Mask},
+		{ "mod5", Mod5Mask}};
 	for(uint8_t i = 0; i < 9; i++)
 		if(!strcmp(m[i].name, arg))
 			return m[i].mask;
