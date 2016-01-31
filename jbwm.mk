@@ -59,10 +59,13 @@ clean:
 	rm -f $(PROG) *.o
 
 distclean: clean
-	rm -f *~ *.out .*.swp .*.swn *.orig
+	rm -f *~ *.out .*.swp .*.swn *.orig .*~ *~~
 
 archive: distclean
 	cd ..;  tar cJf $(PROG)-$(version).tar.xz $(PROG)
-
+ 
 tags:
 	ctags *
+indent:
+	indent *.[ch]
+	sed 's/ \/\//\/\//g' -i'~~' *.[ch]

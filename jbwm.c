@@ -1,11 +1,11 @@
 // jbwm - Minimalist Window Manager for X
-// Copyright 2008-2016, Jeffrey E. Bedard <jefbed@gmail.com> 
+// Copyright 2008-2016, Jeffrey E. Bedard <jefbed@gmail.com>
 // Copyright 1999-2015, Ciaran Anscomb <jbwm@6809.org.uk>
 // See README for license and other details.
 
 #include "jbwm.h"
 
-// Main application data structure.  
+// Main application data structure.
 JBWMEnvironment jbwm;
 
 /* Several following functions are declared cold as they are only used on
@@ -15,152 +15,167 @@ program startup.  */
 
 /* Used for overriding the default WM modifiers */
 __attribute__ ((cold))
-static unsigned int
-parse_modifiers(char *arg)
+static unsigned int parse_modifiers(char *arg)
 {
 	LOG("parse_modifiers()");
-	const struct { const char *name; const unsigned int mask; } m[] 
-		= { { "shift", ShiftMask}, { "lock", LockMask}, 
-		{ "control", ControlMask}, { "mod", Mod1Mask}, 
-		{ "mod1", Mod1Mask}, { "mod2", Mod2Mask}, 
-		{ "mod3", Mod3Mask}, { "mod4", Mod4Mask},
-		{ "mod5", Mod5Mask}};
-	for(uint8_t i = 0; i < 9; i++)
-		if(!strcmp(m[i].name, arg))
+	const struct {
+		const char *name;
+		const unsigned int mask;
+	} m[]
+	    = { {
+	"shift", ShiftMask}, {
+	"lock", LockMask}, {
+	"control", ControlMask}, {
+	"mod", Mod1Mask}, {
+	"mod1", Mod1Mask}, {
+	"mod2", Mod2Mask}, {
+	"mod3", Mod3Mask}, {
+	"mod4", Mod4Mask}, {
+	"mod5", Mod5Mask}
+	};
+
+	for (uint8_t i = 0; i < 9; i++)
+		if (!strcmp(m[i].name, arg))
 			return m[i].mask;
+
 	return 0;
 }
 
-static struct
-{
+static struct {
 	char *fg, *bg, *fc;
 } jbwmopt;
 
-static void
-parse_argv(int argc, char **argv)
+static void parse_argv(int argc, char **argv)
 {
 	LOG("parse_argv(%d,%s...)", argc, argv[0]);
 	const char *optstring = "1:2:b:d:f:s:V";
 
-	for(int opt; (opt = getopt(argc, argv, optstring)) != -1;)
-	{
-		switch (opt)
-		{
+	for (int opt; (opt = getopt(argc, argv, optstring)) != -1;) {
+		switch (opt) {
 		case '1':
 			jbwm.keymasks.grab = parse_modifiers(optarg);
 			break;
+
 		case '2':
 			jbwm.keymasks.mod = parse_modifiers(optarg);
 			break;
+
 		case 'b':
 			jbwmopt.bg = optarg;
 			break;
+
 		case 'd':
 			setenv("DISPLAY", optarg, 1);
 			break;
+
 		case 'f':
 			jbwmopt.fg = optarg;
 			break;
+
 		case 's':
 			jbwmopt.fc = optarg;
 			break;
 #ifdef STDIO
+
 		case 'V':
 			puts(VERSION);
 			exit(EX_OK);
+
 		default:	/* Usage */
 			fprintf(stderr, "%s [%s]\n", argv[0], optstring);
-#else //!STDIO
+#else//!STDIO
+
 		default:
-#endif //STDIO
+#endif//STDIO
 			exit(EX_USAGE);
 		}
 	}
 }
-#endif //USE_ARGV
+#endif//USE_ARGV
 
 #ifdef USE_TBAR
-static void
-setup_fonts(void)
+static void setup_fonts(void)
 {
 #ifdef USE_XFT
 	jbwm.font =
-		XftFontOpen(D, DefaultScreen(D), XFT_FAMILY, XftTypeString,
-		DEF_FONT, XFT_SIZE, XftTypeDouble, FONT_SIZE, NULL);
-#else //!USE_XFT
+	    XftFontOpen(D, DefaultScreen(D), XFT_FAMILY, XftTypeString,
+			DEF_FONT, XFT_SIZE, XftTypeDouble, FONT_SIZE, NULL);
+#else//!USE_XFT
 	jbwm.font = XLoadQueryFont(D, DEF_FONT);
-	if(!jbwm.font)
+
+	if (!jbwm.font)
 		jbwm.font = XLoadQueryFont(D, FALLBACK_FONT);
-#endif //USE_XFT
-	if(!jbwm.font)
+
+#endif//USE_XFT
+
+	if (!jbwm.font)
 		ERROR("FONT");
 }
-#endif //USE_TBAR
+#endif//USE_TBAR
 
 void
 jbwm_grab_button(const Window w, const unsigned int mask,
-	const unsigned int btn)
+		 const unsigned int btn)
 {
 	XGrabButton(D, btn, mask, w, false,
-		ButtonPressMask | ButtonReleaseMask, GrabModeAsync,
-		GrabModeSync, None, None);
+		    ButtonPressMask | ButtonReleaseMask, GrabModeAsync,
+		    GrabModeSync, None, None);
 }
 
 __attribute__ ((cold))
-static void
-setup_event_listeners(const Window root)
+static void setup_event_listeners(const Window root)
 {
 	XSetWindowAttributes attr = {.event_mask =
-			SubstructureRedirectMask | SubstructureNotifyMask |
-			EnterWindowMask | PropertyChangeMask
+		    SubstructureRedirectMask | SubstructureNotifyMask |
+		    EnterWindowMask | PropertyChangeMask
 	};
 #ifdef CMAP
 	attr.event_mask |= ColormapChangeMask
-#endif //CMAP
-		XChangeWindowAttributes(D, root, CWEventMask, &attr);
+#endif//CMAP
+	    XChangeWindowAttributes(D, root, CWEventMask, &attr);
 }
 
 __attribute__ ((cold))
-static inline void
-allocate_colors(ScreenInfo * restrict s)
+static inline void allocate_colors(ScreenInfo * restrict s)
 {
 	XColor nullc;
 	const Colormap cm = DefaultColormap(D, s->screen);
 #ifdef USE_ARGV
 	XAllocNamedColor(D, cm, jbwmopt.fg ? jbwmopt.fg : DEF_FG, &s->fg,
-		&nullc);
+			 &nullc);
 	XAllocNamedColor(D, cm, jbwmopt.bg ? jbwmopt.bg : DEF_BG, &s->bg,
-		&nullc);
+			 &nullc);
 	XAllocNamedColor(D, cm, jbwmopt.fc ? jbwmopt.fc : DEF_FC, &s->fc,
-		&nullc);
-#else //!USE_ARGV
+			 &nullc);
+#else//!USE_ARGV
 	XAllocNamedColor(D, cm, DEF_FG, &s->fg, &nullc);
 	XAllocNamedColor(D, cm, DEF_BG, &s->bg, &nullc);
 	XAllocNamedColor(D, cm, DEF_FC, &s->fc, &nullc);
-#endif //USE_ARGV
+#endif//USE_ARGV
 }
 
-static inline void
-setup_clients(ScreenInfo * restrict s)
+static inline void setup_clients(ScreenInfo * restrict s)
 {
 	unsigned int nwins;
 	Window *wins;
 	Window d;
-	if(!XQueryTree(D, s->root, &d, &d, &wins, &nwins))
+
+	if (!XQueryTree(D, s->root, &d, &d, &wins, &nwins))
 		return;
-	while(nwins--)
-	{
+
+	while (nwins--) {
 		XWindowAttributes a;
 		XGetWindowAttributes(D, wins[nwins], &a);
-		if(!a.override_redirect && (a.map_state == IsViewable))
+
+		if (!a.override_redirect && (a.map_state == IsViewable))
 			make_new_client(wins[nwins], s);
 	}
+
 	XFree(wins);
 }
 
 __attribute__ ((cold))
-static inline void
-setup_screen_elements(const uint8_t i)
+static inline void setup_screen_elements(const uint8_t i)
 {
 	ScreenInfo *restrict s = &jbwm.screens[i];
 	s->screen = i;
@@ -171,26 +186,25 @@ setup_screen_elements(const uint8_t i)
 }
 
 __attribute__ ((cold))
-static inline void
-setup_gc(ScreenInfo * s)
+static inline void setup_gc(ScreenInfo * s)
 {
 	allocate_colors(s);
 	unsigned long vm =
-		GCFunction | GCSubwindowMode | GCLineWidth | GCForeground |
-		GCBackground;
+	    GCFunction | GCSubwindowMode | GCLineWidth | GCForeground |
+	    GCBackground;
 	XGCValues gv = {.foreground = s->fg.pixel,.background = s->bg.pixel,
 		.function = GXinvert,.subwindow_mode = IncludeInferiors,
-		.line_width = JBWM_BORDER };
+		.line_width = JBWM_BORDER
+	};
 #if defined(USE_TBAR) && !defined(USE_XFT)
 	gv.font = jbwm.font->fid;
 	vm |= GCFont;
-#endif //USE_TBAR&&!USE_XFT
+#endif//USE_TBAR&&!USE_XFT
 	s->gc = XCreateGC(D, s->root, vm, &gv);
 }
 
 __attribute__ ((cold))
-static void
-setup_screen(const uint8_t i)
+static void setup_screen(const uint8_t i)
 {
 	ScreenInfo *s = &jbwm.screens[i];
 	setup_screen_elements(i);
@@ -201,49 +215,50 @@ setup_screen(const uint8_t i)
 	setup_clients(s);
 #ifdef EWMH
 	setup_ewmh_for_screen(s);
-#endif //EWMH
+#endif//EWMH
 }
 
 __attribute__ ((cold))
-static inline void
-setup_screens(void)
+static inline void setup_screens(void)
 {
-	/* Now set up each screen in turn: jbwm.num_screens is used 
+	/* Now set up each screen in turn: jbwm.num_screens is used
 	   in scanning windows (XQueryTree) */
 	uint8_t i = ScreenCount(D);
 	jbwm.screens = malloc(i * sizeof(ScreenInfo));
-	while(i--)
+
+	while (i--)
 		setup_screen(i);
 }
 
-int
-handle_xerror(Display * dpy __attribute__ ((unused)), XErrorEvent * e)
+int handle_xerror(Display * dpy __attribute__ ((unused)), XErrorEvent * e)
 {
-	if((e->error_code == BadAccess)
-		&& (e->request_code == X_ChangeWindowAttributes))
+	if ((e->error_code == BadAccess)
+	    && (e->request_code == X_ChangeWindowAttributes))
 		ERROR("ROOT");
-	return 0;	// Ignore everything else.         
+
+	return 0;		// Ignore everything else.
 }
 
-int
-main(
+int main(
 #ifdef USE_ARGV
-	int argc, char **argv)
-#else //!USE_ARGV
-	void)
-#endif //USE_ARGV
+		int argc, char **argv)
+#else				//!USE_ARGV
+		void)
+#endif				//USE_ARGV
 {
 	jbwm.keymasks.grab = GRAB_MASK;
 	jbwm.keymasks.mod = MOD_MASK;
 #ifdef USE_ARGV
 	parse_argv(argc, argv);
-#endif //USE_ARGV
-	if(!(D = XOpenDisplay(NULL)))
+#endif//USE_ARGV
+
+	if (!(D = XOpenDisplay(NULL)))
 		ERROR("DISPLAY");
+
 	XSetErrorHandler(handle_xerror);
 #ifdef EWMH
 	ewmh_init();
-#endif //EWMH
+#endif//EWMH
 #ifdef USE_TBAR
 	/* Fonts only needed with title bars */
 	setup_fonts();

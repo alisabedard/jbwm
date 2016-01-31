@@ -1,5 +1,5 @@
 // jbwm - Minimalist Window Manager for X
-// Copyright 2008-2016, Jeffrey E. Bedard <jefbed@gmail.com> 
+// Copyright 2008-2016, Jeffrey E. Bedard <jefbed@gmail.com>
 // Copyright 1999-2015, Ciaran Anscomb <jbwm@6809.org.uk>
 // See README for license and other details.
 #ifndef JBWM_H
@@ -17,7 +17,7 @@
 #include <sysexits.h>
 #ifdef STDIO
 #include <stdio.h>
-#endif //STDIO
+#endif//STDIO
 
 // X11:
 #include <X11/cursorfont.h>
@@ -55,22 +55,22 @@
 // Optional modules:
 #ifdef USE_TBAR
 #include "titlebar.h"
-#endif //USE_TBAR
+#endif//USE_TBAR
 
 #ifdef MWM
 #include "mwm.h"
-#endif //MWM
+#endif//MWM
 
 #ifdef EWMH
 #include "ewmh.h"
-#endif //EWMH
+#endif//EWMH
 
 #ifdef USE_SNAP
 #include "snap.h"
-#endif //USE_SNAP
+#endif//USE_SNAP
 
 // jbwm.c:
 void jbwm_grab_button(const Window w, const unsigned int mask,
-	const unsigned int button);
+		      const unsigned int button);
 
 #endif /* not JBWM_JBWM_H */

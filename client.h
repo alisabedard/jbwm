@@ -1,5 +1,5 @@
 // jbwm - Minimalist Window Manager for X
-// Copyright 2008-2016, Jeffrey E. Bedard <jefbed@gmail.com> 
+// Copyright 2008-2016, Jeffrey E. Bedard <jefbed@gmail.com>
 // Copyright 1999-2015, Ciaran Anscomb <jbwm@6809.org.uk>
 // See README for license and other details.
 
@@ -28,6 +28,6 @@ void set_wm_state(Client * restrict c, const int state);
 
 #ifdef USE_SHAPE
 bool set_shape(Client * restrict c);
-#endif //USE_SHAPE
+#endif//USE_SHAPE
 
 #endif /* JBWM_CLIENT_H */

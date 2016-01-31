@@ -49,6 +49,9 @@ EXTRASRCS += ewmh.c
 # Uncomment to enable MWM hints
 include mwm.mk
 
+# Uncomment to enable window gravity code
+#DEFINES += -DGRAVITY
+
 # Uncomment to disable window outlines, and use solid drag/resize.
 # Saves ~300 bytes
 # Caveat: Slow

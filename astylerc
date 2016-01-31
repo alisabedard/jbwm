@@ -1,0 +1,14 @@
+style=linux
+indent=force-tab=8
+indent-cases
+indent-preproc-define
+convert-tabs
+min-conditional-indent=0
+break-blocks
+unpad-paren
+delete-empty-lines
+align-pointer=name
+keep-one-line-blocks
+remove-brackets
+keep-one-line-statements
+max-code-length=70

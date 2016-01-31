@@ -1,5 +1,5 @@
 // jbwm - Minimalist Window Manager for X
-// Copyright 2008-2016, Jeffrey E. Bedard <jefbed@gmail.com> 
+// Copyright 2008-2016, Jeffrey E. Bedard <jefbed@gmail.com>
 // Copyright 1999-2015, Ciaran Anscomb <jbwm@6809.org.uk>
 // See README for license and other details.
 
@@ -8,27 +8,27 @@
 
 #ifdef STDIO
 #define ERROR(msg) {fprintf(stderr, "%s\n", msg); exit(EX_SOFTWARE);}
-#else //!STDIO
+#else//!STDIO
 #define ERROR(...) exit(1)
-#endif //STDIO
+#endif//STDIO
 
 #if defined(DEBUG) && defined(STDIO)
 #define LOG(...) \
-{\
-	fprintf(stderr, "%s:%d:  ", __FILE__, __LINE__);\
-	fprintf(stderr, __VA_ARGS__); putc('\n', stderr);\
-}
+	{\
+		fprintf(stderr, "%s:%d:  ", __FILE__, __LINE__);\
+		fprintf(stderr, __VA_ARGS__); putc('\n', stderr);\
+	}
 #define MARK() LOG("MARK")
-#else // !DEBUG || !STDIO
+#else// !DEBUG || !STDIO
 #define LOG(...)
 #define MARK()
-#endif // DEBUG && STDIO
+#endif// DEBUG && STDIO
 
 #ifdef XDEBUG
 #define XLOG(...) LOG(__VA_ARGS__)
-#else //!XDEBUG
+#else//!XDEBUG
 #define XLOG(...)
-#endif //XDEBUG
+#endif//XDEBUG
 
 #define UNUSED(x)
 

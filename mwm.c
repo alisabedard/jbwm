@@ -1,4 +1,4 @@
-// Copyright 2016, Jeffrey E. Bedard <jefbed@gmail.com> 
+// Copyright 2016, Jeffrey E. Bedard <jefbed@gmail.com>
 #include "jbwm.h"
 
 // flags:
@@ -33,89 +33,95 @@
 // status:
 #define MWM_TEAROFF_WINDOW 1
 
-static void
-process_flags(Client * c)
+static void process_flags(Client * c)
 {
-	if(c->flags & JB_NO_BORDER)
+	if (c->flags & JB_NO_BORDER)
 		c->border = 0;
 
-	if(c->flags & JB_TEAROFF)
-	{
+	if (c->flags & JB_TEAROFF) {
 		c->border = 0;
 		c->flags |= JB_NO_RESIZE | JB_NO_MIN | JB_NO_MAX;
 	}
 }
 
-static void
-mwm_hints_decor(Client * c, unsigned long f)
+static void mwm_hints_decor(Client * c, unsigned long f)
 {
 	LOG("MWM_HINTS_DECORATIONS");
-	if(f & MWM_DECOR_ALL)
+
+	if (f & MWM_DECOR_ALL)
 		return;
-	if(!(f & MWM_DECOR_BORDER))
+
+	if (!(f & MWM_DECOR_BORDER))
 		c->flags |= JB_NO_BORDER;
-	if(!(f & MWM_DECOR_RESIZEH))
+
+	if (!(f & MWM_DECOR_RESIZEH))
 		c->flags |= JB_NO_RESIZE_DECOR;
-	if(!(f & MWM_DECOR_TITLE))
+
+	if (!(f & MWM_DECOR_TITLE))
 		c->flags |= JB_NO_TB;
-	if(!(f & MWM_DECOR_MENU))
+
+	if (!(f & MWM_DECOR_MENU))
 		c->flags |= JB_NO_CLOSE_DECOR;
-	if(!(f & MWM_DECOR_MINIMIZE))
+
+	if (!(f & MWM_DECOR_MINIMIZE))
 		c->flags |= JB_NO_MIN_DECOR;
-	if(!(f & MWM_DECOR_MAXIMIZE))
+
+	if (!(f & MWM_DECOR_MAXIMIZE))
 		c->flags |= JB_NO_MAX_DECOR;
 }
 
-static void
-mwm_hints_func(Client * c, unsigned long f)
+static void mwm_hints_func(Client * c, unsigned long f)
 {
 	LOG("MWM_HINTS_FUNCTIONS");
-	if(f & MWM_FUNC_ALL)
+
+	if (f & MWM_FUNC_ALL)
 		return;
-	if(!(f & MWM_FUNC_RESIZE))
+
+	if (!(f & MWM_FUNC_RESIZE))
 		c->flags |= JB_NO_RESIZE | JB_NO_RESIZE_DECOR;
-	if(!(f & MWM_FUNC_MOVE))
+
+	if (!(f & MWM_FUNC_MOVE))
 		c->flags |= JB_NO_MOVE;
-	if(!(f & MWM_FUNC_CLOSE))
+
+	if (!(f & MWM_FUNC_CLOSE))
 		c->flags |= JB_NO_CLOSE | JB_NO_CLOSE_DECOR;
-	if(!(f & MWM_FUNC_MINIMIZE))
+
+	if (!(f & MWM_FUNC_MINIMIZE))
 		c->flags |= JB_NO_MIN | JB_NO_MIN_DECOR;
-	if(!(f & MWM_FUNC_MAXIMIZE))
+
+	if (!(f & MWM_FUNC_MAXIMIZE))
 		c->flags |= JB_NO_MAX | JB_NO_MAX_DECOR;
 }
 
-void
-handle_mwm_hints(Client * c)
+void handle_mwm_hints(Client * c)
 {
 	assert(c);
-
 	const Atom mwm_hints = XA("_MOTIF_WM_HINTS");
-
 	unsigned long n;
-	struct
-	{
+	struct {
 		unsigned long flags, functions, decor, input_mode, status;
-	}     *m = get_property(c->window, mwm_hints, mwm_hints, &n);
+	} *m = get_property(c->window, mwm_hints, mwm_hints, &n);
 
-	if(!m)
+	if (!m)
 		return;
 
-	if(m->flags & MWM_HINTS_FUNCTIONS)
+	if (m->flags & MWM_HINTS_FUNCTIONS)
 		mwm_hints_func(c, m->functions);
-	if(m->flags & MWM_HINTS_DECORATIONS)
+
+	if (m->flags & MWM_HINTS_DECORATIONS)
 		mwm_hints_decor(c, m->decor);
 
-	if(m->flags & MWM_HINTS_STATUS)
-	{
+	if (m->flags & MWM_HINTS_STATUS) {
 		LOG("MWM_HINTS_STATUS");
-		if(m->status & MWM_TEAROFF_WINDOW)
+
+		if (m->status & MWM_TEAROFF_WINDOW)
 			c->flags |= JB_TEAROFF;
 	}
 
-	if(m->flags & MWM_HINTS_INPUT_MODE)
-	{
+	if (m->flags & MWM_HINTS_INPUT_MODE) {
 		LOG("MWM_HINTS_INPUT_MODE");
-		if(m->input_mode)
+
+		if (m->input_mode)
 			c->flags |= JB_MODAL;
 	}
 

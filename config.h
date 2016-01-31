@@ -1,5 +1,5 @@
 // jbwm - Minimalist Window Manager for X
-// Copyright 2008-2016, Jeffrey E. Bedard <jefbed@gmail.com> 
+// Copyright 2008-2016, Jeffrey E. Bedard <jefbed@gmail.com>
 // Copyright 1999-2015, Ciaran Anscomb <jbwm@6809.org.uk>
 // See README for license and other details.
 
@@ -24,12 +24,12 @@
 #endif /* USE_XFT */
 
 /* Default colors */
-#define DEF_FG          	"#eef"
-#define DEF_FC          	"#7a7"
-#define DEF_BG          	"#222"
-#define TITLEBAR_CLOSE_BG	"#977"
-#define TITLEBAR_SHADE_BG	"#797"
-#define TITLEBAR_RESIZE_BG	"#779"
+#define DEF_FG                  "#eef"
+#define DEF_FC                  "#7a7"
+#define DEF_BG                  "#222"
+#define TITLEBAR_CLOSE_BG       "#977"
+#define TITLEBAR_SHADE_BG       "#797"
+#define TITLEBAR_RESIZE_BG      "#779"
 
 #define GRAB_MASK Mod4Mask
 #define LOCK_MASK LockMask
