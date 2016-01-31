@@ -135,9 +135,7 @@ drag_motion(Client * restrict c, XEvent ev, const XPoint p, const XPoint oldp)
 #endif//!SOLID
 	g->x = oldp.x + (ev.xmotion.x - p.x);
 	g->y = oldp.y + (ev.xmotion.y - p.y);
-#ifdef USE_SNAP
 	snap_client(c);
-#endif//USE_SNAP
 #ifndef SOLID
 
 	if (outline)
@@ -216,9 +214,7 @@ void moveresize(Client * restrict c)
 		c->exposed_width = w;
 	}
 #endif//USE_TBAR
-#ifdef USE_SHAPE
 	set_shape(c);
-#endif//USE_SHAPE
 }
 
 void restore_horz(Client * restrict c)
@@ -290,50 +286,6 @@ void maximize(Client * restrict c)
 	XRaiseWindow(D, c->parent);
 	moveresize(c);
 }
-
-#if 0
-void maximize(Client * restrict c)
-{
-	LOG("maximize");
-	assert(c);
-
-	// Honor !MWM_FUNC_MAXIMIZE
-	// Maximizing shaped windows is buggy, so return.
-	if (c->flags & (JB_NO_MAX | JB_SHAPED))
-		return;
-
-	XSizeHints *g = &(c->size);
-
-	if (c->flags & JB_MAXIMIZED) {	// restore:
-		memcpy(g, &(c->old_size), sizeof(XSizeHints));
-#ifdef EWMH
-		ewmh_remove_state(c->window, ewmh.WM_STATE_FULLSCREEN);
-		ewmh_remove_state(c->window, ewmh.WM_STATE_MAXIMIZED_HORZ);
-		ewmh_remove_state(c->window, ewmh.WM_STATE_MAXIMIZED_VERT);
-#endif//EWMH
-		XSetWindowBorderWidth(D, c->parent, c->border);
-	} else {		// maximize:
-		memcpy(&(c->old_size), g, sizeof(XSizeHints));
-		g->x = g->y = 0;
-		Dim *ssz = &c->screen->size;
-		g->width = ssz->w;
-		g->height = ssz->h;
-#ifdef EWMH
-		ewmh_add_state(c->window, ewmh.WM_STATE_FULLSCREEN);
-		ewmh_add_state(c->window, ewmh.WM_STATE_MAXIMIZED_HORZ);
-		ewmh_add_state(c->window, ewmh.WM_STATE_MAXIMIZED_VERT);
-#endif//EWMH
-		XSetWindowBorderWidth(D, c->parent, 0);
-	}
-
-	c->flags ^= JB_MAXIMIZED;	// toggle
-#ifdef USE_TBAR
-	update_titlebar(c);
-#endif//USE_TBAR
-	XRaiseWindow(D, c->parent);
-	moveresize(c);
-}
-#endif//0
 
 void hide(Client * restrict c)
 {

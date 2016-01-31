@@ -24,9 +24,7 @@ void shade(Client * restrict c)
 		XMapWindow(D, c->window);
 		moveresize(c);
 		set_wm_state(c, NormalState);
-#ifdef EWMH
 		ewmh_remove_state(c->window, ewmh.WM_STATE_SHADED);
-#endif//EWMH
 	} else {		// Shade the client
 		c->shade_height = c->size.height;
 		c->ignore_unmap++;
@@ -34,9 +32,7 @@ void shade(Client * restrict c)
 		c->size.height = 0;
 		c->flags |= JB_SHADED;
 		set_wm_state(c, IconicState);
-#ifdef EWMH
 		ewmh_add_state(c->window, ewmh.WM_STATE_SHADED);
-#endif//EWMH
 		select_client(c);
 	}
 }
@@ -57,14 +53,12 @@ void client_to_vdesk(Client * restrict c, const uint8_t d)
 __attribute__ ((hot))
 Client *find_client(const Window w)
 {
-	Client *c = jbwm.head;
+	Client *c=jbwm.head;
+	while(c && c->parent != w && c->window !=w
 #ifdef USE_TBAR
-
-	while (c && c->parent != w && c->window != w && c->titlebar != w)
-#else//!USE_TBAR
-	while (c && c->parent != w && c->window != w)
+		&& c->titlebar != w
 #endif//USE_TBAR
-		c = c->next;
+	     ) c=c->next;
 
 	return c;
 }
@@ -176,10 +170,29 @@ void xmsg(const Window w, const Atom a, const long x)
 	XSendEvent(D, w, false, NoEventMask, &ev);
 }
 
+static bool has_delete_proto(const Client * restrict c)
+{
+	bool found=false;
+	Atom *p;
+	int i;
+	if(XGetWMProtocols(D, c->window, &p, &i)) {
+		const Atom a=XA("WM_DELETE_WINDOW");
+		while(i--)
+			if((found=(p[i]==a)))
+				break;
+	}
+	XFree(p);
+	return found;
+}
+
 void send_wm_delete(const Client * restrict c)
 {
 	LOG("send_wm_delete");
-	xmsg(c->window, XA("WM_PROTOCOLS"), XA("WM_DELETE_WINDOW"));
+	assert(c);
+	if(has_delete_proto(c))
+		xmsg(c->window, XA("WM_PROTOCOLS"), XA("WM_DELETE_WINDOW"));
+	else
+		XKillClient(D, c->window);
 }
 
 #ifdef USE_SHAPE

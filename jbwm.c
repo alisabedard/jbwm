@@ -91,6 +91,8 @@ static void parse_argv(int argc, char **argv)
 		}
 	}
 }
+#else//!USE_ARGV
+#define parse_argv(a, b)
 #endif//USE_ARGV
 
 #ifdef USE_TBAR
@@ -111,6 +113,8 @@ static void setup_fonts(void)
 	if (!jbwm.font)
 		ERROR("FONT");
 }
+#else//!USE_TBAR
+#define setup_fonts()
 #endif//USE_TBAR
 
 void
@@ -213,9 +217,7 @@ static void setup_screen(const uint8_t i)
 	grab_keys_for_screen(s);
 	/* scan all the windows on this screen */
 	setup_clients(s);
-#ifdef EWMH
 	setup_ewmh_for_screen(s);
-#endif//EWMH
 }
 
 __attribute__ ((cold))
@@ -248,21 +250,15 @@ int main(
 {
 	jbwm.keymasks.grab = GRAB_MASK;
 	jbwm.keymasks.mod = MOD_MASK;
-#ifdef USE_ARGV
 	parse_argv(argc, argv);
-#endif//USE_ARGV
 
 	if (!(D = XOpenDisplay(NULL)))
 		ERROR("DISPLAY");
 
 	XSetErrorHandler(handle_xerror);
-#ifdef EWMH
 	ewmh_init();
-#endif//EWMH
-#ifdef USE_TBAR
 	/* Fonts only needed with title bars */
 	setup_fonts();
-#endif /* USE_TBAR */
 	jbwm.cursor = XCreateFontCursor(D, XC_fleur);
 	setup_screens();
 	main_event_loop();

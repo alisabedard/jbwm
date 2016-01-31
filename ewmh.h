@@ -7,7 +7,6 @@
 #define _EWMH_H
 
 #ifdef EWMH
-void ewmh_init();
 
 typedef struct {
 	uint8_t count;
@@ -38,18 +37,14 @@ typedef struct {
 } EWMHEnvironment;
 
 extern EWMHEnvironment ewmh;
-
 void ewmh_update_client_list();
-
 void ewmh_remove_state(const Window w, const Atom state);
-
 void ewmh_add_state(const Window w, const Atom state);
-
 void ewmh_client_message(XClientMessageEvent * e);
-
 void set_ewmh_allowed_actions(const Window w);
-
 void setup_ewmh_for_screen(ScreenInfo * s);
+void ewmh_init();
+
 #else//!EWMH
 #define ewmh_update_client_list()
 #define ewmh_remove_state(w, s)
@@ -57,6 +52,7 @@ void setup_ewmh_for_screen(ScreenInfo * s);
 #define ewmh_client_message(e)
 #define set_ewmh_allowed_actions(w)
 #define setup_ewmh_for_screen(s)
+#define ewmh_init()
 #endif//EWMH
 
 #endif//!_EWMH_H
