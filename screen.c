@@ -246,8 +246,8 @@ maximize(Client * restrict c)
 #ifdef USE_TBAR
 	update_titlebar(c);
 #endif //USE_TBAR
-	moveresize(c);
 	XRaiseWindow(D, c->parent);
+	moveresize(c);
 }
 
 void

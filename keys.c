@@ -123,7 +123,7 @@ cond_client_to_desk(Client * c, ScreenInfo * s, const uint8_t d,
 }
 
 static void
-spawn(const char *cmd)
+spawn(const char *restrict cmd)
 {
 	const int r = system(cmd);
 	if(WIFEXITED(r) && WEXITSTATUS(r))
@@ -179,21 +179,19 @@ jbwm_handle_key_event(XKeyEvent * e)
 }
 
 static void
-grab(ScreenInfo * s, KeySym * ks, const unsigned int mask)
+grab(ScreenInfo *restrict s, KeySym *restrict ks, const unsigned int mask)
 {
 	for(; *ks; ks++)
-	{
 		XGrabKey(D, XKeysymToKeycode(jbwm.dpy, *ks),
 			jbwm.keymasks.grab | mask, s->root, true,
 			GrabModeAsync, GrabModeAsync);
-	}
 }
 
 void
 grab_keys_for_screen(ScreenInfo * restrict s)
 {
-	KeySym keys[] = JBWM_KEYS_TO_GRAB;
+	static KeySym keys[]={JBWM_KEYS_TO_GRAB},
+		      mod_keys[]={JBWM_ALT_KEYS_TO_GRAB};
 	grab(s, keys, 0);
-	KeySym mod_keys[] = JBWM_ALT_KEYS_TO_GRAB;
 	grab(s, mod_keys, jbwm.keymasks.mod);
 }

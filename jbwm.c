@@ -19,13 +19,11 @@ static unsigned int
 parse_modifiers(char *arg)
 {
 	LOG("parse_modifiers()");
-	const struct
-	{
-		const char *name;
-		const unsigned int mask;
-	} m[] = { { "shift", ShiftMask}, { "lock", LockMask}, 
-		{ "control", ControlMask}, { "mod", Mod1Mask}, { "mod1", Mod1Mask},
-		{ "mod2", Mod2Mask}, { "mod3", Mod3Mask}, { "mod4", Mod4Mask},
+	const struct { const char *name; const unsigned int mask; } m[] 
+		= { { "shift", ShiftMask}, { "lock", LockMask}, 
+		{ "control", ControlMask}, { "mod", Mod1Mask}, 
+		{ "mod1", Mod1Mask}, { "mod2", Mod2Mask}, 
+		{ "mod3", Mod3Mask}, { "mod4", Mod4Mask},
 		{ "mod5", Mod5Mask}};
 	for(uint8_t i = 0; i < 9; i++)
 		if(!strcmp(m[i].name, arg))
@@ -182,8 +180,7 @@ setup_gc(ScreenInfo * s)
 		GCBackground;
 	XGCValues gv = {.foreground = s->fg.pixel,.background = s->bg.pixel,
 		.function = GXinvert,.subwindow_mode = IncludeInferiors,
-		.line_width = JBWM_BORDER
-	};
+		.line_width = JBWM_BORDER };
 #if defined(USE_TBAR) && !defined(USE_XFT)
 	gv.font = jbwm.font->fid;
 	vm |= GCFont;

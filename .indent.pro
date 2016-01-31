@@ -1,4 +1,5 @@
 -linux
+-bad
 -bap
 -bbb
 -bbo
@@ -21,7 +22,6 @@
 -ip0
 -l79
 -lc70
--nbad
 -nbc
 -ncs
 -nbfde
@@ -35,13 +35,12 @@
 -nsaw
 -nsc
 -nsob
-//-nss
 -pmt
 -pi0
 -ppi0
 -psl
 -sbi0
--sob
+//-sob
 -ss
 -ts8
 -ut
