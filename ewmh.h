@@ -6,6 +6,7 @@
 #ifndef _EWMH_H
 #define _EWMH_H
 
+#ifdef EWMH
 void ewmh_init();
 
 typedef struct {
@@ -49,5 +50,13 @@ void ewmh_client_message(XClientMessageEvent * e);
 void set_ewmh_allowed_actions(const Window w);
 
 void setup_ewmh_for_screen(ScreenInfo * s);
+#else//!EWMH
+#define ewmh_update_client_list()
+#define ewmh_remove_state(w, s)
+#define ewmh_add_state(w, s)
+#define ewmh_client_message(e)
+#define set_ewmh_allowed_actions(w)
+#define setup_ewmh_for_screen(s)
+#endif//EWMH
 
 #endif//!_EWMH_H

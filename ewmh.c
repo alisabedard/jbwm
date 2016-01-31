@@ -282,10 +282,12 @@ void ewmh_client_message(XClientMessageEvent * e)
 		const uint8_t src = (val >> 12) & 3;
 
 		if (src == 2) {
-			XWindowChanges wc = {.x = e->data.l[1],.y =
-				    e->data.l[2],
-				.width = e->data.l[3],.height = e->data.l[4]
+/* *INDENT-OFF* */
+			XWindowChanges wc = {.x = e->data.l[1],
+				.y = e->data.l[2], .width = e->data.l[3],
+				.height = e->data.l[4]
 			};
+/* *INDENT-ON* */
 			const int vm = (val >> 8) & 0x0f;
 			const int grav = val & 0xff;
 			do_window_changes(vm, &wc, c, grav);

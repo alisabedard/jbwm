@@ -5,6 +5,11 @@
 
 #ifndef SNAP_H
 #define SNAP_H
+#ifdef USE_SNAP
 void snap_border(Client * c);
 void snap_client(Client * c);
+#else
+#define snap_border(c)
+#define snap_client(c)
+#endif
 #endif//SNAP_H

@@ -12,8 +12,11 @@ void resize(Client * restrict c);
 void hide(Client * restrict c);
 void unhide(Client * restrict c);
 uint8_t switch_vdesk(ScreenInfo * s, const uint8_t v);
+void maximize_horz(Client * restrict c);
+void maximize_vert(Client * restrict c);
+void restore_horz(Client * restrict c);
+void restore_vert(Client * restrict c);
 void maximize(Client * restrict c);
-
 // Used by vdesk switching and EWMH
 #define DESKTOPS 10
 

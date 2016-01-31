@@ -15,14 +15,14 @@ static void draw_outline(Client * c)
 	/* restrict, as all changes will occur through g */
 	XSizeHints *restrict g = &(c->size);
 	const bool tb = !(c->flags & JB_NO_TB);
-	XRectangle r[] = { {
-			    .x = g->x,.y = g->y,.width = g->width,
-			    .height = g->height}, {
-						   .x = g->x,.y =
-						   g->y - (tb ? TDIM : 0),
-						   .width = g->width,.height =
-						   (tb ? TDIM : 0) - c->border}
+/* *INDENT-OFF* */
+	XRectangle r[] = { 
+		{ .x = g->x, .y = g->y, .width = g->width, 
+			.height = g->height}, 
+		{ .x = g->x, .y = g->y - (tb ? TDIM : 0), 
+			.width = g->width,.height = (tb ? TDIM : 0) - c->border}
 	};
+/* *INDENT-ON* */
 	ScreenInfo *s = c->screen;
 	XDrawRectangles(D, s->root, s->gc, r, tb ? 2 : 1);
 }
@@ -61,11 +61,10 @@ handle_motion_notify(Client * restrict c, XMotionEvent * restrict mev)
 		draw_outline(c);	// clear outline
 
 #endif//!SOLID
-	recalculate_resize(&c->size, (XPoint) {
-			   c->size.x, c->size.y}
-			   , (XPoint) {
-			   mev->x, mev->y}
-	);
+/* *INDENT-OFF* */
+	recalculate_resize(&c->size, (XPoint) { c->size.x, c->size.y},
+		(XPoint) { mev->x, mev->y});
+/* *INDENT-ON* */
 #ifndef SOLID
 
 	if (c->border)
@@ -222,6 +221,77 @@ void moveresize(Client * restrict c)
 #endif//USE_SHAPE
 }
 
+void restore_horz(Client * restrict c)
+{
+	if (c->flags & JB_MAX_HORZ) {
+		c->flags^=JB_MAX_HORZ;
+		c->size.x=c->old_size.x;
+		c->size.width=c->old_size.width;
+		ewmh_remove_state(c->window, ewmh.WM_STATE_MAXIMIZED_HORZ);
+	}
+}
+
+void maximize_horz(Client * restrict c)
+{
+	if (c->flags & JB_MAX_HORZ)
+ 		 return; 
+	c->old_size.x=c->size.x;
+	c->old_size.width=c->size.width;
+	c->size.x=0;
+	c->size.width=c->screen->size.w;
+	ewmh_add_state(c->window, ewmh.WM_STATE_MAXIMIZED_HORZ);
+	c->flags|=JB_MAX_HORZ;
+}
+
+void restore_vert(Client * restrict c)
+{
+	if (c->flags & JB_MAX_VERT) {
+		c->flags^=JB_MAX_VERT;
+		c->size.y=c->old_size.y;
+		c->size.height=c->old_size.height;
+		ewmh_remove_state(c->window, ewmh.WM_STATE_MAXIMIZED_VERT);
+	}
+
+}
+
+void maximize_vert(Client * restrict c)
+{
+	if (c->flags & JB_MAX_VERT)
+ 		 return; 
+	c->old_size.y=c->size.y;
+	c->old_size.height=c->size.height;
+	c->size.y=0;
+	c->size.height=c->screen->size.h;
+	ewmh_add_state(c->window, ewmh.WM_STATE_MAXIMIZED_VERT);
+	c->flags|=JB_MAX_VERT;
+
+}
+
+void maximize(Client * restrict c)
+{
+	// Honor !MWM_FUNC_MAXIMIZE
+	// Maximizing shaped windows is buggy, so return.
+	if (c->flags & (JB_NO_MAX | JB_SHAPED))
+		return;
+
+	if (c->flags & JB_MAXIMIZED) {	// restore:
+		restore_horz(c);
+		restore_vert(c);
+		XSetWindowBorderWidth(D, c->parent, c->border);
+		ewmh_remove_state(c->window, ewmh.WM_STATE_FULLSCREEN);
+	} else {			// maximize:
+		maximize_horz(c);
+		maximize_vert(c);
+		XSetWindowBorderWidth(D, c->parent, 0);
+		ewmh_add_state(c->window, ewmh.WM_STATE_FULLSCREEN);
+	}
+	c->flags ^= JB_MAXIMIZED;	// toggle
+	update_titlebar(c);
+	XRaiseWindow(D, c->parent);
+	moveresize(c);
+}
+
+#if 0
 void maximize(Client * restrict c)
 {
 	LOG("maximize");
@@ -263,6 +333,7 @@ void maximize(Client * restrict c)
 	XRaiseWindow(D, c->parent);
 	moveresize(c);
 }
+#endif//0
 
 void hide(Client * restrict c)
 {

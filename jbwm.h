@@ -51,23 +51,10 @@
 #include "atoms.h"
 #include "screen.h"
 #include "log.h"
-
-// Optional modules:
-#ifdef USE_TBAR
-#include "titlebar.h"
-#endif//USE_TBAR
-
-#ifdef MWM
-#include "mwm.h"
-#endif//MWM
-
-#ifdef EWMH
 #include "ewmh.h"
-#endif//EWMH
-
-#ifdef USE_SNAP
+#include "titlebar.h"
+#include "mwm.h"
 #include "snap.h"
-#endif//USE_SNAP
 
 // jbwm.c:
 void jbwm_grab_button(const Window w, const unsigned int mask,
