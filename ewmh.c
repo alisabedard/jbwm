@@ -107,16 +107,16 @@ ewmh_remove_state(const Window w, const Atom state)
 {
 	unsigned long n;
 	Atom *a = get_property(w, ewmh.WM_STATE, XA_ATOM, &n);
-
-	if(!a)
-		return;
-	const unsigned long nitems = n;
-
-	while(n--)
-		if(a[n] == state)
-			a[n] = 0;
-	XPROP(w, ewmh.WM_STATE, XA_ATOM, &a, nitems);
-	XFree(a);
+	if(a)
+	{
+		const unsigned long nitems = n;
+	
+		while(n--)
+			if(a[n] == state)
+				a[n] = 0;
+		XPROP(w, ewmh.WM_STATE, XA_ATOM, &a, nitems);
+		XFree(a);
+	}
 }
 
 bool
@@ -124,11 +124,8 @@ ewmh_get_state(const Window w, const Atom state)
 {
 	unsigned long n;
 	Atom *a = get_property(w, ewmh.WM_STATE, XA_ATOM, &n);
-
-	if(!a)
-		return false;
+	if(!a) return false;
 	bool found = false;
-
 	while(n--)
 		if((found = (a[n] == state)))
 			break;
@@ -147,7 +144,6 @@ static void
 set_number_of_desktops(const Window r)
 {
 	const long num = DESKTOPS;
-
 	XPROP(r, ewmh.NUMBER_OF_DESKTOPS, XA_CARDINAL, &num, 1);
 	set_desktop_viewport();
 	XPROP(r, ewmh.VIRTUAL_ROOTS, XA_WINDOW, &r, 1);
@@ -181,26 +177,23 @@ check_state(XClientMessageEvent * e,	// event data
 	is_set |= e->data.l[2] == (long)state;
 	if(is_set)
 	{
-		const Window w = e->window;
-
 		switch (e->data.l[0])
 		{
 		default:
 		case 0:	// remove
 			state_cb(e, false, data);
-			ewmh_remove_state(w, state);
+			ewmh_remove_state(e->window, state);
 			break;
 		case 1:	// add 
 			state_cb(e, true, data);
-			ewmh_add_state(w, state);
+			ewmh_add_state(e->window, state);
 			break;
 		case 2:	// toggle
 		{
-			const bool add = !ewmh_get_state(w, state);
-
+			const bool add = !ewmh_get_state(e->window, state);
 			state_cb(e, add, data);
 			if(add)
-				ewmh_add_state(w, state);
+				ewmh_add_state(e->window, state);
 		}
 		}
 	}
@@ -226,27 +219,26 @@ static void
 skip_pager_cb(XClientMessageEvent * e
 	__attribute__ ((unused)), const bool add, void *data)
 {
-	if(!data)
-		return;
-	Client *c = (Client *) data;
-
-	if(add)
-		c->flags |= JB_STICKY;
-	else
-		c->flags &= ~JB_STICKY;
+	if(data)
+	{
+		Client *c = (Client *) data;
+		if(add)
+			c->flags |= JB_STICKY;
+		else
+			c->flags &= ~JB_STICKY;
+	}
 }
 
 static void
 fullscreen_cb(XClientMessageEvent * e
 	__attribute__ ((unused)), const bool add, void *data)
 {
-	if(!data)
-		return;
-	Client *c = data;
-	const bool is_max = c->flags & JB_MAXIMIZED;
-
-	if((add && !is_max) || (!add && is_max))
-		maximize(c);
+	if(data)
+	{
+		Client *c = data;
+		if(add==!(c->flags&JB_MAXIMIZED))
+			  maximize(c);
+	}
 }
 
 static void
