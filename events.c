@@ -50,7 +50,6 @@ static void handle_unmap_event(XUnmapEvent * e)
 		c->ignore_unmap--;
 }
 
-#ifdef USE_CMAP
 static void handle_colormap_change(XColormapEvent * e)
 {
 	LOG("handle_colormap_change(e)");
@@ -61,7 +60,6 @@ static void handle_colormap_change(XColormapEvent * e)
 		XInstallColormap(D, c->cmap);
 	}
 }
-#endif /* USE_CMAP */
 
 static void handle_wm_hints(Client * c)
 {
@@ -379,32 +377,29 @@ void main_event_loop(void)
 		}
 
 		break;
+
+	case ColormapNotify:
+		handle_colormap_change(&ev.xcolormap);
+		break;
+
 #ifdef EWMH
 
 	case CreateNotify:
 	case DestroyNotify:
 		ewmh_update_client_list();
 		break;
-#endif//EWMH
-#ifdef USE_CMAP
-
-	case ColormapNotify:
-		handle_colormap_change(&ev.xcolormap);
-		break;
-#endif /* USE_CMAP */
-#ifdef EWMH
-
 	case ClientMessage:
 		ewmh_client_message(&ev.xclient);
 		break;
 #endif//EWMH
+
 #ifdef USE_SHAPE
 
 	case ShapeNotify:
 		LOG("ShapeNotify");
 		set_shape(find_client(ev.xany.window));
 		break;
-#endif /* USE_SHAPE */
+#endif//USE_SHAPE 
 #if defined(DEBUG) && defined(XDEBUG)
 
 	case MapNotify:

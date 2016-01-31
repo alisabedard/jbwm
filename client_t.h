@@ -42,9 +42,7 @@ struct Client {
 #endif				//USE_TBAR
 	uint32_t flags;
 	int win_gravity_hint;
-#ifdef USE_CMAP
 	Colormap cmap;
-#endif				//USE_CMAP
 	Window window, parent;
 #ifdef USE_TBAR
 	Window titlebar;

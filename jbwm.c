@@ -18,21 +18,15 @@ __attribute__ ((cold))
 static unsigned int parse_modifiers(char *arg)
 {
 	LOG("parse_modifiers()");
+/* *INDENT-OFF* */
 	const struct {
 		const char *name;
 		const unsigned int mask;
-	} m[]
-	    = { {
-	"shift", ShiftMask}, {
-	"lock", LockMask}, {
-	"control", ControlMask}, {
-	"mod", Mod1Mask}, {
-	"mod1", Mod1Mask}, {
-	"mod2", Mod2Mask}, {
-	"mod3", Mod3Mask}, {
-	"mod4", Mod4Mask}, {
-	"mod5", Mod5Mask}
-	};
+	} m[] = { { "shift", ShiftMask}, { "lock", LockMask},
+		{ "control", ControlMask}, { "mod", Mod1Mask},
+		{ "mod1", Mod1Mask}, { "mod2", Mod2Mask}, { "mod3", Mod3Mask},
+		{ "mod4", Mod4Mask}, { "mod5", Mod5Mask} };
+/* *INDENT-ON* */
 
 	for (uint8_t i = 0; i < 9; i++)
 		if (!strcmp(m[i].name, arg))
@@ -129,32 +123,27 @@ jbwm_grab_button(const Window w, const unsigned int mask,
 __attribute__ ((cold))
 static void setup_event_listeners(const Window root)
 {
-	XSetWindowAttributes attr = {.event_mask =
-		    SubstructureRedirectMask | SubstructureNotifyMask |
-		    EnterWindowMask | PropertyChangeMask
-	};
-#ifdef CMAP
-	attr.event_mask |= ColormapChangeMask
-#endif//CMAP
-	    XChangeWindowAttributes(D, root, CWEventMask, &attr);
+/* *INDENT-OFF* */
+	XSetWindowAttributes attr = {.event_mask = SubstructureRedirectMask
+		| SubstructureNotifyMask | EnterWindowMask | PropertyChangeMask
+		| ColormapChangeMask };
+/* *INDENT-ON* */
+	XChangeWindowAttributes(D, root, CWEventMask, &attr);
 }
 
 __attribute__ ((cold))
 static inline void allocate_colors(ScreenInfo * restrict s)
 {
-	XColor nullc;
+	XColor nc;
 	const Colormap cm = DefaultColormap(D, s->screen);
 #ifdef USE_ARGV
-	XAllocNamedColor(D, cm, jbwmopt.fg ? jbwmopt.fg : DEF_FG, &s->fg,
-			 &nullc);
-	XAllocNamedColor(D, cm, jbwmopt.bg ? jbwmopt.bg : DEF_BG, &s->bg,
-			 &nullc);
-	XAllocNamedColor(D, cm, jbwmopt.fc ? jbwmopt.fc : DEF_FC, &s->fc,
-			 &nullc);
+	XAllocNamedColor(D, cm, jbwmopt.fg ? jbwmopt.fg : DEF_FG, &s->fg, &nc);
+	XAllocNamedColor(D, cm, jbwmopt.bg ? jbwmopt.bg : DEF_BG, &s->bg, &nc);
+	XAllocNamedColor(D, cm, jbwmopt.fc ? jbwmopt.fc : DEF_FC, &s->fc, &nc);
 #else//!USE_ARGV
-	XAllocNamedColor(D, cm, DEF_FG, &s->fg, &nullc);
-	XAllocNamedColor(D, cm, DEF_BG, &s->bg, &nullc);
-	XAllocNamedColor(D, cm, DEF_FC, &s->fc, &nullc);
+	XAllocNamedColor(D, cm, DEF_FG, &s->fg, &nc);
+	XAllocNamedColor(D, cm, DEF_BG, &s->bg, &nc);
+	XAllocNamedColor(D, cm, DEF_FC, &s->fc, &nc);
 #endif//USE_ARGV
 }
 

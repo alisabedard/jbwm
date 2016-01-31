@@ -98,9 +98,7 @@ static void init_geometry(Client * c)
 {
 	XWindowAttributes attr;
 	XGetWindowAttributes(D, c->window, &attr);
-#ifdef USE_CMAP
 	c->cmap = attr.colormap;
-#endif//USE_CMAP
 	long d;			// dummy var
 	XGetWMNormalHints(D, c->window, &(c->size), &d);
 	init_size(c, &attr);
@@ -172,11 +170,8 @@ void make_new_client(Window w, ScreenInfo * s)
 	if (c->flags & JB_DONT_MANAGE)
 		return;
 
-	long mask = EnterWindowMask | PropertyChangeMask;
-#ifdef USE_CMAP
-	mask |= ColormapChangeMask;
-#endif//USE_CMAP
-	XSelectInput(D, c->window, mask);
+	XSelectInput(D, c->window, EnterWindowMask | PropertyChangeMask 
+		| ColormapChangeMask);
 #ifdef USE_SHAPE
 	set_shape(c);
 #endif /* USE_SHAPE */

@@ -15,7 +15,7 @@ CFLAGS+=-fomit-frame-pointer
 CFLAGS+=-W -Wall -Wextra
 
 # Uncomment to disable assertions
-DEFINES += -DNDEBUG
+#DEFINES += -DNDEBUG
 
 # Uncomment to enable SHAPE extension support
 DEFINES += -DUSE_SHAPE
@@ -23,10 +23,6 @@ EXTRALIBS += -lXext # Required for SHAPE extension
 
 # Titlebar Xft support:
 #include xft.mk
-
-# Uncomment to enable colormap support
-# Saves ~600 bytes
-#DEFINES+= -DUSE_CMAP
 
 # Uncomment to enable parsing command line arguments.
 #  Saves ~2030 bytes

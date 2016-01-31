@@ -85,9 +85,7 @@ void select_client(Client * restrict c)
 		XSetWindowBorder(D, c->parent,
 				 c->flags & JB_STICKY ? c->screen->fc.
 				 pixel : c->screen->fg.pixel);
-#ifdef USE_CMAP
 		XInstallColormap(D, c->cmap);
-#endif /* USE_CMAP */
 		XSetInputFocus(D, c->window, RevertToPointerRoot, CurrentTime);
 #ifdef EWMH
 		XPROP(c->screen->root, ewmh.ACTIVE_WINDOW, XA_WINDOW,

@@ -7,7 +7,6 @@ CFLAGS+=-W -Wall -Wextra -Werror
 DEFINES += -DUSE_SHAPE
 EXTRALIBS += -lXext # Required for SHAPE extension
 include xft.mk
-DEFINES+= -DUSE_CMAP
 DEFINES += -DUSE_ARGV 
 DEFINES += -DUSE_TBAR
 EXTRASRCS += titlebar.c 
