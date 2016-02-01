@@ -77,7 +77,7 @@ void select_client(Client * restrict c)
 	if (jbwm.current) {
 		XSetWindowBorder(D, jbwm.current->parent,
 				 jbwm.current->screen->bg.pixel);
-		jbwm.current->flags &= ~JB_ACTIVE;
+		jbwm.current->flags ^= JB_ACTIVE;
 	}
 
 	if (c) {
@@ -107,7 +107,7 @@ void stick(Client * c)
 #endif//USE_TBAR
 }
 
-static inline void relink_window_list(Client * c)
+static void relink_window_list(Client * c)
 {
 	LOG("relink_window_list");
 

@@ -22,19 +22,12 @@ static inline void setup_gcs(ScreenInfo * restrict s)
 
 static void new_titlebar(Client * restrict c)
 {
-	if (c->flags & JB_NO_TB)
+	if (c->flags & (JB_NO_TB|JB_SHAPED))
 		return;
 
-#ifdef USE_SHAPE
-
-	if (c->flags & JB_SHAPED)
-		return;
-
-#endif /* USE_SHAPE */
-	const Window w = c->titlebar = XCreateSimpleWindow(D, c->parent, 0, 0,
-							   c->size.width, TDIM,
-							   0, 0, 0);
-
+	const Window w = XCreateSimpleWindow(D, c->parent, 0, 0, 
+		c->size.width, TDIM, 0, 0, 0);
+	c->titlebar=w;
 	if (!jbwm.gc.close)
 		setup_gcs(c->screen);
 

@@ -22,7 +22,9 @@ void *get_property(Window w, Atom property, Atom type, unsigned long *num_items)
 }
 #endif//EWMH||MWM
 
-static void init_size(Client * restrict c, XWindowAttributes * restrict attr)
+__attribute__((nonnull))
+static void init_size(Client * restrict c,
+	XWindowAttributes * restrict attr)
 {
 	const Dim dim = { attr->width, attr->height };
 	const bool valid = (dim.w >= c->size.min_width)
@@ -31,8 +33,9 @@ static void init_size(Client * restrict c, XWindowAttributes * restrict attr)
 	c->size.height = valid ? dim.h : c->size.min_height;
 }
 
-static void
-init_position(Client * restrict c, XWindowAttributes * restrict attr)
+__attribute__((nonnull))
+static void init_position(Client * restrict c,
+	XWindowAttributes * restrict attr)
 {
 	XSizeHints *restrict g = &(c->size);
 	const bool a = (attr->map_state == IsViewable)
@@ -42,7 +45,8 @@ init_position(Client * restrict c, XWindowAttributes * restrict attr)
 }
 
 #ifdef EWMH
-static void init_long_properties(Client * c)
+__attribute__((nonnull))
+static void wm_desktop(Client * restrict c)
 {
 	unsigned long nitems;
 	unsigned long *lprop = get_property(c->window, ewmh.WM_DESKTOP,
@@ -57,44 +61,45 @@ static void init_long_properties(Client * c)
 		XFree(lprop);
 }
 
-static void init_atom_properties(Client * c)
+#if 0
+/* These are corner cases at the moment, so this code is disabled.  If further
+ * testing shows clients actually set any of these properties, it will be
+ * further implemented. */
+__attribute__((nonnull))
+static void init_atom_properties(Client * restrict c)
 {
 	Atom *aprop;
 	unsigned long nitems;
-
-	if ((aprop = get_property(c->window, XA("WM_STATE"), XA_ATOM, &nitems))) {
+	aprop=get_property(c->window, XA("WM_STATE"), XA_ATOM, &nitems);
+	if (aprop) {
 		for (uint8_t i = 0; i < nitems; i++) {
 			if (aprop[i] == ewmh.WM_STATE_STICKY)
 				c->flags |= JB_STICKY;
-
-#ifdef USE_TBAR
 			else if (aprop[i] == ewmh.WM_STATE_SHADED)
 				shade(c);
-
-#endif//USE_TBAR
 		}
 
 		XFree(aprop);
 	}
 }
+#endif//0
+#else//!EWMH
+#define wm_desktop(c)
 #endif//EWMH
 
-static void init_properties(Client * c)
+__attribute__((nonnull))
+static void init_properties(Client * restrict c)
 {
 	if (!c->screen)
 		return;
 
 	c->vdesk = c->screen->vdesk;
-#ifdef MWM
 	handle_mwm_hints(c);
-#endif//MWM
-#ifdef EWMH
-	init_long_properties(c);
-	init_atom_properties(c);
-#endif//EWMH
+	wm_desktop(c);
 }
 
-static void init_geometry(Client * c)
+__attribute__((nonnull))
+static void init_geometry(Client * restrict c)
 {
 	XWindowAttributes attr;
 	XGetWindowAttributes(D, c->window, &attr);
@@ -110,6 +115,7 @@ static void init_geometry(Client * c)
 }
 
 #ifdef USE_SHAPE
+__attribute__((pure))
 static bool is_shaped(Client * c)
 {
 	int d, s;
@@ -117,19 +123,23 @@ static bool is_shaped(Client * c)
 	return XShapeQueryExtents(D, c->window, &s, &d, &d, U & d, U & d, &d,
 				  &d, &d, U & d, U & d) && s;
 }
-#endif//USE_SHAPE
 
-static void reparent(Client * c)
+static void setup_shaped(Client * restrict c)
 {
-	LOG("reparent()");
-#ifdef USE_SHAPE
-
 	if (is_shaped(c)) {
 		LOG("Window %d is shaped", (int)c->window);
 		c->border = 0;
 		c->flags |= JB_NO_TB | JB_SHAPED;
 	}
+}
+#else//!USE_SHAPE
+#define setup_shaped(c)
 #endif//USE_SHAPE
+
+static void reparent(Client * c)
+{
+	LOG("reparent()");
+	setup_shaped(c);
 	const unsigned long vm = CWOverrideRedirect | CWEventMask;
 	const uint8_t s = c->screen->screen;
 	XSetWindowAttributes a = {.override_redirect = true,
@@ -148,8 +158,8 @@ static void reparent(Client * c)
 	XMapWindow(D, w);
 }
 
-static Client *Client_new(Window w, ScreenInfo * restrict s)
-{
+void make_new_client(Window w, ScreenInfo * s)
+{	
 	LOG("Client_new(%d,s)", (int)w);
 	Client *c = calloc(1, sizeof(Client));
 	assert(c);
@@ -160,25 +170,15 @@ static Client *Client_new(Window w, ScreenInfo * restrict s)
 	c->border = JBWM_BORDER;
 	init_properties(c);
 	init_geometry(c);
-	return c;
-}
-
-void make_new_client(Window w, ScreenInfo * s)
-{
-	Client *c = Client_new(w, s);
 
 	if (c->flags & JB_DONT_MANAGE)
 		return;
 
 	XSelectInput(D, c->window, EnterWindowMask | PropertyChangeMask 
 		| ColormapChangeMask);
-#ifdef USE_SHAPE
 	set_shape(c);
-#endif /* USE_SHAPE */
 	reparent(c);
 	unhide(c);
 	jbwm_grab_button(w, jbwm.keymasks.grab, AnyButton);
-#ifdef EWMH
 	set_ewmh_allowed_actions(w);
-#endif//EWMH
 }

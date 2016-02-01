@@ -5,7 +5,7 @@
 
 #include "jbwm.h"
 
-static inline ScreenInfo *find_screen(const Window root)
+static ScreenInfo *find_screen(const Window root)
 {
 	uint8_t i = ScreenCount(jbwm.dpy);
 

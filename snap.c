@@ -12,8 +12,9 @@ static void sborder(int *restrict xy, const int edge)
 		*xy = -edge;
 }
 
-void snap_border(Client * c)
+void snap_border(Client *restrict c)
 {
+	assert(c);
 	XSizeHints *restrict g = &(c->size);
 	/* snap to screen border */
 	const uint8_t b = 2 * c->border;
@@ -24,7 +25,7 @@ void snap_border(Client * c)
 }
 
 __attribute__ ((const, hot))
-static int absmin(const int16_t a, const int16_t b)
+static inline int absmin(const int16_t a, const int16_t b)
 {
 	return abs(a) < abs(b) ? a : b;
 }

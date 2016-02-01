@@ -23,17 +23,13 @@ void jbwm_handle_key_event(XKeyEvent * e);
 #define KEY_PREVDESK    XK_Left
 #define KEY_NEXTDESK    XK_Right
 
-#ifdef AVOID_ALPHA
-#define KEY_UP          XK_Up
-#define KEY_DOWN        XK_Down
-#define KEY_LEFT        XK_Left
-#define KEY_RIGHT       XK_Right
-#else /* AVOID_ALPHA */
 #define KEY_UP          XK_k
 #define KEY_DOWN        XK_j
 #define KEY_LEFT        XK_h
 #define KEY_RIGHT       XK_l
-#endif
+
+#define KEY_MAX_H	XK_x
+#define KEY_MAX_V	XK_z
 
 #define KEY_ALTLOWER    XK_minus
 #define KEY_INFO        XK_F5
@@ -59,7 +55,8 @@ void jbwm_handle_key_event(XKeyEvent * e);
 
 #define JBWM_KEYS_TO_GRAB KEY_NEXT, KEY_NEW, KEY_QUIT, KEY_KILL,\
 	JBWM_DIRECTION_KEYS, KEY_LOWER, KEY_ALTLOWER, KEY_MAX, KEY_STICK,\
-	JBWM_VWM_KEYS, KEY_MOVE, KEY_RAISE, KEY_SHADE, 0
+	JBWM_VWM_KEYS, KEY_MOVE, KEY_RAISE, KEY_SHADE, KEY_MAX_H,\
+	KEY_MAX_V, 0
 
 #define JBWM_ALT_KEYS_TO_GRAB KEY_KILL, JBWM_DIRECTION_KEYS, JBWM_VWM_KEYS, 0
 

@@ -164,9 +164,9 @@ static void check_state(XClientMessageEvent * e,	// event data
 			const Atom state,	// state to test
 			void *data,	// user data
 			// callback:
-			void (*state_cb) (XClientMessageEvent *,	// event data
-					  bool,	// add action if true, else remove action
-					  void *))	// user data
+			void (*state_cb) (XClientMessageEvent *,// event data
+					// add action if true, else remove action
+					  bool,	void *)) // user data
 {
 	// 2 atoms can be set at once
 	bool is_set = e->data.l[1] == (long)state;
@@ -217,26 +217,22 @@ static void
 skip_pager_cb(XClientMessageEvent * e
 	      __attribute__ ((unused)), const bool add, void *data)
 {
-	if (data) {
-		Client *c = (Client *) data;
+	Client *c = (Client *) data; // validated by caller
 
-		if (add)
-			c->flags |= JB_STICKY;
-		else
-			c->flags &= ~JB_STICKY;
-	}
+	if (add)
+		c->flags |= JB_STICKY;
+	else
+		c->flags &= ~JB_STICKY;
 }
 
 static void
 fullscreen_cb(XClientMessageEvent * e
 	      __attribute__ ((unused)), const bool add, void *data)
 {
-	if (data) {
-		Client *c = data;
+	Client *c = data; // validated by caller
 
-		if (add == !(c->flags & JB_MAXIMIZED))
-			maximize(c);
-	}
+	if (add == !(c->flags & JB_MAXIMIZED))
+		maximize(c);
 }
 
 static void handle_wm_state_changes(XClientMessageEvent * e, Client * c)
@@ -297,7 +293,7 @@ void ewmh_client_message(XClientMessageEvent * e)
 	else if (t == ewmh.WM_MOVERESIZE && c) {
 		XRaiseWindow(D, c->parent);
 		drag(c);
-	} else if (t == ewmh.WM_STATE)
+	} else if (t == ewmh.WM_STATE && c)
 		handle_wm_state_changes(e, c);
 	else if (t == ewmh.WM_CHANGE_STATE && c) {
 		if (val == 3)	// Minimize (lower)

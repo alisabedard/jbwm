@@ -161,6 +161,7 @@ static void drag_event_loop(Client * restrict c, XPoint p, const XPoint oldp)
 		XUngrabPointer(D, CurrentTime);
 		moveresize(c);
 		XUngrabServer(D);
+		// This allows QT menus to be positioned correctly.
 		configure(&(c->size), c->window);
 		return;
 	}
@@ -168,7 +169,7 @@ static void drag_event_loop(Client * restrict c, XPoint p, const XPoint oldp)
 	goto drag_loop;
 }
 
-static inline XPoint get_mouse_position(Window w)
+static XPoint get_mouse_position(Window w)
 {
 	XPoint p;
 	XQueryPointer(D, w, &w, &w, (int *)&p.x, (int *)&p.y, (int *)&w,

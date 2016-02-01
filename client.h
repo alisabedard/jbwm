@@ -6,7 +6,11 @@
 #ifndef JBWM_CLIENT_H
 #define JBWM_CLIENT_H
 
+#ifdef USE_TBAR
 void shade(Client * restrict c);
+#else
+#define shade(c)
+#endif
 
 void client_to_vdesk(Client * restrict c, const uint8_t d);
 

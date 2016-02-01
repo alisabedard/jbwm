@@ -44,6 +44,7 @@ keymv(Client * c, XKeyEvent * e, int *xy, int *wh, const int8_t sign)
 static void handle_client_key_event(XKeyEvent * e, Client * c, KeySym key)
 {
 	XSizeHints *g = &(c->size);
+	const uint32_t f = c->flags;
 
 	switch (key) {
 	case KEY_LEFT:
@@ -79,6 +80,26 @@ static void handle_client_key_event(XKeyEvent * e, Client * c, KeySym key)
 		maximize(c);
 		break;
 
+	case KEY_MAX_H:
+		if(f&JB_MAX_HORZ)
+			  restore_horz(c);
+		else {
+			maximize_horz(c);
+			c->size.width-=2*c->border;
+		}
+		break;
+
+	case KEY_MAX_V:
+		if(f&JB_MAX_VERT)
+			  restore_vert(c);
+		else {
+ 			maximize_vert(c);
+			c->size.y+=TDIM+c->border;
+			c->size.height-=(TDIM+4*c->border);
+			moveresize(c);
+		}
+		break;
+
 	case KEY_STICK:
 		stick(c);
 		break;
@@ -86,11 +107,9 @@ static void handle_client_key_event(XKeyEvent * e, Client * c, KeySym key)
 	case KEY_MOVE:
 		drag(c);
 		break;
-#ifdef USE_TBAR
 
 	case KEY_SHADE:
 		shade(c);
-#endif//USE_TBAR
 	}
 }
 
@@ -210,8 +229,8 @@ grab(ScreenInfo * restrict s, KeySym * restrict ks, const unsigned int mask)
 
 void grab_keys_for_screen(ScreenInfo * restrict s)
 {
-	static KeySym keys[] = { JBWM_KEYS_TO_GRAB }, mod_keys[] = {
-	JBWM_ALT_KEYS_TO_GRAB};
+	static KeySym keys[] = { JBWM_KEYS_TO_GRAB };
 	grab(s, keys, 0);
+        static KeySym mod_keys[] = { JBWM_ALT_KEYS_TO_GRAB };
 	grab(s, mod_keys, jbwm.keymasks.mod);
 }

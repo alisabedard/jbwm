@@ -132,7 +132,7 @@ static void setup_event_listeners(const Window root)
 }
 
 __attribute__ ((cold))
-static inline void allocate_colors(ScreenInfo * restrict s)
+static void allocate_colors(ScreenInfo * restrict s)
 {
 	XColor nc;
 	const Colormap cm = DefaultColormap(D, s->screen);
@@ -147,7 +147,7 @@ static inline void allocate_colors(ScreenInfo * restrict s)
 #endif//USE_ARGV
 }
 
-static inline void setup_clients(ScreenInfo * restrict s)
+static void setup_clients(ScreenInfo * restrict s)
 {
 	unsigned int nwins;
 	Window *wins;
@@ -168,7 +168,7 @@ static inline void setup_clients(ScreenInfo * restrict s)
 }
 
 __attribute__ ((cold))
-static inline void setup_screen_elements(const uint8_t i)
+static void setup_screen_elements(const uint8_t i)
 {
 	ScreenInfo *restrict s = &jbwm.screens[i];
 	s->screen = i;
@@ -179,7 +179,7 @@ static inline void setup_screen_elements(const uint8_t i)
 }
 
 __attribute__ ((cold))
-static inline void setup_gc(ScreenInfo * s)
+static void setup_gc(ScreenInfo * s)
 {
 	allocate_colors(s);
 	unsigned long vm =
@@ -210,7 +210,7 @@ static void setup_screen(const uint8_t i)
 }
 
 __attribute__ ((cold))
-static inline void setup_screens(void)
+static void setup_screens(void)
 {
 	/* Now set up each screen in turn: jbwm.num_screens is used
 	   in scanning windows (XQueryTree) */
@@ -220,6 +220,7 @@ static inline void setup_screens(void)
 	while (i--)
 		setup_screen(i);
 }
+
 
 int handle_xerror(Display * dpy __attribute__ ((unused)), XErrorEvent * e)
 {
