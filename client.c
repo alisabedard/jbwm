@@ -168,15 +168,28 @@ void xmsg(const Window w, const Atom a, const long x)
 	XSendEvent(D, w, false, NoEventMask, &ev);
 }
 
+static Atom client_atoms[2];
+static bool client_atoms_init=false;
+#define I_PROTOS 0
+#define I_DEL_WIN 1
+
+static void setup_client_atoms()
+{
+	if(client_atoms_init)
+		  return;
+	char *names[]={"WM_PROTOCOLS", "WM_DELETE_WINDOW"};
+	XInternAtoms(D, names, 2, true, client_atoms);
+	client_atoms_init=true;
+}
+
 static bool has_delete_proto(const Client * restrict c)
 {
 	bool found=false;
 	Atom *p;
 	int i;
 	if(XGetWMProtocols(D, c->window, &p, &i)) {
-		const Atom a=XA("WM_DELETE_WINDOW");
 		while(i--)
-			if((found=(p[i]==a)))
+			if((found=(p[i]==client_atoms[I_DEL_WIN])))
 				break;
 	}
 	XFree(p);
@@ -185,12 +198,12 @@ static bool has_delete_proto(const Client * restrict c)
 
 void send_wm_delete(const Client * restrict c)
 {
-	LOG("send_wm_delete");
-	assert(c);
+	setup_client_atoms();
 	if(has_delete_proto(c))
-		xmsg(c->window, XA("WM_PROTOCOLS"), XA("WM_DELETE_WINDOW"));
+		  xmsg(c->window, client_atoms[I_PROTOS], 
+			  client_atoms[I_DEL_WIN]);
 	else
-		XKillClient(D, c->window);
+		  XKillClient(D, c->window);
 }
 
 #ifdef USE_SHAPE
