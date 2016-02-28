@@ -63,11 +63,28 @@ Client *find_client(const Window w)
 	return c;
 }
 
+#define CA_SZ 3
+static Atom client_atoms[CA_SZ];
+static bool client_atoms_init=false;
+#define I_PROTOS 0
+#define I_DEL_WIN 1
+#define I_WM_STATE 2
+
+static void setup_client_atoms()
+{
+	if(client_atoms_init)
+		  return;
+	char *names[]={"WM_PROTOCOLS", "WM_DELETE_WINDOW", "WM_STATE"};
+	XInternAtoms(D, names, CA_SZ, true, client_atoms);
+	client_atoms_init=true;
+}
+
 void set_wm_state(Client * restrict c, const int state)
 {
 	assert(c);
 	LOG("set_wm_state(%d, %d)", (int)c->window, state);
-	XPROP(c->window, XA("WM_STATE"), XA_CARDINAL, &state, 1);
+	setup_client_atoms();
+	XPROP(c->window, client_atoms[I_WM_STATE], XA_CARDINAL, &state, 1);
 }
 
 void select_client(Client * restrict c)
@@ -168,20 +185,6 @@ void xmsg(const Window w, const Atom a, const long x)
 	XSendEvent(D, w, false, NoEventMask, &ev);
 }
 
-static Atom client_atoms[2];
-static bool client_atoms_init=false;
-#define I_PROTOS 0
-#define I_DEL_WIN 1
-
-static void setup_client_atoms()
-{
-	if(client_atoms_init)
-		  return;
-	char *names[]={"WM_PROTOCOLS", "WM_DELETE_WINDOW"};
-	XInternAtoms(D, names, 2, true, client_atoms);
-	client_atoms_init=true;
-}
-
 static bool has_delete_proto(const Client * restrict c)
 {
 	bool found=false;
@@ -198,6 +201,7 @@ static bool has_delete_proto(const Client * restrict c)
 
 void send_wm_delete(const Client * restrict c)
 {
+	assert(c);
 	setup_client_atoms();
 	if(has_delete_proto(c))
 		  xmsg(c->window, client_atoms[I_PROTOS], 
