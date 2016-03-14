@@ -99,9 +99,18 @@ static void handle_property_change(XPropertyEvent * e)
 #ifdef USE_TBAR
 	else if (a == XA_WM_NAME)
 		update_titlebar(c);
-	else
+#ifdef EWMH // fixes Firefox drag and drop
+	else if (a == ewmh.WM_OPAQUE_REGION)
+		  return;
+	else if (a == ewmh.WM_USER_TIME)
+		  return;
+#endif//EWMH
+	else {
+#ifdef DEBUG
+		print_atom(a, __LINE__);
+#endif//DEBUG
 		moveresize(c);	// Required to show titlebar on new client
-
+	}
 #endif//USE_TBAR
 }
 

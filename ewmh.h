@@ -19,7 +19,7 @@ typedef struct {
 	// Atoms with "_NET_WM" prefix:
 	Atom WM_ALLOWED_ACTIONS, WM_NAME, WM_DESKTOP, WM_MOVERESIZE, WM_PID,
 	    WM_MOVERESIZE_CANCEL, WM_WINDOW_TYPE, WM_STRUT_PARTIAL,
-	    WM_CHANGE_STATE;
+	    WM_CHANGE_STATE, WM_USER_TIME, WM_OPAQUE_REGION;
 
 	// Atoms with "_NET_WM_ACTION" prefix:
 	Atom WM_ACTION_MOVE, WM_ACTION_RESIZE, WM_ACTION_CLOSE,
@@ -33,7 +33,7 @@ typedef struct {
 	    WM_STATE_FULLSCREEN, WM_STATE_ABOVE, WM_STATE_BELOW,
 	    WM_STATE_DEMANDS_ATTENTION, WM_STATE_FOCUSED, WM_STATE_SKIP_PAGER;
 
-	Atom supported[50];	//42 taken so far.
+	Atom supported[50];	//47 taken so far.
 } EWMHEnvironment;
 
 extern EWMHEnvironment ewmh;

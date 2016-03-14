@@ -1,5 +1,10 @@
 # Debug
-CFLAGS=-O0 -ggdb -DDEBUG -DSTDIO -pg -Werror
+CFLAGS=-O0
+CFLAGS+=-ggdb
+CFLAGS+=-DDEBUG
+CFLAGS+=-DXDEBUG
+# Profile
+CFLAGS+=-pg
 # Enable all warnings
 CFLAGS+=-W -Wall -Wextra -Werror
 

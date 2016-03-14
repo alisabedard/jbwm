@@ -65,18 +65,16 @@ Client *find_client(const Window w)
 
 #define CA_SZ 3
 static Atom client_atoms[CA_SZ];
-static bool client_atoms_init=false;
 #define I_PROTOS 0
 #define I_DEL_WIN 1
 #define I_WM_STATE 2
 
 static void setup_client_atoms()
 {
-	if(client_atoms_init)
-		  return;
+	if(client_atoms[0])
+		  return; // Already initialized
 	char *names[]={"WM_PROTOCOLS", "WM_DELETE_WINDOW", "WM_STATE"};
 	XInternAtoms(D, names, CA_SZ, true, client_atoms);
-	client_atoms_init=true;
 }
 
 void set_wm_state(Client * restrict c, const int state)

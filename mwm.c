@@ -93,10 +93,13 @@ static void mwm_hints_func(Client * c, unsigned long f)
 		c->flags |= JB_NO_MAX | JB_NO_MAX_DECOR;
 }
 
+static Atom mwm_hints;
+
 void handle_mwm_hints(Client * c)
 {
 	assert(c);
-	const Atom mwm_hints = XA("_MOTIF_WM_HINTS");
+	if(!mwm_hints)
+		  mwm_hints=XA("_MOTIF_WM_HINTS");
 	unsigned long n;
 	struct {
 		unsigned long flags, functions, decor, input_mode, status;
