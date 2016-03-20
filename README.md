@@ -7,7 +7,6 @@
 	- Takes only 13kb on a Raspberry PI, minimal configuration
 * Titlebar support if wanted
 * Xft support if wanted
-* Xpm support if wanted
 * Window shading with titlebar
 * Code cleanups, simpler UI and key bindings
 * Use of C99 features where possible.
