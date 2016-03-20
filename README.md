@@ -16,9 +16,11 @@
 * More EWMH support needed, particularly to enable pagers and window placement.
 
 ## INSTALLATION
-* Edit configuration options in Makefile and config.h
+Edit configuration options in Makefile and config.h, then build:
+```sh
 	$ make
 	# make install
+```
 
 ## ACKNOWLEDGEMENTS
 
