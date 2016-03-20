@@ -1,6 +1,6 @@
 # JBWM
 
-[Screenshot](/images/screensot.png?raw=true "Screenshot")
+![Screenshot](/images/screensot.png?raw=true "Screenshot")
 
 ## FEATURES of JBWM
 * 16K binary size (with gcc 5.3.0 on linux/amd64) for minimal configuration
