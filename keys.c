@@ -44,7 +44,6 @@ keymv(Client * c, XKeyEvent * e, int *xy, int *wh, const int8_t sign)
 static void handle_client_key_event(XKeyEvent * e, Client * c, KeySym key)
 {
 	XSizeHints *g = &(c->size);
-	const uint32_t f = c->flags;
 
 	switch (key) {
 	case KEY_LEFT:
@@ -81,19 +80,12 @@ static void handle_client_key_event(XKeyEvent * e, Client * c, KeySym key)
 		break;
 
 	case KEY_MAX_H:
-		if(f&JB_MAX_HORZ)
-			  restore_horz(c);
-		else {
-			maximize_horz(c);
+		if(toggle_horz(c))
 			c->size.width-=2*c->border;
-		}
 		break;
 
 	case KEY_MAX_V:
-		if(f&JB_MAX_VERT)
-			  restore_vert(c);
-		else {
- 			maximize_vert(c);
+		if(toggle_vert(c)) {
 			c->size.y+=TDIM+c->border;
 			c->size.height-=(TDIM+4*c->border);
 			moveresize(c);
