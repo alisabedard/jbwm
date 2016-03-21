@@ -6,6 +6,9 @@
 #ifndef JBWM_CLIENT_H
 #define JBWM_CLIENT_H
 
+// Free result with XFree if not NULL
+char * get_title(const Window w);
+
 #ifdef USE_TBAR
 void shade(Client * restrict c);
 #else

@@ -104,6 +104,8 @@ static void handle_property_change(XPropertyEvent * e)
 		  return;
 	else if (a == ewmh.WM_USER_TIME)
 		  return;
+	else if (a == ewmh.WM_STATE)
+		  return;
 #endif//EWMH
 	else {
 #ifdef DEBUG

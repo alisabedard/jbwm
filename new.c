@@ -60,6 +60,9 @@ static void wm_desktop(Client * restrict c)
 	else
 		XFree(lprop);
 }
+#else//!EWMH
+#define wm_desktop(c)
+#endif//EWMH
 
 #if 0
 /* These are corner cases at the moment, so this code is disabled.  If further
@@ -83,8 +86,23 @@ static void init_atom_properties(Client * restrict c)
 	}
 }
 #endif//0
+
+#ifdef EWMH
+static void init_wm_state(Client * restrict c)
+{
+	Atom *aprop;
+	unsigned long nitems;
+	if(!(aprop=get_property(c->window, XA("WM_STATE"), XA_ATOM, &nitems)))
+		return;
+	for (uint8_t i = 0; i < nitems; i++) {
+		if (aprop[i] == ewmh.WM_STATE_STICKY) c->flags |= JB_STICKY;
+		else if (aprop[i] == ewmh.WM_STATE_SHADED) shade(c);
+		else if (aprop[i] == ewmh.WM_STATE_FULLSCREEN) set_maximized(c);
+	}
+	XFree(aprop);
+}
 #else//!EWMH
-#define wm_desktop(c)
+#define init_wm_state(c)
 #endif//EWMH
 
 __attribute__((nonnull))
@@ -96,6 +114,23 @@ static void init_properties(Client * restrict c)
 	c->vdesk = c->screen->vdesk;
 	handle_mwm_hints(c);
 	wm_desktop(c);
+	init_wm_state(c);
+}
+
+static void fix_fullscreen(Client * restrict c)
+{
+	// Hack to make flash videos in firefox fullscreen: 
+	char * name = get_title(c->window);
+	if(name) {
+		if(!strncmp(name, "plugin-container", 16)) {
+			const uint8_t b = c->border; // save before next call
+			set_maximized(c);
+			c->size.x-=b;
+			c->size.y-=b;
+			moveresize(c);
+		}
+		XFree(name);
+	}
 }
 
 __attribute__((nonnull))
@@ -112,6 +147,7 @@ static void init_geometry(Client * restrict c)
 	// Test if the reparent that is to come would trigger an unmap event.
 	if (attr.map_state == IsViewable)
 		c->ignore_unmap++;
+	fix_fullscreen(c); // fix flash plugin-container bug
 }
 
 #ifdef USE_SHAPE

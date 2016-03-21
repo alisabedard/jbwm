@@ -248,7 +248,6 @@ void restore_vert(Client * restrict c)
 		c->size.height=c->old_size.height;
 		ewmh_remove_state(c->window, ewmh.WM_STATE_MAXIMIZED_VERT);
 	}
-
 }
 
 void maximize_vert(Client * restrict c)
@@ -261,7 +260,53 @@ void maximize_vert(Client * restrict c)
 	c->size.height=c->screen->size.h;
 	ewmh_add_state(c->window, ewmh.WM_STATE_MAXIMIZED_VERT);
 	c->flags|=JB_MAX_VERT;
+}
 
+void unset_fullscreen(Client * restrict c)
+{
+	if(!(c->flags&JB_FULLSCREEN))
+		  return;
+	XSetWindowBorderWidth(D, c->parent, c->border);
+	ewmh_remove_state(c->window, ewmh.WM_STATE_FULLSCREEN);
+	c->flags &= ~JB_FULLSCREEN;
+}
+
+void set_fullscreen(Client * restrict c)
+{
+	if(c->flags&JB_FULLSCREEN)
+		  return;
+	XSetWindowBorderWidth(D, c->parent, 0);
+	ewmh_add_state(c->window, ewmh.WM_STATE_FULLSCREEN);
+	c->flags |= JB_FULLSCREEN;
+}
+
+static void finalize_maximization(Client * restrict c)
+{
+	update_titlebar(c);
+	XRaiseWindow(D, c->parent);
+	moveresize(c);
+}
+
+void unset_maximized(Client * restrict c)
+{
+	if(!(c->flags&JB_MAXIMIZED))
+		  return;
+	restore_horz(c);
+	restore_vert(c);
+	c->flags &= ~JB_MAXIMIZED;
+	unset_fullscreen(c);
+	finalize_maximization(c);
+}
+
+void set_maximized(Client * restrict c)
+{
+	if(c->flags&JB_MAXIMIZED)
+		  return;
+	maximize_horz(c);
+	maximize_vert(c);
+	c->flags |= JB_MAXIMIZED;
+	set_fullscreen(c);
+	finalize_maximization(c);
 }
 
 void maximize(Client * restrict c)
@@ -270,22 +315,7 @@ void maximize(Client * restrict c)
 	// Maximizing shaped windows is buggy, so return.
 	if (c->flags & (JB_NO_MAX | JB_SHAPED))
 		return;
-
-	if (c->flags & JB_MAXIMIZED) {	// restore:
-		restore_horz(c);
-		restore_vert(c);
-		XSetWindowBorderWidth(D, c->parent, c->border);
-		ewmh_remove_state(c->window, ewmh.WM_STATE_FULLSCREEN);
-	} else {			// maximize:
-		maximize_horz(c);
-		maximize_vert(c);
-		XSetWindowBorderWidth(D, c->parent, 0);
-		ewmh_add_state(c->window, ewmh.WM_STATE_FULLSCREEN);
-	}
-	c->flags ^= JB_MAXIMIZED;	// toggle
-	update_titlebar(c);
-	XRaiseWindow(D, c->parent);
-	moveresize(c);
+	c->flags&JB_MAXIMIZED?unset_maximized(c):set_maximized(c);
 }
 
 void hide(Client * restrict c)

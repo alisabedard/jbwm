@@ -66,6 +66,35 @@ archive: distclean
  
 tags:
 	ctags *
+
 indent:
 	indent *.[ch]
 	sed 's/ \/\//\/\//g' -i'~~' *.[ch]
+
+debug:
+	make clean
+	make -f Makefile.debug
+
+small:
+	make clean
+	make -f Makefile.small
+
+clang:
+	make clean
+	make -f Makefile.clang
+
+tbonly:
+	make clean
+	make -f Makefile.tbonly
+
+check:
+	make clean
+	make -f Makefile.clang
+	make clean
+	make -f Makefile.debug
+	make clean
+	make -f Makefile.small
+	make clean
+	make -f Makefile.tbonly
+	make clean
+

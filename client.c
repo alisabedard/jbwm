@@ -5,6 +5,15 @@
 
 #include "jbwm.h"
 
+// Free result with XFree if not NULL
+char * get_title(const Window w)
+{
+	XTextProperty tp;
+	if (!XGetWMName(D, w, &tp)) 
+		  return NULL;
+	return (char *)tp.value;
+}
+
 #ifdef USE_TBAR
 void shade(Client * restrict c)
 {

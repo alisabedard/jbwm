@@ -16,6 +16,10 @@ void maximize_horz(Client * restrict c);
 void maximize_vert(Client * restrict c);
 void restore_horz(Client * restrict c);
 void restore_vert(Client * restrict c);
+void set_fullscreen(Client * restrict c);
+void unset_fullscreen(Client * restrict c);
+void set_maximized(Client * restrict c);
+void unset_maximized(Client * restrict c);
 void maximize(Client * restrict c);
 // Used by vdesk switching and EWMH
 #define DESKTOPS 10

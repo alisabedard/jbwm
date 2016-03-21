@@ -265,7 +265,6 @@ void ewmh_client_message(XClientMessageEvent * e)
 
 	if (t == ewmh.CURRENT_DESKTOP)
 		switch_vdesk(s, val);
-
 	if (t == ewmh.WM_DESKTOP && c)
 		client_to_vdesk(c, val);
 	else if (t == ewmh.DESKTOP_VIEWPORT)

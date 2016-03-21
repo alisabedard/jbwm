@@ -65,12 +65,7 @@ GC tbgc;
 
 static void draw_title(Client * restrict c)
 {
-	XTextProperty tp;
-
-	if (!XGetWMName(D, c->window, &tp))
-		return;
-
-	char *name = (char *)tp.value;
+	char * name = get_title(c->window);
 	const size_t l = strlen(name);
 	const XPoint p = { TDIM + 4, jbwm.font->ascent - JBWM_BORDER };
 #ifdef USE_XFT
