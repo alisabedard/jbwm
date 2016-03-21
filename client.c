@@ -51,8 +51,11 @@ void client_to_vdesk(Client * restrict c, const uint8_t d)
 {
 	LOG("client_to_vdesk");
 	assert(c);
+	const uint8_t p = c->vdesk;
 	c->vdesk = d;
+	// use switch_vdesk to validate d:
 	c->vdesk = switch_vdesk(c->screen, d);
+	switch_vdesk(c->screen, p);
 }
 
 /*
