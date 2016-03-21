@@ -3,7 +3,7 @@
 # Copyright 1999-2015, Ciaran Anscomb <jbwm@6809.org.uk>
 # See README for license and other details.
 
-version = 1.43
+version = 1.44
 
 PROG=jbwm
 distname = $(PROG)-$(version)
@@ -50,7 +50,7 @@ strip: $(PROG)
 INSTALL=install -c
 INSTALL_PROG=$(INSTALL) -s
 INSTALL_DIR=install -d
-install: strip
+install: 
 	$(INSTALL_DIR) $(prefix)/bin $(prefix)/share/man/man1
 	$(INSTALL_PROG) $(PROG) $(prefix)/bin
 	$(INSTALL) $(PROG).1 $(prefix)/share/man/man1
