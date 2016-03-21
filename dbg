@@ -1,0 +1,4 @@
+#!/bin/sh
+export DISPLAY=:1
+make debug
+exec gdb ./jbwm
