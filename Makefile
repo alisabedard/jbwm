@@ -3,14 +3,14 @@
 # See README for license and other details.
 
 #CFLAGS=-Ofast
-CFLAGS=-Os
+#CFLAGS+=-Os
 # Compile for current machine
-CFLAGS+=-march=native
+#CFLAGS+=-march=native
 # Link time optimization greatly reduces binary size:
 # However, it may not work correctly with clang.
 CFLAGS+=-flto
 # Tuning
-CFLAGS+=-fomit-frame-pointer
+#CFLAGS+=-fomit-frame-pointer
 # Enable all warnings
 CFLAGS+=-W -Wall -Wextra
 
