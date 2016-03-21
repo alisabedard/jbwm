@@ -11,7 +11,7 @@ distname = $(PROG)-$(version)
 # Edit/override this line if you don't want jbwm to install under /usr.
 PREFIX=/usr
 # Note that $(DESTDIR) is used by the Debian build process.
-prefix = $(DESTDIR)/$(PREFIX)
+prefix = $(DESTDIR)$(PREFIX)
 
 SRCS+=$(EXTRASRCS)
 INCLUDES+=$(EXTRAINCLUDES)
