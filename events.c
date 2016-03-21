@@ -88,10 +88,13 @@ static void handle_property_change(XPropertyEvent * e)
 {
 	Client *c = find_client(e->window);
 
-	if (!c)
-		return;
+	if (!c) return;
 
 	const Atom a = e->atom;
+
+#ifdef DEBUG
+		print_atom(a, __LINE__);
+#endif//DEBUG
 
 	if (a == XA_WM_HINTS)
 		handle_wm_hints(c);
@@ -99,29 +102,15 @@ static void handle_property_change(XPropertyEvent * e)
 #ifdef USE_TBAR
 	else if (a == XA_WM_NAME)
 		update_titlebar(c);
-#ifdef EWMH // fixes Firefox drag and drop
-	else if (a == ewmh.WM_OPAQUE_REGION)
-		  return;
-	else if (a == ewmh.WM_USER_TIME)
-		  return;
-	else if (a == ewmh.WM_STATE)
-		  return;
-#endif//EWMH
-	else {
-#ifdef DEBUG
-		print_atom(a, __LINE__);
-#endif//DEBUG
-		moveresize(c);	// Required to show titlebar on new client
-	}
+	else
+		  moveresize(c);
 #endif//USE_TBAR
 }
 
-static void handle_enter_event(XCrossingEvent * e)
+static inline void handle_enter_event(XCrossingEvent * e)
 {
 	Client *c = find_client(e->window);
-
-	if (c)
-		select_client(c);
+	if (c) select_client(c);
 }
 
 #ifdef USE_TBAR
