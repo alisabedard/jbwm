@@ -10,6 +10,10 @@
 * Code cleanups, simpler UI and key bindings
 * Use of C99 features where possible.
 
+## RELEASES
+Releases are made when sufficient changes are made to the code base.  Releases
+fixing crashes are made as soon as possible.  
+
 ## KNOWN ISSUES
 * More EWMH support needed, particularly to enable pagers and window placement.
 
