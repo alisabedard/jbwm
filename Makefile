@@ -17,6 +17,9 @@ CFLAGS+=-W -Wall -Wextra
 # Uncomment to disable assertions
 #DEFINES += -DNDEBUG
 
+# Uncomment if you use firefox with flash
+DEFINES += -DFIX_FIREFOX
+
 # Uncomment to enable SHAPE extension support
 DEFINES += -DUSE_SHAPE
 EXTRALIBS += -lXext # Required for SHAPE extension

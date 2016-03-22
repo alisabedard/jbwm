@@ -97,4 +97,4 @@ check:
 	make clean
 	make -f Makefile.tbonly
 	make clean
-
+	make # Default config

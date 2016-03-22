@@ -19,6 +19,7 @@ include snap.mk
 DEFINES += -DSTDIO
 DEFINES += -DEWMH
 EXTRASRCS += ewmh.c
+DEFINES += -DGRAVITY
 
 # Uncomment to enable MWM hints
 include mwm.mk

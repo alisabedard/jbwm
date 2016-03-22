@@ -394,7 +394,6 @@ void main_event_loop(void)
 #endif//EWMH
 
 #ifdef USE_SHAPE
-
 	case ShapeNotify:
 		LOG("ShapeNotify");
 		set_shape(find_client(ev.xany.window));

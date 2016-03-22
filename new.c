@@ -64,29 +64,10 @@ static void wm_desktop(Client * restrict c)
 #define wm_desktop(c)
 #endif//EWMH
 
-#if 0
 /* These are corner cases at the moment, so this code is disabled.  If further
  * testing shows clients actually set any of these properties, it will be
  * further implemented. */
-__attribute__((nonnull))
-static void init_atom_properties(Client * restrict c)
-{
-	Atom *aprop;
-	unsigned long nitems;
-	aprop=get_property(c->window, XA("WM_STATE"), XA_ATOM, &nitems);
-	if (aprop) {
-		for (uint8_t i = 0; i < nitems; i++) {
-			if (aprop[i] == ewmh.WM_STATE_STICKY)
-				c->flags |= JB_STICKY;
-			else if (aprop[i] == ewmh.WM_STATE_SHADED)
-				shade(c);
-		}
-
-		XFree(aprop);
-	}
-}
-#endif//0
-
+#if 0
 #ifdef EWMH
 static void init_wm_state(Client * restrict c)
 {
@@ -104,6 +85,7 @@ static void init_wm_state(Client * restrict c)
 #else//!EWMH
 #define init_wm_state(c)
 #endif//EWMH
+#endif//0
 
 __attribute__((nonnull))
 static void init_properties(Client * restrict c)
@@ -114,24 +96,27 @@ static void init_properties(Client * restrict c)
 	c->vdesk = c->screen->vdesk;
 	handle_mwm_hints(c);
 	wm_desktop(c);
-	init_wm_state(c);
+	//init_wm_state(c);
 }
 
+#ifdef FIX_FIREFOX
 static void fix_fullscreen(Client * restrict c)
 {
 	// Hack to make flash videos in firefox fullscreen: 
 	char * name = get_title(c->window);
-	if(name) {
-		if(!strncmp(name, "plugin-container", 16)) {
-			const uint8_t b = c->border; // save before next call
-			set_maximized(c);
-			c->size.x-=b;
-			c->size.y-=b;
-			moveresize(c);
-		}
-		XFree(name);
+	if(!name) return;
+	if(!strncmp(name, "plugin-container", 16)) {
+		const uint8_t b = c->border; // save before next call
+		set_maximized(c);
+		c->size.x-=b;
+		c->size.y-=b;
+		moveresize(c);
 	}
+	XFree(name);
 }
+#else//!FIX_FIREFOX
+#define fix_fullscreen(c)
+#endif//FIX_FIREFOX
 
 __attribute__((nonnull))
 static void init_geometry(Client * restrict c)
