@@ -66,6 +66,7 @@ GC tbgc;
 static void draw_title(Client * restrict c)
 {
 	char * name = get_title(c->window);
+	if(!name) return; // No title could be loaded, abort
 	const size_t l = strlen(name);
 	const XPoint p = { TDIM + 4, jbwm.font->ascent - JBWM_BORDER };
 #ifdef USE_XFT

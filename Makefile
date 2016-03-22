@@ -6,6 +6,8 @@
 #CFLAGS+=-Os
 # Compile for current machine
 #CFLAGS+=-march=native
+# Debugging symbols
+CFLAGS+=-ggdb
 # Link time optimization greatly reduces binary size:
 # However, it may not work correctly with clang.
 CFLAGS+=-flto

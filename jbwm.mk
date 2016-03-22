@@ -48,7 +48,7 @@ strip: $(PROG)
 		--remove-section=.note $(PROG)
 
 INSTALL=install -c
-INSTALL_PROG=$(INSTALL) -s
+INSTALL_PROG=$(INSTALL) 
 INSTALL_DIR=install -d
 install: 
 	$(INSTALL_DIR) $(prefix)/bin $(prefix)/share/man/man1

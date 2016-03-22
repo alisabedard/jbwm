@@ -23,13 +23,10 @@ static void cleanup()
 	Client *i;
 
 	for (Client * c = jbwm.head; c; c = i) {
-		i = c->next;
-
+		if(!(i = c->next))
+			return;
 		if (c->flags & JB_REMOVE)
 			remove_client(c);
-
-		if (!i)
-			return;
 	}
 }
 
@@ -119,7 +116,6 @@ static void handle_expose_event(XEvent * ev)
 	// Ignore extra expose events
 	if (ev->xexpose.count == 0) {
 		LOG("handle_expose_event");
-		// xproperty was used instead of xexpose, previously.
 		const Window w = ev->xexpose.window;
 		Client *c = find_client(w);
 
