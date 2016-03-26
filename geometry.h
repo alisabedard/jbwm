@@ -2,6 +2,8 @@
 #ifndef GEOMETRY_H
 #define GEOMETRY_H
 
+#include <stdint.h>
+
 typedef struct {
 	uint16_t w, h;
 } Dim;

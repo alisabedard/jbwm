@@ -3,7 +3,19 @@
 // Copyright 1999-2015, Ciaran Anscomb <jbwm@6809.org.uk>
 // See README for license and other details.
 
+#ifdef USE_SHAPE
+#include <X11/extensions/shape.h>
+#endif//USE_SHAPE
+#include <X11/Xatom.h>
+#include "button_event.h"
+#include "client.h"
+#include "ewmh.h"
 #include "jbwm.h"
+#include "keys.h"
+#include "log.h"
+#include "new.h"
+#include "screen.h"
+#include "titlebar.h"
 
 static ScreenInfo *find_screen(const Window root)
 {

@@ -1,5 +1,9 @@
 // Copyright 2016, Jeffrey E. Bedard <jefbed@gmail.com>
+#include <assert.h>
+#include "atoms.h"
 #include "jbwm.h"
+#include "log.h"
+#include "new.h"
 
 // flags:
 #define MWM_HINTS_FUNCTIONS     (1L << 0)

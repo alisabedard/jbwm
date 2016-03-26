@@ -3,7 +3,22 @@
 // Copyright 1999-2015, Ciaran Anscomb <jbwm@6809.org.uk>
 // See README for license and other details.
 
+#include <assert.h>
+#include <stdlib.h>
+#include <string.h>
+#ifdef USE_SHAPE
+#include <X11/extensions/shape.h>
+#endif//USE_SHAPE
+#include <X11/Xatom.h>
+#include "atoms.h"
+#include "client.h"
+#include "config.h"
+#include "ewmh.h"
 #include "jbwm.h"
+#include "log.h"
+#include "mwm.h"
+#include "screen.h"
+#include "titlebar.h"
 
 #if defined(EWMH) || defined(MWM)
 void *get_property(Window w, Atom property, Atom type, unsigned long *num_items)

@@ -3,7 +3,15 @@
 // Copyright 1999-2015, Ciaran Anscomb <jbwm@6809.org.uk>
 // See README for license and other details.
 
+#include <stdlib.h>
+#include "client.h"
+#include "config.h"
 #include "jbwm.h"
+#include "keys.h"
+#include "log.h"
+#include "screen.h"
+#include "snap.h"
+#include "titlebar.h"
 
 static void point(Client * c, const int x, const int y)
 {

@@ -6,6 +6,9 @@
 #ifndef JBWM_CLIENT_H
 #define JBWM_CLIENT_H
 
+#include <stdbool.h>
+#include "client_t.h"
+
 // Free result with XFree if not NULL
 char * get_title(const Window w);
 

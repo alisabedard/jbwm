@@ -3,8 +3,8 @@
 // Copyright 1999-2015, Ciaran Anscomb <jbwm@6809.org.uk>
 // See README for license and other details.
 
-#ifndef _EWMH_H
-#define _EWMH_H
+#ifndef EWMH_H
+#define EWMH_H
 
 #ifdef EWMH
 
@@ -55,4 +55,4 @@ void ewmh_init();
 #define ewmh_init()
 #endif//EWMH
 
-#endif//!_EWMH_H
+#endif//!EWMH_H

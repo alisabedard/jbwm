@@ -3,7 +3,17 @@
 // Copyright 1999-2015, Ciaran Anscomb <jbwm@6809.org.uk>
 // See README for license and other details.
 
+//#include "jbwm.h"
+#include <unistd.h>
+#include "atoms.h"
+#include "client.h"
+#include "config.h"
+#include "ewmh.h"
+#include "events.h"
 #include "jbwm.h"
+#include "new.h"
+#include "screen.h"
+#include "titlebar.h"
 
 #ifdef EWMH
 
@@ -233,9 +243,7 @@ fullscreen_cb(XClientMessageEvent * e
 	      __attribute__ ((unused)), const bool add, void *data)
 {
 	Client *c = data; // validated by caller
-
-	if (add == !(c->flags & JB_MAXIMIZED))
-		maximize(c);
+	add?set_maximized(c):unset_maximized(c);
 }
 
 static void handle_wm_state_changes(XClientMessageEvent * e, Client * c)

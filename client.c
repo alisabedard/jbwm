@@ -3,7 +3,18 @@
 // Copyright 1999-2015, Ciaran Anscomb <jbwm@6809.org.uk>
 // See README for license and other details.
 
+#include <assert.h>
+#include <stdlib.h>
+#ifdef USE_SHAPE
+#include <X11/extensions/shape.h>
+#endif//USE_SHAPE
+#include "atoms.h"
+#include "client.h"
+#include "ewmh.h"
 #include "jbwm.h"
+#include "log.h"
+#include "screen.h"
+#include "titlebar.h"
 
 // Free result with XFree if not NULL
 char * get_title(const Window w)

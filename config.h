@@ -39,4 +39,6 @@
 #define JBWM_SNAP 12
 #define JBWM_RESIZE_INCREMENT 20
 
+#define DESKTOPS 10
+
 #endif /* JBWM_CONFIG_H */

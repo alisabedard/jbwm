@@ -5,58 +5,8 @@
 #ifndef JBWM_H
 #define JBWM_H
 
-// Standard Library:
-#include <assert.h>
-#include <signal.h>
-#include <stdbool.h>
-#include <stdlib.h>
-#include <string.h>
-#include <sys/wait.h>
-#include <unistd.h>
-#include <stdint.h>
-#include <sysexits.h>
-#ifdef STDIO
-#include <stdio.h>
-#endif//STDIO
-
-// X11:
-#include <X11/cursorfont.h>
-#include <X11/X.h>
-#include <X11/Xatom.h>
-#include <X11/Xlib.h>
-#include <X11/Xproto.h>
-#include <X11/Xutil.h>
-#include <X11/keysym.h>
-#ifdef USE_SHAPE
-#include <X11/extensions/shape.h>
-#endif /* USE_SHAPE */
-
-// Xft:
-#ifdef USE_XFT
-#include <X11/Xft/Xft.h>
-#endif
-
-// JBWM:
-#include "geometry.h"
-#include "ScreenInfo.h"
-#include "client_t.h"
 #include "jbwmenv.h"
-#include "config.h"
-#include "keys.h"
-#include "screen.h"
-#include "client.h"
-#include "new.h"
-#include "events.h"
-#include "button_event.h"
-#include "atoms.h"
-#include "screen.h"
-#include "log.h"
-#include "ewmh.h"
-#include "titlebar.h"
-#include "mwm.h"
-#include "snap.h"
 
-// jbwm.c:
 void jbwm_grab_button(const Window w, const unsigned int mask,
 		      const unsigned int button);
 

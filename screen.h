@@ -23,7 +23,5 @@ void unset_fullscreen(Client * restrict c);
 void set_maximized(Client * restrict c);
 void unset_maximized(Client * restrict c);
 void maximize(Client * restrict c);
-// Used by vdesk switching and EWMH
-#define DESKTOPS 10
 
 #endif /* JBWM_SCREEN_H */

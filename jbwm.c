@@ -3,7 +3,18 @@
 // Copyright 1999-2015, Ciaran Anscomb <jbwm@6809.org.uk>
 // See README for license and other details.
 
+#include <string.h>
+#ifdef USE_ARGV
+#include <unistd.h>
+#endif//USE_ARGV
+#include <X11/cursorfont.h>
+#include "config.h"
+#include "events.h"
+#include "ewmh.h"
 #include "jbwm.h"
+#include "keys.h"
+#include "log.h"
+#include "new.h"
 
 // Main application data structure.
 JBWMEnvironment jbwm;
@@ -73,7 +84,7 @@ static void parse_argv(int argc, char **argv)
 
 		case 'V':
 			puts(VERSION);
-			exit(EX_OK);
+			exit(0);
 
 		default:	/* Usage */
 			fprintf(stderr, "%s [%s]\n", argv[0], optstring);
@@ -81,7 +92,7 @@ static void parse_argv(int argc, char **argv)
 
 		default:
 #endif//STDIO
-			exit(EX_USAGE);
+			exit(1);
 		}
 	}
 }

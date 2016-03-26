@@ -6,7 +6,8 @@
 #ifndef JBWM_CLIENT_STRUCT_H
 #define JBWM_CLIENT_STRUCT_H
 
-#include <stdint.h>
+#include <X11/Xutil.h>
+#include "ScreenInfo.h"
 
 #define JB_STICKY               1
 #define JB_REMOVE               (1<<1)

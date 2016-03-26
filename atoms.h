@@ -8,6 +8,10 @@
 #ifndef ATOMS_H
 #define ATOMS_H
 
+#include <X11/Xatom.h>
+#include <X11/Xlib.h>
+#include "jbwmenv.h"
+
 #define XA(atom) XInternAtom(D, atom, false)
 #define XPROP(win, prop, type, data, size) XChangeProperty(D, win, \
 		prop, type, 32, PropModeReplace, \

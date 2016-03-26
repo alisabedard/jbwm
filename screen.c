@@ -3,7 +3,17 @@
 // Copyright 1999-2015, Ciaran Anscomb <jbwm@6809.org.uk>
 // See README for license and other details.
 
+#include <assert.h>
+#include <stdlib.h>
+#include "atoms.h"
+#include "client.h"
+#include "config.h"
+#include "ewmh.h"
 #include "jbwm.h"
+#include "log.h"
+#include "titlebar.h"
+#include "screen.h"
+#include "snap.h"
 
 #define MouseMask (ButtonPressMask|ButtonReleaseMask|PointerMotionMask)
 
@@ -101,6 +111,7 @@ static XPoint get_mouse_position(Window w)
 
 void drag(Client * restrict c)
 {
+	assert(c);
 	const Window r = c->screen->root;
 	if(!grab_pointer(r, jbwm.cursor))
 		  return;
@@ -125,8 +136,10 @@ drag_end:
 	moveresize(c);
 	configure(&(c->size), c->window);
 }
+
 void moveresize(Client * restrict c)
 {
+	assert(c);
 #ifdef USE_TBAR
 	const uint8_t offset =
 	    (c->flags & (JB_NO_TB | JB_MAXIMIZED)) ? 0 : TDIM;
@@ -137,13 +150,14 @@ void moveresize(Client * restrict c)
 	XMoveResizeWindow(D, c->parent, c->size.x, c->size.y - offset, w,
 			  c->size.height + offset);
 	XMoveResizeWindow(D, c->window, 0, offset, w, c->size.height);
-#ifdef USE_TBAR
 
+#ifdef USE_TBAR
 	if (offset && (c->exposed_width != w)) {
 		update_titlebar(c);
 		c->exposed_width = w;
 	}
 #endif//USE_TBAR
+
 	set_shape(c);
 }
 
@@ -156,6 +170,8 @@ static void finalize_maximization(Client * restrict c)
 
 void restore_horz(Client * restrict c)
 {
+	LOG("restore_horz");
+	assert(c);
 	if(!(c->flags & JB_MAX_HORZ))
 		  return;
 	c->flags^=JB_MAX_HORZ;
@@ -167,6 +183,8 @@ void restore_horz(Client * restrict c)
 
 void maximize_horz(Client * restrict c)
 {
+	LOG("maximize_horz");
+	assert(c);
 	if (c->flags & JB_MAX_HORZ)
  		 return; 
 	c->old_size.x=c->size.x;
@@ -180,12 +198,16 @@ void maximize_horz(Client * restrict c)
 
 bool toggle_horz(Client * restrict c)
 {
+	LOG("toggle_horz");
+	assert(c);
 	c->flags&JB_MAX_HORZ?restore_horz(c):maximize_horz(c);
 	return c->flags&JB_MAX_HORZ;
 }
 
 void restore_vert(Client * restrict c)
 {
+	LOG("restore_vert");
+	assert(c);
 	if (c->flags & JB_MAX_VERT) {
 		c->flags^=JB_MAX_VERT;
 		c->size.y=c->old_size.y;
@@ -197,6 +219,8 @@ void restore_vert(Client * restrict c)
 
 void maximize_vert(Client * restrict c)
 {
+	LOG("maximize_vert");
+	assert(c);
 	if (c->flags & JB_MAX_VERT)
  		 return; 
 	c->old_size.y=c->size.y;
@@ -210,12 +234,16 @@ void maximize_vert(Client * restrict c)
 
 bool toggle_vert(Client * restrict c)
 {
+	LOG("toggle_vert");
+	assert(c);
 	c->flags&JB_MAX_VERT?restore_vert(c):maximize_vert(c);
 	return c->flags&JB_MAX_VERT;
 }
 
 void unset_fullscreen(Client * restrict c)
 {
+	LOG("unset_fullscreen");
+	assert(c);
 	if(!(c->flags&JB_FULLSCREEN))
 		  return;
 	XSetWindowBorderWidth(D, c->parent, c->border);
@@ -226,6 +254,8 @@ void unset_fullscreen(Client * restrict c)
 
 void set_fullscreen(Client * restrict c)
 {
+	LOG("set_fullscreen");
+	assert(c);
 	if(c->flags&JB_FULLSCREEN)
 		  return;
 	XSetWindowBorderWidth(D, c->parent, 0);
@@ -236,6 +266,8 @@ void set_fullscreen(Client * restrict c)
 
 void unset_maximized(Client * restrict c)
 {
+	LOG("unset_maximized");
+	assert(c);
 	if(!(c->flags&JB_MAXIMIZED))
 		  return;
 	restore_horz(c);
@@ -247,6 +279,8 @@ void unset_maximized(Client * restrict c)
 
 void set_maximized(Client * restrict c)
 {
+	LOG("set_maximized");
+	assert(c);
 	if(c->flags&JB_MAXIMIZED)
 		  return;
 	maximize_horz(c);
@@ -258,6 +292,8 @@ void set_maximized(Client * restrict c)
 
 void maximize(Client * restrict c)
 {
+	LOG("maximize");
+	assert(c);
 	// Honor !MWM_FUNC_MAXIMIZE
 	// Maximizing shaped windows is buggy, so return.
 	if (!(c->flags & (JB_NO_MAX | JB_SHAPED)))
@@ -296,14 +332,9 @@ uint8_t switch_vdesk(ScreenInfo * s, const uint8_t v)
 			unhide(c);
 			continue;
 		}
-
-		if (c->screen != s)
-			continue;
-
-		if (c->vdesk == s->vdesk)
-			hide(c);
-		else if (c->vdesk == v)
-			unhide(c);
+		if (c->screen != s) continue;
+		if (c->vdesk == s->vdesk) hide(c);
+		else if (c->vdesk == v) unhide(c);
 	}
 
 	s->vdesk = v;

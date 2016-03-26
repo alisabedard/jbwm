@@ -6,8 +6,10 @@
 #ifndef JBWM__LOG_H__
 #define JBWM__LOG_H__
 
+#include <stdlib.h>
 #ifdef STDIO
-#define ERROR(msg) {fprintf(stderr, "%s\n", msg); exit(EX_SOFTWARE);}
+#include <stdio.h>
+#define ERROR(msg) {fprintf(stderr, "%s\n", msg); exit(1);}
 #else//!STDIO
 #define ERROR(...) exit(1)
 #endif//STDIO

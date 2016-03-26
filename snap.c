@@ -3,7 +3,12 @@
 // Copyright 1999-2015, Ciaran Anscomb <jbwm@6809.org.uk>
 // See README for license and other details.
 
+#include <stdlib.h>
+#include "client.h"
+#include "config.h"
 #include "jbwm.h"
+#include "log.h"
+#include "titlebar.h"
 
 __attribute__ ((hot))
 static void sborder(int *restrict xy, const int edge)
@@ -14,7 +19,6 @@ static void sborder(int *restrict xy, const int edge)
 
 void snap_border(Client *restrict c)
 {
-	assert(c);
 	XSizeHints *restrict g = &(c->size);
 	/* snap to screen border */
 	const uint8_t b = 2 * c->border;
@@ -46,7 +50,6 @@ snap_dim(const int cxy, const uint16_t cwh, const int cixy,
 void snap_client(Client * c)
 {
 	XLOG("snap_client");
-	assert(c);
 	snap_border(c);
 	// Snap to other windows:
 	XSizeHints *restrict g = &(c->size);

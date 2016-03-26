@@ -6,6 +6,9 @@
 #ifndef SCREENINFO_H
 #define SCREENINFO_H
 
+#include <X11/Xlib.h>
+#include "geometry.h"
+
 typedef struct ScreenInfo {
 	uint8_t screen, vdesk;
 	Dim size;

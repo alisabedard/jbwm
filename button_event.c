@@ -3,7 +3,10 @@
 // Copyright 1999-2015, Ciaran Anscomb <jbwm@6809.org.uk>
 // See README for license and other details.
 
+#include "client.h"
 #include "jbwm.h"
+#include "screen.h"
+#include "titlebar.h"
 
 static void button1_event(XButtonEvent * e
 #ifndef USE_TBAR
