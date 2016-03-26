@@ -11,6 +11,7 @@
 #include "ewmh.h"
 #include "events.h"
 #include "jbwm.h"
+#include "log.h"
 #include "new.h"
 #include "screen.h"
 #include "titlebar.h"

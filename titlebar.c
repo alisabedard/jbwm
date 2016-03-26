@@ -5,6 +5,9 @@
 
 #include <assert.h>
 #include <string.h>
+#ifdef USE_XFT
+#include <X11/Xft/Xft.h>
+#endif//USE_XFT
 #include "client.h"
 #include "config.h"
 #include "jbwm.h"

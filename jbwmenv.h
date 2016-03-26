@@ -7,6 +7,9 @@
 #define JBWM_ENVIRONMENT_H
 
 #include <stdbool.h>
+#ifdef USE_XFT
+#include <X11/Xft/Xft.h>
+#endif//USE_XFT
 #include "client_t.h"
 
 typedef struct {
@@ -23,16 +26,16 @@ typedef struct {
 #ifdef USE_TBAR
 #ifdef USE_XFT
 	XftFont *font;
-#else				//! USE_XFT
+#else//! USE_XFT
 	XFontStruct *font;
-#endif				//USE_XFT
-#endif				//USE_TBAR
+#endif//USE_XFT
+#endif//USE_TBAR
 
 #ifdef USE_TBAR
 	struct {
 		GC close, shade, resize;
 	} gc;
-#endif				//USE_TBAR
+#endif//USE_TBAR
 } JBWMEnvironment;
 
 extern JBWMEnvironment jbwm;

@@ -6,6 +6,8 @@
 #ifndef JBWM_BTN_EVT_H
 #define JBWM_BTN_EVT_H
 
+#include <X11/Xlib.h>
+
 void jbwm_handle_button_event(XButtonEvent * e);
 
 #endif /* JBWM_BTN_EVT_H */
