@@ -212,6 +212,7 @@ static bool has_delete_proto(const Client * restrict c)
 	Atom *p;
 	int i;
 	if(XGetWMProtocols(D, c->window, &p, &i)) {
+		assert(p);
 		while(i--)
 			if((found=(p[i]==client_atoms[I_DEL_WIN])))
 				break;
