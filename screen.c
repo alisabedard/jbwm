@@ -7,26 +7,16 @@
 
 #define MouseMask (ButtonPressMask|ButtonReleaseMask|PointerMotionMask)
 
-#ifndef SOLID
 __attribute__ ((hot))
 static void draw_outline(Client * c)
 {
-	assert(c);
 	/* restrict, as all changes will occur through g */
 	XSizeHints *restrict g = &(c->size);
 	const bool tb = !(c->flags & JB_NO_TB);
-/* *INDENT-OFF* */
-	XRectangle r[] = { 
-		{ .x = g->x, .y = g->y, .width = g->width, 
-			.height = g->height}, 
-		{ .x = g->x, .y = g->y - (tb ? TDIM : 0), 
-			.width = g->width,.height = (tb ? TDIM : 0) - c->border}
-	};
-/* *INDENT-ON* */
-	ScreenInfo *s = c->screen;
-	XDrawRectangles(D, s->root, s->gc, r, tb ? 2 : 1);
+	XDrawRectangle(D, c->screen->root, c->screen->gc,
+		g->x, g->y - (tb?TDIM:0), g->width, 
+		g->height + (tb?TDIM:0));
 }
-#endif//!SOLID
 
 static void configure(XSizeHints * restrict g, const Window w)
 {
@@ -55,23 +45,15 @@ static bool grab_pointer(const Window w, const Cursor cursor)
 static void
 handle_motion_notify(Client * restrict c, XMotionEvent * restrict mev)
 {
-#ifndef SOLID
+	if (c->border) draw_outline(c);	// clear outline
 
-	if (c->border)
-		draw_outline(c);	// clear outline
-
-#endif//!SOLID
 /* *INDENT-OFF* */
 	recalculate_resize(&c->size, (XPoint) { c->size.x, c->size.y},
 		(XPoint) { mev->x, mev->y});
 /* *INDENT-ON* */
-#ifndef SOLID
 
-	if (c->border)
-		draw_outline(c);
-	else
-#endif//!SOLID
-		moveresize(c);
+	if (c->border) draw_outline(c);
+	else moveresize(c);
 }
 
 void resize(Client * restrict c)
@@ -81,11 +63,8 @@ void resize(Client * restrict c)
 	/* Resizing shaded windows yields undefined behavior.  */
 	const uint32_t f = c->flags;
 
-	if (f & (JB_NO_RESIZE | JB_SHADED))
-		return;
-
-	if (!grab_pointer(c->screen->root, jbwm.cursor))
-		return;
+	if (f & (JB_NO_RESIZE | JB_SHADED)) return;
+	if (!grab_pointer(c->screen->root, jbwm.cursor)) return;
 
 	// Valid with restricted c, as it is derived from c:
 	XSizeHints *g = &(c->size);
@@ -97,12 +76,7 @@ void resize(Client * restrict c)
 #endif//USE_SHAPE
 	XWarpPointer(D, None, c->window, 0, 0, 0, 0, g->width, g->height);
 	XEvent ev;
-#ifndef SOLID
-
-	if (c->border)
-		XGrabServer(D);
-
-#endif//!SOLID
+	if (c->border) XGrabServer(D);
  resize_loop:
 	XMaskEvent(D, MouseMask, &ev);
 
@@ -112,61 +86,9 @@ void resize(Client * restrict c)
 	}
 
 	configure(g, c->window);
-#ifndef SOLID
-
-	if (c->border)
-		XUngrabServer(D);
-
-#endif//!SOLID
+	if (c->border) XUngrabServer(D);
 	XUngrabPointer(D, CurrentTime);
 	moveresize(c);
-}
-
-static void
-drag_motion(Client * restrict c, XEvent ev, const XPoint p, const XPoint oldp)
-{
-	XSizeHints *g = &(c->size);
-#ifndef SOLID
-	const bool outline = c->border && !(c->flags & JB_SHADED);
-
-	if (outline)
-		draw_outline(c);
-
-#endif//!SOLID
-	g->x = oldp.x + (ev.xmotion.x - p.x);
-	g->y = oldp.y + (ev.xmotion.y - p.y);
-	snap_client(c);
-#ifndef SOLID
-
-	if (outline)
-		draw_outline(c);
-	else
-#endif//!SOLID
-		moveresize(c);
-}
-
-static void drag_event_loop(Client * restrict c, XPoint p, const XPoint oldp)
-{
-	XEvent ev;
-#ifdef USE_TBAR
-	p.y += c->flags & JB_NO_TB ? TDIM : 0;
-#endif//USE_TBAR
-	XGrabServer(D);
- drag_loop:
-	XMaskEvent(D, MouseMask, &ev);
-
-	if (ev.type == MotionNotify)
-		drag_motion(c, ev, p, oldp);
-	else {
-		XUngrabPointer(D, CurrentTime);
-		moveresize(c);
-		XUngrabServer(D);
-		// This allows QT menus to be positioned correctly.
-		configure(&(c->size), c->window);
-		return;
-	}
-
-	goto drag_loop;
 }
 
 static XPoint get_mouse_position(Window w)
@@ -179,23 +101,30 @@ static XPoint get_mouse_position(Window w)
 
 void drag(Client * restrict c)
 {
-	LOG("drag");
-	assert(c);
-
-	if (c->flags & JB_NO_MOVE)
-		return;
-
-	const Window root = c->screen->root;
-
-	if (!grab_pointer(root, jbwm.cursor))
-		return;
-
-	XSizeHints *g = &(c->size);
-	drag_event_loop(c, get_mouse_position(root), (XPoint) {
-			g->x, g->y}
-	);
+	const Window r = c->screen->root;
+	if(!grab_pointer(r, jbwm.cursor))
+		  return;
+	const XPoint op = { c->size.x, c->size.y 
+		+ (c->flags & JB_NO_TB ? TDIM : 0)};
+	XPoint p=get_mouse_position(r);
+	p.y += c->flags & JB_NO_TB ? TDIM : 0;
+	XEvent ev;
+drag_begin:
+	XMaskEvent(D, MouseMask, &ev);
+	if(ev.type != MotionNotify)
+		  goto drag_end;
+	draw_outline(c); // clear
+	c->size.x = op.x - p.x + ev.xmotion.x;
+	c->size.y = op.y - p.y + ev.xmotion.y;
+	snap_client(c);
+	draw_outline(c); // draw
+	goto drag_begin;
+drag_end:
+	draw_outline(c); // clear
+	XUngrabPointer(D, CurrentTime);
+	moveresize(c);
+	configure(&(c->size), c->window);
 }
-
 void moveresize(Client * restrict c)
 {
 #ifdef USE_TBAR

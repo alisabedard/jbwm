@@ -185,8 +185,8 @@ static void setup_gc(ScreenInfo * s)
 	unsigned long vm =
 	    GCFunction | GCSubwindowMode | GCLineWidth | GCForeground |
 	    GCBackground;
-	XGCValues gv = {.foreground = s->fg.pixel,.background = s->bg.pixel,
-		.function = GXinvert,.subwindow_mode = IncludeInferiors,
+	XGCValues gv = {.foreground = s->fg.pixel, .background = s->bg.pixel,
+		.function = GXxor, .subwindow_mode = IncludeInferiors,
 		.line_width = JBWM_BORDER
 	};
 #if defined(USE_TBAR) && !defined(USE_XFT)
