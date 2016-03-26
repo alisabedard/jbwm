@@ -24,8 +24,8 @@ static void draw_outline(Client * c)
 	XSizeHints *restrict g = &(c->size);
 	const bool tb = !(c->flags & JB_NO_TB);
 	XDrawRectangle(D, c->screen->root, c->screen->gc,
-		g->x, g->y - (tb?TDIM:0), g->width, 
-		g->height + (tb?TDIM:0));
+		g->x, g->y - (tb?TDIM:0), g->width + c->border, 
+		g->height + c->border + (tb?TDIM:0));
 }
 
 static void configure(XSizeHints * restrict g, const Window w)
