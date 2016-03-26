@@ -112,6 +112,8 @@ static XPoint get_mouse_position(Window w)
 void drag(Client * restrict c)
 {
 	assert(c);
+	assert(c->screen);
+	LOG("drag");
 	const Window r = c->screen->root;
 	if(!grab_pointer(r, jbwm.cursor))
 		  return;

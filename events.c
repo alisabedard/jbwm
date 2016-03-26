@@ -35,10 +35,10 @@ static void cleanup()
 	Client *i;
 
 	for (Client * c = jbwm.head; c; c = i) {
-		if(!(i = c->next))
-			return;
+		i = c->next;
 		if (c->flags & JB_REMOVE)
 			remove_client(c);
+		if(!i) return;
 	}
 }
 
