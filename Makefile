@@ -2,15 +2,14 @@
 # Copyright 1999-2015, Ciaran Anscomb <jbwm@6809.org.uk>
 # See README for license and other details.
 
-#CFLAGS=-Ofast
-#CFLAGS+=-Os
+#CFLAGS=-Os
 # Compile for current machine
 #CFLAGS+=-march=native
 # Debugging symbols
-CFLAGS+=-ggdb
+#CFLAGS+=-ggdb
 # Link time optimization greatly reduces binary size:
 # However, it may not work correctly with clang.
-CFLAGS+=-flto
+#CFLAGS+=-flto
 # Tuning
 #CFLAGS+=-fomit-frame-pointer
 # Enable all warnings
