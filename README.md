@@ -12,7 +12,8 @@
 
 ## RELEASES
 Releases are made when sufficient changes are made to the code base.  Releases
-fixing crashes are made as soon as possible.  
+fixing crashes are made as soon as possible--such releases will be as tertiary
+point releases, starting at x.x.1. 
 
 ## KNOWN ISSUES
 * More EWMH support needed, particularly to enable pagers and window placement.
