@@ -34,9 +34,10 @@ void jbwm_handle_key_event(XKeyEvent * e);
 #define KEY_ALTLOWER    XK_minus
 #define KEY_INFO        XK_F5
 #define KEY_MAX         XK_space
-#define KEY_STICK               XK_f
+#define KEY_STICK       XK_period
 #define KEY_MOVE        XK_m
 #define KEY_SHADE       XK_s
+#define KEY_FS		XK_a
 
 /*
  * Mixtures of Ctrl, Alt an Escape are used for things like VMWare and
@@ -56,9 +57,10 @@ void jbwm_handle_key_event(XKeyEvent * e);
 #define JBWM_KEYS_TO_GRAB KEY_NEXT, KEY_NEW, KEY_QUIT, KEY_KILL,\
 	JBWM_DIRECTION_KEYS, KEY_LOWER, KEY_ALTLOWER, KEY_MAX, KEY_STICK,\
 	JBWM_VWM_KEYS, KEY_MOVE, KEY_RAISE, KEY_SHADE, KEY_MAX_H,\
-	KEY_MAX_V, 0
+	KEY_MAX_V, KEY_FS, 0
 
-#define JBWM_ALT_KEYS_TO_GRAB KEY_KILL, JBWM_DIRECTION_KEYS, JBWM_VWM_KEYS, 0
+#define JBWM_ALT_KEYS_TO_GRAB KEY_KILL, JBWM_DIRECTION_KEYS,\
+	JBWM_VWM_KEYS, 0
 
 void grab_keys_for_screen(ScreenInfo * restrict s);
 

@@ -176,85 +176,91 @@ static void set_number_of_desktops(const Window r)
 
 static void check_state(XClientMessageEvent * e,	// event data
 			const Atom state,	// state to test
-			void *data,	// user data
+			Client *c,
 			// callback:
-			void (*state_cb) (XClientMessageEvent *,// event data
-					// add action if true, else remove action
-					  bool,	void *)) // user data
+			void (*state_cb) (const bool, // true if add
+			Client *))
 {
 	// 2 atoms can be set at once
-	bool is_set = e->data.l[1] == (long)state;
-	is_set |= e->data.l[2] == (long)state;
+	long * l = &e->data.l[0];
+	const bool set = l[1] == (long)state || l[2] == (long)state;
+	if(!set) return;
+	switch (e->data.l[0]) {
+	default:
+	case 0:	// remove
+		state_cb(false, c);
+		ewmh_remove_state(e->window, state);
+		break;
 
-	if (is_set) {
-		switch (e->data.l[0]) {
-		default:
-		case 0:	// remove
-			state_cb(e, false, data);
-			ewmh_remove_state(e->window, state);
-			break;
+	case 1:	// add
+		state_cb(false, c);
+		ewmh_add_state(e->window, state);
+		break;
 
-		case 1:	// add
-			state_cb(e, true, data);
-			ewmh_add_state(e->window, state);
-			break;
+	case 2:{	// toggle
+			const bool add =
+			    !ewmh_get_state(e->window, state);
+			state_cb(false, c);
 
-		case 2:{	// toggle
-				const bool add =
-				    !ewmh_get_state(e->window, state);
-				state_cb(e, add, data);
-
-				if (add)
-					ewmh_add_state(e->window, state);
-			}
+			if (add)
+				ewmh_add_state(e->window, state);
+			else
+				  ewmh_remove_state(e->window, state);
 		}
 	}
 }
 
-static void
-above_cb(XClientMessageEvent * e, const bool add, void *data
-	 __attribute__ ((unused)))
+static void layer(const bool above, Client * c)
 {
-	if (add)
-		XRaiseWindow(D, e->window);
-}
-
-static void
-below_cb(XClientMessageEvent * e, const bool add, void *data
-	 __attribute__ ((unused)))
-{
-	if (add)
-		XLowerWindow(D, e->window);
-}
-
-static void
-skip_pager_cb(XClientMessageEvent * e
-	      __attribute__ ((unused)), const bool add, void *data)
-{
-	Client *c = (Client *) data; // validated by caller
-
-	if (add)
-		c->flags |= JB_STICKY;
+	if(above)
+		  XRaiseWindow(D, c->parent);
 	else
-		c->flags &= ~JB_STICKY;
+		  XLowerWindow(D, c->parent);
+}
+
+static void above_cb(const bool add, Client * c)
+{
+	add?layer(true, c):layer(false, c);
+}
+
+static void below_cb(const bool add, Client * c)
+{
+	add?layer(false, c):layer(true, c);
+}
+
+static void fullscreen_cb(const bool add, Client * c)
+{
+	add?set_fullscreen(c):unset_fullscreen(c);
+}
+
+static void max_h_cb(const bool add, Client * c)
+{
+	add?maximize_horz(c):restore_horz(c);
 }
 
 static void
-fullscreen_cb(XClientMessageEvent * e
-	      __attribute__ ((unused)), const bool add, void *data)
+max_v_cb(const bool add, Client * c)
 {
-	Client *c = data; // validated by caller
-	add?set_maximized(c):unset_maximized(c);
+	add?maximize_vert(c):restore_vert(c);
+}
+
+static void
+stick_cb(const bool add, Client * c)
+{
+	if(add)
+		  c->flags |= JB_STICKY;
+	else
+		  c->flags &= ~JB_STICKY;
 }
 
 static void handle_wm_state_changes(XClientMessageEvent * e, Client * c)
 {
-	check_state(e, ewmh.WM_STATE_ABOVE, NULL, above_cb);
-	check_state(e, ewmh.WM_STATE_BELOW, NULL, below_cb);
-	check_state(e, ewmh.WM_STATE_SKIP_PAGER, c, skip_pager_cb);
+	check_state(e, ewmh.WM_STATE_ABOVE, c, above_cb);
+	check_state(e, ewmh.WM_STATE_BELOW, c, below_cb);
 	check_state(e, ewmh.WM_STATE_FULLSCREEN, c, fullscreen_cb);
-	check_state(e, ewmh.WM_STATE_MAXIMIZED_HORZ, c, fullscreen_cb);
-	check_state(e, ewmh.WM_STATE_MAXIMIZED_VERT, c, fullscreen_cb);
+	check_state(e, ewmh.WM_STATE_MAXIMIZED_HORZ, c, max_h_cb);
+	check_state(e, ewmh.WM_STATE_MAXIMIZED_VERT, c, max_v_cb);
+	check_state(e, ewmh.WM_STATE_STICKY, c, stick_cb);
 }
 
 void ewmh_client_message(XClientMessageEvent * e)
@@ -328,18 +334,20 @@ void set_ewmh_allowed_actions(const Window w)
 	XPROP(w, a[0], XA_ATOM, &a, sizeof(a) / sizeof(Atom));
 }
 
-void setup_ewmh_for_screen(ScreenInfo * s)
+static void init_desktops(ScreenInfo * restrict s)
 {
 	const Window r = s->root;
-	XPROP(r, ewmh.supported[0], XA_ATOM, ewmh.supported, ewmh.count);
 	const unsigned long workarea[4] = { 0, 0, s->size.w, s->size.h };
 	XPROP(r, ewmh.DESKTOP_VIEWPORT, XA_CARDINAL, &workarea[0], 2);
 	XPROP(r, ewmh.DESKTOP_GEOMETRY, XA_CARDINAL, &workarea[2], 2);
-	const unsigned long vdesk = s->vdesk;
-	XPROP(r, ewmh.CURRENT_DESKTOP, XA_CARDINAL, &vdesk, 1);
+	XPROP(r, ewmh.CURRENT_DESKTOP, XA_CARDINAL, &s->vdesk, 1);
 	static const unsigned char n = DESKTOPS;
 	XPROP(r, ewmh.NUMBER_OF_DESKTOPS, XA_CARDINAL, &n, 1);
-	XPROP(r, ewmh.WM_NAME, XA_STRING, "jbwm", 4);
+}
+
+static void init_supporting(ScreenInfo * restrict s)
+{
+	const Window r = s->root;
 	s->supporting = XCreateSimpleWindow(D, s->root, 0, 0, 1, 1, 0, 0, 0);
 	XPROP(r, ewmh.SUPPORTING_WM_CHECK, XA_WINDOW, &(s->supporting), 1);
 	XPROP(s->supporting, ewmh.SUPPORTING_WM_CHECK, XA_WINDOW,
@@ -347,8 +355,17 @@ void setup_ewmh_for_screen(ScreenInfo * s)
 	XPROP(s->supporting, ewmh.WM_NAME, XA_STRING, "jbwm", 4);
 	const pid_t pid = getpid();
 	XPROP(s->supporting, ewmh.WM_PID, XA_CARDINAL, &pid, 1);
+}
+
+void setup_ewmh_for_screen(ScreenInfo * s)
+{
+	const Window r = s->root;
+	XPROP(r, ewmh.supported[0], XA_ATOM, ewmh.supported, ewmh.count);
+	XPROP(r, ewmh.WM_NAME, XA_STRING, "jbwm", 4);
 	// Set this to the root window until we have some clients.
 	XPROP(r, ewmh.CLIENT_LIST, XA_WINDOW, &r, 1);
+	init_desktops(s);
+	init_supporting(s);
 }
 
 #endif//EWMH

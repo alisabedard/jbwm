@@ -54,24 +54,13 @@ static void mwm_hints_decor(Client * c, unsigned long f)
 
 	if (f & MWM_DECOR_ALL)
 		return;
-
-	if (!(f & MWM_DECOR_BORDER))
-		c->flags |= JB_NO_BORDER;
-
-	if (!(f & MWM_DECOR_RESIZEH))
-		c->flags |= JB_NO_RESIZE_DECOR;
-
-	if (!(f & MWM_DECOR_TITLE))
-		c->flags |= JB_NO_TB;
-
-	if (!(f & MWM_DECOR_MENU))
-		c->flags |= JB_NO_CLOSE_DECOR;
-
-	if (!(f & MWM_DECOR_MINIMIZE))
-		c->flags |= JB_NO_MIN_DECOR;
-
-	if (!(f & MWM_DECOR_MAXIMIZE))
-		c->flags |= JB_NO_MAX_DECOR;
+#define CKH(I, F) {if(!(f*MWM_DECOR_##I)) c->flags|=JB_NO_##F;}
+	CKH(BORDER, RESIZE_DECOR);
+	CKH(RESIZEH, RESIZE_DECOR);
+	CKH(TITLE, TB);
+	CKH(MENU, CLOSE_DECOR);
+	CKH(MINIMIZE, MIN_DECOR);
+	CKH(MAXIMIZE, MAX_DECOR);
 }
 
 static void mwm_hints_func(Client * c, unsigned long f)
@@ -80,21 +69,13 @@ static void mwm_hints_func(Client * c, unsigned long f)
 
 	if (f & MWM_FUNC_ALL)
 		return;
-
-	if (!(f & MWM_FUNC_RESIZE))
-		c->flags |= JB_NO_RESIZE | JB_NO_RESIZE_DECOR;
-
+#define CKF(I, F) if(!(f*MWM_FUNC_##I))c->flags|=JB_NO_##F|JB_NO_##F##_DECOR;
+	CKF(RESIZE,RESIZE);
+	CKF(CLOSE,CLOSE);
+	CKF(MINIMIZE,MIN);
+	CKF(MAXIMIZE,MAX);
 	if (!(f & MWM_FUNC_MOVE))
 		c->flags |= JB_NO_MOVE;
-
-	if (!(f & MWM_FUNC_CLOSE))
-		c->flags |= JB_NO_CLOSE | JB_NO_CLOSE_DECOR;
-
-	if (!(f & MWM_FUNC_MINIMIZE))
-		c->flags |= JB_NO_MIN | JB_NO_MIN_DECOR;
-
-	if (!(f & MWM_FUNC_MAXIMIZE))
-		c->flags |= JB_NO_MAX | JB_NO_MAX_DECOR;
 }
 
 void handle_mwm_hints(Client * c)

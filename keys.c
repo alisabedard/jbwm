@@ -83,21 +83,26 @@ static void handle_client_key_event(XKeyEvent * e, Client * c, KeySym key)
 		XRaiseWindow(D, c->parent);
 		break;
 
+	case KEY_FS:
+		fullscreen(c);
+		break;
+
 	case KEY_MAX:
 		maximize(c);
 		break;
 
 	case KEY_MAX_H:
-		if(toggle_horz(c))
-			c->size.width-=2*c->border;
+		if(c->flags&JB_MAX_HORZ)
+			  restore_horz(c);
+		else
+			  maximize_horz(c);
 		break;
 
 	case KEY_MAX_V:
-		if(toggle_vert(c)) {
-			c->size.y+=TDIM+c->border;
-			c->size.height-=(TDIM+4*c->border);
-			moveresize(c);
-		}
+		if(c->flags&JB_MAX_VERT)
+			  restore_vert(c);
+		else
+			  maximize_vert(c);
 		break;
 
 	case KEY_STICK:

@@ -21,7 +21,8 @@
 #include "titlebar.h"
 
 #if defined(EWMH) || defined(MWM)
-void *get_property(Window w, Atom property, Atom type, unsigned long *num_items)
+void *get_property(Window w, Atom property, Atom type,
+	unsigned long * restrict num_items)
 {
 	assert(num_items);
 	int actual_format;
@@ -93,7 +94,7 @@ static void init_wm_state(Client * restrict c)
 	for (uint8_t i = 0; i < nitems; i++) {
 		if (aprop[i] == ewmh.WM_STATE_STICKY) c->flags |= JB_STICKY;
 		else if (aprop[i] == ewmh.WM_STATE_SHADED) shade(c);
-		else if (aprop[i] == ewmh.WM_STATE_FULLSCREEN) set_maximized(c);
+		else if (aprop[i] == ewmh.WM_STATE_FULLSCREEN) set_fullscreen(c);
 	}
 	XFree(aprop);
 }
@@ -105,9 +106,11 @@ static void init_wm_state(Client * restrict c)
 __attribute__((nonnull))
 static void init_properties(Client * restrict c)
 {
+	assert(c->screen);
+	/*
 	if (!c->screen)
 		return;
-
+	*/
 	c->vdesk = c->screen->vdesk;
 	handle_mwm_hints(c);
 	wm_desktop(c);
@@ -115,14 +118,14 @@ static void init_properties(Client * restrict c)
 }
 
 #ifdef FIX_FIREFOX
-static void fix_fullscreen(Client * restrict c)
+static void fix_firefox(Client * restrict c)
 {
 	// Hack to make flash videos in firefox fullscreen: 
 	char * name = get_title(c->window);
 	if(!name) return;
 	if(!strncmp(name, "plugin-container", 16)) {
 		const uint8_t b = c->border; // save before next call
-		set_maximized(c);
+		set_fullscreen(c);
 		c->size.x-=b;
 		c->size.y-=b;
 		moveresize(c);
@@ -130,7 +133,7 @@ static void fix_fullscreen(Client * restrict c)
 	XFree(name);
 }
 #else//!FIX_FIREFOX
-#define fix_fullscreen(c)
+#define fix_firefox(c)
 #endif//FIX_FIREFOX
 
 __attribute__((nonnull))
@@ -139,15 +142,17 @@ static void init_geometry(Client * restrict c)
 	XWindowAttributes attr;
 	XGetWindowAttributes(D, c->window, &attr);
 	c->cmap = attr.colormap;
-	long d;			// dummy var
-	XGetWMNormalHints(D, c->window, &(c->size), &d);
+	{
+		long d;// dummy var
+		XGetWMNormalHints(D, c->window, &(c->size), &d);
+	}
 	init_size(c, &attr);
 	init_position(c, &attr);
 
 	// Test if the reparent that is to come would trigger an unmap event.
 	if (attr.map_state == IsViewable)
 		c->ignore_unmap++;
-	fix_fullscreen(c); // fix flash plugin-container bug
+	fix_firefox(c); // fix flash plugin-container bug
 }
 
 #ifdef USE_SHAPE

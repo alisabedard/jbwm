@@ -26,7 +26,7 @@ void send_wm_delete(const Client * restrict c);
 
 Client *find_client(Window w);
 
-void select_client(Client * restrict c);
+void select_client(Client * c);
 
 void stick(Client * c);
 

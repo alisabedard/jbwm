@@ -41,7 +41,7 @@ static void new_titlebar(Client * restrict c)
 		setup_gcs(c->screen);
 
 	XSelectInput(D, w, ExposureMask);
-	XSetWindowBackground(D, w, c->screen->bg.pixel);
+	XSetWindowBackground(D, w, c->screen->pixels.bg);
 	XMapRaised(D, w);
 	jbwm_grab_button(w, 0, AnyButton);
 }
@@ -58,7 +58,7 @@ draw_xft(Client * restrict c, const XPoint * restrict p,
 	const Colormap cm = DefaultColormap(D, s);
 	XftDraw *xd = XftDrawCreate(D, c->titlebar, v, cm);
 	XftColor color;
-	XftColorAllocName(D, v, cm, DEF_FG, &color);
+	XftColorAllocName(D, v, cm, DEF_fg, &color);
 	/* Prevent the text from going over the resize button.  */
 	const unsigned short max_width = c->size.width - 3 * TDIM;
 	XftDrawStringUtf8(xd, &color, jbwm.font, p->x, p->y,
@@ -135,7 +135,7 @@ void update_titlebar(Client * c)
 	if (c->flags & (JB_NO_TB | JB_SHAPED))
 		return;
 
-	if (c->flags & JB_MAXIMIZED) {
+	if (c->flags & JB_FULLSCREEN) {
 		/* May generate BadWindow on subsequent invocations,
 		   however the error handler makes such irrelevant.  */
 		XDestroyWindow(D, c->titlebar);

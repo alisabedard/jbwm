@@ -147,15 +147,15 @@ static void allocate_colors(ScreenInfo * restrict s)
 {
 	XColor nc;
 	const Colormap cm = DefaultColormap(D, s->screen);
+	XColor c;
 #ifdef USE_ARGV
-	XAllocNamedColor(D, cm, jbwmopt.fg ? jbwmopt.fg : DEF_FG, &s->fg, &nc);
-	XAllocNamedColor(D, cm, jbwmopt.bg ? jbwmopt.bg : DEF_BG, &s->bg, &nc);
-	XAllocNamedColor(D, cm, jbwmopt.fc ? jbwmopt.fc : DEF_FC, &s->fc, &nc);
+#define ALLOCC(C) XAllocNamedColor(D, cm, jbwmopt.C?jbwmopt.C:DEF_##C,\
+	&c, &nc); s->pixels.C = c.pixel;
 #else//!USE_ARGV
-	XAllocNamedColor(D, cm, DEF_FG, &s->fg, &nc);
-	XAllocNamedColor(D, cm, DEF_BG, &s->bg, &nc);
-	XAllocNamedColor(D, cm, DEF_FC, &s->fc, &nc);
+#define ALLOCC(C) XAllocNamedColor(D, cm, DEF_##C, &c, &nc);\
+	s->pixels.C = c.pixel;
 #endif//USE_ARGV
+	ALLOCC(fg); ALLOCC(fc); ALLOCC(bg);
 }
 
 static void setup_clients(ScreenInfo * restrict s)
@@ -196,7 +196,7 @@ static void setup_gc(ScreenInfo * s)
 	unsigned long vm =
 	    GCFunction | GCSubwindowMode | GCLineWidth | GCForeground |
 	    GCBackground;
-	XGCValues gv = {.foreground = s->fg.pixel, .background = s->bg.pixel,
+	XGCValues gv = {.foreground = s->pixels.fg, .background = s->pixels.bg,
 		.function = GXxor, .subwindow_mode = IncludeInferiors,
 		.line_width = JBWM_BORDER
 	};

@@ -14,14 +14,13 @@ void unhide(Client * restrict c);
 uint8_t switch_vdesk(ScreenInfo * s, const uint8_t v);
 void maximize_horz(Client * restrict c);
 void restore_horz(Client * restrict c);
-bool toggle_horz(Client * restrict c); // true if maxed
 void maximize_vert(Client * restrict c);
 void restore_vert(Client * restrict c);
-bool toggle_vert(Client * restrict c); // true if maxed
 void set_fullscreen(Client * restrict c);
 void unset_fullscreen(Client * restrict c);
 void set_maximized(Client * restrict c);
 void unset_maximized(Client * restrict c);
 void maximize(Client * restrict c);
+void fullscreen(Client * restrict c);
 
 #endif /* JBWM_SCREEN_H */

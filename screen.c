@@ -111,9 +111,9 @@ static XPoint get_mouse_position(Window w)
 
 void drag(Client * restrict c)
 {
+	LOG("drag");
 	assert(c);
 	assert(c->screen);
-	LOG("drag");
 	const Window r = c->screen->root;
 	if(!grab_pointer(r, jbwm.cursor))
 		  return;
@@ -141,10 +141,11 @@ drag_end:
 
 void moveresize(Client * restrict c)
 {
+	LOG("moveresize");
 	assert(c);
 #ifdef USE_TBAR
 	const uint8_t offset =
-	    (c->flags & (JB_NO_TB | JB_MAXIMIZED)) ? 0 : TDIM;
+	    (c->flags & (JB_NO_TB | JB_FULLSCREEN)) ? 0 : TDIM;
 #else//!USE_TBAR
 #define offset 0
 #endif//USE_TBAR
@@ -163,13 +164,6 @@ void moveresize(Client * restrict c)
 	set_shape(c);
 }
 
-static void finalize_maximization(Client * restrict c)
-{
-	update_titlebar(c);
-	XRaiseWindow(D, c->parent);
-	moveresize(c);
-}
-
 void restore_horz(Client * restrict c)
 {
 	LOG("restore_horz");
@@ -180,7 +174,6 @@ void restore_horz(Client * restrict c)
 	c->size.x=c->old_size.x;
 	c->size.width=c->old_size.width;
 	ewmh_remove_state(c->window, ewmh.WM_STATE_MAXIMIZED_HORZ);
-	finalize_maximization(c);
 }
 
 void maximize_horz(Client * restrict c)
@@ -195,17 +188,11 @@ void maximize_horz(Client * restrict c)
 	c->size.width=c->screen->size.w;
 	ewmh_add_state(c->window, ewmh.WM_STATE_MAXIMIZED_HORZ);
 	c->flags|=JB_MAX_HORZ;
-	finalize_maximization(c);
+	// Offset if not fullscreen
+	if(!(c->flags&JB_FULLSCREEN)) {
+		c->size.width-=2*c->border;
+	}
 }
-
-bool toggle_horz(Client * restrict c)
-{
-	LOG("toggle_horz");
-	assert(c);
-	c->flags&JB_MAX_HORZ?restore_horz(c):maximize_horz(c);
-	return c->flags&JB_MAX_HORZ;
-}
-
 void restore_vert(Client * restrict c)
 {
 	LOG("restore_vert");
@@ -216,7 +203,6 @@ void restore_vert(Client * restrict c)
 		c->size.height=c->old_size.height;
 		ewmh_remove_state(c->window, ewmh.WM_STATE_MAXIMIZED_VERT);
 	}
-	finalize_maximization(c);
 }
 
 void maximize_vert(Client * restrict c)
@@ -231,52 +217,25 @@ void maximize_vert(Client * restrict c)
 	c->size.height=c->screen->size.h;
 	ewmh_add_state(c->window, ewmh.WM_STATE_MAXIMIZED_VERT);
 	c->flags|=JB_MAX_VERT;
-	finalize_maximization(c);
-}
-
-bool toggle_vert(Client * restrict c)
-{
-	LOG("toggle_vert");
-	assert(c);
-	c->flags&JB_MAX_VERT?restore_vert(c):maximize_vert(c);
-	return c->flags&JB_MAX_VERT;
-}
-
-void unset_fullscreen(Client * restrict c)
-{
-	LOG("unset_fullscreen");
-	assert(c);
-	if(!(c->flags&JB_FULLSCREEN))
-		  return;
-	XSetWindowBorderWidth(D, c->parent, c->border);
-	ewmh_remove_state(c->window, ewmh.WM_STATE_FULLSCREEN);
-	c->flags &= ~JB_FULLSCREEN;
-	finalize_maximization(c);
-}
-
-void set_fullscreen(Client * restrict c)
-{
-	LOG("set_fullscreen");
-	assert(c);
-	if(c->flags&JB_FULLSCREEN)
-		  return;
-	XSetWindowBorderWidth(D, c->parent, 0);
-	ewmh_add_state(c->window, ewmh.WM_STATE_FULLSCREEN);
-	c->flags |= JB_FULLSCREEN;
-	finalize_maximization(c);
+	// Offset the titlebar if not fullscreen
+	if(!(c->flags&JB_FULLSCREEN)) {
+		const uint8_t b = c->border;
+		c->size.y+=TDIM+b;
+		c->size.height-=TDIM+4*b;
+		moveresize(c);
+	}
 }
 
 void unset_maximized(Client * restrict c)
 {
 	LOG("unset_maximized");
 	assert(c);
-	if(!(c->flags&JB_MAXIMIZED))
+	// Don't restore a fullscreen window.  
+	if(!(c->flags&JB_MAXIMIZED)||(c->flags&JB_FULLSCREEN))
 		  return;
 	restore_horz(c);
 	restore_vert(c);
 	c->flags &= ~JB_MAXIMIZED;
-	unset_fullscreen(c);
-	finalize_maximization(c);
 }
 
 void set_maximized(Client * restrict c)
@@ -288,8 +247,6 @@ void set_maximized(Client * restrict c)
 	maximize_horz(c);
 	maximize_vert(c);
 	c->flags |= JB_MAXIMIZED;
-	set_fullscreen(c);
-	finalize_maximization(c);
 }
 
 void maximize(Client * restrict c)
@@ -300,6 +257,51 @@ void maximize(Client * restrict c)
 	// Maximizing shaped windows is buggy, so return.
 	if (!(c->flags & (JB_NO_MAX | JB_SHAPED)))
 		c->flags&JB_MAXIMIZED?unset_maximized(c):set_maximized(c);
+}
+
+void unset_fullscreen(Client * restrict c)
+{
+	LOG("unset_fullscreen");
+	assert(c);
+	if(!(c->flags&JB_FULLSCREEN))
+		  return;
+	c->flags &= ~JB_FULLSCREEN;
+	unset_maximized(c);
+	XSetWindowBorderWidth(D, c->parent, c->border);
+	ewmh_remove_state(c->window, ewmh.WM_STATE_FULLSCREEN);
+	update_titlebar(c);
+}
+
+void set_fullscreen(Client * restrict c)
+{
+	LOG("set_fullscreen");
+	assert(c);
+	if(c->flags&JB_FULLSCREEN)
+		  return;
+	/* The following checks remove conflicts between fullscreen
+	   mode and maximized modes.  */
+	if(c->flags&JB_MAXIMIZED)
+		  unset_maximized(c);
+	if(c->flags&JB_MAX_HORZ)
+		  restore_horz(c);
+	if(c->flags&JB_MAX_VERT)
+		  restore_vert(c);
+	c->flags |= JB_FULLSCREEN;
+	set_maximized(c);
+	XSetWindowBorderWidth(D, c->parent, 0);
+	ewmh_add_state(c->window, ewmh.WM_STATE_FULLSCREEN);
+	update_titlebar(c);
+}
+
+void fullscreen(Client * restrict c)
+{
+	assert(c);
+	if(c->flags&JB_NO_MAX)
+		  return;
+	if(c->flags&JB_FULLSCREEN)
+		  unset_fullscreen(c);
+	else
+		  set_fullscreen(c);
 }
 
 void hide(Client * restrict c)

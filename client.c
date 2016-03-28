@@ -108,35 +108,34 @@ void set_wm_state(Client * restrict c, const int state)
 	XPROP(c->window, client_atoms[I_WM_STATE], XA_CARDINAL, &state, 1);
 }
 
-void select_client(Client * restrict c)
+static void unselect_current()
+{
+	if(!jbwm.current) return;
+	XSetWindowBorder(D, jbwm.current->parent,
+		jbwm.current->screen->pixels.bg);
+	jbwm.current->flags ^= JB_ACTIVE;
+}
+
+void select_client(Client * c)
 {
 	LOG("select_client");
-
-	if (jbwm.current) {
-		XSetWindowBorder(D, jbwm.current->parent,
-				 jbwm.current->screen->bg.pixel);
-		jbwm.current->flags ^= JB_ACTIVE;
-	}
-
-	if (c) {
-		c->flags |= JB_ACTIVE;
-		XSetWindowBorder(D, c->parent,
-				 c->flags & JB_STICKY ? c->screen->fc.
-				 pixel : c->screen->fg.pixel);
-		XInstallColormap(D, c->cmap);
-		XSetInputFocus(D, c->window, RevertToPointerRoot, CurrentTime);
+	assert(c);
+	unselect_current();
+	c->flags |= JB_ACTIVE;
+	XSetWindowBorder(D, c->parent, c->flags & JB_STICKY 
+		? c->screen->pixels.fc : c->screen->pixels.fg);
+	XInstallColormap(D, c->cmap);
+	XSetInputFocus(D, c->window, RevertToPointerRoot, CurrentTime);
 #ifdef EWMH
-		XPROP(c->screen->root, ewmh.ACTIVE_WINDOW, XA_WINDOW,
-		      &(c->window), 1);
+	XPROP(c->screen->root, ewmh.ACTIVE_WINDOW, XA_WINDOW, &(c->window), 1);
 #endif//EWMH
-	}
-
 	jbwm.current = c;
 }
 
 void stick(Client * c)
 {
 	LOG("stick");
+	assert(c);
 	c->vdesk = c->screen->vdesk;
 	c->flags ^= JB_STICKY;	// toggle
 	select_client(c);
@@ -174,7 +173,7 @@ static void unparent_window(Client * c)
 void remove_client(Client * c)
 {
 	LOG("remove_client");
-
+	assert(c);
 	if (c->flags & JB_REMOVE) {
 #ifdef EWMH
 		XDeleteProperty(D, c->window, ewmh.WM_DESKTOP);
@@ -236,7 +235,7 @@ void send_wm_delete(const Client * restrict c)
 bool set_shape(Client * restrict c)
 {
 	XLOG("set_shape");
-
+	assert(c);
 	/* Validate inputs:  Make sure that the SHAPE extension is available,
 	   and make sure that C is initialized.  */
 	if (c && (c->flags & JB_SHAPED)) {
