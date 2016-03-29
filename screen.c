@@ -282,14 +282,13 @@ void set_fullscreen(Client * restrict c)
 		  return;
 	/* The following checks remove conflicts between fullscreen
 	   mode and maximized modes.  */
-	c->flags |= JB_FULLSCREEN;
 	if(c->flags&JB_MAXIMIZED)
 		  unset_maximized(c);
 	if(c->flags&JB_MAX_HORZ)
 		  restore_horz(c);
 	if(c->flags&JB_MAX_VERT)
 		  restore_vert(c);
-	//set_maximized(c);
+	c->flags |= JB_FULLSCREEN;
 	maximize_horz(c);
 	maximize_vert(c);
 	XSetWindowBorderWidth(D, c->parent, 0);
