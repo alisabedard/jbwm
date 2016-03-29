@@ -107,14 +107,9 @@ __attribute__((nonnull))
 static void init_properties(Client * restrict c)
 {
 	assert(c->screen);
-	/*
-	if (!c->screen)
-		return;
-	*/
 	c->vdesk = c->screen->vdesk;
 	handle_mwm_hints(c);
 	wm_desktop(c);
-	//init_wm_state(c);
 }
 
 #ifdef FIX_FIREFOX

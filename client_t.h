@@ -32,6 +32,7 @@
 #define JB_MAX_HORZ		(1<<20)
 #define JB_MAX_VERT		(1<<21)
 #define JB_FULLSCREEN		(1<<22)
+#define JB_IS_FS		(1<<23)
 
 typedef struct Client Client;
 struct Client {

@@ -263,34 +263,39 @@ void unset_fullscreen(Client * restrict c)
 {
 	LOG("unset_fullscreen");
 	assert(c);
-	if(!(c->flags&JB_FULLSCREEN))
+	if(!(c->flags&JB_IS_FS))
 		  return;
 	c->flags &= ~JB_FULLSCREEN;
-	unset_maximized(c);
+	restore_horz(c);
+	restore_vert(c);
 	XSetWindowBorderWidth(D, c->parent, c->border);
 	ewmh_remove_state(c->window, ewmh.WM_STATE_FULLSCREEN);
 	update_titlebar(c);
+	c->flags &= ~JB_IS_FS;
 }
 
 void set_fullscreen(Client * restrict c)
 {
 	LOG("set_fullscreen");
 	assert(c);
-	if(c->flags&JB_FULLSCREEN)
+	if(c->flags&JB_IS_FS)
 		  return;
 	/* The following checks remove conflicts between fullscreen
 	   mode and maximized modes.  */
+	c->flags |= JB_FULLSCREEN;
 	if(c->flags&JB_MAXIMIZED)
 		  unset_maximized(c);
 	if(c->flags&JB_MAX_HORZ)
 		  restore_horz(c);
 	if(c->flags&JB_MAX_VERT)
 		  restore_vert(c);
-	c->flags |= JB_FULLSCREEN;
-	set_maximized(c);
+	//set_maximized(c);
+	maximize_horz(c);
+	maximize_vert(c);
 	XSetWindowBorderWidth(D, c->parent, 0);
 	ewmh_add_state(c->window, ewmh.WM_STATE_FULLSCREEN);
 	update_titlebar(c);
+	c->flags |= JB_IS_FS;
 }
 
 void fullscreen(Client * restrict c)
@@ -298,7 +303,7 @@ void fullscreen(Client * restrict c)
 	assert(c);
 	if(c->flags&JB_NO_MAX)
 		  return;
-	if(c->flags&JB_FULLSCREEN)
+	if(c->flags&JB_IS_FS)
 		  unset_fullscreen(c);
 	else
 		  set_fullscreen(c);

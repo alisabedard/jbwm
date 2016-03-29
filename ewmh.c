@@ -193,7 +193,7 @@ static void check_state(XClientMessageEvent * e,	// event data
 		break;
 
 	case 1:	// add
-		state_cb(false, c);
+		state_cb(true, c);
 		ewmh_add_state(e->window, state);
 		break;
 
