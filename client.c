@@ -215,8 +215,9 @@ static bool has_delete_proto(const Client * restrict c)
 		while(i--)
 			if((found=(p[i]==client_atoms[I_DEL_WIN])))
 				break;
+		// Should be freed here, otherwise p has no alloc.  
+		XFree(p);
 	}
-	XFree(p);
 	return found;
 }
 
@@ -224,11 +225,15 @@ void send_wm_delete(const Client * restrict c)
 {
 	assert(c);
 	setup_client_atoms();
-	if(has_delete_proto(c))
-		  xmsg(c->window, client_atoms[I_PROTOS], 
-			  client_atoms[I_DEL_WIN]);
-	else
-		  XKillClient(D, c->window);
+	if(has_delete_proto(c)) {
+		assert(c->window);
+		xmsg(c->window, client_atoms[I_PROTOS],
+			client_atoms[I_DEL_WIN]);
+	}
+	else {
+		assert(c->window);
+		XKillClient(D, c->window);
+	}
 }
 
 #ifdef USE_SHAPE
