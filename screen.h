@@ -23,4 +23,6 @@ void unset_maximized(Client * restrict c);
 void maximize(Client * restrict c);
 void fullscreen(Client * restrict c);
 
+#define DESKTOPS 10
+
 #endif /* JBWM_SCREEN_H */

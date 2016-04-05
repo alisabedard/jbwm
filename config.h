@@ -24,9 +24,9 @@
 #endif /* USE_XFT */
 
 /* Default colors */
-#define DEF_fg                  "#eef"
-#define DEF_fc                  "#7a7"
-#define DEF_bg                  "#222"
+#define DEF_fg                  "white"
+#define DEF_fc			"green"
+#define DEF_bg			"grey15"
 #define TITLEBAR_CLOSE_BG       "#977"
 #define TITLEBAR_SHADE_BG       "#797"
 #define TITLEBAR_RESIZE_BG      "#779"
@@ -39,6 +39,4 @@
 #define JBWM_SNAP 12
 #define JBWM_RESIZE_INCREMENT 20
 
-#define DESKTOPS 10
-
-#endif /* JBWM_CONFIG_H */
+#endif//JBWM_CONFIG_H
