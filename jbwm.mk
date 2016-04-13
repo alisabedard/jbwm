@@ -20,8 +20,9 @@ LIBS+=$(EXTRALIBS)
 # Fix build on NetBSD and older systems:
 INCLUDES+=-I/usr/X11R6/include
 INCLUDES+=-I/usr/X11R7/include
-LDPATH+=-L/usr/X11R6/lib
-LDPATH+=-L/usr/X11R7/lib
+# NetBSD now requires RPATH set
+LDPATH+=-L/usr/X11R6/lib -Wl,-R/usr/X11R6/lib
+LDPATH+=-L/usr/X11R7/lib -Wl,-R/usr/X11R7/lib
 LIBS += -lX11 
 
 # Uncomment to enable X11 miscellaneous debugging (events)
