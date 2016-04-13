@@ -29,7 +29,7 @@ LIBS += -lX11
 
 DEFINES += -DVERSION=\"$(version)\" $(DEBIAN)
 CFLAGS  += $(INCLUDES) $(DEFINES) 
-CFLAGS += -D_XOPEN_SOURCE=700 -std=c99
+CFLAGS += -D_XOPEN_SOURCE=700 -std=c11
 LDFLAGS += $(LDPATH) $(LIBS)
 # Uncomment for static linking of binary:
 #LDFLAGS += -static 

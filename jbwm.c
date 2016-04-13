@@ -122,8 +122,7 @@ static void setup_fonts(void)
 #define setup_fonts()
 #endif//USE_TBAR
 
-void
-jbwm_grab_button(const Window w, const unsigned int mask,
+void jbwm_grab_button(const Window w, const unsigned int mask,
 		 const unsigned int btn)
 {
 	XGrabButton(D, btn, mask, w, false,

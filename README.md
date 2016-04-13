@@ -8,7 +8,7 @@
 * Xft support if wanted
 * Window shading with titlebar
 * Code cleanups, simpler UI and key bindings
-* Use of C99 features where possible.
+* Use of C11 features where possible.
 
 ## RELEASES
 Releases are made when sufficient changes are made to the code base.  Releases

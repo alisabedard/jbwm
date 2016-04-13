@@ -40,7 +40,7 @@
 static void process_flags(Client * c)
 {
 	if (c->flags & JB_NO_BORDER)
-		c->border = 0;
+		  c->border = 0;
 
 	if (c->flags & JB_TEAROFF) {
 		c->border = 0;
@@ -53,7 +53,7 @@ static void mwm_hints_decor(Client * c, unsigned long f)
 	LOG("MWM_HINTS_DECORATIONS");
 
 	if (f & MWM_DECOR_ALL)
-		return;
+		  return;
 #define CKH(I, F) {if(!(f*MWM_DECOR_##I)) c->flags|=JB_NO_##F;}
 	CKH(BORDER, RESIZE_DECOR);
 	CKH(RESIZEH, RESIZE_DECOR);
@@ -68,14 +68,14 @@ static void mwm_hints_func(Client * c, unsigned long f)
 	LOG("MWM_HINTS_FUNCTIONS");
 
 	if (f & MWM_FUNC_ALL)
-		return;
+		  return;
 #define CKF(I, F) if(!(f*MWM_FUNC_##I))c->flags|=JB_NO_##F|JB_NO_##F##_DECOR;
 	CKF(RESIZE,RESIZE);
 	CKF(CLOSE,CLOSE);
 	CKF(MINIMIZE,MIN);
 	CKF(MAXIMIZE,MAX);
 	if (!(f & MWM_FUNC_MOVE))
-		c->flags |= JB_NO_MOVE;
+		  c->flags |= JB_NO_MOVE;
 }
 
 void handle_mwm_hints(Client * c)
@@ -90,26 +90,26 @@ void handle_mwm_hints(Client * c)
 	} *m = get_property(c->window, mwm_hints, mwm_hints, &n);
 
 	if (!m)
-		return;
+		  return;
 
 	if (m->flags & MWM_HINTS_FUNCTIONS)
-		mwm_hints_func(c, m->functions);
+		  mwm_hints_func(c, m->functions);
 
 	if (m->flags & MWM_HINTS_DECORATIONS)
-		mwm_hints_decor(c, m->decor);
+		  mwm_hints_decor(c, m->decor);
 
 	if (m->flags & MWM_HINTS_STATUS) {
 		LOG("MWM_HINTS_STATUS");
 
 		if (m->status & MWM_TEAROFF_WINDOW)
-			c->flags |= JB_TEAROFF;
+			  c->flags |= JB_TEAROFF;
 	}
 
 	if (m->flags & MWM_HINTS_INPUT_MODE) {
 		LOG("MWM_HINTS_INPUT_MODE");
 
 		if (m->input_mode)
-			c->flags |= JB_MODAL;
+			  c->flags |= JB_MODAL;
 	}
 
 	XFree(m);
