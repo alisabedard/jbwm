@@ -4,6 +4,7 @@
 // See README for license and other details.
 
 #include <stdlib.h>
+#include <sys/wait.h>
 #include "client.h"
 #include "config.h"
 #include "jbwm.h"
