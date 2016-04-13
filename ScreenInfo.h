@@ -17,7 +17,6 @@ typedef struct ScreenInfo {
 	Window supporting;
 #endif//EWMH
 	GC gc;
-//	XColor fg, bg, fc;
 	struct {
 		unsigned long fg, bg, fc;
 	} pixels;
