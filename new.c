@@ -172,26 +172,22 @@ static void setup_shaped(Client * restrict c)
 #define setup_shaped(c)
 #endif//USE_SHAPE
 
-static void reparent(Client * c)
+static void reparent(Client * restrict c)
 {
 	LOG("reparent()");
 	setup_shaped(c);
-	const unsigned long vm = CWOverrideRedirect | CWEventMask;
-	const uint8_t s = c->screen->screen;
-	XSetWindowAttributes a = {.override_redirect = true,
-		.event_mask =
-		    SubstructureRedirectMask | SubstructureNotifyMask |
-		    ButtonPressMask | EnterWindowMask
-	};
-	XSizeHints *g = &(c->size);
-	c->parent =
-	    XCreateWindow(D, c->screen->root, g->x, g->y, g->width,
-			  g->height, c->border, DefaultDepth(D, s),
-			  CopyFromParent, DefaultVisual(D, s), vm, &a);
-	const Window w = c->window;
-	XAddToSaveSet(D, w);
-	XReparentWindow(D, w, c->parent, 0, 0);
-	XMapWindow(D, w);
+	c->parent = XCreateWindow(D, c->screen->root, c->size.x, c->size.y, 
+		c->size.width, c->size.height, c->border,
+		CopyFromParent, CopyFromParent, CopyFromParent, 
+		CWOverrideRedirect | CWEventMask, &(XSetWindowAttributes){
+			.override_redirect=true,
+			.event_mask = SubstructureRedirectMask
+				| SubstructureNotifyMask
+				| ButtonPressMask
+				| EnterWindowMask});
+	XAddToSaveSet(D, c->window);
+	XReparentWindow(D, c->window, c->parent, 0, 0);
+	XMapWindow(D, c->window);
 }
 
 void make_new_client(Window w, ScreenInfo * s)
