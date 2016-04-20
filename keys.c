@@ -170,9 +170,9 @@ static void spawn(const char *restrict cmd)
 		ERROR(cmd);
 }
 
-void jbwm_handle_key_event(XKeyEvent * e)
+void jbwm_handle_key_event(XKeyEvent * restrict e)
 {
-	KeySym key = XLookupKeysym(e, 0);
+	const KeySym key = XLookupKeysym(e, 0);
 	Client *c = jbwm.current;
 	ScreenInfo *s = c ? c->screen : jbwm.screens;
 	const bool mod = e->state & jbwm.keymasks.mod;
@@ -235,8 +235,6 @@ grab(ScreenInfo * restrict s, KeySym * restrict ks, const unsigned int mask)
 
 void grab_keys_for_screen(ScreenInfo * restrict s)
 {
-	static KeySym keys[] = { JBWM_KEYS_TO_GRAB };
-	grab(s, keys, 0);
-        static KeySym mod_keys[] = { JBWM_ALT_KEYS_TO_GRAB };
-	grab(s, mod_keys, jbwm.keymasks.mod);
+	grab(s, (KeySym[]){JBWM_KEYS_TO_GRAB}, 0);
+	grab(s, (KeySym[]){JBWM_ALT_KEYS_TO_GRAB}, jbwm.keymasks.mod);
 }
