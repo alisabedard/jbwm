@@ -108,7 +108,7 @@ void set_wm_state(Client * restrict c, const int state)
 	XPROP(c->window, client_atoms[I_WM_STATE], XA_CARDINAL, &state, 1);
 }
 
-static void unselect_current()
+static void unselect_current(void)
 {
 	if(!jbwm.current) return;
 	XSetWindowBorder(D, jbwm.current->parent,
@@ -158,7 +158,7 @@ static void relink_window_list(Client * c)
 			}
 }
 
-static void unparent_window(Client * c)
+static void unparent_window(Client * restrict c)
 {
 	LOG("unparent_window");
 	XReparentWindow(D, c->window, c->screen->root, c->size.x, c->size.y);
@@ -195,14 +195,15 @@ void remove_client(Client * c)
 	free(c);
 }
 
-void xmsg(const Window w, const Atom a, const long x)
+// Returns 0 on failure.  
+Status xmsg(const Window w, const Atom a, const long x)
 {
 	XLOG("xmsg");
-	XEvent ev = {.xclient.type = ClientMessage,.xclient.window = w,
+	return XSendEvent(D, w, false, NoEventMask, &(XEvent){
+		.xclient.type = ClientMessage,.xclient.window = w,
 		.xclient.message_type = a,.xclient.format = 32,
 		.xclient.data.l[0] = x,.xclient.data.l[1] = CurrentTime
-	};
-	XSendEvent(D, w, false, NoEventMask, &ev);
+	});
 }
 
 static bool has_delete_proto(const Client * restrict c)
