@@ -44,15 +44,15 @@ struct Client {
 	uint16_t shade_height;
 #endif				//USE_TBAR
 	uint32_t flags;
-	int win_gravity_hint;
 	Colormap cmap;
 	Window window, parent;
 #ifdef USE_TBAR
 	Window titlebar;
 #endif				//USE_TBAR
+	XRectangle old_size;
 	ScreenInfo *screen;
 	Client *next;
-	XSizeHints size, old_size;
+	XSizeHints size;
 };
 
 /* This is to initialize the above CE.  */
