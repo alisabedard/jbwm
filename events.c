@@ -31,7 +31,7 @@ static ScreenInfo *find_screen(const Window root)
 static void cleanup()
 {
 	LOG("cleanup()");
-	jbwm.need_cleanup = 0;
+	jbwm.need_cleanup = false;
 	Client *i;
 
 	for (Client * c = jbwm.head; c; c = i) {
@@ -46,8 +46,7 @@ static void handle_unmap_event(XUnmapEvent * e)
 {
 	Client *c = find_client(e->window);
 
-	if (!c)
-		return;
+	if (!c) return;
 
 	LOG("handle_unmap_event(e): %d ignores remaining", c->ignore_unmap);
 
@@ -116,10 +115,16 @@ static void handle_property_change(XPropertyEvent * e)
 #endif//USE_TBAR
 }
 
-static inline void handle_enter_event(XCrossingEvent * e)
+static void handle_enter_event(XCrossingEvent * restrict e)
 {
-	Client *c = find_client(e->window);
-	if (c) select_client(c);
+	Client * c = find_client(e->window);
+	if(c) {
+		/* Only deal with the parent window, prevent multiple enter
+ 		 * events.  */
+		if(e->window != c->parent)
+			return;
+		select_client(c);
+	}
 }
 
 #ifdef USE_TBAR
@@ -196,7 +201,8 @@ static void gravitate_border(Client * c, int bw)
 #endif//GRAVITY
 
 void
-do_window_changes(int value_mask, XWindowChanges * wc, Client * c, int gravity)
+do_window_changes(int value_mask, XWindowChanges * restrict wc, 
+	Client * restrict c, int gravity)
 {
 	LOG("do_window_changes");
 
