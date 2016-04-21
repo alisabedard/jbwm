@@ -14,7 +14,7 @@ static void button1_event(XButtonEvent * e
 #endif//!USE_TBAR
 			  , Client * c)
 {
-	XRaiseWindow(D, c->parent);
+	XRaiseWindow(jbwm.dpy, c->parent);
 #ifdef USE_TBAR
 	const uint16_t w = c->size.width;
 	const XPoint p = { e->x, e->y };
@@ -52,7 +52,7 @@ void jbwm_handle_button_event(XButtonEvent * e)
 		break;
 
 	case Button2:
-		XLowerWindow(D, c->parent);
+		XLowerWindow(jbwm.dpy, c->parent);
 		break;
 
 	case Button3:

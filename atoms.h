@@ -12,8 +12,8 @@
 #include <X11/Xlib.h>
 #include "jbwmenv.h"
 
-#define XA(atom) XInternAtom(D, atom, false)
-#define XPROP(win, prop, type, data, size) XChangeProperty(D, win, \
+#define XA(atom) XInternAtom(jbwm.dpy, atom, false)
+#define XPROP(win, prop, type, data, size) XChangeProperty(jbwm.dpy, win, \
 		prop, type, 32, PropModeReplace, \
 		(const unsigned char *)(data), size)
 

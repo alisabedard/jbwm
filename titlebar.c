@@ -15,11 +15,11 @@
 
 static GC colorgc(ScreenInfo * restrict s, const char *restrict colorname)
 {
-	XColor c, nullc;
-	XAllocNamedColor(D, DefaultColormap(D, s->screen), colorname, &c,
-			 &nullc);
-	XGCValues v = {.foreground = c.pixel };
-	return XCreateGC(D, s->root, GCForeground, &v);
+	XColor c;
+	XAllocNamedColor(jbwm.dpy, DefaultColormap(jbwm.dpy, s->screen),
+		colorname, &c, &(XColor){});
+	return XCreateGC(jbwm.dpy, s->root, GCForeground, 
+		&(XGCValues){.foreground=c.pixel});
 }
 
 static inline void setup_gcs(ScreenInfo * restrict s)
@@ -34,16 +34,15 @@ static void new_titlebar(Client * restrict c)
 	if (c->flags & (JB_NO_TB|JB_SHAPED))
 		return;
 
-	const Window w = XCreateSimpleWindow(D, c->parent, 0, 0, 
+	c->titlebar = XCreateSimpleWindow(jbwm.dpy, c->parent, 0, 0, 
 		c->size.width, TDIM, 0, 0, 0);
-	c->titlebar=w;
 	if (!jbwm.gc.close)
 		setup_gcs(c->screen);
 
-	XSelectInput(D, w, ExposureMask);
-	XSetWindowBackground(D, w, c->screen->pixels.bg);
-	XMapRaised(D, w);
-	jbwm_grab_button(w, 0, AnyButton);
+	XSelectInput(jbwm.dpy, c->titlebar, ExposureMask);
+	XSetWindowBackground(jbwm.dpy, c->titlebar, c->screen->pixels.bg);
+	XMapRaised(jbwm.dpy, c->titlebar);
+	jbwm_grab_button(c->titlebar, 0, AnyButton);
 }
 
 #ifdef USE_XFT
@@ -52,13 +51,13 @@ draw_xft(Client * restrict c, const XPoint * restrict p,
 	 char *restrict name, const size_t l)
 {
 	XGlyphInfo e;
-	XftTextExtentsUtf8(D, jbwm.font, (XftChar8 *) name, l, &e);
+	XftTextExtentsUtf8(jbwm.dpy, jbwm.font, (XftChar8 *) name, l, &e);
 	const uint8_t s = c->screen->screen;
-	Visual *v = DefaultVisual(D, s);
-	const Colormap cm = DefaultColormap(D, s);
-	XftDraw *xd = XftDrawCreate(D, c->titlebar, v, cm);
+	Visual *v = DefaultVisual(jbwm.dpy, s);
+	const Colormap cm = DefaultColormap(jbwm.dpy, s);
+	XftDraw *xd = XftDrawCreate(jbwm.dpy, c->titlebar, v, cm);
 	XftColor color;
-	XftColorAllocName(D, v, cm, DEF_fg, &color);
+	XftColorAllocName(jbwm.dpy, v, cm, DEF_fg, &color);
 	/* Prevent the text from going over the resize button.  */
 	const unsigned short max_width = c->size.width - 3 * TDIM;
 	XftDrawStringUtf8(xd, &color, jbwm.font, p->x, p->y,
@@ -66,7 +65,7 @@ draw_xft(Client * restrict c, const XPoint * restrict p,
 			  e.width > max_width
 			  && e.width > 0 ? l * max_width / e.width : l);
 	XftDrawDestroy(xd);
-	XftColorFree(D, v, cm, &color);
+	XftColorFree(jbwm.dpy, v, cm, &color);
 }
 #endif//USE_XFT
 
@@ -76,19 +75,19 @@ static void draw_title(Client * restrict c)
 {
 	char * name = get_title(c->window);
 	if(!name) return; // No title could be loaded, abort
-	const size_t l = strlen(name);
 	const XPoint p = { TDIM + 4, jbwm.font->ascent - JBWM_BORDER };
 #ifdef USE_XFT
-	draw_xft(c, &p, name, l);
+	draw_xft(c, &p, name, strlen(name));
 #else//!USE_XFT
-	XDrawString(D, c->titlebar, c->screen->gc, p.x, p.y, name, l);
+	XDrawString(jbwm.dpy, c->titlebar, c->screen->gc, p.x, p.y,
+		name, strlen(name));
 #endif//USE_XFT
 	XFree(name);
 }
 
 static void draw(const Window t, GC gc, const int x)
 {
-	XFillRectangle(D, t, gc, x, 0, TDIM, TDIM);
+	XFillRectangle(jbwm.dpy, t, gc, x, 0, TDIM, TDIM);
 }
 
 static inline void draw_close(const uint32_t f, const Window t)
@@ -118,7 +117,7 @@ static void draw_titlebar(Client * restrict c)
 {
 	const unsigned short w = c->size.width;
 	const Window t = c->titlebar;
-	XClearWindow(D, t);
+	XClearWindow(jbwm.dpy, t);
 	const uint32_t f = c->flags;
 	draw_close(f, t);
 	draw_resize(f, t, tboffset(w, 1));
@@ -138,7 +137,7 @@ void update_titlebar(Client * c)
 	if (c->flags & JB_FULLSCREEN) {
 		/* May generate BadWindow on subsequent invocations,
 		   however the error handler makes such irrelevant.  */
-		XDestroyWindow(D, c->titlebar);
+		XDestroyWindow(jbwm.dpy, c->titlebar);
 		c->titlebar = 0;
 		return;
 	}
@@ -150,6 +149,6 @@ void update_titlebar(Client * c)
 	}
 
 	/* Expand/Contract the titlebar width as necessary:  */
-	XMoveResizeWindow(D, c->titlebar, 0, 0, c->size.width, TDIM);
+	XMoveResizeWindow(jbwm.dpy, c->titlebar, 0, 0, c->size.width, TDIM);
 	draw_titlebar(c);
 }

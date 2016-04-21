@@ -20,7 +20,7 @@
 char * get_title(const Window w)
 {
 	XTextProperty tp;
-	if (!XGetWMName(D, w, &tp)) 
+	if (!XGetWMName(jbwm.dpy, w, &tp)) 
 		  return NULL;
 	return (char *)tp.value;
 }
@@ -41,14 +41,14 @@ void shade(Client * restrict c)
 		// Unshade
 		c->size.height = c->shade_height;
 		c->flags &= ~JB_SHADED;
-		XMapWindow(D, c->window);
+		XMapWindow(jbwm.dpy, c->window);
 		moveresize(c);
 		set_wm_state(c, NormalState);
 		ewmh_remove_state(c->window, ewmh.WM_STATE_SHADED);
 	} else {		// Shade the client
 		c->shade_height = c->size.height;
 		c->ignore_unmap++;
-		XUnmapWindow(D, c->window);
+		XUnmapWindow(jbwm.dpy, c->window);
 		c->size.height = 0;
 		c->flags |= JB_SHADED;
 		set_wm_state(c, IconicState);
@@ -97,7 +97,7 @@ static void setup_client_atoms()
 	if(client_atoms[0])
 		  return; // Already initialized
 	char *names[]={"WM_PROTOCOLS", "WM_DELETE_WINDOW", "WM_STATE"};
-	XInternAtoms(D, names, CA_SZ, true, client_atoms);
+	XInternAtoms(jbwm.dpy, names, CA_SZ, true, client_atoms);
 }
 
 void set_wm_state(Client * restrict c, const int state)
@@ -111,25 +111,23 @@ void set_wm_state(Client * restrict c, const int state)
 static void unselect_current(void)
 {
 	if(!jbwm.current) return;
-	XSetWindowBorder(D, jbwm.current->parent,
+	XSetWindowBorder(jbwm.dpy, jbwm.current->parent,
 		jbwm.current->screen->pixels.bg);
 	jbwm.current->flags ^= JB_ACTIVE;
 }
 
-void select_client(Client * c)
+void select_client(Client * restrict c)
 {
-	LOG("select_client");
-	assert(c);
-	unselect_current();
 	c->flags |= JB_ACTIVE;
-	XSetWindowBorder(D, c->parent, c->flags & JB_STICKY 
+	unselect_current();
+	XInstallColormap(jbwm.dpy, c->cmap);
+	XSetInputFocus(jbwm.dpy, c->window, RevertToPointerRoot, CurrentTime);
+	XSetWindowBorder(jbwm.dpy, c->parent, c->flags & JB_STICKY 
 		? c->screen->pixels.fc : c->screen->pixels.fg);
-	XInstallColormap(D, c->cmap);
-	XSetInputFocus(D, c->window, RevertToPointerRoot, CurrentTime);
+	jbwm.current=c;
 #ifdef EWMH
-	XPROP(c->screen->root, ewmh.ACTIVE_WINDOW, XA_WINDOW, &(c->window), 1);
+	XPROP(c->screen->root, ewmh.ACTIVE_WINDOW, XA_WINDOW, &(c->parent), 1);
 #endif//EWMH
-	jbwm.current = c;
 }
 
 void stick(Client * c)
@@ -161,11 +159,11 @@ static void relink_window_list(Client * c)
 static void unparent_window(Client * restrict c)
 {
 	LOG("unparent_window");
-	XReparentWindow(D, c->window, c->screen->root, c->size.x, c->size.y);
-	XRemoveFromSaveSet(D, c->window);
+	XReparentWindow(jbwm.dpy, c->window, c->screen->root, c->size.x, c->size.y);
+	XRemoveFromSaveSet(jbwm.dpy, c->window);
 
 	if (c->parent)
-		XDestroyWindow(D, c->parent);
+		XDestroyWindow(jbwm.dpy, c->parent);
 
 	c->parent = 0;
 }
@@ -176,14 +174,14 @@ void remove_client(Client * c)
 	assert(c);
 	if (c->flags & JB_REMOVE) {
 #ifdef EWMH
-		XDeleteProperty(D, c->window, ewmh.WM_DESKTOP);
-		XDeleteProperty(D, c->window, ewmh.WM_STATE);
+		XDeleteProperty(jbwm.dpy, c->window, ewmh.WM_DESKTOP);
+		XDeleteProperty(jbwm.dpy, c->window, ewmh.WM_STATE);
 #endif//EWMH
 		set_wm_state(c, WithdrawnState);
 	}
 #ifdef EWMH
 	else
-		XDeleteProperty(D, c->window, ewmh.WM_ALLOWED_ACTIONS);
+		XDeleteProperty(jbwm.dpy, c->window, ewmh.WM_ALLOWED_ACTIONS);
 
 #endif//EWMH
 	unparent_window(c);
@@ -199,7 +197,7 @@ void remove_client(Client * c)
 Status xmsg(const Window w, const Atom a, const long x)
 {
 	XLOG("xmsg");
-	return XSendEvent(D, w, false, NoEventMask, &(XEvent){
+	return XSendEvent(jbwm.dpy, w, false, NoEventMask, &(XEvent){
 		.xclient.type = ClientMessage,.xclient.window = w,
 		.xclient.message_type = a,.xclient.format = 32,
 		.xclient.data.l[0] = x,.xclient.data.l[1] = CurrentTime
@@ -211,7 +209,7 @@ static bool has_delete_proto(const Client * restrict c)
 	bool found=false;
 	Atom *p;
 	int i;
-	if(XGetWMProtocols(D, c->window, &p, &i)) {
+	if(XGetWMProtocols(jbwm.dpy, c->window, &p, &i)) {
 		assert(p);
 		while(i--)
 			if((found=(p[i]==client_atoms[I_DEL_WIN])))
@@ -233,7 +231,7 @@ void send_wm_delete(const Client * restrict c)
 	}
 	else {
 		assert(c->window);
-		XKillClient(D, c->window);
+		XKillClient(jbwm.dpy, c->window);
 	}
 }
 
@@ -245,7 +243,7 @@ bool set_shape(Client * restrict c)
 	/* Validate inputs:  Make sure that the SHAPE extension is available,
 	   and make sure that C is initialized.  */
 	if (c && (c->flags & JB_SHAPED)) {
-		XShapeCombineShape(D, c->parent, ShapeBounding, 0, 0,
+		XShapeCombineShape(jbwm.dpy, c->parent, ShapeBounding, 0, 0,
 				   c->window, ShapeBounding, ShapeSet);
 		return true;
 	}

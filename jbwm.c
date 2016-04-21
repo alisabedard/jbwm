@@ -105,18 +105,18 @@ static void setup_fonts(void)
 {
 #ifdef USE_XFT
 	jbwm.font =
-	    XftFontOpen(D, DefaultScreen(D), XFT_FAMILY, XftTypeString,
+	    XftFontOpen(jbwm.dpy, DefaultScreen(jbwm.dpy), XFT_FAMILY, XftTypeString,
 			DEF_FONT, XFT_SIZE, XftTypeDouble, FONT_SIZE, NULL);
 #else//!USE_XFT
-	jbwm.font = XLoadQueryFont(D, DEF_FONT);
+	jbwm.font = XLoadQueryFont(jbwm.dpy, DEF_FONT);
 
 	if (!jbwm.font)
-		jbwm.font = XLoadQueryFont(D, FALLBACK_FONT);
+		jbwm.font = XLoadQueryFont(jbwm.dpy, FALLBACK_FONT);
 
 #endif//USE_XFT
 
 	if (!jbwm.font)
-		ERROR("FONT");
+		ERROR("Cannot load any font");
 }
 #else//!USE_TBAR
 #define setup_fonts()
@@ -125,7 +125,7 @@ static void setup_fonts(void)
 void jbwm_grab_button(const Window w, const unsigned int mask,
 		 const unsigned int btn)
 {
-	XGrabButton(D, btn, mask, w, false,
+	XGrabButton(jbwm.dpy, btn, mask, w, false,
 		    ButtonPressMask | ButtonReleaseMask, GrabModeAsync,
 		    GrabModeSync, None, None);
 }
@@ -133,25 +133,23 @@ void jbwm_grab_button(const Window w, const unsigned int mask,
 __attribute__ ((cold))
 static void setup_event_listeners(const Window root)
 {
-/* *INDENT-OFF* */
-	XSetWindowAttributes attr = {.event_mask = SubstructureRedirectMask
+	XChangeWindowAttributes(jbwm.dpy, root, CWEventMask, 
+		&(XSetWindowAttributes){.event_mask = SubstructureRedirectMask
 		| SubstructureNotifyMask | EnterWindowMask | PropertyChangeMask
-		| ColormapChangeMask };
-/* *INDENT-ON* */
-	XChangeWindowAttributes(D, root, CWEventMask, &attr);
+		| ColormapChangeMask });
 }
 
 __attribute__ ((cold))
 static void allocate_colors(ScreenInfo * restrict s)
 {
 	XColor nc;
-	const Colormap cm = DefaultColormap(D, s->screen);
+	const Colormap cm = DefaultColormap(jbwm.dpy, s->screen);
 	XColor c;
 #ifdef USE_ARGV
-#define ALLOCC(C) XAllocNamedColor(D, cm, jbwmopt.C?jbwmopt.C:DEF_##C,\
+#define ALLOCC(C) XAllocNamedColor(jbwm.dpy, cm, jbwmopt.C?jbwmopt.C:DEF_##C,\
 	&c, &nc); s->pixels.C = c.pixel;
 #else//!USE_ARGV
-#define ALLOCC(C) XAllocNamedColor(D, cm, DEF_##C, &c, &nc);\
+#define ALLOCC(C) XAllocNamedColor(jbwm.dpy, cm, DEF_##C, &c, &nc);\
 	s->pixels.C = c.pixel;
 #endif//USE_ARGV
 	ALLOCC(fg); ALLOCC(fc); ALLOCC(bg);
@@ -163,12 +161,12 @@ static void setup_clients(ScreenInfo * restrict s)
 	Window *wins;
 	Window d;
 
-	if (!XQueryTree(D, s->root, &d, &d, &wins, &nwins))
+	if (!XQueryTree(jbwm.dpy, s->root, &d, &d, &wins, &nwins))
 		return;
 
 	while (nwins--) {
 		XWindowAttributes a;
-		XGetWindowAttributes(D, wins[nwins], &a);
+		XGetWindowAttributes(jbwm.dpy, wins[nwins], &a);
 
 		if (!a.override_redirect && (a.map_state == IsViewable))
 			make_new_client(wins[nwins], s);
@@ -182,10 +180,10 @@ static void setup_screen_elements(const uint8_t i)
 {
 	ScreenInfo *restrict s = &jbwm.screens[i];
 	s->screen = i;
-	s->root = RootWindow(D, i);
+	s->root = RootWindow(jbwm.dpy, i);
 	s->vdesk = 0;
-	s->size.w = DisplayWidth(D, i);
-	s->size.h = DisplayHeight(D, i);
+	s->size.w = DisplayWidth(jbwm.dpy, i);
+	s->size.h = DisplayHeight(jbwm.dpy, i);
 }
 
 __attribute__ ((cold))
@@ -203,7 +201,7 @@ static void setup_gc(ScreenInfo * s)
 	gv.font = jbwm.font->fid;
 	vm |= GCFont;
 #endif//USE_TBAR&&!USE_XFT
-	s->gc = XCreateGC(D, s->root, vm, &gv);
+	s->gc = XCreateGC(jbwm.dpy, s->root, vm, &gv);
 }
 
 __attribute__ ((cold))
@@ -224,7 +222,7 @@ static void setup_screens(void)
 {
 	/* Now set up each screen in turn: jbwm.num_screens is used
 	   in scanning windows (XQueryTree) */
-	uint8_t i = ScreenCount(D);
+	uint8_t i = ScreenCount(jbwm.dpy);
 	jbwm.screens = malloc(i * sizeof(ScreenInfo));
 
 	while (i--)
@@ -252,14 +250,14 @@ int main(
 	jbwm.keymasks.mod = MOD_MASK;
 	parse_argv(argc, argv);
 
-	if (!(D = XOpenDisplay(NULL)))
+	if (!(jbwm.dpy = XOpenDisplay(NULL)))
 		ERROR("DISPLAY");
 
 	XSetErrorHandler(handle_xerror);
 	ewmh_init();
 	/* Fonts only needed with title bars */
 	setup_fonts();
-	jbwm.cursor = XCreateFontCursor(D, XC_fleur);
+	jbwm.cursor = XCreateFontCursor(jbwm.dpy, XC_fleur);
 	setup_screens();
 	main_event_loop();
 	return 0;

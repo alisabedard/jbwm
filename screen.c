@@ -23,17 +23,17 @@ static void draw_outline(Client * c)
 	/* restrict, as all changes will occur through g */
 	XSizeHints *restrict g = &(c->size);
 	const bool tb = !(c->flags & JB_NO_TB);
-	XDrawRectangle(D, c->screen->root, c->screen->gc,
+	XDrawRectangle(jbwm.dpy, c->screen->root, c->screen->gc,
 		g->x, g->y - (tb?TDIM:0), g->width + c->border, 
 		g->height + c->border + (tb?TDIM:0));
 }
 
 static void configure(XSizeHints * restrict g, const Window w)
 {
-	XConfigureEvent ce = {.x = g->x,.y = g->y,.width = g->width,
-		.height = g->height,.type = ConfigureNotify,.event = w
-	};
-	XSendEvent(D, w, true, StructureNotifyMask, (XEvent *) & ce);
+	XSendEvent(jbwm.dpy, w, true, StructureNotifyMask, 
+		(XEvent *) &(XConfigureEvent){.x = g->x,.y = g->y,
+			.width = g->width, .height = g->height,
+			.type = ConfigureNotify,.event = w });
 }
 
 static void recalculate_resize(XSizeHints * restrict g, XPoint p1, XPoint p2)
@@ -45,9 +45,9 @@ static void recalculate_resize(XSizeHints * restrict g, XPoint p1, XPoint p2)
 	g->y = p1.y;
 }
 
-static bool grab_pointer(const Window w, const Cursor cursor)
+static inline bool grab_pointer(const Window w, const Cursor cursor)
 {
-	return XGrabPointer(D, w, false, MouseMask, GrabModeAsync,
+	return XGrabPointer(jbwm.dpy, w, false, MouseMask, GrabModeAsync,
 			    GrabModeAsync, None, cursor,
 			    CurrentTime) == GrabSuccess;
 }
@@ -57,10 +57,8 @@ handle_motion_notify(Client * restrict c, XMotionEvent * restrict mev)
 {
 	if (c->border) draw_outline(c);	// clear outline
 
-/* *INDENT-OFF* */
 	recalculate_resize(&c->size, (XPoint) { c->size.x, c->size.y},
 		(XPoint) { mev->x, mev->y});
-/* *INDENT-ON* */
 
 	if (c->border) draw_outline(c);
 	else moveresize(c);
@@ -84,11 +82,11 @@ void resize(Client * restrict c)
 		g->height += TDIM;
 
 #endif//USE_SHAPE
-	XWarpPointer(D, None, c->window, 0, 0, 0, 0, g->width, g->height);
+	XWarpPointer(jbwm.dpy, None, c->window, 0, 0, 0, 0, g->width, g->height);
 	XEvent ev;
-	if (c->border) XGrabServer(D);
+	if (c->border) XGrabServer(jbwm.dpy);
  resize_loop:
-	XMaskEvent(D, MouseMask, &ev);
+	XMaskEvent(jbwm.dpy, MouseMask, &ev);
 
 	if (ev.type == MotionNotify) {
 		handle_motion_notify(c, &ev.xmotion);
@@ -96,15 +94,15 @@ void resize(Client * restrict c)
 	}
 
 	configure(g, c->window);
-	if (c->border) XUngrabServer(D);
-	XUngrabPointer(D, CurrentTime);
+	if (c->border) XUngrabServer(jbwm.dpy);
+	XUngrabPointer(jbwm.dpy, CurrentTime);
 	moveresize(c);
 }
 
 static XPoint get_mouse_position(Window w)
 {
 	XPoint p;
-	XQueryPointer(D, w, &w, &w, (int *)&p.x, (int *)&p.y, (int *)&w,
+	XQueryPointer(jbwm.dpy, w, &w, &w, (int *)&p.x, (int *)&p.y, (int *)&w,
 		      (int *)&w, (unsigned int *)&w);
 	return p;
 }
@@ -123,7 +121,7 @@ void drag(Client * restrict c)
 	p.y += c->flags & JB_NO_TB ? TDIM : 0;
 	XEvent ev;
 drag_begin:
-	XMaskEvent(D, MouseMask, &ev);
+	XMaskEvent(jbwm.dpy, MouseMask, &ev);
 	if(ev.type != MotionNotify)
 		  goto drag_end;
 	draw_outline(c); // clear
@@ -134,7 +132,7 @@ drag_begin:
 	goto drag_begin;
 drag_end:
 	draw_outline(c); // clear
-	XUngrabPointer(D, CurrentTime);
+	XUngrabPointer(jbwm.dpy, CurrentTime);
 	moveresize(c);
 	configure(&(c->size), c->window);
 }
@@ -150,9 +148,9 @@ void moveresize(Client * restrict c)
 #define offset 0
 #endif//USE_TBAR
 	const uint16_t w = c->size.width;
-	XMoveResizeWindow(D, c->parent, c->size.x, c->size.y - offset, w,
+	XMoveResizeWindow(jbwm.dpy, c->parent, c->size.x, c->size.y - offset, w,
 			  c->size.height + offset);
-	XMoveResizeWindow(D, c->window, 0, offset, w, c->size.height);
+	XMoveResizeWindow(jbwm.dpy, c->window, 0, offset, w, c->size.height);
 
 #ifdef USE_TBAR
 	if (offset && (c->exposed_width != w)) {
@@ -268,7 +266,7 @@ void unset_fullscreen(Client * restrict c)
 	c->flags &= ~JB_FULLSCREEN;
 	restore_horz(c);
 	restore_vert(c);
-	XSetWindowBorderWidth(D, c->parent, c->border);
+	XSetWindowBorderWidth(jbwm.dpy, c->parent, c->border);
 	ewmh_remove_state(c->window, ewmh.WM_STATE_FULLSCREEN);
 	update_titlebar(c);
 	c->flags &= ~JB_IS_FS;
@@ -291,7 +289,7 @@ void set_fullscreen(Client * restrict c)
 	c->flags |= JB_FULLSCREEN;
 	maximize_horz(c);
 	maximize_vert(c);
-	XSetWindowBorderWidth(D, c->parent, 0);
+	XSetWindowBorderWidth(jbwm.dpy, c->parent, 0);
 	ewmh_add_state(c->window, ewmh.WM_STATE_FULLSCREEN);
 	update_titlebar(c);
 	c->flags |= JB_IS_FS;
@@ -315,7 +313,7 @@ void hide(Client * restrict c)
 	/* This will generate an unmap event.  Tell event handler
 	 * to ignore it.  */
 	c->ignore_unmap++;
-	XUnmapWindow(D, c->parent);
+	XUnmapWindow(jbwm.dpy, c->parent);
 	set_wm_state(c, IconicState);
 }
 
@@ -323,7 +321,7 @@ void unhide(Client * restrict c)
 {
 	LOG("unhide");
 	assert(c);
-	XMapWindow(D, c->parent);
+	XMapWindow(jbwm.dpy, c->parent);
 	set_wm_state(c, NormalState);
 }
 

@@ -16,8 +16,8 @@
 
 static void point(Client * c, const int x, const int y)
 {
-	XRaiseWindow(D, c->parent);
-	XWarpPointer(D, None, c->window, 0, 0, 0, 0, x, y);
+	XRaiseWindow(jbwm.dpy, c->parent);
+	XWarpPointer(jbwm.dpy, None, c->window, 0, 0, 0, 0, x, y);
 }
 
 static void
@@ -77,11 +77,11 @@ static void handle_client_key_event(XKeyEvent * e, Client * c, KeySym key)
 
 	case KEY_LOWER:
 	case KEY_ALTLOWER:
-		XLowerWindow(D, c->parent);
+		XLowerWindow(jbwm.dpy, c->parent);
 		break;
 
 	case KEY_RAISE:
-		XRaiseWindow(D, c->parent);
+		XRaiseWindow(jbwm.dpy, c->parent);
 		break;
 
 	case KEY_FS:
@@ -228,7 +228,7 @@ static void
 grab(ScreenInfo * restrict s, KeySym * restrict ks, const unsigned int mask)
 {
 	for (; *ks; ks++)
-		XGrabKey(D, XKeysymToKeycode(jbwm.dpy, *ks),
+		XGrabKey(jbwm.dpy, XKeysymToKeycode(jbwm.dpy, *ks),
 			 jbwm.keymasks.grab | mask, s->root, true,
 			 GrabModeAsync, GrabModeAsync);
 }

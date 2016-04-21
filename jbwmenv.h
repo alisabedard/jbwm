@@ -40,10 +40,4 @@ typedef struct {
 
 extern JBWMEnvironment jbwm;
 
-// Convenience reference to display, ensure unique:
-#ifdef D
-#undef D
-#endif//D
-#define D jbwm.dpy
-
 #endif /* not JBWM_ENVIRONMENT_H */

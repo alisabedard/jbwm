@@ -89,10 +89,10 @@ void ewmh_init()
 #endif//DEBUG
 }
 
-static void set_desktop_viewport()
+static inline void set_desktop_viewport(void)
 {
-	const long vp[2] = { 0, 0 };
-	XPROP(jbwm.screens->root, ewmh.DESKTOP_VIEWPORT, XA_CARDINAL, &vp, 2);
+	XPROP(jbwm.screens->root, ewmh.DESKTOP_VIEWPORT, XA_CARDINAL, 
+		(&(long[]){0, 0}), 2);
 }
 
 void ewmh_update_client_list()
@@ -100,7 +100,7 @@ void ewmh_update_client_list()
 #define MAX_CLIENTS 1024
 	// Prevent data from disappearing after return.
 	static Window wl[MAX_CLIENTS];
-	uint16_t count = 0;
+	register size_t count = 0;
 
 	for (Client * i = jbwm.head; i && (count < MAX_CLIENTS); i = i->next)
 		wl[count++] = i->window;
@@ -149,7 +149,7 @@ bool ewmh_get_state(const Window w, const Atom state)
 
 void ewmh_add_state(const Window w, const Atom state)
 {
-	XChangeProperty(D, w, ewmh.WM_STATE, XA_ATOM, 32, PropModePrepend,
+	XChangeProperty(jbwm.dpy, w, ewmh.WM_STATE, XA_ATOM, 32, PropModePrepend,
 			(unsigned char *)&state, 1);
 }
 
@@ -203,7 +203,7 @@ static void check_state(XClientMessageEvent * e,	// event data
 			state_cb(false, c);
 
 			if (add)
-				ewmh_add_state(e->window, state);
+				  ewmh_add_state(e->window, state);
 			else
 				  ewmh_remove_state(e->window, state);
 		}
@@ -213,9 +213,9 @@ static void check_state(XClientMessageEvent * e,	// event data
 static void layer(const bool above, Client * c)
 {
 	if(above)
-		  XRaiseWindow(D, c->parent);
+		  XRaiseWindow(jbwm.dpy, c->parent);
 	else
-		  XLowerWindow(D, c->parent);
+		  XLowerWindow(jbwm.dpy, c->parent);
 }
 
 static void above_cb(const bool add, Client * c)
@@ -293,28 +293,26 @@ void ewmh_client_message(XClientMessageEvent * e)
 	// If something else moves the window:
 	else if (t == ewmh.MOVERESIZE_WINDOW) {
 		const uint8_t src = (val >> 12) & 3;
-
 		if (src == 2) {
-/* *INDENT-OFF* */
-			XWindowChanges wc = {.x = e->data.l[1],
-				.y = e->data.l[2], .width = e->data.l[3],
-				.height = e->data.l[4]
-			};
-/* *INDENT-ON* */
 			const int vm = (val >> 8) & 0x0f;
-			const int grav = val & 0xff;
-			do_window_changes(vm, &wc, c, grav);
+			//const int grav = val & 0xff;
+			XConfigureWindow(e->display, e->window,
+				vm, &(XWindowChanges){
+				.x = e->data.l[1], .y = e->data.l[2],
+				.width = e->data.l[3],
+				.height = e->data.l[4]});
+	
 		}
 	}
 	// If user moves window (client-side titlebars):
 	else if (t == ewmh.WM_MOVERESIZE && c) {
-		XRaiseWindow(D, c->parent);
+		XRaiseWindow(jbwm.dpy, c->parent);
 		drag(c);
 	} else if (t == ewmh.WM_STATE && c)
 		handle_wm_state_changes(e, c);
 	else if (t == ewmh.WM_CHANGE_STATE && c) {
 		if (val == 3)	// Minimize (lower)
-			XLowerWindow(D, c->parent);
+			XLowerWindow(jbwm.dpy, c->parent);
 	}
 }
 
@@ -348,13 +346,13 @@ static void init_desktops(ScreenInfo * restrict s)
 static void init_supporting(ScreenInfo * restrict s)
 {
 	const Window r = s->root;
-	s->supporting = XCreateSimpleWindow(D, s->root, 0, 0, 1, 1, 0, 0, 0);
+	s->supporting = XCreateSimpleWindow(jbwm.dpy, s->root, 0, 0, 1, 1, 0, 0, 0);
 	XPROP(r, ewmh.SUPPORTING_WM_CHECK, XA_WINDOW, &(s->supporting), 1);
 	XPROP(s->supporting, ewmh.SUPPORTING_WM_CHECK, XA_WINDOW,
 	      &(s->supporting), 1);
 	XPROP(s->supporting, ewmh.WM_NAME, XA_STRING, "jbwm", 4);
-	const pid_t pid = getpid();
-	XPROP(s->supporting, ewmh.WM_PID, XA_CARDINAL, &pid, 1);
+	XPROP(s->supporting, ewmh.WM_PID, XA_CARDINAL, 
+		&(pid_t){getpid()}, 1);
 }
 
 void setup_ewmh_for_screen(ScreenInfo * s)

@@ -65,19 +65,19 @@ static void handle_colormap_change(XColormapEvent * e)
 
 	if (c && e->new) {
 		c->cmap = e->colormap;
-		XInstallColormap(D, c->cmap);
+		XInstallColormap(jbwm.dpy, c->cmap);
 	}
 }
 
 static void handle_wm_hints(Client * c)
 {
 	LOG("handle_wm_hints");
-	XWMHints *h = XGetWMHints(D, c->window);
+	XWMHints *h = XGetWMHints(jbwm.dpy, c->window);
 
 	if (h->flags & XUrgencyHint) {
 		switch_vdesk(c->screen, c->screen->vdesk);
 		unhide(c);
-		XRaiseWindow(D, c->parent);
+		XRaiseWindow(jbwm.dpy, c->parent);
 	}
 
 	XFree(h);
@@ -86,7 +86,7 @@ static void handle_wm_hints(Client * c)
 #ifdef DEBUG
 void print_atom(const Atom a, const unsigned int line)
 {
-	char *an = XGetAtomName(D, a);
+	char *an = XGetAtomName(jbwm.dpy, a);
 	fprintf(stderr, "\t%s:%d %s(%lu)\n", __FILE__, line, an, a);
 	XFree(an);
 }
@@ -145,204 +145,20 @@ static void handle_expose_event(XEvent * ev)
 }
 #endif//USE_TBAR
 
-#ifdef GRAVITY
-static void gravitate_border(Client * c, int bw)
-{
-	XPoint d = { 0, 0 };
-
-	switch (c->size.win_gravity) {
-	default:
-	case NorthWestGravity:
-		d.x = bw;
-		d.y = bw;
-		break;
-
-	case NorthGravity:
-		d.y = bw;
-		break;
-
-	case NorthEastGravity:
-		d.x = -bw;
-		d.y = bw;
-		break;
-
-	case EastGravity:
-		d.x = -bw;
-		break;
-
-	case CenterGravity:
-		break;
-
-	case WestGravity:
-		d.x = bw;
-		break;
-
-	case SouthWestGravity:
-		d.x = bw;
-		d.y = -bw;
-		break;
-
-	case SouthGravity:
-		d.y = -bw;
-		break;
-
-	case SouthEastGravity:
-		d.x = -bw;
-		d.y = -bw;
-		break;
-	}
-
-	if (c->size.x != 0 || c->size.width != c->screen->size.w)
-		c->size.x += d.x;
-
-	if (c->size.y != 0 || c->size.height != c->screen->size.h)
-		c->size.y += d.y;
-}
-#endif//GRAVITY
-
-void
-do_window_changes(int value_mask, XWindowChanges * restrict wc, 
-	Client * restrict c, int gravity)
-{
-	LOG("do_window_changes");
-
-	if (!gravity)
-		gravity = c->win_gravity_hint;
-
-	c->size.win_gravity = gravity;
-
-	if (value_mask & CWX)
-		c->size.x = wc->x;
-
-	if (value_mask & CWY)
-		c->size.y = wc->y;
-
-	if (value_mask & (CWWidth | CWHeight)) {
-#ifdef GRAVITY
-		int16_t dw = 0, dh = 0;
-		if (!(value_mask & (CWX | CWY)))
-			gravitate_border(c, -c->border);
-#endif//GRAVITY
-		if (value_mask & CWWidth) {
-			int neww = wc->width;
-
-			if (neww < c->size.min_width)
-				neww = c->size.min_width;
-
-			if (c->size.max_width && neww > c->size.max_width)
-				neww = c->size.max_width;
-#ifdef GRAVITY
-			dw = neww - c->size.width;
-#endif//GRAVITY
-			c->size.width = neww;
-		}
-
-		if (value_mask & CWHeight) {
-			int newh = wc->height;
-
-			if (newh < c->size.min_height)
-				newh = c->size.min_height;
-
-			if (c->size.max_height && newh > c->size.max_height)
-				newh = c->size.max_height;
-#ifdef GRAVITY
-			dh = newh - c->size.height;
-#endif//GRAVITY
-			c->size.height = newh;
-		}
-#ifdef GRAVITY
-		/* only apply position fixes if not being explicitly moved */
-		if (!(value_mask & (CWX | CWY))) {
-			switch (gravity) {
-			default:
-			case NorthWestGravity:
-				break;
-
-			case NorthGravity:
-				c->size.x -= (dw / 2);
-				break;
-
-			case NorthEastGravity:
-				c->size.x -= dw;
-				break;
-
-			case WestGravity:
-				c->size.y -= (dh / 2);
-				break;
-
-			case CenterGravity:
-				c->size.x -= (dw / 2);
-				c->size.y -= (dh / 2);
-				break;
-
-			case EastGravity:
-				c->size.x -= dw;
-				c->size.y -= (dh / 2);
-				break;
-
-			case SouthWestGravity:
-				c->size.y -= dh;
-				break;
-
-			case SouthGravity:
-				c->size.x -= (dw / 2);
-				c->size.y -= dh;
-				break;
-
-			case SouthEastGravity:
-				c->size.x -= dw;
-				c->size.y -= dh;
-				break;
-			}
-
-			value_mask |= CWX | CWY;
-			gravitate_border(c, c->border);
-		}
-#endif//GRAVITY
-	}
-	wc->x = c->size.x - c->border;
-	wc->y = c->size.y - c->border;
-	wc->border_width = c->border;
-	XConfigureWindow(D, c->parent, value_mask, wc);
-	XMoveResizeWindow(D, c->window, 0, 0, c->size.width, c->size.height);
-	// Note: call to configure() was here.
-}
-
 static void handle_configure_request(XConfigureRequestEvent * e)
 {
-	LOG("handle_configure_request");
-	XWindowChanges wc = {
-		.x = e->x,
-		.y = e->y,
-		.width = e->width,
-		.height = e->height,
+	XConfigureWindow(jbwm.dpy, e->window, e->value_mask, 
+		&(XWindowChanges){ .x = e->x, .y = e->y,
+		.width = e->width, .height = e->height,
 		.border_width = e->border_width,
-		.sibling = e->above,
-		.stack_mode = e->detail
-	};
-	Client *c = find_client(e->window);
-
-	if (c) {
-		if (e->value_mask & CWStackMode && e->value_mask & CWSibling) {
-			Client *sibling = find_client(e->above);
-
-			if (sibling)
-				wc.sibling = sibling->parent;
-		}
-
-		do_window_changes(e->value_mask, &wc, c, 0);
-	} else {
-		LOG("XConfigureWindow(window=%lx, value_mask=%lx)",
-		    (long unsigned int)e->window, e->value_mask);
-		XConfigureWindow(D, e->window, e->value_mask, &wc);
-	}
+		.sibling = e->above, .stack_mode = e->detail});
 }
 
 void main_event_loop(void)
 {
 	XEvent ev;
  head:
-	XNextEvent(D, &ev);
+	XNextEvent(jbwm.dpy, &ev);
 
 	switch (ev.type) {
 	case EnterNotify:

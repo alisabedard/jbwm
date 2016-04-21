@@ -2,24 +2,16 @@
 # Copyright 1999-2015, Ciaran Anscomb <jbwm@6809.org.uk>
 # See README for license and other details.
 
-#CFLAGS=-Os
-# Compile for current machine
-#CFLAGS+=-march=native
 # Debugging symbols
-#CFLAGS+=-ggdb
+CFLAGS+=-ggdb
 # Link time optimization greatly reduces binary size:
 # However, it may not work correctly with clang.
 #CFLAGS+=-flto
-# Tuning
-#CFLAGS+=-fomit-frame-pointer
 # Enable all warnings
 CFLAGS+=-W -Wall -Wextra
 
-# Uncomment to disable assertions
-#DEFINES += -DNDEBUG
-
-# Uncomment if you use firefox with flash
-DEFINES += -DFIX_FIREFOX
+# Uncomment if you use firefox with flash fullscreen videos.
+#DEFINES += -DFIX_FIREFOX
 
 # Uncomment to enable SHAPE extension support
 DEFINES += -DUSE_SHAPE
@@ -49,12 +41,5 @@ EXTRASRCS += ewmh.c
 # Uncomment to enable MWM hints
 include mwm.mk
 
-# Uncomment to enable window gravity code
-#DEFINES += -DGRAVITY
-
-# Uncomment to disable window outlines, and use solid drag/resize.
-# Saves ~300 bytes
-# Caveat: Slow
-#DEFINES += -DSOLID
-
 include jbwm.mk
+

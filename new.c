@@ -25,12 +25,11 @@ void *get_property(Window w, Atom property, Atom type,
 	unsigned long * restrict num_items)
 {
 	assert(num_items);
-	int actual_format;
-	unsigned long bytes_after;
 	unsigned char *prop;
 
-	if (XGetWindowProperty(D, w, property, 0L, 1024, false, property,
-			       &type, &actual_format, num_items, &bytes_after,
+	if (XGetWindowProperty(jbwm.dpy, w, property, 0L, 1024, false, property,
+			       &type, &(int){0}, num_items, 
+			       &(long unsigned int){0}, 
 			       &prop) == Success)
 		return prop;
 
@@ -135,12 +134,9 @@ __attribute__((nonnull))
 static void init_geometry(Client * restrict c)
 {
 	XWindowAttributes attr;
-	XGetWindowAttributes(D, c->window, &attr);
+	XGetWindowAttributes(jbwm.dpy, c->window, &attr);
 	c->cmap = attr.colormap;
-	{
-		long d;// dummy var
-		XGetWMNormalHints(D, c->window, &(c->size), &d);
-	}
+	XGetWMNormalHints(jbwm.dpy, c->window, &(c->size), &(long){0});
 	init_size(c, &attr);
 	init_position(c, &attr);
 
@@ -156,7 +152,7 @@ static bool is_shaped(Client * c)
 {
 	int d, s;
 #define U (unsigned int *)
-	return XShapeQueryExtents(D, c->window, &s, &d, &d, U & d, U & d, &d,
+	return XShapeQueryExtents(jbwm.dpy, c->window, &s, &d, &d, U & d, U & d, &d,
 				  &d, &d, U & d, U & d) && s;
 }
 
@@ -176,7 +172,7 @@ static void reparent(Client * restrict c)
 {
 	LOG("reparent()");
 	setup_shaped(c);
-	c->parent = XCreateWindow(D, c->screen->root, c->size.x, c->size.y, 
+	c->parent = XCreateWindow(jbwm.dpy, c->screen->root, c->size.x, c->size.y, 
 		c->size.width, c->size.height, c->border,
 		CopyFromParent, CopyFromParent, CopyFromParent, 
 		CWOverrideRedirect | CWEventMask, &(XSetWindowAttributes){
@@ -185,9 +181,9 @@ static void reparent(Client * restrict c)
 				| SubstructureNotifyMask
 				| ButtonPressMask
 				| EnterWindowMask});
-	XAddToSaveSet(D, c->window);
-	XReparentWindow(D, c->window, c->parent, 0, 0);
-	XMapWindow(D, c->window);
+	XAddToSaveSet(jbwm.dpy, c->window);
+	XReparentWindow(jbwm.dpy, c->window, c->parent, 0, 0);
+	XMapWindow(jbwm.dpy, c->window);
 }
 
 void make_new_client(Window w, ScreenInfo * s)
@@ -206,7 +202,7 @@ void make_new_client(Window w, ScreenInfo * s)
 	if (c->flags & JB_DONT_MANAGE)
 		return;
 
-	XSelectInput(D, c->window, EnterWindowMask | PropertyChangeMask 
+	XSelectInput(jbwm.dpy, c->window, EnterWindowMask | PropertyChangeMask 
 		| ColormapChangeMask);
 	set_shape(c);
 	reparent(c);

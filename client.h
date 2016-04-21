@@ -7,6 +7,7 @@
 #define JBWM_CLIENT_H
 
 #include <stdbool.h>
+#include <X11/Xlib.h>
 #include "client_t.h"
 
 // Free result with XFree if not NULL
@@ -20,7 +21,7 @@ void shade(Client * restrict c);
 
 void client_to_vdesk(Client * restrict c, const uint8_t d);
 
-void xmsg(const Window w, const Atom a, const long x);
+Status xmsg(const Window w, const Atom a, const long x);
 
 void send_wm_delete(const Client * restrict c);
 

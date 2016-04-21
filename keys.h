@@ -6,7 +6,7 @@
 #ifndef __KEYS_H
 #define __KEYS_H
 
-void jbwm_handle_key_event(XKeyEvent * e);
+void jbwm_handle_key_event(XKeyEvent * restrict e);
 
 #define KEY_NEXT        XK_Tab
 #ifndef KEY_NEW
