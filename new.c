@@ -79,29 +79,6 @@ static void wm_desktop(Client * restrict c)
 #define wm_desktop(c)
 #endif//EWMH
 
-/* These are corner cases at the moment, so this code is disabled.  If further
- * testing shows clients actually set any of these properties, it will be
- * further implemented. */
-#if 0
-#ifdef EWMH
-static void init_wm_state(Client * restrict c)
-{
-	Atom *aprop;
-	unsigned long nitems;
-	if(!(aprop=get_property(c->window, XA("WM_STATE"), XA_ATOM, &nitems)))
-		return;
-	for (uint8_t i = 0; i < nitems; i++) {
-		if (aprop[i] == ewmh.WM_STATE_STICKY) c->flags |= JB_STICKY;
-		else if (aprop[i] == ewmh.WM_STATE_SHADED) shade(c);
-		else if (aprop[i] == ewmh.WM_STATE_FULLSCREEN) set_fullscreen(c);
-	}
-	XFree(aprop);
-}
-#else//!EWMH
-#define init_wm_state(c)
-#endif//EWMH
-#endif//0
-
 __attribute__((nonnull))
 static void init_properties(Client * restrict c)
 {
@@ -152,8 +129,8 @@ static bool is_shaped(Client * c)
 {
 	int d, s;
 #define U (unsigned int *)
-	return XShapeQueryExtents(jbwm.dpy, c->window, &s, &d, &d, U & d, U & d, &d,
-				  &d, &d, U & d, U & d) && s;
+	return XShapeQueryExtents(jbwm.dpy, c->window, &s, &d, &d, 
+		U & d, U & d, &d, &d, &d, U & d, U & d) && s;
 }
 
 static void setup_shaped(Client * restrict c)
