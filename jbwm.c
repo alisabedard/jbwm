@@ -46,11 +46,12 @@ static unsigned int parse_modifiers(char *arg)
 	return 0;
 }
 
-static struct {
+typedef struct {
+	// Color names:
 	char *fg, *bg, *fc;
-} jbwmopt;
+} Options;
 
-static void parse_argv(int argc, char **argv)
+static void parse_argv(int argc, char **argv, Options * restrict o)
 {
 	LOG("parse_argv(%d,%s...)", argc, argv[0]);
 	const char *optstring = "1:2:b:d:f:s:V";
@@ -66,7 +67,7 @@ static void parse_argv(int argc, char **argv)
 			break;
 
 		case 'b':
-			jbwmopt.bg = optarg;
+			o->bg = optarg;
 			break;
 
 		case 'd':
@@ -74,11 +75,11 @@ static void parse_argv(int argc, char **argv)
 			break;
 
 		case 'f':
-			jbwmopt.fg = optarg;
+			o->fg = optarg;
 			break;
 
 		case 's':
-			jbwmopt.fc = optarg;
+			o->fc = optarg;
 			break;
 #ifdef STDIO
 
@@ -104,9 +105,9 @@ static void parse_argv(int argc, char **argv)
 static void setup_fonts(void)
 {
 #ifdef USE_XFT
-	jbwm.font =
-	    XftFontOpen(jbwm.dpy, DefaultScreen(jbwm.dpy), XFT_FAMILY, XftTypeString,
-			DEF_FONT, XFT_SIZE, XftTypeDouble, FONT_SIZE, NULL);
+	jbwm.font = XftFontOpen(jbwm.dpy, DefaultScreen(jbwm.dpy),
+		XFT_FAMILY, XftTypeString, DEF_FONT, XFT_SIZE, 
+		XftTypeDouble, FONT_SIZE, NULL);
 #else//!USE_XFT
 	jbwm.font = XLoadQueryFont(jbwm.dpy, DEF_FONT);
 
@@ -130,8 +131,7 @@ void jbwm_grab_button(const Window w, const unsigned int mask,
 		    GrabModeSync, None, None);
 }
 
-__attribute__ ((cold))
-static void setup_event_listeners(const Window root)
+static inline void setup_event_listeners(const Window root)
 {
 	XChangeWindowAttributes(jbwm.dpy, root, CWEventMask, 
 		&(XSetWindowAttributes){.event_mask = SubstructureRedirectMask
@@ -139,29 +139,34 @@ static void setup_event_listeners(const Window root)
 		| ColormapChangeMask });
 }
 
-__attribute__ ((cold))
-static void allocate_colors(ScreenInfo * restrict s)
+static inline void allocate_colors(ScreenInfo * restrict s,
+	Options * restrict o)
 {
-	XColor nc;
-	const Colormap cm = DefaultColormap(jbwm.dpy, s->screen);
 	XColor c;
-#ifdef USE_ARGV
-#define ALLOCC(C) XAllocNamedColor(jbwm.dpy, cm, jbwmopt.C?jbwmopt.C:DEF_##C,\
-	&c, &nc); s->pixels.C = c.pixel;
-#else//!USE_ARGV
-#define ALLOCC(C) XAllocNamedColor(jbwm.dpy, cm, DEF_##C, &c, &nc);\
-	s->pixels.C = c.pixel;
-#endif//USE_ARGV
-	ALLOCC(fg); ALLOCC(fc); ALLOCC(bg);
+
+	// Foreground:
+	XAllocNamedColor(jbwm.dpy, DefaultColormap(jbwm.dpy, s->screen),
+		o->fg, &c, &(XColor){});
+	s->pixels.fg = c.pixel;
+
+	// Background:
+	XAllocNamedColor(jbwm.dpy, DefaultColormap(jbwm.dpy, s->screen),
+		o->bg, &c, &(XColor){});
+	s->pixels.bg = c.pixel;
+
+	// Fixed:
+	XAllocNamedColor(jbwm.dpy, DefaultColormap(jbwm.dpy, s->screen),
+		o->fc, &c, &(XColor){});
+	s->pixels.fc = c.pixel;
 }
 
 static void setup_clients(ScreenInfo * restrict s)
 {
 	unsigned int nwins;
 	Window *wins;
-	Window d;
 
-	if (!XQueryTree(jbwm.dpy, s->root, &d, &d, &wins, &nwins))
+	if (!XQueryTree(jbwm.dpy, s->root, &(Window){0}, 
+		&(Window){0}, &wins, &nwins))
 		return;
 
 	while (nwins--) {
@@ -187,9 +192,9 @@ static void setup_screen_elements(const uint8_t i)
 }
 
 __attribute__ ((cold))
-static void setup_gc(ScreenInfo * s)
+static void setup_gc(ScreenInfo * restrict s, Options * restrict o)
 {
-	allocate_colors(s);
+	allocate_colors(s, o);
 	unsigned long vm =
 	    GCFunction | GCSubwindowMode | GCLineWidth | GCForeground |
 	    GCBackground;
@@ -205,11 +210,11 @@ static void setup_gc(ScreenInfo * s)
 }
 
 __attribute__ ((cold))
-static void setup_screen(const uint8_t i)
+static void setup_screen(const uint8_t i, Options * restrict o)
 {
 	ScreenInfo *s = &jbwm.screens[i];
 	setup_screen_elements(i);
-	setup_gc(s);
+	setup_gc(s, o);
 	setup_event_listeners(s->root);
 	grab_keys_for_screen(s);
 	/* scan all the windows on this screen */
@@ -218,7 +223,7 @@ static void setup_screen(const uint8_t i)
 }
 
 __attribute__ ((cold))
-static void setup_screens(void)
+static void setup_screens(Options * restrict o)
 {
 	/* Now set up each screen in turn: jbwm.num_screens is used
 	   in scanning windows (XQueryTree) */
@@ -226,7 +231,7 @@ static void setup_screens(void)
 	jbwm.screens = malloc(i * sizeof(ScreenInfo));
 
 	while (i--)
-		setup_screen(i);
+		setup_screen(i, o);
 }
 
 
@@ -248,7 +253,8 @@ int main(
 {
 	jbwm.keymasks.grab = GRAB_MASK;
 	jbwm.keymasks.mod = MOD_MASK;
-	parse_argv(argc, argv);
+	Options o = {.fg=DEF_fg, .bg=DEF_bg, .fc=DEF_fc};
+	parse_argv(argc, argv, &o);
 
 	if (!(jbwm.dpy = XOpenDisplay(NULL)))
 		ERROR("DISPLAY");
@@ -258,7 +264,7 @@ int main(
 	/* Fonts only needed with title bars */
 	setup_fonts();
 	jbwm.cursor = XCreateFontCursor(jbwm.dpy, XC_fleur);
-	setup_screens();
+	setup_screens(&o);
 	main_event_loop();
 	return 0;
 }
