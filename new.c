@@ -165,7 +165,8 @@ static void reparent(Client * restrict c)
 
 void make_new_client(Window w, ScreenInfo * s)
 {	
-	LOG("Client_new(%d,s)", (int)w);
+	LOG("make_new_client(%d,s)", (int)w);
+	assert(s);
 	Client *c = calloc(1, sizeof(Client));
 	assert(c);
 	c->next = jbwm.head;
