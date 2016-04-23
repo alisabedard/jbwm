@@ -37,15 +37,6 @@ static void configure(XSizeHints * restrict g, const Window w)
 			.type = ConfigureNotify, .event = w });
 }
 
-static void recalculate_resize(XSizeHints * restrict g, XPoint p1, XPoint p2)
-{
-	LOG("recalculate_resize");
-	g->width = abs(p1.x - p2.x);
-	g->height = abs(p1.y - p2.y);
-	g->x = p1.x;
-	g->y = p1.y;
-}
-
 static bool grab_pointer(const Window w, const Cursor cursor)
 {
 	return XGrabPointer(jbwm.dpy, w, false, MouseMask, GrabModeAsync,
@@ -53,52 +44,28 @@ static bool grab_pointer(const Window w, const Cursor cursor)
 			    CurrentTime) == GrabSuccess;
 }
 
-static void handle_motion_notify(Client * restrict c,
-	XMotionEvent * restrict mev)
-{
-	if (c->border) draw_outline(c);	// clear outline
-
-	recalculate_resize(&c->size, (XPoint) { c->size.x, c->size.y},
-		(XPoint) { mev->x, mev->y});
-
-	if (c->border) draw_outline(c);
-	else moveresize(c);
-}
-
 void resize(Client * restrict c)
 {
 	LOG("resize");
-	assert(c);
-	/* Resizing shaded windows yields undefined behavior.  */
-	const uint32_t f = c->flags;
-
-	if ((f & (JB_NO_RESIZE | JB_SHADED))
-		|| (!grab_pointer(c->screen->root, jbwm.cursor)))
+	if (c->flags & (JB_NO_RESIZE | JB_SHADED))
 		  return;
-
-	// Valid with restricted c, as it is derived from c:
-	XSizeHints *g = &(c->size);
-#ifdef USE_SHAPE
-
-	if (f & JB_SHAPED)	// Bugfix for offset issue
-		g->height += TDIM;
-
-#endif//USE_SHAPE
-	XWarpPointer(jbwm.dpy, None, c->window, 0, 0, 0, 0, g->width, g->height);
+	grab_pointer(c->screen->root, jbwm.cursor);
 	XEvent ev;
-	if (c->border) XGrabServer(jbwm.dpy);
- resize_loop:
+	XWarpPointer(jbwm.dpy, None, c->window,
+		0, 0, 0, 0, c->size.width, c->size.height);
+resize_loop:
 	XMaskEvent(jbwm.dpy, MouseMask, &ev);
-
 	if (ev.type == MotionNotify) {
-		handle_motion_notify(c, &ev.xmotion);
+		if(c->border) draw_outline(c);
+		c->size.width=abs(c->size.x-ev.xmotion.x);
+		c->size.height=abs(c->size.y-ev.xmotion.y);
+		if(c->border) draw_outline(c);
+		else moveresize(c);
 		goto resize_loop;
 	}
-
-	configure(g, c->window);
-	if (c->border) XUngrabServer(jbwm.dpy);
 	XUngrabPointer(jbwm.dpy, CurrentTime);
 	moveresize(c);
+	configure(&c->size, c->window);
 }
 
 static XPoint get_mouse_position(Window w)
@@ -118,43 +85,31 @@ void drag(Client * restrict c)
 	XEvent ev;
 drag_begin:
 	XMaskEvent(jbwm.dpy, MouseMask, &ev);
-	if(ev.type != MotionNotify) {
-		draw_outline(c); // clear
-		XUngrabPointer(jbwm.dpy, CurrentTime);
-		moveresize(c);
-		configure(&(c->size), c->window);
-		return;
+	if(ev.type == MotionNotify) {
+		if(c->border) draw_outline(c); // clear
+		c->size.x = op.x - p.x + ev.xmotion.x;
+		c->size.y = op.y - p.y + ev.xmotion.y;
+		snap_client(c);
+		if(c->border) draw_outline(c); // draw
+		else moveresize(c);
+		goto drag_begin;
 	}
-	draw_outline(c); // clear
-	c->size.x = op.x - p.x + ev.xmotion.x;
-	c->size.y = op.y - p.y + ev.xmotion.y;
-	snap_client(c);
-	draw_outline(c); // draw
-	goto drag_begin;
+	if(c->border) draw_outline(c); // clear
+	XUngrabPointer(jbwm.dpy, CurrentTime);
+	moveresize(c);
+	configure(&(c->size), c->window);
 }
 
 void moveresize(Client * restrict c)
 {
 	LOG("moveresize");
-	assert(c);
-#ifdef USE_TBAR
 	const uint8_t offset = (c->flags & (JB_NO_TB | JB_FULLSCREEN))
 		? 0 : TDIM;
-#else//!USE_TBAR
-#define offset 0
-#endif//USE_TBAR
-	const uint16_t w = c->size.width;
 	XMoveResizeWindow(jbwm.dpy, c->parent, c->size.x,
-		c->size.y - offset, w, c->size.height + offset);
-	XMoveResizeWindow(jbwm.dpy, c->window, 0, offset, w, c->size.height);
-
-#ifdef USE_TBAR
-	if (offset && (c->exposed_width != w)) {
-		update_titlebar(c);
-		c->exposed_width = w;
-	}
-#endif//USE_TBAR
-
+		c->size.y - offset, c->size.width, c->size.height + offset);
+	XMoveResizeWindow(jbwm.dpy, c->window, 0, offset,
+		c->size.width, c->size.height);
+	if(offset) { update_titlebar(c); }
 	set_shape(c);
 }
 
