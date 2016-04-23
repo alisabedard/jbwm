@@ -82,6 +82,8 @@ debug:
 small:
 	make clean
 	make -f Makefile.small
+	strip jbwm
+	ls -l jbwm
 
 clang:
 	make clean
