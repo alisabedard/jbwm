@@ -19,13 +19,14 @@
 // Main application data structure.
 JBWMEnvironment jbwm;
 
-/* Several following functions are declared cold as they are only used on
-program startup.  */
+typedef struct {
+	// Color names:
+	char *fg, *bg, *fc;
+} Options;
 
 #ifdef USE_ARGV
 
 /* Used for overriding the default WM modifiers */
-__attribute__ ((cold))
 static unsigned int parse_modifiers(char *arg)
 {
 	LOG("parse_modifiers()");
@@ -45,11 +46,6 @@ static unsigned int parse_modifiers(char *arg)
 
 	return 0;
 }
-
-typedef struct {
-	// Color names:
-	char *fg, *bg, *fc;
-} Options;
 
 static void parse_argv(int argc, char **argv, Options * restrict o)
 {
@@ -98,7 +94,7 @@ static void parse_argv(int argc, char **argv, Options * restrict o)
 	}
 }
 #else//!USE_ARGV
-#define parse_argv(a, b)
+#define parse_argv(a, b, o)
 #endif//USE_ARGV
 
 #ifdef USE_TBAR
@@ -180,7 +176,6 @@ static void setup_clients(ScreenInfo * restrict s)
 	XFree(wins);
 }
 
-__attribute__ ((cold))
 static void setup_screen_elements(const uint8_t i)
 {
 	ScreenInfo *restrict s = &jbwm.screens[i];
@@ -191,7 +186,6 @@ static void setup_screen_elements(const uint8_t i)
 	s->size.h = DisplayHeight(jbwm.dpy, i);
 }
 
-__attribute__ ((cold))
 static void setup_gc(ScreenInfo * restrict s, Options * restrict o)
 {
 	allocate_colors(s, o);
@@ -209,7 +203,6 @@ static void setup_gc(ScreenInfo * restrict s, Options * restrict o)
 	s->gc = XCreateGC(jbwm.dpy, s->root, vm, &gv);
 }
 
-__attribute__ ((cold))
 static void setup_screen(const uint8_t i, Options * restrict o)
 {
 	ScreenInfo *s = &jbwm.screens[i];
@@ -222,7 +215,6 @@ static void setup_screen(const uint8_t i, Options * restrict o)
 	setup_ewmh_for_screen(s);
 }
 
-__attribute__ ((cold))
 static void setup_screens(Options * restrict o)
 {
 	/* Now set up each screen in turn: jbwm.num_screens is used
