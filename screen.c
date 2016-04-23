@@ -22,10 +22,11 @@ static void draw_outline(Client * c)
 {
 	/* restrict, as all changes will occur through g */
 	XSizeHints *restrict g = &(c->size);
-	const bool tb = !(c->flags & JB_NO_TB);
+	const uint8_t offset = c->flags & JB_NO_TB ? 0 : TDIM;
 	XDrawRectangle(jbwm.dpy, c->screen->root, c->screen->gc,
-		g->x, g->y - (tb?TDIM:0), g->width + c->border, 
-		g->height + c->border + (tb?TDIM:0));
+		g->x, g->y - offset,
+		g->width + c->border,
+		g->height + c->border + offset);
 }
 
 static void configure(XSizeHints * restrict g, const Window w)
@@ -33,7 +34,7 @@ static void configure(XSizeHints * restrict g, const Window w)
 	XSendEvent(jbwm.dpy, w, true, StructureNotifyMask, 
 		(XEvent *) &(XConfigureEvent){.x = g->x,.y = g->y,
 			.width = g->width, .height = g->height,
-			.type = ConfigureNotify,.event = w });
+			.type = ConfigureNotify, .event = w });
 }
 
 static void recalculate_resize(XSizeHints * restrict g, XPoint p1, XPoint p2)
@@ -45,15 +46,15 @@ static void recalculate_resize(XSizeHints * restrict g, XPoint p1, XPoint p2)
 	g->y = p1.y;
 }
 
-static inline bool grab_pointer(const Window w, const Cursor cursor)
+static bool grab_pointer(const Window w, const Cursor cursor)
 {
 	return XGrabPointer(jbwm.dpy, w, false, MouseMask, GrabModeAsync,
 			    GrabModeAsync, None, cursor,
 			    CurrentTime) == GrabSuccess;
 }
 
-static void
-handle_motion_notify(Client * restrict c, XMotionEvent * restrict mev)
+static void handle_motion_notify(Client * restrict c,
+	XMotionEvent * restrict mev)
 {
 	if (c->border) draw_outline(c);	// clear outline
 
@@ -71,8 +72,9 @@ void resize(Client * restrict c)
 	/* Resizing shaded windows yields undefined behavior.  */
 	const uint32_t f = c->flags;
 
-	if (f & (JB_NO_RESIZE | JB_SHADED)) return;
-	if (!grab_pointer(c->screen->root, jbwm.cursor)) return;
+	if ((f & (JB_NO_RESIZE | JB_SHADED))
+		|| (!grab_pointer(c->screen->root, jbwm.cursor)))
+		  return;
 
 	// Valid with restricted c, as it is derived from c:
 	XSizeHints *g = &(c->size);
@@ -110,31 +112,25 @@ static XPoint get_mouse_position(Window w)
 void drag(Client * restrict c)
 {
 	LOG("drag");
-	assert(c);
-	assert(c->screen);
-	const Window r = c->screen->root;
-	if(!grab_pointer(r, jbwm.cursor))
-		  return;
-	const XPoint op = { c->size.x, c->size.y 
-		+ (c->flags & JB_NO_TB ? TDIM : 0)};
-	XPoint p=get_mouse_position(r);
-	p.y += c->flags & JB_NO_TB ? TDIM : 0;
+	grab_pointer(c->screen->root, jbwm.cursor);
+	const XPoint op = { c->size.x, c->size.y};
+	XPoint p=get_mouse_position(c->screen->root);
 	XEvent ev;
 drag_begin:
 	XMaskEvent(jbwm.dpy, MouseMask, &ev);
-	if(ev.type != MotionNotify)
-		  goto drag_end;
+	if(ev.type != MotionNotify) {
+		draw_outline(c); // clear
+		XUngrabPointer(jbwm.dpy, CurrentTime);
+		moveresize(c);
+		configure(&(c->size), c->window);
+		return;
+	}
 	draw_outline(c); // clear
 	c->size.x = op.x - p.x + ev.xmotion.x;
 	c->size.y = op.y - p.y + ev.xmotion.y;
 	snap_client(c);
 	draw_outline(c); // draw
 	goto drag_begin;
-drag_end:
-	draw_outline(c); // clear
-	XUngrabPointer(jbwm.dpy, CurrentTime);
-	moveresize(c);
-	configure(&(c->size), c->window);
 }
 
 void moveresize(Client * restrict c)
@@ -142,14 +138,14 @@ void moveresize(Client * restrict c)
 	LOG("moveresize");
 	assert(c);
 #ifdef USE_TBAR
-	const uint8_t offset =
-	    (c->flags & (JB_NO_TB | JB_FULLSCREEN)) ? 0 : TDIM;
+	const uint8_t offset = (c->flags & (JB_NO_TB | JB_FULLSCREEN))
+		? 0 : TDIM;
 #else//!USE_TBAR
 #define offset 0
 #endif//USE_TBAR
 	const uint16_t w = c->size.width;
-	XMoveResizeWindow(jbwm.dpy, c->parent, c->size.x, c->size.y - offset, w,
-			  c->size.height + offset);
+	XMoveResizeWindow(jbwm.dpy, c->parent, c->size.x,
+		c->size.y - offset, w, c->size.height + offset);
 	XMoveResizeWindow(jbwm.dpy, c->window, 0, offset, w, c->size.height);
 
 #ifdef USE_TBAR
