@@ -17,8 +17,7 @@ DEFINES += -DUSE_TBAR
 EXTRASRCS += titlebar.c 
 include snap.mk
 DEFINES += -DSTDIO
-DEFINES += -DEWMH
-EXTRASRCS += ewmh.c
+include ewmh.mk
 DEFINES += -DGRAVITY
 
 # Uncomment to enable MWM hints

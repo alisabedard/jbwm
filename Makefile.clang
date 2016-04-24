@@ -36,8 +36,7 @@ include snap.mk
 DEFINES += -DSTDIO
 
 # Uncomment to enable EWMH ~8k
-DEFINES += -DEWMH
-EXTRASRCS += ewmh.c
+include ewmh.mk
 
 # Uncomment to enable MWM hints
 include mwm.mk

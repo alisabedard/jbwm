@@ -3,7 +3,6 @@
 // Copyright 1999-2015, Ciaran Anscomb <jbwm@6809.org.uk>
 // See README for license and other details.
 
-//#include "jbwm.h"
 #include <unistd.h>
 #include "atoms.h"
 #include "client.h"
@@ -16,7 +15,6 @@
 #include "screen.h"
 #include "titlebar.h"
 
-#ifdef EWMH
 
 EWMHEnvironment ewmh;
 
@@ -349,7 +347,7 @@ static void init_supporting(ScreenInfo * restrict s)
 		&(pid_t){getpid()}, 1);
 }
 
-void setup_ewmh_for_screen(ScreenInfo * s)
+void setup_ewmh_for_screen(ScreenInfo * restrict s)
 {
 	const Window r = s->root;
 	XPROP(r, ewmh.atoms[SUPPORTED], XA_ATOM, ewmh.atoms, ewmh.count);
@@ -360,4 +358,3 @@ void setup_ewmh_for_screen(ScreenInfo * s)
 	init_supporting(s);
 }
 
-#endif//EWMH

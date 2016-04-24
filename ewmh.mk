@@ -1,0 +1,3 @@
+DEFINES += -DEWMH
+EXTRASRCS += ewmh.c
+

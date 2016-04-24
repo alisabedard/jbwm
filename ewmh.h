@@ -22,7 +22,7 @@ void ewmh_remove_state(const Window w, const Atom state);
 void ewmh_add_state(const Window w, const Atom state);
 void ewmh_client_message(XClientMessageEvent * e);
 void set_ewmh_allowed_actions(const Window w);
-void setup_ewmh_for_screen(ScreenInfo * s);
+void setup_ewmh_for_screen(ScreenInfo * restrict s);
 void ewmh_init(void);
 
 typedef enum {

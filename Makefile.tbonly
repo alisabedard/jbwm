@@ -15,7 +15,6 @@ DEFINES += -DNDEBUG
 #include xft.mk
 
 # Uncomment to enable titlebars
-DEFINES += -DUSE_TBAR
-EXTRASRCS += titlebar.c 
+include titlebar.mk
 
 include jbwm.mk
