@@ -5,40 +5,4 @@
 
 CC=clang
 CFLAGS=-Os
-# Compile for current machine
-#CFLAGS+=-march=native
-# Tuning
-#CFLAGS+=-fomit-frame-pointer -pipe
-# Enable all warnings
-CFLAGS+=-W -Wall -Wextra
-
-# Uncomment to disable assertions
-#DEFINES += -DNDEBUG
-
-# Uncomment to enable SHAPE extension support
-DEFINES += -DUSE_SHAPE
-EXTRALIBS += -lXext # Required for SHAPE extension
-
-# Titlebar Xft support:
-#include xft.mk
-
-# Uncomment to enable parsing command line arguments.
-DEFINES += -DUSE_ARGV 
-
-# Uncomment to enable titlebars
-DEFINES += -DUSE_TBAR
-EXTRASRCS += titlebar.c 
-
-# Uncomment to enable window snapping. ~4k
-include snap.mk
-
-# Uncomment to enable STDIO
-DEFINES += -DSTDIO
-
-# Uncomment to enable EWMH ~8k
-include ewmh.mk
-
-# Uncomment to enable MWM hints
-include mwm.mk
-
-include jbwm.mk
+include Makefile

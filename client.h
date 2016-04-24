@@ -37,10 +37,4 @@ void send_config(Client * c);
 
 void set_wm_state(Client * restrict c, const int state);
 
-#ifdef USE_SHAPE
-bool set_shape(Client * restrict c);
-#else
-#define set_shape(c)
-#endif//USE_SHAPE
-
 #endif /* JBWM_CLIENT_H */

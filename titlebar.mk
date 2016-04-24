@@ -1,3 +1,3 @@
 DEFINES += -DUSE_TBAR
-EXTRASRC += titlebar.c
+EXTRASRCS += titlebar.c
 

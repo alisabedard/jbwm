@@ -5,8 +5,9 @@
 
 #ifdef USE_SHAPE
 #include <X11/extensions/shape.h>
-#endif//USE_SHAPE
+#endif
 #include <X11/Xatom.h>
+#include <X11/Xlib.h>
 #include "button_event.h"
 #include "client.h"
 #include "ewmh.h"
@@ -28,7 +29,7 @@ static ScreenInfo *find_screen(const Window root)
 	return NULL;
 }
 
-static void cleanup()
+static void cleanup(void)
 {
 	LOG("cleanup()");
 	jbwm.need_cleanup = false;
@@ -214,22 +215,16 @@ void main_event_loop(void)
 		break;
 
 #ifdef EWMH
-
 	case CreateNotify:
 	case DestroyNotify:
 		ewmh_update_client_list();
 		break;
+
 	case ClientMessage:
 		ewmh_client_message(&ev.xclient);
 		break;
 #endif//EWMH
 
-#ifdef USE_SHAPE
-	case ShapeNotify:
-		LOG("ShapeNotify");
-		set_shape(find_client(ev.xany.window));
-		break;
-#endif//USE_SHAPE 
 #if defined(DEBUG) && defined(XDEBUG)
 
 	case MapNotify:

@@ -5,9 +5,6 @@
 
 #include <assert.h>
 #include <stdlib.h>
-#ifdef USE_SHAPE
-#include <X11/extensions/shape.h>
-#endif//USE_SHAPE
 #include "atoms.h"
 #include "client.h"
 #include "ewmh.h"
@@ -238,19 +235,3 @@ void send_wm_delete(const Client * restrict c)
 	}
 }
 
-#ifdef USE_SHAPE
-bool set_shape(Client * restrict c)
-{
-	XLOG("set_shape");
-	assert(c);
-	/* Validate inputs:  Make sure that the SHAPE extension is available,
-	   and make sure that C is initialized.  */
-	if (c && (c->flags & JB_SHAPED)) {
-		XShapeCombineShape(jbwm.dpy, c->parent, ShapeBounding, 0, 0,
-				   c->window, ShapeBounding, ShapeSet);
-		return true;
-	}
-
-	return false;
-}
-#endif//USE_SHAPE

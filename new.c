@@ -6,9 +6,6 @@
 #include <assert.h>
 #include <stdlib.h>
 #include <string.h>
-#ifdef USE_SHAPE
-#include <X11/extensions/shape.h>
-#endif//USE_SHAPE
 #include <X11/Xatom.h>
 #include "atoms.h"
 #include "client.h"
@@ -18,6 +15,7 @@
 #include "log.h"
 #include "mwm.h"
 #include "screen.h"
+#include "shape.h"
 #include "titlebar.h"
 
 #if defined(EWMH) || defined(MWM)
@@ -124,28 +122,6 @@ static void init_geometry(Client * restrict c)
 	fix_firefox(c); // fix flash plugin-container bug
 }
 
-#ifdef USE_SHAPE
-__attribute__((pure))
-static bool is_shaped(Client * c)
-{
-	int d, s;
-#define U (unsigned int *)
-	return XShapeQueryExtents(jbwm.dpy, c->window, &s, &d, &d, 
-		U & d, U & d, &d, &d, &d, U & d, U & d) && s;
-}
-
-static void setup_shaped(Client * restrict c)
-{
-	if (is_shaped(c)) {
-		LOG("Window %d is shaped", (int)c->window);
-		c->border = 0;
-		c->flags |= JB_NO_TB | JB_SHAPED;
-	}
-}
-#else//!USE_SHAPE
-#define setup_shaped(c)
-#endif//USE_SHAPE
-
 static void reparent(Client * restrict c)
 {
 	LOG("reparent()");
@@ -183,7 +159,7 @@ void make_new_client(Window w, ScreenInfo * s)
 
 	XSelectInput(jbwm.dpy, c->window, EnterWindowMask | PropertyChangeMask 
 		| ColormapChangeMask);
-	set_shape(c);
+	//set_shape(c); //SSS
 	reparent(c);
 	unhide(c);
 	jbwm_grab_button(w, jbwm.keymasks.grab, AnyButton);

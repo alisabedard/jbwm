@@ -1,0 +1,4 @@
+DEFINES += -DUSE_SHAPE
+EXTRASRCS += shape.c
+EXTRALIBS += -lXext
+

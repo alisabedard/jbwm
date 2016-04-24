@@ -14,8 +14,7 @@ CFLAGS+=-W -Wall -Wextra
 #DEFINES += -DFIX_FIREFOX
 
 # Uncomment to enable SHAPE extension support
-DEFINES += -DUSE_SHAPE
-EXTRALIBS += -lXext # Required for SHAPE extension
+include shape.mk
 
 # Titlebar Xft support:
 #include xft.mk
@@ -25,8 +24,7 @@ EXTRALIBS += -lXext # Required for SHAPE extension
 DEFINES += -DUSE_ARGV 
 
 # Uncomment to enable titlebars
-DEFINES += -DUSE_TBAR
-EXTRASRCS += titlebar.c 
+include titlebar.mk
 
 # Uncomment to enable window snapping. ~4k
 include snap.mk

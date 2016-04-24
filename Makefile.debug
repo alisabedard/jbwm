@@ -8,19 +8,15 @@ CFLAGS+=-pg
 # Enable all warnings
 CFLAGS+=-W -Wall -Wextra -Werror
 
-# Uncomment to enable SHAPE extension support
-DEFINES += -DUSE_SHAPE
-EXTRALIBS += -lXext # Required for SHAPE extension
-include xft.mk
 DEFINES += -DUSE_ARGV 
-DEFINES += -DUSE_TBAR
-EXTRASRCS += titlebar.c 
-include snap.mk
 DEFINES += -DSTDIO
-include ewmh.mk
-DEFINES += -DGRAVITY
 
-# Uncomment to enable MWM hints
+include ewmh.mk
 include mwm.mk
+include shape.mk
+include snap.mk
+include titlebar.mk
+include xft.mk
+
 
 include jbwm.mk

@@ -127,12 +127,15 @@ void jbwm_grab_button(const Window w, const unsigned int mask,
 		    GrabModeSync, None, None);
 }
 
+#ifdef USE_SHAPE
+#include <X11/extensions/shape.h>
+#endif
 static inline void setup_event_listeners(const Window root)
 {
 	XChangeWindowAttributes(jbwm.dpy, root, CWEventMask, 
 		&(XSetWindowAttributes){.event_mask = SubstructureRedirectMask
 		| SubstructureNotifyMask | EnterWindowMask | PropertyChangeMask
-		| ColormapChangeMask });
+		| ColormapChangeMask});
 }
 
 static inline void allocate_colors(ScreenInfo * restrict s,

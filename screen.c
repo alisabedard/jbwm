@@ -13,6 +13,7 @@
 #include "log.h"
 #include "titlebar.h"
 #include "screen.h"
+#include "shape.h"
 #include "snap.h"
 
 #define MouseMask (ButtonPressMask|ButtonReleaseMask|PointerMotionMask)
@@ -37,11 +38,10 @@ static void configure(XSizeHints * restrict g, const Window w)
 			.type = ConfigureNotify, .event = w });
 }
 
-static bool grab_pointer(const Window w, const Cursor cursor)
+static void grab_pointer(const Window w)
 {
-	return XGrabPointer(jbwm.dpy, w, false, MouseMask, GrabModeAsync,
-			    GrabModeAsync, None, cursor,
-			    CurrentTime) == GrabSuccess;
+	XGrabPointer(jbwm.dpy, w, false, MouseMask, GrabModeAsync,
+		GrabModeAsync, None, jbwm.cursor, CurrentTime);
 }
 
 void resize(Client * restrict c)
@@ -49,7 +49,7 @@ void resize(Client * restrict c)
 	LOG("resize");
 	if (c->flags & (JB_NO_RESIZE | JB_SHADED))
 		  return;
-	grab_pointer(c->screen->root, jbwm.cursor);
+	grab_pointer(c->screen->root);
 	XEvent ev;
 	XWarpPointer(jbwm.dpy, None, c->window,
 		0, 0, 0, 0, c->size.width, c->size.height);
@@ -80,7 +80,7 @@ static XPoint get_mouse_position(Window w)
 void drag(Client * restrict c)
 {
 	LOG("drag");
-	grab_pointer(c->screen->root, jbwm.cursor);
+	grab_pointer(c->screen->root);
 	const XPoint op = { c->size.x, c->size.y};
 	XPoint p=get_mouse_position(c->screen->root);
 	XEvent ev;
@@ -113,7 +113,7 @@ void moveresize(Client * restrict c)
 		0, offset,
 		c->size.width, c->size.height);
 	if(offset) { update_titlebar(c); }
-	set_shape(c);
+	set_shape(c); 
 }
 
 void restore_horz(Client * restrict c)
