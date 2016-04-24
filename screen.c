@@ -71,6 +71,7 @@ resize_loop:
 static XPoint get_mouse_position(Window w)
 {
 	XPoint p;
+	// Recycle w as dummy variable.  
 	XQueryPointer(jbwm.dpy, w, &w, &w, (int *)&p.x, (int *)&p.y, (int *)&w,
 		      (int *)&w, (unsigned int *)&w);
 	return p;
@@ -105,9 +106,11 @@ void moveresize(Client * restrict c)
 	LOG("moveresize");
 	const uint8_t offset = (c->flags & (JB_NO_TB | JB_FULLSCREEN))
 		? 0 : TDIM;
-	XMoveResizeWindow(jbwm.dpy, c->parent, c->size.x,
-		c->size.y - offset, c->size.width, c->size.height + offset);
-	XMoveResizeWindow(jbwm.dpy, c->window, 0, offset,
+	XMoveResizeWindow(jbwm.dpy, c->parent,
+		c->size.x, c->size.y - offset,
+		c->size.width, c->size.height + offset);
+	XMoveResizeWindow(jbwm.dpy, c->window,
+		0, offset,
 		c->size.width, c->size.height);
 	if(offset) { update_titlebar(c); }
 	set_shape(c);
@@ -122,7 +125,7 @@ void restore_horz(Client * restrict c)
 	c->flags^=JB_MAX_HORZ;
 	c->size.x=c->old_size.x;
 	c->size.width=c->old_size.width;
-	ewmh_remove_state(c->window, ewmh.WM_STATE_MAXIMIZED_HORZ);
+	ewmh_remove_state(c->window, ewmh.atoms[WM_STATE_MAXIMIZED_HORZ]);
 }
 
 void maximize_horz(Client * restrict c)
@@ -135,7 +138,7 @@ void maximize_horz(Client * restrict c)
 	c->old_size.width=c->size.width;
 	c->size.x=0;
 	c->size.width=c->screen->size.w;
-	ewmh_add_state(c->window, ewmh.WM_STATE_MAXIMIZED_HORZ);
+	ewmh_add_state(c->window, ewmh.atoms[WM_STATE_MAXIMIZED_HORZ]);
 	c->flags|=JB_MAX_HORZ;
 	// Offset if not fullscreen
 	if(!(c->flags&JB_FULLSCREEN)) {
@@ -150,7 +153,8 @@ void restore_vert(Client * restrict c)
 		c->flags^=JB_MAX_VERT;
 		c->size.y=c->old_size.y;
 		c->size.height=c->old_size.height;
-		ewmh_remove_state(c->window, ewmh.WM_STATE_MAXIMIZED_VERT);
+		ewmh_remove_state(c->window,
+			ewmh.atoms[WM_STATE_MAXIMIZED_VERT]);
 	}
 }
 
@@ -164,7 +168,7 @@ void maximize_vert(Client * restrict c)
 	c->old_size.height=c->size.height;
 	c->size.y=0;
 	c->size.height=c->screen->size.h;
-	ewmh_add_state(c->window, ewmh.WM_STATE_MAXIMIZED_VERT);
+	ewmh_add_state(c->window, ewmh.atoms[WM_STATE_MAXIMIZED_VERT]);
 	c->flags|=JB_MAX_VERT;
 	// Offset the titlebar if not fullscreen
 	if(!(c->flags&JB_FULLSCREEN)) {
@@ -217,7 +221,7 @@ void unset_fullscreen(Client * restrict c)
 	restore_horz(c);
 	restore_vert(c);
 	XSetWindowBorderWidth(jbwm.dpy, c->parent, c->border);
-	ewmh_remove_state(c->window, ewmh.WM_STATE_FULLSCREEN);
+	ewmh_remove_state(c->window, ewmh.atoms[WM_STATE_FULLSCREEN]);
 	update_titlebar(c);
 	c->flags &= ~JB_IS_FS;
 }
@@ -240,7 +244,7 @@ void set_fullscreen(Client * restrict c)
 	maximize_horz(c);
 	maximize_vert(c);
 	XSetWindowBorderWidth(jbwm.dpy, c->parent, 0);
-	ewmh_add_state(c->window, ewmh.WM_STATE_FULLSCREEN);
+	ewmh_add_state(c->window, ewmh.atoms[WM_STATE_FULLSCREEN]);
 	update_titlebar(c);
 	c->flags |= JB_IS_FS;
 }
@@ -295,7 +299,8 @@ uint8_t switch_vdesk(ScreenInfo * s, const uint8_t v)
 
 	s->vdesk = v;
 #ifdef EWMH
-	XPROP(s->root, ewmh.CURRENT_DESKTOP, XA_CARDINAL, &(s->vdesk), 1);
+	XPROP(s->root, ewmh.atoms[CURRENT_DESKTOP],
+		XA_CARDINAL, &(s->vdesk), 1);
 #endif//EWMH
 	return s->vdesk;
 }

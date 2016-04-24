@@ -20,78 +20,67 @@
 
 EWMHEnvironment ewmh;
 
-void ewmh_init()
+static char * atom_names [] = {
+	"_NET_SUPPORTED",
+	"_NET_CURRENT_DESKTOP",
+	"_NET_NUMBER_OF_DESKTOPS",
+	"_NET_DESKTOP_VIEWPORT",
+	"_NET_DESKTOP_GEOMETRY",
+	"_NET_SUPPORTING_WM_CHECK",
+	"_NET_ACTIVE_WINDOW",
+	"_NET_MOVERESIZE_WINDOW",
+	"_NET_CLOSE_WINDOW",
+	"_NET_CLIENT_LIST",
+	"_NET_RESTACK_WINDOW",
+	"_NET_REQUEST_FRAME_EXTENTS",
+	"_NET_VIRTUAL_ROOTS",
+	"_NET_CLIENT_LIST_STACKING",
+	"_NET_WM_ALLOWED_ACTIONS",
+	"_NET_WM_NAME",
+	"_NET_WM_DESKTOP",
+	"_NET_WM_MOVERESIZE",
+	"_NET_WM_PID",
+	"_NET_WM_MOVERESIZE_CANCEL",
+	"_NET_WM_WINDOW_TYPE",
+	"_NET_WM_STRUT_PARTIAL",
+	"WM_CHANGE_STATE",
+	"_NET_WM_USER_TIME",
+	"_NET_WM_OPAQUE_REGION",
+	"_NET_WM_ACTION_MOVE",
+	"_NET_WM_ACTION_RESIZE",
+	"_NET_WM_ACTION_CLOSE",
+	"_NET_WM_ACTION_SHADE",
+	"_NET_WM_ACTION_FULLSCREEN",
+	"_NET_WM_ACTION_CHANGE_DESKTOP",
+	"_NET_WM_ACTION_ABOVE",
+	"_NET_WM_ACTION_BELOW",
+	"_NET_WM_ACTION_MAXIMIZE_HORZ",
+	"_NET_WM_ACTION_MAXIMIZE_VERT",
+	"_NET_WM_STATE",
+	"_NET_WM_STATE_STICKY",
+	"_NET_WM_STATE_MAXIMIZED_VERT",
+	"_NET_WM_STATE_MAXIMIZED_HORZ",
+	"_NET_WM_STATE_SHADED",
+	"_NET_WM_STATE_HIDDEN",
+	"_NET_WM_STATE_FULLSCREEN",
+	"_NET_WM_STATE_ABOVE",
+	"_NET_WM_STATE_BELOW",
+	"_NET_WM_STATE_DEMANDS_ATTENTION",
+	"_NET_WM_STATE_FOCUSED",
+	"_NET_WM_STATE_SKIP_PAGER"
+};
+
+void ewmh_init(void)
 {
-	// Non-ewmh atoms:
-	ewmh.WM_CHANGE_STATE = XA("WM_CHANGE_STATE");
-	// Ewmh atoms:
-	/* Initializing these elements with the preprocessor shortcut
-	   below, and following a variable naming convention directly
-	   corresponding to the atom name, allows further programatic
-	   access to the atoms defined and helps prevent typographic
-	   errors.  */
-#define EA(atom) ewmh.supported[ewmh.count++]=ewmh.atom=XA("_NET_"#atom)
-	EA(SUPPORTED);		// Must be first!!!
-	EA(CURRENT_DESKTOP);
-	EA(NUMBER_OF_DESKTOPS);
-	EA(DESKTOP_VIEWPORT);
-	EA(DESKTOP_GEOMETRY);
-	EA(SUPPORTING_WM_CHECK);
-	EA(ACTIVE_WINDOW);
-	EA(MOVERESIZE_WINDOW);
-	EA(CLOSE_WINDOW);
-	EA(CLIENT_LIST);
-	EA(CLIENT_LIST_STACKING);
-	EA(RESTACK_WINDOW);
-	EA(REQUEST_FRAME_EXTENTS);
-	EA(VIRTUAL_ROOTS);
-	EA(WM_ALLOWED_ACTIONS);
-	EA(WM_NAME);
-	EA(WM_DESKTOP);
-	EA(WM_MOVERESIZE);
-	EA(WM_PID);
-	EA(WM_MOVERESIZE_CANCEL);
-	EA(WM_WINDOW_TYPE);
-	EA(WM_STRUT_PARTIAL);
-	EA(WM_CHANGE_STATE);
-	EA(WM_USER_TIME);
-	EA(WM_OPAQUE_REGION);
-	EA(WM_ACTION_MOVE);
-	EA(WM_ACTION_RESIZE);
-	EA(WM_ACTION_CLOSE);
-	EA(WM_ACTION_SHADE);
-	EA(WM_ACTION_FULLSCREEN);
-	EA(WM_ACTION_CHANGE_DESKTOP);
-	EA(WM_ACTION_ABOVE);
-	EA(WM_ACTION_BELOW);
-	EA(WM_ACTION_MAXIMIZE_HORZ);
-	EA(WM_ACTION_MAXIMIZE_VERT);
-	EA(WM_STATE);
-	EA(WM_STATE_STICKY);
-	EA(WM_STATE_MAXIMIZED_VERT);
-	EA(WM_STATE_MAXIMIZED_HORZ);
-	EA(WM_STATE_SHADED);
-	EA(WM_STATE_HIDDEN);
-	EA(WM_STATE_FULLSCREEN);
-	EA(WM_STATE_ABOVE);
-	EA(WM_STATE_BELOW);
-	EA(WM_STATE_DEMANDS_ATTENTION);
-	EA(WM_STATE_FOCUSED);
-	EA(WM_STATE_SKIP_PAGER);
-#ifdef DEBUG
-	LOG("Added %d _NET atoms, %lu allowed", ewmh.count,
-	    sizeof(ewmh.supported) / sizeof(Atom));
-
-	// Quit if overflow, sanity check.
-	if (ewmh.count > sizeof(ewmh.supported) / sizeof(Atom))
-		ERROR("Buffer Overflow!!!");
-
-#endif//DEBUG
+	ewmh.count = sizeof(atom_names) / sizeof(char *);
+	LOG("atom_names: %d\n", ewmh.count);
+	ewmh.atoms=malloc(ewmh.count*sizeof(Atom));
+	XInternAtoms(jbwm.dpy, atom_names, ewmh.count, false, ewmh.atoms);
 }
 
 static inline void set_desktop_viewport(void)
 {
-	XPROP(jbwm.screens->root, ewmh.DESKTOP_VIEWPORT, XA_CARDINAL, 
+	XPROP(jbwm.screens->root, ewmh.atoms[DESKTOP_VIEWPORT], XA_CARDINAL, 
 		(&(long[]){0, 0}), 2);
 }
 
@@ -105,17 +94,18 @@ void ewmh_update_client_list()
 	for (Client * i = jbwm.head; i && (count < MAX_CLIENTS); i = i->next)
 		wl[count++] = i->window;
 
-	XPROP(jbwm.screens->root, ewmh.CLIENT_LIST, XA_WINDOW, &wl, count);
+	XPROP(jbwm.screens->root, ewmh.atoms[CLIENT_LIST],
+		XA_WINDOW, &wl, count);
 	// FIXME: Does not correctly report stacking order.
-	XPROP(jbwm.screens->root, ewmh.CLIENT_LIST_STACKING, XA_WINDOW, &wl,
-	      count);
+	XPROP(jbwm.screens->root, ewmh.atoms[CLIENT_LIST_STACKING],
+		XA_WINDOW, &wl, count);
 }
 
 // Remove specified atom from WM_STATE
 void ewmh_remove_state(const Window w, const Atom state)
 {
 	unsigned long n;
-	Atom *a = get_property(w, ewmh.WM_STATE, XA_ATOM, &n);
+	Atom *a = get_property(w, ewmh.atoms[WM_STATE], XA_ATOM, &n);
 
 	if (a) {
 		const unsigned long nitems = n;
@@ -124,7 +114,7 @@ void ewmh_remove_state(const Window w, const Atom state)
 			if (a[n] == state)
 				a[n] = 0;
 
-		XPROP(w, ewmh.WM_STATE, XA_ATOM, &a, nitems);
+		XPROP(w, ewmh.atoms[WM_STATE], XA_ATOM, &a, nitems);
 		XFree(a);
 	}
 }
@@ -132,7 +122,7 @@ void ewmh_remove_state(const Window w, const Atom state)
 bool ewmh_get_state(const Window w, const Atom state)
 {
 	unsigned long n;
-	Atom *a = get_property(w, ewmh.WM_STATE, XA_ATOM, &n);
+	Atom *a = get_property(w, ewmh.atoms[WM_STATE], XA_ATOM, &n);
 
 	if (!a)
 		return false;
@@ -149,16 +139,17 @@ bool ewmh_get_state(const Window w, const Atom state)
 
 void ewmh_add_state(const Window w, const Atom state)
 {
-	XChangeProperty(jbwm.dpy, w, ewmh.WM_STATE, XA_ATOM, 32, PropModePrepend,
-			(unsigned char *)&state, 1);
+	XChangeProperty(jbwm.dpy, w, ewmh.atoms[WM_STATE],
+		XA_ATOM, 32, PropModePrepend,
+		(unsigned char *)&state, 1);
 }
 
 static void set_number_of_desktops(const Window r)
 {
 	const long num = DESKTOPS;
-	XPROP(r, ewmh.NUMBER_OF_DESKTOPS, XA_CARDINAL, &num, 1);
+	XPROP(r, ewmh.atoms[NUMBER_OF_DESKTOPS], XA_CARDINAL, &num, 1);
 	set_desktop_viewport();
-	XPROP(r, ewmh.VIRTUAL_ROOTS, XA_WINDOW, &r, 1);
+	XPROP(r, ewmh.atoms[VIRTUAL_ROOTS], XA_WINDOW, &r, 1);
 }
 
 /*      Reference, per wm-spec:
@@ -255,12 +246,12 @@ stick_cb(const bool add, Client * c)
 
 static void handle_wm_state_changes(XClientMessageEvent * e, Client * c)
 {
-	check_state(e, ewmh.WM_STATE_ABOVE, c, above_cb);
-	check_state(e, ewmh.WM_STATE_BELOW, c, below_cb);
-	check_state(e, ewmh.WM_STATE_FULLSCREEN, c, fullscreen_cb);
-	check_state(e, ewmh.WM_STATE_MAXIMIZED_HORZ, c, max_h_cb);
-	check_state(e, ewmh.WM_STATE_MAXIMIZED_VERT, c, max_v_cb);
-	check_state(e, ewmh.WM_STATE_STICKY, c, stick_cb);
+	check_state(e, ewmh.atoms[WM_STATE_ABOVE], c, above_cb);
+	check_state(e, ewmh.atoms[WM_STATE_BELOW], c, below_cb);
+	check_state(e, ewmh.atoms[WM_STATE_FULLSCREEN], c, fullscreen_cb);
+	check_state(e, ewmh.atoms[WM_STATE_MAXIMIZED_HORZ], c, max_h_cb);
+	check_state(e, ewmh.atoms[WM_STATE_MAXIMIZED_VERT], c, max_v_cb);
+	check_state(e, ewmh.atoms[WM_STATE_STICKY], c, stick_cb);
 }
 
 void ewmh_client_message(XClientMessageEvent * e)
@@ -278,20 +269,20 @@ void ewmh_client_message(XClientMessageEvent * e)
 	ScreenInfo *s = c ? c->screen : jbwm.screens;
 	const long val = e->data.l[0];
 
-	if (t == ewmh.CURRENT_DESKTOP)
+	if (t == ewmh.atoms[CURRENT_DESKTOP])
 		switch_vdesk(s, val);
-	if (t == ewmh.WM_DESKTOP && c)
+	if (t == ewmh.atoms[WM_DESKTOP] && c)
 		client_to_vdesk(c, val);
-	else if (t == ewmh.DESKTOP_VIEWPORT)
+	else if (t == ewmh.atoms[DESKTOP_VIEWPORT])
 		set_desktop_viewport();
-	else if (t == ewmh.NUMBER_OF_DESKTOPS)
+	else if (t == ewmh.atoms[NUMBER_OF_DESKTOPS])
 		set_number_of_desktops(s->root);
-	else if (t == ewmh.ACTIVE_WINDOW && val == 2 && c)
+	else if (t == ewmh.atoms[ACTIVE_WINDOW] && val == 2 && c)
 		select_client(c);
-	else if (t == ewmh.CLOSE_WINDOW && e->data.l[1] == 2 && c)
+	else if (t == ewmh.atoms[CLOSE_WINDOW] && e->data.l[1] == 2 && c)
 		send_wm_delete(c);
 	// If something else moves the window:
-	else if (t == ewmh.MOVERESIZE_WINDOW) {
+	else if (t == ewmh.atoms[MOVERESIZE_WINDOW]) {
 		const uint8_t src = (val >> 12) & 3;
 		if (src == 2) {
 			const int vm = (val >> 8) & 0x0f;
@@ -305,12 +296,12 @@ void ewmh_client_message(XClientMessageEvent * e)
 		}
 	}
 	// If user moves window (client-side titlebars):
-	else if (t == ewmh.WM_MOVERESIZE && c) {
+	else if (t == ewmh.atoms[WM_MOVERESIZE] && c) {
 		XRaiseWindow(jbwm.dpy, c->parent);
 		drag(c);
-	} else if (t == ewmh.WM_STATE && c)
+	} else if (t == ewmh.atoms[WM_STATE] && c)
 		handle_wm_state_changes(e, c);
-	else if (t == ewmh.WM_CHANGE_STATE && c) {
+	else if (t == ewmh.atoms[WM_CHANGE_STATE] && c) {
 		if (val == 3)	// Minimize (lower)
 			XLowerWindow(jbwm.dpy, c->parent);
 	}
@@ -318,16 +309,17 @@ void ewmh_client_message(XClientMessageEvent * e)
 
 void set_ewmh_allowed_actions(const Window w)
 {
-	const Atom a[] = { ewmh.WM_ALLOWED_ACTIONS,
-		ewmh.WM_ACTION_MOVE,
-		ewmh.WM_ACTION_RESIZE, ewmh.WM_ACTION_CLOSE,
-		ewmh.WM_ACTION_SHADE,
-		ewmh.WM_ACTION_FULLSCREEN,
-		ewmh.WM_ACTION_CHANGE_DESKTOP,
-		ewmh.WM_ACTION_ABOVE,
-		ewmh.WM_ACTION_BELOW,
-		ewmh.WM_ACTION_MAXIMIZE_HORZ,
-		ewmh.WM_ACTION_MAXIMIZE_VERT
+	const Atom a[] = {
+		ewmh.atoms[WM_ALLOWED_ACTIONS],
+		ewmh.atoms[WM_ACTION_MOVE],
+		ewmh.atoms[WM_ACTION_RESIZE], ewmh.atoms[WM_ACTION_CLOSE],
+		ewmh.atoms[WM_ACTION_SHADE],
+		ewmh.atoms[WM_ACTION_FULLSCREEN],
+		ewmh.atoms[WM_ACTION_CHANGE_DESKTOP],
+		ewmh.atoms[WM_ACTION_ABOVE],
+		ewmh.atoms[WM_ACTION_BELOW],
+		ewmh.atoms[WM_ACTION_MAXIMIZE_HORZ],
+		ewmh.atoms[WM_ACTION_MAXIMIZE_VERT]
 	};
 	XPROP(w, a[0], XA_ATOM, &a, sizeof(a) / sizeof(Atom));
 }
@@ -336,32 +328,34 @@ static void init_desktops(ScreenInfo * restrict s)
 {
 	const Window r = s->root;
 	const unsigned long workarea[4] = { 0, 0, s->size.w, s->size.h };
-	XPROP(r, ewmh.DESKTOP_VIEWPORT, XA_CARDINAL, &workarea[0], 2);
-	XPROP(r, ewmh.DESKTOP_GEOMETRY, XA_CARDINAL, &workarea[2], 2);
-	XPROP(r, ewmh.CURRENT_DESKTOP, XA_CARDINAL, &s->vdesk, 1);
+	XPROP(r, ewmh.atoms[DESKTOP_VIEWPORT], XA_CARDINAL, &workarea[0], 2);
+	XPROP(r, ewmh.atoms[DESKTOP_GEOMETRY], XA_CARDINAL, &workarea[2], 2);
+	XPROP(r, ewmh.atoms[CURRENT_DESKTOP], XA_CARDINAL, &s->vdesk, 1);
 	static const unsigned char n = DESKTOPS;
-	XPROP(r, ewmh.NUMBER_OF_DESKTOPS, XA_CARDINAL, &n, 1);
+	XPROP(r, ewmh.atoms[NUMBER_OF_DESKTOPS], XA_CARDINAL, &n, 1);
 }
 
 static void init_supporting(ScreenInfo * restrict s)
 {
 	const Window r = s->root;
-	s->supporting = XCreateSimpleWindow(jbwm.dpy, s->root, 0, 0, 1, 1, 0, 0, 0);
-	XPROP(r, ewmh.SUPPORTING_WM_CHECK, XA_WINDOW, &(s->supporting), 1);
-	XPROP(s->supporting, ewmh.SUPPORTING_WM_CHECK, XA_WINDOW,
-	      &(s->supporting), 1);
-	XPROP(s->supporting, ewmh.WM_NAME, XA_STRING, "jbwm", 4);
-	XPROP(s->supporting, ewmh.WM_PID, XA_CARDINAL, 
+	s->supporting = XCreateSimpleWindow(jbwm.dpy, s->root,
+		0, 0, 1, 1, 0, 0, 0);
+	XPROP(r, ewmh.atoms[SUPPORTING_WM_CHECK],
+		XA_WINDOW, &(s->supporting), 1);
+	XPROP(s->supporting, ewmh.atoms[SUPPORTING_WM_CHECK],
+		XA_WINDOW, &(s->supporting), 1);
+	XPROP(s->supporting, ewmh.atoms[WM_NAME], XA_STRING, "jbwm", 4);
+	XPROP(s->supporting, ewmh.atoms[WM_PID], XA_CARDINAL, 
 		&(pid_t){getpid()}, 1);
 }
 
 void setup_ewmh_for_screen(ScreenInfo * s)
 {
 	const Window r = s->root;
-	XPROP(r, ewmh.supported[0], XA_ATOM, ewmh.supported, ewmh.count);
-	XPROP(r, ewmh.WM_NAME, XA_STRING, "jbwm", 4);
+	XPROP(r, ewmh.atoms[SUPPORTED], XA_ATOM, ewmh.atoms, ewmh.count);
+	XPROP(r, ewmh.atoms[WM_NAME], XA_STRING, "jbwm", 4);
 	// Set this to the root window until we have some clients.
-	XPROP(r, ewmh.CLIENT_LIST, XA_WINDOW, &r, 1);
+	XPROP(r, ewmh.atoms[CLIENT_LIST], XA_WINDOW, &r, 1);
 	init_desktops(s);
 	init_supporting(s);
 }

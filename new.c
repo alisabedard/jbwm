@@ -64,14 +64,15 @@ __attribute__((nonnull))
 static void wm_desktop(Client * restrict c)
 {
 	unsigned long nitems;
-	unsigned long *lprop = get_property(c->window, ewmh.WM_DESKTOP,
-					    XA_CARDINAL, &nitems);
+	unsigned long *lprop = get_property(c->window, 
+		ewmh.atoms[WM_DESKTOP], XA_CARDINAL, &nitems);
 
 	if (lprop && nitems && (lprop[0] < 9))
 		c->vdesk = lprop[0];
 
 	if (!lprop)
-		XPROP(c->window, ewmh.WM_DESKTOP, XA_CARDINAL, &(c->vdesk), 1);
+		XPROP(c->window, ewmh.atoms[WM_DESKTOP],
+			XA_CARDINAL, &(c->vdesk), 1);
 	else
 		XFree(lprop);
 }

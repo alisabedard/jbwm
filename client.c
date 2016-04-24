@@ -44,7 +44,7 @@ void shade(Client * restrict c)
 		XMapWindow(jbwm.dpy, c->window);
 		moveresize(c);
 		set_wm_state(c, NormalState);
-		ewmh_remove_state(c->window, ewmh.WM_STATE_SHADED);
+		ewmh_remove_state(c->window, ewmh.atoms[WM_STATE_SHADED]);
 	} else {		// Shade the client
 		c->shade_height = c->size.height;
 		c->ignore_unmap++;
@@ -52,7 +52,7 @@ void shade(Client * restrict c)
 		c->size.height = 0;
 		c->flags |= JB_SHADED;
 		set_wm_state(c, IconicState);
-		ewmh_add_state(c->window, ewmh.WM_STATE_SHADED);
+		ewmh_add_state(c->window, ewmh.atoms[WM_STATE_SHADED]);
 		select_client(c);
 	}
 }
@@ -126,7 +126,8 @@ void select_client(Client * restrict c)
 		? c->screen->pixels.fc : c->screen->pixels.fg);
 	jbwm.current=c;
 #ifdef EWMH
-	XPROP(c->screen->root, ewmh.ACTIVE_WINDOW, XA_WINDOW, &(c->parent), 1);
+	XPROP(c->screen->root, ewmh.atoms[ACTIVE_WINDOW],
+		XA_WINDOW, &(c->parent), 1);
 #endif//EWMH
 }
 
@@ -159,7 +160,8 @@ static void relink_window_list(Client * c)
 static void unparent_window(Client * restrict c)
 {
 	LOG("unparent_window");
-	XReparentWindow(jbwm.dpy, c->window, c->screen->root, c->size.x, c->size.y);
+	XReparentWindow(jbwm.dpy, c->window, c->screen->root,
+		c->size.x, c->size.y);
 	XRemoveFromSaveSet(jbwm.dpy, c->window);
 
 	if (c->parent)
@@ -174,14 +176,15 @@ void remove_client(Client * c)
 	assert(c);
 	if (c->flags & JB_REMOVE) {
 #ifdef EWMH
-		XDeleteProperty(jbwm.dpy, c->window, ewmh.WM_DESKTOP);
-		XDeleteProperty(jbwm.dpy, c->window, ewmh.WM_STATE);
+		XDeleteProperty(jbwm.dpy, c->window, ewmh.atoms[WM_DESKTOP]);
+		XDeleteProperty(jbwm.dpy, c->window, ewmh.atoms[WM_STATE]);
 #endif//EWMH
 		set_wm_state(c, WithdrawnState);
 	}
 #ifdef EWMH
 	else
-		XDeleteProperty(jbwm.dpy, c->window, ewmh.WM_ALLOWED_ACTIONS);
+		XDeleteProperty(jbwm.dpy, c->window,
+			ewmh.atoms[WM_ALLOWED_ACTIONS]);
 
 #endif//EWMH
 	unparent_window(c);
