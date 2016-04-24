@@ -5,6 +5,7 @@
 
 #include <assert.h>
 #include <stdbool.h>
+#include <stdint.h>
 #include <X11/extensions/shape.h>
 #include "client_t.h"
 #include "jbwmenv.h"
@@ -13,18 +14,21 @@
 static bool is_shaped(Client * c)
 {
 	assert(c);
-	int d, s;
-#define U (unsigned int *)
-	return XShapeQueryExtents(jbwm.dpy, c->window, &s, &d, &d, 
-		U & d, U & d, &d, &d, &d, U & d, U & d) && s;
+	bool s;
+	int d;
+	return XShapeQueryExtents(jbwm.dpy, c->window, (int *)&s, &d, &d, 
+		(unsigned int *) &d, (unsigned int *) &d, &d, &d, &d,
+		(unsigned int *) &d, (unsigned int *) &d) && s;
 }
 
 void set_shape(Client * restrict c)
 {
 	assert(c);
-	if(c->flags & JB_SHAPED)
+	if(c->flags & JB_SHAPED) {
+		LOG("XShapeCombineShape: %d", (int)c->window);
 		XShapeCombineShape(jbwm.dpy, c->parent, ShapeBounding,
-			0, 0, c->window, ShapeBounding, ShapeSet);
+			1, 1, c->window, ShapeBounding, ShapeSet);
+	}
 }
 
 void setup_shaped(Client * restrict c)
