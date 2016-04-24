@@ -1,0 +1,7 @@
+#!/bin/sh
+export CFLAGS="-Os -DNDEBUG"
+make clean
+make -j8
+strip jbwm
+ls -l jbwm >> sz.log
+tail sz.log
