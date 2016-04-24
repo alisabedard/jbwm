@@ -159,7 +159,6 @@ void make_new_client(Window w, ScreenInfo * s)
 
 	XSelectInput(jbwm.dpy, c->window, EnterWindowMask | PropertyChangeMask 
 		| ColormapChangeMask);
-	//set_shape(c); //SSS
 	reparent(c);
 	unhide(c);
 	jbwm_grab_button(w, jbwm.keymasks.grab, AnyButton);

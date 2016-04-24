@@ -19,6 +19,14 @@ static bool is_shaped(Client * c)
 		U & d, U & d, &d, &d, &d, U & d, U & d) && s;
 }
 
+void set_shape(Client * restrict c)
+{
+	assert(c);
+	if(c->flags & JB_SHAPED)
+		XShapeCombineShape(jbwm.dpy, c->parent, ShapeBounding,
+			0, 0, c->window, ShapeBounding, ShapeSet);
+}
+
 void setup_shaped(Client * restrict c)
 {
 	assert(c);
@@ -27,13 +35,5 @@ void setup_shaped(Client * restrict c)
 		c->border = 0;
 		c->flags |= JB_NO_TB | JB_SHAPED;
 	}
-}
-
-void set_shape(Client * restrict c)
-{
-	assert(c);
-	if(c->flags & JB_SHAPED)
-		XShapeCombineShape(jbwm.dpy, c->parent, ShapeBounding,
-			0, 0, c->window, ShapeBounding, ShapeSet);
 }
 
