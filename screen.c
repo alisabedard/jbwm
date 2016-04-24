@@ -168,9 +168,8 @@ void maximize_vert(Client * restrict c)
 	c->flags|=JB_MAX_VERT;
 	// Offset the titlebar if not fullscreen
 	if(!(c->flags&JB_FULLSCREEN)) {
-		const uint8_t b = c->border;
-		c->size.y+=TDIM+b;
-		c->size.height-=TDIM+4*b;
+		c->size.y+=TDIM+c->border;
+		c->size.height-=TDIM+4*c->border;
 		moveresize(c);
 	}
 }
