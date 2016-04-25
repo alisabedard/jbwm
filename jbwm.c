@@ -138,7 +138,7 @@ static inline void setup_event_listeners(const Window root)
 		| ColormapChangeMask});
 }
 
-static unsigned long pixel(const uint8_t screen, const char * restrict name)
+unsigned long pixel(const uint8_t screen, const char * restrict name)
 {
 	XColor c;
 	XAllocNamedColor(jbwm.dpy, DefaultColormap(jbwm.dpy, screen),

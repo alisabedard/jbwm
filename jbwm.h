@@ -10,4 +10,6 @@
 void jbwm_grab_button(const Window w, const unsigned int mask,
 		      const unsigned int button);
 
+unsigned long pixel(const uint8_t screen, const char * restrict name);
+
 #endif /* not JBWM_JBWM_H */
