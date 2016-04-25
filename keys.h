@@ -27,20 +27,20 @@ enum { KEY_NEXT=XK_Tab, KEY_NEW=XK_Return, KEY_QUIT=XK_Escape,
 #define KEY_KILL        XK_q
 #endif
 
-#define jbwm_num_keys xk_0, xk_1, xk_2, xk_3, xk_4, xk_5, xk_6, xk_7,\
-	xk_8, xk_9
+#define JBWM_NUM_KEYS XK_0, XK_1, XK_2, XK_3, XK_4, XK_5, XK_6, XK_7,\
+	XK_8, XK_9
 
-#define jbwm_vwm_keys key_prevdesk, key_nextdesk, jbwm_num_keys
+#define JBWM_VWM_KEYS KEY_PREVDESK, KEY_NEXTDESK, JBWM_NUM_KEYS
 
-#define jbwm_direction_keys key_left, key_right, key_down, key_up
+#define JBWM_DIRECTION_KEYS KEY_LEFT, KEY_RIGHT, KEY_DOWN, KEY_UP
 
-#define jbwm_keys_to_grab key_next, key_new, key_quit, key_kill,\
-	jbwm_direction_keys, key_lower, key_altlower, key_max, key_stick,\
-	jbwm_vwm_keys, key_move, key_raise, key_shade, key_max_h,\
-	key_max_v, key_fs, 0
+#define JBWM_KEYS_TO_GRAB KEY_NEXT, KEY_NEW, KEY_QUIT, KEY_KILL,\
+	JBWM_DIRECTION_KEYS, KEY_LOWER, KEY_ALTLOWER, KEY_MAX, KEY_STICK,\
+	JBWM_VWM_KEYS, KEY_MOVE, KEY_RAISE, KEY_SHADE, KEY_MAX_H,\
+	KEY_MAX_V, KEY_FS, 0
 
-#define jbwm_alt_keys_to_grab key_kill, jbwm_direction_keys,\
-	jbwm_vwm_keys, 0
+#define JBWM_ALT_KEYS_TO_GRAB KEY_KILL, JBWM_DIRECTION_KEYS,\
+	JBWM_VWM_KEYS, 0
 
 void grab_keys_for_screen(ScreenInfo * restrict s);
 
