@@ -3,18 +3,18 @@
 // Copyright 1999-2015, Ciaran Anscomb <jbwm@6809.org.uk>
 // See README for license and other details.
 
+#include <stdbool.h>
 #include <unistd.h>
+#include <X11/Xatom.h>
+#include <X11/Xlib.h>
 #include "atoms.h"
 #include "client.h"
-#include "config.h"
+#include "client_t.h"
 #include "ewmh.h"
-#include "events.h"
-#include "jbwm.h"
+#include "jbwmenv.h"
 #include "log.h"
 #include "new.h"
 #include "screen.h"
-#include "titlebar.h"
-
 
 EWMHEnvironment ewmh;
 
