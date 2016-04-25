@@ -19,6 +19,7 @@
 #include "titlebar.h"
 
 #if defined(EWMH) || defined(MWM)
+__attribute__((warn_unused_result))
 void *get_property(Window w, Atom property, Atom type,
 	unsigned long * restrict num_items)
 {
