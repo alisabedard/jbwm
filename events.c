@@ -3,6 +3,8 @@
 // Copyright 1999-2015, Ciaran Anscomb <jbwm@6809.org.uk>
 // See README for license and other details.
 
+#include <stdint.h>
+#include <stdnoreturn.h>
 #ifdef USE_SHAPE
 #include <X11/extensions/shape.h>
 #endif
@@ -155,8 +157,7 @@ static void handle_configure_request(XConfigureRequestEvent * e)
 		.sibling = e->above, .stack_mode = e->detail});
 }
 
-__attribute__((noreturn))
-void main_event_loop(void)
+noreturn void main_event_loop(void)
 {
 	XEvent ev;
  head:
