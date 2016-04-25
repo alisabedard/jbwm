@@ -4,19 +4,24 @@
 // See README for license and other details.
 
 #include <assert.h>
+#include <stdbool.h>
+#include <stdint.h>
 #include <stdlib.h>
+#include <X11/Xlib.h>
+#include <X11/Xatom.h>
 #include "atoms.h"
+#include "client_t.h"
 #include "client.h"
-#include "config.h"
 #include "ewmh.h"
-#include "jbwm.h"
+#include "jbwmenv.h"
 #include "log.h"
-#include "titlebar.h"
 #include "screen.h"
+#include "ScreenInfo.h"
 #include "shape.h"
 #include "snap.h"
+#include "titlebar.h"
 
-#define MouseMask (ButtonPressMask|ButtonReleaseMask|PointerMotionMask)
+enum {MouseMask=(ButtonPressMask|ButtonReleaseMask|PointerMotionMask)};
 
 __attribute__ ((hot))
 static void draw_outline(Client * c)
