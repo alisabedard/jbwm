@@ -9,7 +9,8 @@
 #include <stdlib.h>
 #ifdef STDIO
 #include <stdio.h>
-#define ERROR(msg) {fprintf(stderr, "%s\n", msg); exit(1);}
+//#define ERROR(msg) {fprintf(stderr, "%s\n", msg); exit(1);}
+#define ERROR(msg) {perror(msg); exit(1);}
 #else//!STDIO
 #define ERROR(...) exit(1)
 #endif//STDIO
