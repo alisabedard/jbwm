@@ -10,11 +10,13 @@
 #include "log.h"
 #include "titlebar.h"
 
-__attribute__ ((hot))
-static void sborder(int *restrict xy, const int edge)
+__attribute__ ((hot,const,warn_unused_result))
+static int16_t sborder(const int16_t xy, const int16_t edge)
 {
-	if (abs(*xy + edge) < JBWM_SNAP)
-		*xy = -edge;
+	if(abs(xy+edge) < JBWM_SNAP)
+		  return - edge;
+	else
+		  return xy;
 }
 
 void snap_border(Client *restrict c)
@@ -22,21 +24,22 @@ void snap_border(Client *restrict c)
 	XSizeHints *restrict g = &(c->size);
 	/* snap to screen border */
 	const uint8_t b = 2 * c->border;
-	sborder(&g->x, 0 - b);
-	sborder(&g->x, g->width - c->screen->size.w + b);
-	sborder(&g->y, 0 - (c->flags & JB_NO_TB ? 0 : TDIM));
-	sborder(&g->y, g->height + b - c->screen->size.h);
+	g->x=sborder(g->x, 0 - b);
+	g->x=sborder(g->x, g->width - c->screen->size.w + b);
+	g->y=sborder(g->y, 0 - (c->flags & JB_NO_TB ? 0 : TDIM));
+	g->y=sborder(g->y, g->height + b - c->screen->size.h);
 }
 
-__attribute__ ((const, hot))
-static inline int absmin(const int16_t a, const int16_t b)
+__attribute__ ((const, hot, warn_unused_result))
+static inline int16_t absmin(const int16_t a, const int16_t b)
 {
 	return abs(a) < abs(b) ? a : b;
 }
 
-static int
-snap_dim(const int cxy, const uint16_t cwh, const int cixy,
-	 const uint16_t ciwh, const uint8_t border, int d)
+__attribute__ ((const))
+static int16_t
+snap_dim(const int16_t cxy, const uint16_t cwh, const int16_t cixy,
+	 const uint16_t ciwh, const uint8_t border, int16_t d)
 {
 	int s = cixy + ciwh;
 	d = absmin(d, s - cxy + border);
