@@ -3,8 +3,10 @@
 // Copyright 1999-2015, Ciaran Anscomb <jbwm@6809.org.uk>
 // See README for license and other details.
 
+#include <stdint.h>
 #include <stdlib.h>
-#include "client.h"
+#include <X11/Xlib.h>
+#include "client_t.h"
 #include "config.h"
 #include "jbwm.h"
 #include "log.h"
