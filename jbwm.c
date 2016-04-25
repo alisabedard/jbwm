@@ -27,13 +27,14 @@ typedef struct {
 #ifdef USE_ARGV
 
 /* Used for overriding the default WM modifiers */
-static unsigned int parse_modifiers(char *arg)
+__attribute__((warn_unused_result))
+static unsigned int parse_modifiers(char * restrict arg)
 {
 	LOG("parse_modifiers()");
 /* *INDENT-OFF* */
 	const struct {
 		const char *name;
-		const unsigned int mask;
+		const uint16_t mask;
 	} m[] = { { "shift", ShiftMask}, { "lock", LockMask},
 		{ "control", ControlMask}, { "mod", Mod1Mask},
 		{ "mod1", Mod1Mask}, { "mod2", Mod2Mask}, { "mod3", Mod3Mask},
@@ -78,7 +79,6 @@ static void parse_argv(int argc, char **argv, Options * restrict o)
 			o->fc = optarg;
 			break;
 #ifdef STDIO
-
 		case 'V':
 			puts(VERSION);
 			exit(0);
@@ -138,25 +138,20 @@ static inline void setup_event_listeners(const Window root)
 		| ColormapChangeMask});
 }
 
-static inline void allocate_colors(ScreenInfo * restrict s,
-	Options * restrict o)
+static unsigned long pixel(const uint8_t screen, const char * restrict name)
 {
 	XColor c;
+	XAllocNamedColor(jbwm.dpy, DefaultColormap(jbwm.dpy, screen),
+		name, &c, &(XColor){});
+	return c.pixel;
+}
 
-	// Foreground:
-	XAllocNamedColor(jbwm.dpy, DefaultColormap(jbwm.dpy, s->screen),
-		o->fg, &c, &(XColor){});
-	s->pixels.fg = c.pixel;
-
-	// Background:
-	XAllocNamedColor(jbwm.dpy, DefaultColormap(jbwm.dpy, s->screen),
-		o->bg, &c, &(XColor){});
-	s->pixels.bg = c.pixel;
-
-	// Fixed:
-	XAllocNamedColor(jbwm.dpy, DefaultColormap(jbwm.dpy, s->screen),
-		o->fc, &c, &(XColor){});
-	s->pixels.fc = c.pixel;
+static void allocate_colors(ScreenInfo * restrict s,
+	Options * restrict o)
+{
+	s->pixels.fg=pixel(s->screen, o->fg);
+	s->pixels.bg=pixel(s->screen, o->bg);
+	s->pixels.fc=pixel(s->screen, o->fc);
 }
 
 static void setup_clients(ScreenInfo * restrict s)
@@ -233,8 +228,9 @@ static void setup_screens(Options * restrict o)
 int handle_xerror(Display * dpy __attribute__ ((unused)), XErrorEvent * e)
 {
 	if ((e->error_code == BadAccess)
-	    && (e->request_code == X_ChangeWindowAttributes))
+	    && (e->request_code == X_ChangeWindowAttributes)) {
 		ERROR("ROOT");
+	}
 
 	return 0;		// Ignore everything else.
 }
