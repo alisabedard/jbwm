@@ -15,8 +15,8 @@
 typedef struct {
 	bool need_cleanup;
 	struct {
-		uint16_t grab, mod;
-	} keymasks;
+		uint16_t grab, mod __attribute__((packed));
+	} keymasks __attribute__((packed));
 	Cursor cursor;
 	Display *restrict dpy;
 	// Client tracking:

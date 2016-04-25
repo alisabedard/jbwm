@@ -10,13 +10,12 @@
 #include "log.h"
 #include "titlebar.h"
 
-__attribute__ ((hot,const,warn_unused_result))
+__attribute__ ((const, hot, warn_unused_result))
 static int16_t sborder(const int16_t xy, const int16_t edge)
 {
 	if(abs(xy+edge) < JBWM_SNAP)
 		  return - edge;
-	else
-		  return xy;
+	return xy;
 }
 
 void snap_border(Client *restrict c)

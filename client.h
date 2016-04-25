@@ -13,12 +13,6 @@
 // Free result with XFree if not NULL
 char * get_title(const Window w);
 
-#ifdef USE_TBAR
-void shade(Client * restrict c);
-#else
-#define shade(c)
-#endif
-
 void client_to_vdesk(Client * restrict c, const uint8_t d);
 
 Status xmsg(const Window w, const Atom a, const long x);

@@ -41,7 +41,6 @@ struct Client {
 	uint8_t border;
 #ifdef USE_TBAR
 	uint16_t exposed_width;
-	uint16_t shade_height;
 #endif				//USE_TBAR
 	uint32_t flags;
 	Colormap cmap;

@@ -10,8 +10,44 @@
 #endif//USE_XFT
 #include "client.h"
 #include "config.h"
+#include "ewmh.h"
 #include "jbwm.h"
+#include "log.h"
+#include "screen.h"
 #include "titlebar.h"
+
+void shade(Client * restrict c)
+{
+	LOG("shade");
+	assert(c);
+
+	// Honor !MWM_FUNC_MINIMIZE
+	if (c->flags & JB_NO_MIN)
+		return;
+
+	/* This implements window shading, a substitute
+	   for iconification.  */
+	if (c->flags & JB_SHADED) {
+		// Unshade
+		//c->size.height = c->shade_height;
+		c->size.height = c->old_size.height;
+		c->flags &= ~JB_SHADED;
+		XMapWindow(jbwm.dpy, c->window);
+		moveresize(c);
+		set_wm_state(c, NormalState);
+		ewmh_remove_state(c->window, ewmh.atoms[WM_STATE_SHADED]);
+	} else {		// Shade the client
+		//c->shade_height = c->size.height;
+		c->old_size.height = c->size.height;
+		c->ignore_unmap++;
+		XUnmapWindow(jbwm.dpy, c->window);
+		c->size.height = 0;
+		c->flags |= JB_SHADED;
+		set_wm_state(c, IconicState);
+		ewmh_add_state(c->window, ewmh.atoms[WM_STATE_SHADED]);
+		select_client(c);
+	}
+}
 
 static GC colorgc(ScreenInfo * restrict s, const char *restrict colorname)
 {
@@ -22,7 +58,7 @@ static GC colorgc(ScreenInfo * restrict s, const char *restrict colorname)
 		&(XGCValues){.foreground=c.pixel});
 }
 
-static inline void setup_gcs(ScreenInfo * restrict s)
+static void setup_gcs(ScreenInfo * restrict s)
 {
 	jbwm.gc.close = colorgc(s, TITLEBAR_CLOSE_BG);
 	jbwm.gc.shade = colorgc(s, TITLEBAR_SHADE_BG);
@@ -90,25 +126,25 @@ static void draw(const Window t, GC gc, const int x)
 	XFillRectangle(jbwm.dpy, t, gc, x, 0, TDIM, TDIM);
 }
 
-static inline void draw_close(const uint32_t f, const Window t)
+static void draw_close(const uint32_t f, const Window t)
 {
 	if (!(f & JB_NO_CLOSE_DECOR))
 		draw(t, jbwm.gc.close, 0);
 }
 
-static inline void draw_shade(const uint32_t f, const Window t, const int x)
+static void draw_shade(const uint32_t f, const Window t, const int x)
 {
 	if (!(f & JB_NO_MIN_DECOR))
 		draw(t, jbwm.gc.shade, x);
 }
 
-static inline void draw_resize(const uint32_t f, const Window t, const int x)
+static void draw_resize(const uint32_t f, const Window t, const int x)
 {
 	if (!(f & JB_NO_MIN_DECOR))
 		draw(t, jbwm.gc.resize, x);
 }
 
-static inline int tboffset(const int w, const int n)
+static int tboffset(const int w, const int n)
 {
 	return w - n * TDIM;
 }

@@ -26,10 +26,9 @@ void *get_property(Window w, Atom property, Atom type,
 	assert(num_items);
 	unsigned char *prop;
 
-	if (XGetWindowProperty(jbwm.dpy, w, property, 0L, 1024, false, property,
-			       &type, &(int){0}, num_items, 
-			       &(long unsigned int){0}, 
-			       &prop) == Success)
+	if (XGetWindowProperty(jbwm.dpy, w, property, 0L, 1024,
+		false, property, &type, &(int){0}, num_items, 
+		&(long unsigned int){0}, &prop) == Success)
 		return prop;
 
 	return NULL;

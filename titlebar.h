@@ -6,13 +6,19 @@
 #define JBWM_TITLEBAR_H
 
 #ifdef USE_TBAR
+
+void shade(Client * restrict c);
 void update_titlebar(Client * c);
 
 /* Ensure that the title text fits within the titlebar.  */
 #define TDIM (jbwm.font->ascent+jbwm.font->descent)
+
 #else//!USE_TBAR
+
 #define TDIM 0
+#define shade(c)
 #define update_titlebar(c)
+
 #endif//USE_TBAR
 
 #endif /* JBWM_TITLEBAR_H */

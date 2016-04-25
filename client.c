@@ -22,39 +22,6 @@ char * get_title(const Window w)
 	return (char *)tp.value;
 }
 
-#ifdef USE_TBAR
-void shade(Client * restrict c)
-{
-	LOG("shade");
-	assert(c);
-
-	// Honor !MWM_FUNC_MINIMIZE
-	if (c->flags & JB_NO_MIN)
-		return;
-
-	/* This implements window shading, a substitute
-	   for iconification.  */
-	if (c->flags & JB_SHADED) {
-		// Unshade
-		c->size.height = c->shade_height;
-		c->flags &= ~JB_SHADED;
-		XMapWindow(jbwm.dpy, c->window);
-		moveresize(c);
-		set_wm_state(c, NormalState);
-		ewmh_remove_state(c->window, ewmh.atoms[WM_STATE_SHADED]);
-	} else {		// Shade the client
-		c->shade_height = c->size.height;
-		c->ignore_unmap++;
-		XUnmapWindow(jbwm.dpy, c->window);
-		c->size.height = 0;
-		c->flags |= JB_SHADED;
-		set_wm_state(c, IconicState);
-		ewmh_add_state(c->window, ewmh.atoms[WM_STATE_SHADED]);
-		select_client(c);
-	}
-}
-#endif//USE_TBAR
-
 void client_to_vdesk(Client * restrict c, const uint8_t d)
 {
 	LOG("client_to_vdesk");
@@ -83,11 +50,9 @@ Client *find_client(const Window w)
 	return c;
 }
 
-#define CA_SZ 3
+enum { CA_SZ=3 };
 static Atom client_atoms[CA_SZ];
-#define I_PROTOS 0
-#define I_DEL_WIN 1
-#define I_WM_STATE 2
+enum { I_PROTOS, I_DEL_WIN, I_WM_STATE };
 
 static void setup_client_atoms()
 {
@@ -135,9 +100,7 @@ void stick(Client * c)
 	c->vdesk = c->screen->vdesk;
 	c->flags ^= JB_STICKY;	// toggle
 	select_client(c);
-#ifdef USE_TBAR
 	update_titlebar(c);
-#endif//USE_TBAR
 }
 
 static void relink_window_list(Client * c)
