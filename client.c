@@ -4,11 +4,15 @@
 // See README for license and other details.
 
 #include <assert.h>
+#include <stdbool.h>
+#include <stdint.h>
 #include <stdlib.h>
+#include <X11/Xatom.h>
+#include <X11/Xlib.h>
 #include "atoms.h"
-#include "client.h"
+#include "client_t.h"
 #include "ewmh.h"
-#include "jbwm.h"
+#include "jbwmenv.h"
 #include "log.h"
 #include "screen.h"
 #include "titlebar.h"
