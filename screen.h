@@ -6,6 +6,10 @@
 #ifndef JBWM_SCREEN_H
 #define JBWM_SCREEN_H
 
+#include <stdint.h>
+#include "client_t.h"
+#include "ScreenInfo.h"
+
 void drag(Client * restrict c);
 void moveresize(Client * restrict c);
 void resize(Client * restrict c);
@@ -23,6 +27,6 @@ void unset_maximized(Client * restrict c);
 void maximize(Client * restrict c);
 void fullscreen(Client * restrict c);
 
-#define DESKTOPS 10
+enum {DESKTOPS=10};
 
 #endif /* JBWM_SCREEN_H */
