@@ -3,14 +3,18 @@
 // Copyright 1999-2015, Ciaran Anscomb <jbwm@6809.org.uk>
 // See README for license and other details.
 
+#include <stdbool.h>
+#include <stdint.h>
 #include <stdlib.h>
-#include <sys/wait.h>
+#include <X11/keysymdef.h>
+#include <X11/Xlib.h>
 #include "client.h"
 #include "config.h"
-#include "jbwm.h"
+#include "jbwmenv.h"
 #include "keys.h"
 #include "log.h"
 #include "screen.h"
+#include "ScreenInfo.h"
 #include "snap.h"
 #include "titlebar.h"
 
@@ -135,11 +139,9 @@ static void next(void)
 		if (!c)
 			c = jbwm.head;
 
-		if (!c)
+		if (!c || (c == jbwm.current))
 			return;
 
-		if (c == jbwm.current)
-			return;
 	} while (c->vdesk != c->screen->vdesk);
 
 	if (!c)
@@ -162,14 +164,6 @@ cond_client_to_desk(Client * c, ScreenInfo * s, const uint8_t d, const bool mod)
 		switch_vdesk(s, d);
 }
 
-static void spawn(const char *restrict cmd)
-{
-	const int r = system(cmd);
-
-	if (WIFEXITED(r) && WEXITSTATUS(r))
-		ERROR(cmd);
-}
-
 void jbwm_handle_key_event(XKeyEvent * restrict e)
 {
 	const KeySym key = XLookupKeysym(e, 0);
@@ -181,7 +175,7 @@ void jbwm_handle_key_event(XKeyEvent * restrict e)
 
 	switch (key) {
 	case KEY_NEW:
-		spawn(TERMINAL_CMD);
+		system(TERMINAL_CMD);
 		break;
 
 	case KEY_QUIT:
