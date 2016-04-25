@@ -10,6 +10,7 @@
 #include "atoms.h"
 #include "client.h"
 #include "client_t.h"
+#include "events.h"
 #include "ewmh.h"
 #include "jbwmenv.h"
 #include "log.h"
@@ -78,7 +79,7 @@ void ewmh_init(void)
 
 static inline void set_desktop_viewport(void)
 {
-	XPROP(jbwm.screens->root, ewmh.atoms[DESKTOP_VIEWPORT], XA_CARDINAL, 
+	XPROP(jbwm.screens->root, ewmh.atoms[DESKTOP_VIEWPORT], XA_CARDINAL,
 		(&(long[]){0, 0}), 2);
 }
 
@@ -290,7 +291,6 @@ void ewmh_client_message(XClientMessageEvent * e)
 				.x = e->data.l[1], .y = e->data.l[2],
 				.width = e->data.l[3],
 				.height = e->data.l[4]});
-	
 		}
 	}
 	// If user moves window (client-side titlebars):
@@ -343,7 +343,7 @@ static void init_supporting(ScreenInfo * restrict s)
 	XPROP(s->supporting, ewmh.atoms[SUPPORTING_WM_CHECK],
 		XA_WINDOW, &(s->supporting), 1);
 	XPROP(s->supporting, ewmh.atoms[WM_NAME], XA_STRING, "jbwm", 4);
-	XPROP(s->supporting, ewmh.atoms[WM_PID], XA_CARDINAL, 
+	XPROP(s->supporting, ewmh.atoms[WM_PID], XA_CARDINAL,
 		&(pid_t){getpid()}, 1);
 }
 
