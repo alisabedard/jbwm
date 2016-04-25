@@ -4,14 +4,18 @@
 // See README for license and other details.
 
 #include <assert.h>
+#include <stdint.h>
 #include <string.h>
+#include <X11/Xlib.h>
 #ifdef USE_XFT
 #include <X11/Xft/Xft.h>
 #endif//USE_XFT
 #include "client.h"
+#include "client_t.h"
 #include "config.h"
 #include "ewmh.h"
 #include "jbwm.h"
+#include "jbwmenv.h"
 #include "log.h"
 #include "screen.h"
 #include "titlebar.h"
@@ -51,11 +55,8 @@ void shade(Client * restrict c)
 
 static GC colorgc(ScreenInfo * restrict s, const char *restrict colorname)
 {
-	XColor c;
-	XAllocNamedColor(jbwm.dpy, DefaultColormap(jbwm.dpy, s->screen),
-		colorname, &c, &(XColor){});
-	return XCreateGC(jbwm.dpy, s->root, GCForeground, 
-		&(XGCValues){.foreground=c.pixel});
+	return XCreateGC(jbwm.dpy, s->root, GCForeground,
+		&(XGCValues){.foreground=pixel(s->screen, colorname)});
 }
 
 static void setup_gcs(ScreenInfo * restrict s)
@@ -70,13 +71,12 @@ static void new_titlebar(Client * restrict c)
 	if (c->flags & (JB_NO_TB|JB_SHAPED))
 		return;
 
-	c->titlebar = XCreateSimpleWindow(jbwm.dpy, c->parent, 0, 0, 
-		c->size.width, TDIM, 0, 0, 0);
+	c->titlebar = XCreateSimpleWindow(jbwm.dpy, c->parent, 0, 0,
+		c->size.width, TDIM, 0, 0, c->screen->pixels.bg);
 	if (!jbwm.gc.close)
 		setup_gcs(c->screen);
 
 	XSelectInput(jbwm.dpy, c->titlebar, ExposureMask);
-	XSetWindowBackground(jbwm.dpy, c->titlebar, c->screen->pixels.bg);
 	XMapRaised(jbwm.dpy, c->titlebar);
 	jbwm_grab_button(c->titlebar, 0, AnyButton);
 }
@@ -126,41 +126,21 @@ static void draw(const Window t, GC gc, const int x)
 	XFillRectangle(jbwm.dpy, t, gc, x, 0, TDIM, TDIM);
 }
 
-static void draw_close(const uint32_t f, const Window t)
-{
-	if (!(f & JB_NO_CLOSE_DECOR))
-		draw(t, jbwm.gc.close, 0);
-}
-
-static void draw_shade(const uint32_t f, const Window t, const int x)
-{
-	if (!(f & JB_NO_MIN_DECOR))
-		draw(t, jbwm.gc.shade, x);
-}
-
-static void draw_resize(const uint32_t f, const Window t, const int x)
-{
-	if (!(f & JB_NO_MIN_DECOR))
-		draw(t, jbwm.gc.resize, x);
-}
-
-static int tboffset(const int w, const int n)
-{
-	return w - n * TDIM;
-}
-
 static void draw_titlebar(Client * restrict c)
 {
 	const unsigned short w = c->size.width;
 	const Window t = c->titlebar;
 	XClearWindow(jbwm.dpy, t);
 	const uint32_t f = c->flags;
-	draw_close(f, t);
-	draw_resize(f, t, tboffset(w, 1));
-	draw_shade(f, t, tboffset(w, 2));
-
-	if (!(f & JB_TEAROFF))
-		draw_title(c);
+	if (!(f & JB_NO_CLOSE_DECOR))
+		draw(t, jbwm.gc.close, 0);
+	if (!(f & JB_NO_MIN_DECOR))
+		draw(t, jbwm.gc.shade, w-TDIM);
+	if (!(f & JB_NO_MIN_DECOR))
+		draw(t, jbwm.gc.resize, w-(TDIM<<1));
+	if(f & JB_TEAROFF)
+		  return;
+	draw_title(c);
 }
 
 void update_titlebar(Client * c)
