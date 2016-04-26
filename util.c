@@ -7,6 +7,7 @@
 #include <X11/Xlib.h>
 #include "jbwmenv.h"
 
+__attribute__((nonnull(2)))
 unsigned long pixel(const uint8_t screen, const char * restrict name)
 {
 	XColor c;
