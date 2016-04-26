@@ -5,35 +5,19 @@
 
 #include <assert.h>
 #include <stdlib.h>
-#include <string.h>
-#include <X11/Xatom.h>
+#include <X11/Xlib.h>
 #include "atoms.h"
-#include "client.h"
+#include "client_t.h"
 #include "config.h"
 #include "ewmh.h"
 #include "jbwm.h"
+#include "jbwmenv.h"
 #include "log.h"
 #include "mwm.h"
 #include "screen.h"
 #include "shape.h"
+#include "util.h"
 #include "titlebar.h"
-
-#if defined(EWMH) || defined(MWM)
-__attribute__((warn_unused_result))
-void *get_property(Window w, Atom property, Atom type,
-	unsigned long * restrict num_items)
-{
-	assert(num_items);
-	unsigned char *prop;
-
-	if (XGetWindowProperty(jbwm.dpy, w, property, 0L, 1024,
-		false, property, &type, &(int){0}, num_items, 
-		&(long unsigned int){0}, &prop) == Success)
-		return prop;
-
-	return NULL;
-}
-#endif//EWMH||MWM
 
 __attribute__((nonnull))
 static void init_size(Client * restrict c,
@@ -62,8 +46,8 @@ __attribute__((nonnull))
 static void wm_desktop(Client * restrict c)
 {
 	unsigned long nitems;
-	unsigned long *lprop = get_property(c->window, 
-		ewmh.atoms[WM_DESKTOP], XA_CARDINAL, &nitems);
+	unsigned long *lprop = get_property(c->window,
+		ewmh.atoms[WM_DESKTOP], &nitems);
 
 	if (lprop && nitems && (lprop[0] < 9))
 		c->vdesk = lprop[0];

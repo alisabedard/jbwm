@@ -1,9 +1,10 @@
 // Copyright 2016, Jeffrey E. Bedard <jefbed@gmail.com>
 #include <assert.h>
+#include <X11/Xlib.h>
 #include "atoms.h"
-#include "jbwm.h"
+#include "client.h"
 #include "log.h"
-#include "new.h"
+#include "util.h"
 
 // flags:
 #define MWM_HINTS_FUNCTIONS     (1L << 0)
@@ -87,7 +88,7 @@ void handle_mwm_hints(Client * c)
 	unsigned long n;
 	struct {
 		unsigned long flags, functions, decor, input_mode, status;
-	} *m = get_property(c->window, mwm_hints, mwm_hints, &n);
+	} *m = get_property(c->window, mwm_hints, &n);
 
 	if (!m)
 		  return;

@@ -16,6 +16,7 @@
 #include "log.h"
 #include "new.h"
 #include "screen.h"
+#include "util.h"
 
 EWMHEnvironment ewmh;
 
@@ -104,7 +105,7 @@ void ewmh_update_client_list()
 void ewmh_remove_state(const Window w, const Atom state)
 {
 	unsigned long n;
-	Atom *a = get_property(w, ewmh.atoms[WM_STATE], XA_ATOM, &n);
+	Atom *a = get_property(w, ewmh.atoms[WM_STATE], &n);
 
 	if (a) {
 		const unsigned long nitems = n;
@@ -121,7 +122,7 @@ void ewmh_remove_state(const Window w, const Atom state)
 bool ewmh_get_state(const Window w, const Atom state)
 {
 	unsigned long n;
-	Atom *a = get_property(w, ewmh.atoms[WM_STATE], XA_ATOM, &n);
+	Atom *a = get_property(w, ewmh.atoms[WM_STATE], &n);
 
 	if (!a)
 		return false;

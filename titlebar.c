@@ -19,6 +19,7 @@
 #include "log.h"
 #include "screen.h"
 #include "titlebar.h"
+#include "util.h"
 
 void shade(Client * restrict c)
 {

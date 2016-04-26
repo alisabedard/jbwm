@@ -15,6 +15,7 @@
 #include "keys.h"
 #include "log.h"
 #include "new.h"
+#include "util.h"
 
 // Main application data structure.
 JBWMEnvironment jbwm;
@@ -136,14 +137,6 @@ static inline void setup_event_listeners(const Window root)
 		&(XSetWindowAttributes){.event_mask = SubstructureRedirectMask
 		| SubstructureNotifyMask | EnterWindowMask | PropertyChangeMask
 		| ColormapChangeMask});
-}
-
-unsigned long pixel(const uint8_t screen, const char * restrict name)
-{
-	XColor c;
-	XAllocNamedColor(jbwm.dpy, DefaultColormap(jbwm.dpy, screen),
-		name, &c, &(XColor){});
-	return c.pixel;
 }
 
 static void allocate_colors(ScreenInfo * restrict s,
