@@ -19,25 +19,19 @@
 #include "titlebar.h"
 
 __attribute__((nonnull))
-static void init_size(Client * restrict c,
+static void set_geometry(Client * restrict c,
 	XWindowAttributes * restrict attr)
 {
+	XSizeHints *restrict g = &(c->size);
 	const Dim dim = { attr->width, attr->height };
 	const bool valid = (dim.w >= c->size.min_width)
 	    && (dim.h >= c->size.min_height);
 	c->size.width = valid ? dim.w : c->size.min_width;
 	c->size.height = valid ? dim.h : c->size.min_height;
-}
-
-__attribute__((nonnull))
-static void init_position(Client * restrict c,
-	XWindowAttributes * restrict attr)
-{
-	XSizeHints *restrict g = &(c->size);
-	const bool a = (attr->map_state == IsViewable)
+	const bool pos = (attr->map_state == IsViewable)
 	    || (g->flags & USPosition);
-	g->x = a ? attr->x : 0;
-	g->y = a ? attr->y : TDIM;
+	g->x=pos ? attr->x : (c->screen->size.w>>1)-(g->width>>1);
+	g->y=pos ? attr->y : (c->screen->size.h>>1)-(g->height>>1);
 }
 
 #ifdef EWMH
@@ -96,8 +90,7 @@ static void init_geometry(Client * restrict c)
 	XGetWindowAttributes(jbwm.dpy, c->window, &attr);
 	c->cmap = attr.colormap;
 	XGetWMNormalHints(jbwm.dpy, c->window, &(c->size), &(long){0});
-	init_size(c, &attr);
-	init_position(c, &attr);
+	set_geometry(c, &attr);
 
 	// Test if the reparent that is to come would trigger an unmap event.
 	if (attr.map_state == IsViewable)
@@ -109,9 +102,10 @@ static void reparent(Client * restrict c)
 {
 	LOG("reparent()");
 	setup_shaped(c);
-	c->parent = XCreateWindow(jbwm.dpy, c->screen->root, c->size.x, c->size.y, 
+	c->parent = XCreateWindow(jbwm.dpy, c->screen->root,
+		c->size.x, c->size.y,
 		c->size.width, c->size.height, c->border,
-		CopyFromParent, CopyFromParent, CopyFromParent, 
+		CopyFromParent, CopyFromParent, CopyFromParent,
 		CWOverrideRedirect | CWEventMask, &(XSetWindowAttributes){
 			.override_redirect=true,
 			.event_mask = SubstructureRedirectMask
