@@ -49,34 +49,43 @@ static void process_flags(Client * c)
 	}
 }
 
-static void mwm_hints_decor(Client * c, unsigned long f)
+__attribute__((const))
+static inline uint32_t hint(const uint32_t hint_flags,
+	const uint32_t hint, const uint32_t assoc_flag,
+	const uint32_t client_flags) // client_flags last for chained calling
 {
-	LOG("MWM_HINTS_DECORATIONS");
-
-	if (f & MWM_DECOR_ALL)
-		  return;
-#define CKH(I, F) {if(!(f*MWM_DECOR_##I)) c->flags|=JB_NO_##F;}
-	CKH(BORDER, RESIZE_DECOR);
-	CKH(RESIZEH, RESIZE_DECOR);
-	CKH(TITLE, TB);
-	CKH(MENU, CLOSE_DECOR);
-	CKH(MINIMIZE, MIN_DECOR);
-	CKH(MAXIMIZE, MAX_DECOR);
+	/* flags stored in Client.flags indicate negative options,
+	   so invert test logic.  */
+	if(hint_flags & hint)
+		  return client_flags;
+	return client_flags | assoc_flag;
 }
 
-static void mwm_hints_func(Client * c, unsigned long f)
+__attribute__((const))
+static uint32_t mwm_hints_decor(const uint32_t client_flags, const unsigned long f)
 {
-	LOG("MWM_HINTS_FUNCTIONS");
+	if (f & MWM_DECOR_ALL)
+		  return client_flags;
+	return hint(f, MWM_DECOR_BORDER, JB_NO_RESIZE_DECOR,
+		hint(f, MWM_DECOR_RESIZEH, JB_NO_RESIZE_DECOR,
+		hint(f, MWM_DECOR_TITLE, JB_NO_TB,
+		hint(f, MWM_DECOR_MENU, JB_NO_CLOSE_DECOR,
+		hint(f, MWM_DECOR_MINIMIZE, JB_NO_MIN_DECOR,
+		hint(f, MWM_DECOR_MAXIMIZE, JB_NO_MAX_DECOR,
+		client_flags)))))); // <== input
+}
 
+__attribute__((const))
+static uint32_t mwm_hints_func(const uint32_t client_flags, const unsigned long f)
+{
 	if (f & MWM_FUNC_ALL)
-		  return;
-#define CKF(I, F) if(!(f*MWM_FUNC_##I))c->flags|=JB_NO_##F|JB_NO_##F##_DECOR;
-	CKF(RESIZE,RESIZE);
-	CKF(CLOSE,CLOSE);
-	CKF(MINIMIZE,MIN);
-	CKF(MAXIMIZE,MAX);
-	if (!(f & MWM_FUNC_MOVE))
-		  c->flags |= JB_NO_MOVE;
+		  return client_flags;
+	return hint(f, MWM_FUNC_RESIZE, JB_NO_RESIZE_DECOR|JB_NO_RESIZE_DECOR,
+		hint(f, MWM_FUNC_CLOSE, JB_NO_CLOSE_DECOR|JB_NO_CLOSE,
+		hint(f, MWM_FUNC_MINIMIZE, JB_NO_MIN_DECOR|JB_NO_MIN,
+		hint(f, MWM_FUNC_MAXIMIZE, JB_NO_MAX_DECOR|JB_NO_MAX,
+		hint(f, MWM_FUNC_MOVE, JB_NO_MOVE,
+		client_flags))))); // <== input
 }
 
 void handle_mwm_hints(Client * c)
@@ -84,7 +93,7 @@ void handle_mwm_hints(Client * c)
 	static Atom mwm_hints;
 	assert(c);
 	if(!mwm_hints)
-		  mwm_hints=XA("_MOTIF_WM_HINTS");
+		  mwm_hints=XInternAtom(jbwm.dpy, "_MOTIF_WM_HINTS", false);
 	unsigned long n;
 	struct {
 		unsigned long flags, functions, decor, input_mode, status;
@@ -94,10 +103,10 @@ void handle_mwm_hints(Client * c)
 		  return;
 
 	if (m->flags & MWM_HINTS_FUNCTIONS)
-		  mwm_hints_func(c, m->functions);
+		  c->flags=mwm_hints_func(c->flags, m->functions);
 
 	if (m->flags & MWM_HINTS_DECORATIONS)
-		  mwm_hints_decor(c, m->decor);
+		  c->flags=mwm_hints_decor(c->flags, m->decor);
 
 	if (m->flags & MWM_HINTS_STATUS) {
 		LOG("MWM_HINTS_STATUS");
