@@ -29,4 +29,11 @@ void *get_property(Window w, Atom property, unsigned long * restrict num_items)
 }
 #endif//EWMH||MWM
 
+void jbwm_grab_button(const Window w, const unsigned int mask,
+		 const unsigned int btn)
+{
+	XGrabButton(jbwm.dpy, btn, mask, w, false,
+		    ButtonPressMask | ButtonReleaseMask, GrabModeAsync,
+		    GrabModeSync, None, None);
+}
 

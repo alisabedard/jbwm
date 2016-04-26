@@ -10,7 +10,6 @@
 #include "client_t.h"
 #include "config.h"
 #include "ewmh.h"
-#include "jbwm.h"
 #include "jbwmenv.h"
 #include "log.h"
 #include "mwm.h"
@@ -74,7 +73,7 @@ static void init_properties(Client * restrict c)
 #ifdef FIX_FIREFOX
 static void fix_firefox(Client * restrict c)
 {
-	// Hack to make flash videos in firefox fullscreen: 
+	// Hack to make flash videos in firefox fullscreen:
 	char * name = get_title(c->window);
 	if(!name) return;
 	if(!strncmp(name, "plugin-container", 16)) {

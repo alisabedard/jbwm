@@ -14,7 +14,6 @@
 #include "client_t.h"
 #include "config.h"
 #include "ewmh.h"
-#include "jbwm.h"
 #include "jbwmenv.h"
 #include "log.h"
 #include "screen.h"

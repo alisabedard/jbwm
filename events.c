@@ -13,7 +13,7 @@
 #include "button_event.h"
 #include "client.h"
 #include "ewmh.h"
-#include "jbwm.h"
+#include "jbwmenv.h"
 #include "keys.h"
 #include "log.h"
 #include "new.h"

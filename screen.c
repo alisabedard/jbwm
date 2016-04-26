@@ -37,10 +37,9 @@ static void draw_outline(Client * c)
 
 static void configure(XSizeHints * restrict g, const Window w)
 {
-	XSendEvent(jbwm.dpy, w, true, StructureNotifyMask, 
-		(XEvent *) &(XConfigureEvent){.x = g->x,.y = g->y,
-			.width = g->width, .height = g->height,
-			.type = ConfigureNotify, .event = w });
+	XSendEvent(jbwm.dpy, w, true, StructureNotifyMask, (XEvent *)
+		&(XConfigureEvent){.x = g->x,.y = g->y, .width = g->width,
+		.height = g->height, .type = ConfigureNotify, .event = w });
 }
 
 static void grab_pointer(const Window w)
@@ -76,7 +75,7 @@ resize_loop:
 static XPoint get_mouse_position(Window w)
 {
 	XPoint p;
-	// Recycle w as dummy variable.  
+	// Recycle w as dummy variable.
 	XQueryPointer(jbwm.dpy, w, &w, &w, (int *)&p.x, (int *)&p.y, (int *)&w,
 		      (int *)&w, (unsigned int *)&w);
 	return p;
@@ -118,7 +117,7 @@ void moveresize(Client * restrict c)
 		0, offset,
 		c->size.width, c->size.height);
 	if(offset) { update_titlebar(c); }
-	set_shape(c); 
+	set_shape(c);
 }
 
 void restore_horz(Client * restrict c)
@@ -138,7 +137,7 @@ void maximize_horz(Client * restrict c)
 	LOG("maximize_horz");
 	assert(c);
 	if (c->flags & JB_MAX_HORZ)
- 		 return; 
+		 return;
 	c->old_size.x=c->size.x;
 	c->old_size.width=c->size.width;
 	c->size.x=0;
@@ -168,7 +167,7 @@ void maximize_vert(Client * restrict c)
 	LOG("maximize_vert");
 	assert(c);
 	if (c->flags & JB_MAX_VERT)
- 		 return; 
+		 return;
 	c->old_size.y=c->size.y;
 	c->old_size.height=c->size.height;
 	c->size.y=0;
@@ -187,7 +186,7 @@ void unset_maximized(Client * restrict c)
 {
 	LOG("unset_maximized");
 	assert(c);
-	// Don't restore a fullscreen window.  
+	// Don't restore a fullscreen window.
 	if(!(c->flags&JB_MAXIMIZED)||(c->flags&JB_FULLSCREEN))
 		  return;
 	restore_horz(c);

@@ -11,7 +11,7 @@
 #include "config.h"
 #include "events.h"
 #include "ewmh.h"
-#include "jbwm.h"
+#include "jbwmenv.h"
 #include "keys.h"
 #include "log.h"
 #include "new.h"
@@ -103,7 +103,7 @@ static void setup_fonts(void)
 {
 #ifdef USE_XFT
 	jbwm.font = XftFontOpen(jbwm.dpy, DefaultScreen(jbwm.dpy),
-		XFT_FAMILY, XftTypeString, DEF_FONT, XFT_SIZE, 
+		XFT_FAMILY, XftTypeString, DEF_FONT, XFT_SIZE,
 		XftTypeDouble, FONT_SIZE, NULL);
 #else//!USE_XFT
 	jbwm.font = XLoadQueryFont(jbwm.dpy, DEF_FONT);
@@ -120,20 +120,12 @@ static void setup_fonts(void)
 #define setup_fonts()
 #endif//USE_TBAR
 
-void jbwm_grab_button(const Window w, const unsigned int mask,
-		 const unsigned int btn)
-{
-	XGrabButton(jbwm.dpy, btn, mask, w, false,
-		    ButtonPressMask | ButtonReleaseMask, GrabModeAsync,
-		    GrabModeSync, None, None);
-}
-
 #ifdef USE_SHAPE
 #include <X11/extensions/shape.h>
 #endif
-static inline void setup_event_listeners(const Window root)
+static void setup_event_listeners(const Window root)
 {
-	XChangeWindowAttributes(jbwm.dpy, root, CWEventMask, 
+	XChangeWindowAttributes(jbwm.dpy, root, CWEventMask,
 		&(XSetWindowAttributes){.event_mask = SubstructureRedirectMask
 		| SubstructureNotifyMask | EnterWindowMask | PropertyChangeMask
 		| ColormapChangeMask});
