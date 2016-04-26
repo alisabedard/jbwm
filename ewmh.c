@@ -146,8 +146,8 @@ void ewmh_add_state(const Window w, const Atom state)
 
 static void set_number_of_desktops(const Window r)
 {
-	const long num = DESKTOPS;
-	XPROP(r, ewmh.atoms[NUMBER_OF_DESKTOPS], XA_CARDINAL, &num, 1);
+	XPROP(r, ewmh.atoms[NUMBER_OF_DESKTOPS], XA_CARDINAL,
+		&(long){DESKTOPS}, 1);
 	set_desktop_viewport();
 	XPROP(r, ewmh.atoms[VIRTUAL_ROOTS], XA_WINDOW, &r, 1);
 }
@@ -201,40 +201,47 @@ static void check_state(XClientMessageEvent * e,	// event data
 	}
 }
 
-static void layer(const bool above, Client * c)
+__attribute__((cold))
+static void layer(const bool above, const Window w)
 {
 	if(above)
-		  XRaiseWindow(jbwm.dpy, c->parent);
+		  XRaiseWindow(jbwm.dpy, w);
 	else
-		  XLowerWindow(jbwm.dpy, c->parent);
+		  XLowerWindow(jbwm.dpy, w);
 }
 
+__attribute__((nonnull(2),cold))
 static void above_cb(const bool add, Client * c)
 {
-	add?layer(true, c):layer(false, c);
+	add?layer(true, c->parent):layer(false, c->parent);
 }
 
+__attribute__((nonnull(2),cold))
 static void below_cb(const bool add, Client * c)
 {
-	add?layer(false, c):layer(true, c);
+	add?layer(false, c->parent):layer(true, c->parent);
 }
 
+__attribute__((nonnull(2)))
 static void fullscreen_cb(const bool add, Client * c)
 {
 	add?set_fullscreen(c):unset_fullscreen(c);
 }
 
+__attribute__((nonnull(2)))
 static void max_h_cb(const bool add, Client * c)
 {
 	add?maximize_horz(c):restore_horz(c);
 }
 
+__attribute__((nonnull(2)))
 static void
 max_v_cb(const bool add, Client * c)
 {
 	add?maximize_vert(c):restore_vert(c);
 }
 
+__attribute__((nonnull(2),cold))
 static void
 stick_cb(const bool add, Client * c)
 {
@@ -244,7 +251,9 @@ stick_cb(const bool add, Client * c)
 		  c->flags &= ~JB_STICKY;
 }
 
-static void handle_wm_state_changes(XClientMessageEvent * e, Client * c)
+__attribute__((nonnull(1,2)))
+static void handle_wm_state_changes(XClientMessageEvent * restrict e,
+	Client * restrict c)
 {
 	check_state(e, ewmh.atoms[WM_STATE_ABOVE], c, above_cb);
 	check_state(e, ewmh.atoms[WM_STATE_BELOW], c, below_cb);
@@ -254,6 +263,7 @@ static void handle_wm_state_changes(XClientMessageEvent * e, Client * c)
 	check_state(e, ewmh.atoms[WM_STATE_STICKY], c, stick_cb);
 }
 
+__attribute__((nonnull))
 void ewmh_client_message(XClientMessageEvent * e)
 {
 	const Atom t = e->message_type;
@@ -323,6 +333,7 @@ void set_ewmh_allowed_actions(const Window w)
 	XPROP(w, a[0], XA_ATOM, &a, sizeof(a) / sizeof(Atom));
 }
 
+__attribute__((nonnull(1)))
 static void init_desktops(ScreenInfo * restrict s)
 {
 	const Window r = s->root;
@@ -334,12 +345,12 @@ static void init_desktops(ScreenInfo * restrict s)
 	XPROP(r, ewmh.atoms[NUMBER_OF_DESKTOPS], XA_CARDINAL, &n, 1);
 }
 
+__attribute__((nonnull(1)))
 static void init_supporting(ScreenInfo * restrict s)
 {
-	const Window r = s->root;
 	s->supporting = XCreateSimpleWindow(jbwm.dpy, s->root,
 		0, 0, 1, 1, 0, 0, 0);
-	XPROP(r, ewmh.atoms[SUPPORTING_WM_CHECK],
+	XPROP(s->root, ewmh.atoms[SUPPORTING_WM_CHECK],
 		XA_WINDOW, &(s->supporting), 1);
 	XPROP(s->supporting, ewmh.atoms[SUPPORTING_WM_CHECK],
 		XA_WINDOW, &(s->supporting), 1);
@@ -348,13 +359,13 @@ static void init_supporting(ScreenInfo * restrict s)
 		&(pid_t){getpid()}, 1);
 }
 
+__attribute__((nonnull(1)))
 void setup_ewmh_for_screen(ScreenInfo * restrict s)
 {
-	const Window r = s->root;
-	XPROP(r, ewmh.atoms[SUPPORTED], XA_ATOM, ewmh.atoms, ewmh.count);
-	XPROP(r, ewmh.atoms[WM_NAME], XA_STRING, "jbwm", 4);
+	XPROP(s->root, ewmh.atoms[SUPPORTED], XA_ATOM, ewmh.atoms, ewmh.count);
+	XPROP(s->root, ewmh.atoms[WM_NAME], XA_STRING, "jbwm", 4);
 	// Set this to the root window until we have some clients.
-	XPROP(r, ewmh.atoms[CLIENT_LIST], XA_WINDOW, &r, 1);
+	XPROP(s->root, ewmh.atoms[CLIENT_LIST], XA_WINDOW, &s->root, 1);
 	init_desktops(s);
 	init_supporting(s);
 }
