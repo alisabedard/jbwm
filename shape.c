@@ -13,7 +13,6 @@
 
 static bool is_shaped(Client * c)
 {
-	assert(c);
 	int s, d;
 	unsigned int u;
 	return XShapeQueryExtents(jbwm.dpy, c->window, &s, &d, &d,
