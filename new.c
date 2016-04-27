@@ -20,8 +20,7 @@
 #include <X11/Xatom.h>
 
 __attribute__((nonnull))
-static void set_geometry(Client * restrict c,
-	XWindowAttributes * restrict attr)
+static void set_geometry(Client * c, XWindowAttributes * attr)
 {
 	const Dim dim = { attr->width, attr->height };
 	const bool valid = (dim.w >= c->size.min_width)
@@ -36,7 +35,7 @@ static void set_geometry(Client * restrict c,
 
 #ifdef EWMH
 __attribute__((nonnull))
-static void wm_desktop(Client * restrict c)
+static void wm_desktop(Client * c)
 {
 	unsigned long nitems;
 	unsigned long *lprop = get_property(c->window,
@@ -56,7 +55,7 @@ static void wm_desktop(Client * restrict c)
 #endif//EWMH
 
 __attribute__((nonnull))
-static void init_properties(Client * restrict c)
+static void init_properties(Client * c)
 {
 	assert(c->screen);
 	c->vdesk = c->screen->vdesk;
@@ -65,7 +64,7 @@ static void init_properties(Client * restrict c)
 }
 
 #ifdef FIX_FIREFOX
-static void fix_firefox(Client * restrict c)
+static void fix_firefox(Client * c)
 {
 	// Hack to make flash videos in firefox fullscreen:
 	char * name = get_title(c->window);
@@ -84,7 +83,7 @@ static void fix_firefox(Client * restrict c)
 #endif//FIX_FIREFOX
 
 __attribute__((nonnull))
-static void init_geometry(Client * restrict c)
+static void init_geometry(Client * c)
 {
 	XWindowAttributes attr;
 	XGetWindowAttributes(jbwm.dpy, c->window, &attr);
@@ -98,7 +97,7 @@ static void init_geometry(Client * restrict c)
 	fix_firefox(c); // fix flash plugin-container bug
 }
 
-static void reparent(Client * restrict c)
+static void reparent(Client * c) // use of restrict here is a bug
 {
 	LOG("reparent()");
 	setup_shaped(c);
@@ -117,7 +116,7 @@ static void reparent(Client * restrict c)
 	XMapWindow(jbwm.dpy, c->window);
 }
 
-void make_new_client(Window w, ScreenInfo * restrict s)
+void make_new_client(Window w, ScreenInfo * s)
 {
 	LOG("make_new_client(%d,s)", (int)w);
 	assert(s);

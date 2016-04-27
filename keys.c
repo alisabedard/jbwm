@@ -14,15 +14,14 @@
 #include "snap.h"
 #include "titlebar.h"
 
-static void point(Client * c, const int x, const int y)
+static void point(Client * restrict c, const int x, const int y)
 {
 	XRaiseWindow(jbwm.dpy, c->parent);
 	XWarpPointer(jbwm.dpy, None, c->window, 0, 0, 0, 0, x, y);
 }
 
 static void
-keymv(Client * c, XKeyEvent * e, int * restrict xy, int * restrict wh,
-	const int8_t sign)
+keymv(Client * c, const bool mod, int * xy, int * wh, const int8_t sign)
 {
 	/* These operations invalid when maximized.  */
 	if (c->flags & JB_MAXIMIZED)
@@ -30,7 +29,8 @@ keymv(Client * c, XKeyEvent * e, int * restrict xy, int * restrict wh,
 
 	const int8_t d = sign * JBWM_RESIZE_INCREMENT;
 
-	if ((e->state & jbwm.keymasks.mod) && (*wh > 0)) {
+	//if ((e->state & jbwm.keymasks.mod) && (*wh > 0)) {
+	if (mod && (*wh > 0)) {
 #ifdef USE_SHAPE
 
 		if (c->flags & JB_SHAPED)
@@ -51,25 +51,26 @@ keymv(Client * c, XKeyEvent * e, int * restrict xy, int * restrict wh,
 	point(c, 1, 1);
 }
 
-static void handle_client_key_event(XKeyEvent * e, Client * c, KeySym key)
+static void handle_client_key_event(const bool mod,
+	Client * restrict c, const KeySym key)
 {
 	XSizeHints *g = &(c->size);
 
 	switch (key) {
 	case KEY_LEFT:
-		keymv(c, e, &(g->x), &(g->width), -1);
+		keymv(c, mod, &(g->x), &(g->width), -1);
 		break;
 
 	case KEY_DOWN:
-		keymv(c, e, &(g->y), &(g->height), 1);
+		keymv(c, mod, &(g->y), &(g->height), 1);
 		break;
 
 	case KEY_UP:
-		keymv(c, e, &(g->y), &(g->height), -1);
+		keymv(c, mod, &(g->y), &(g->height), -1);
 		break;
 
 	case KEY_RIGHT:
-		keymv(c, e, &(g->x), &(g->width), 1);
+		keymv(c, mod, &(g->x), &(g->width), 1);
 		break;
 
 	case KEY_KILL:
@@ -142,16 +143,14 @@ static void next(void)
 				return;
 		}
 
-		if (!c)
-			c = jbwm.head;
+		if (!c) c = jbwm.head;
 
 		if (!c || (c == jbwm.current))
 			return;
 
 	} while (c->vdesk != c->screen->vdesk);
 
-	if (!c)
-		return;
+	if (!c) return;
 
 	unhide(c);
 	select_client(c);
@@ -215,8 +214,8 @@ void jbwm_handle_key_event(XKeyEvent * restrict e)
 		break;
 
 	default:
-		if (c)
-			handle_client_key_event(e, c, key);
+		if (c) handle_client_key_event(e->state
+			& jbwm.keymasks.mod, c, key);
 	}
 }
 
@@ -236,3 +235,4 @@ void grab_keys_for_screen(ScreenInfo * restrict s)
 	grab(s, (KeySym[]){JBWM_KEYS_TO_GRAB}, 0);
 	grab(s, (KeySym[]){JBWM_ALT_KEYS_TO_GRAB}, jbwm.keymasks.mod);
 }
+

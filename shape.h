@@ -10,8 +10,8 @@
 
 #include "client_t.h"
 
-void setup_shaped(Client * restrict c);
-void set_shape(Client * restrict c);
+void setup_shaped(Client * c);
+void set_shape(Client * c);
 
 #else//!USE_SHAPE
 

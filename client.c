@@ -25,7 +25,7 @@ char * get_title(const Window w)
 	return (char *)tp.value;
 }
 
-void client_to_vdesk(Client * restrict c, const uint8_t d)
+void client_to_vdesk(Client * c, const uint8_t d)
 {
 	LOG("client_to_vdesk");
 	assert(c);
@@ -65,7 +65,7 @@ static void setup_client_atoms()
 	XInternAtoms(jbwm.dpy, names, CA_SZ, true, client_atoms);
 }
 
-void set_wm_state(Client * restrict c, const int state)
+void set_wm_state(Client * c, const int state)
 {
 	assert(c);
 	LOG("set_wm_state(%d, %d)", (int)c->window, state);
@@ -81,13 +81,13 @@ static void unselect_current(void)
 	jbwm.current->flags ^= JB_ACTIVE;
 }
 
-void select_client(Client * restrict c)
+void select_client(Client * c)
 {
 	c->flags |= JB_ACTIVE;
 	unselect_current();
 	XInstallColormap(jbwm.dpy, c->cmap);
 	XSetInputFocus(jbwm.dpy, c->window, RevertToPointerRoot, CurrentTime);
-	XSetWindowBorder(jbwm.dpy, c->parent, c->flags & JB_STICKY 
+	XSetWindowBorder(jbwm.dpy, c->parent, c->flags & JB_STICKY
 		? c->screen->pixels.fc : c->screen->pixels.fg);
 	jbwm.current=c;
 #ifdef EWMH
@@ -120,7 +120,7 @@ static void relink_window_list(Client * c)
 			}
 }
 
-static void unparent_window(Client * restrict c)
+static void unparent_window(Client * c)
 {
 	LOG("unparent_window");
 	XReparentWindow(jbwm.dpy, c->window, c->screen->root,
@@ -170,7 +170,7 @@ static Status xmsg(const Window w, const Atom a, const long x)
 	});
 }
 
-static bool has_delete_proto(const Client * restrict c)
+static bool has_delete_proto(const Client * c)
 {
 	bool found=false;
 	Atom *p;

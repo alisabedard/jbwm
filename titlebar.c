@@ -31,7 +31,6 @@ void shade(Client * restrict c)
 	   for iconification.  */
 	if (c->flags & JB_SHADED) {
 		// Unshade
-		//c->size.height = c->shade_height;
 		c->size.height = c->old_size.height;
 		c->flags &= ~JB_SHADED;
 		XMapWindow(jbwm.dpy, c->window);
@@ -39,7 +38,6 @@ void shade(Client * restrict c)
 		set_wm_state(c, NormalState);
 		ewmh_remove_state(c->window, ewmh.atoms[WM_STATE_SHADED]);
 	} else {		// Shade the client
-		//c->shade_height = c->size.height;
 		c->old_size.height = c->size.height;
 		c->ignore_unmap++;
 		XUnmapWindow(jbwm.dpy, c->window);
@@ -132,12 +130,12 @@ static void draw_titlebar(Client * restrict c)
 	const uint32_t f = c->flags;
 	if (!(f & JB_NO_CLOSE_DECOR))
 		draw(t, jbwm.gc.close, 0);
+	if(f & JB_TEAROFF)
+		  return;
 	if (!(f & JB_NO_MIN_DECOR))
 		draw(t, jbwm.gc.shade, w-TDIM);
 	if (!(f & JB_NO_MIN_DECOR))
 		draw(t, jbwm.gc.resize, w-(TDIM<<1));
-	if(f & JB_TEAROFF)
-		  return;
 	draw_title(c);
 }
 

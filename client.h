@@ -11,14 +11,14 @@
 #include <X11/Xlib.h>
 
 
-void client_to_vdesk(Client * restrict c, const uint8_t d);
+void client_to_vdesk(Client * c, const uint8_t d);
 Client *find_client(Window w);
 // Free result with XFree if not NULL
 char * get_title(const Window w);
 void remove_client(Client * c);
 void select_client(Client * c);
 void send_wm_delete(const Client * restrict c);
-void set_wm_state(Client * restrict c, const int state);
+void set_wm_state(Client * c, const int state);
 void stick(Client * c);
 
 #endif /* JBWM_CLIENT_H */

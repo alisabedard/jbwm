@@ -16,15 +16,19 @@
 unsigned long pixel(const uint8_t screen, const char * restrict name);
 
 #if defined(EWMH) || defined(MWM)
+
 void *get_property(Window w, Atom property,
 	unsigned long * restrict num_items);
+
 #endif//EWMH||MWM
 
 void jbwm_grab_button(const Window w, const unsigned int mask,
 		 const unsigned int btn);
 
 #ifdef DEBUG
+
 void print_atom(const Atom a, const uint16_t line);
+
 #endif//DEBUG
 
 #endif//!JBWM_UTIL_H

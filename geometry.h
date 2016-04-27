@@ -8,8 +8,4 @@ typedef struct {
 	uint16_t w, h;
 } Dim;
 
-#ifndef USE_TBAR
-#define TDIM 0
-#endif//!USE_TBAR
-
 #endif//!GEOMETRY_H
