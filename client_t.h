@@ -41,7 +41,4 @@ struct Client {
 	XSizeHints size;
 };
 
-/* This is to initialize the above CE.  */
-void initialize_client_ce(Client * c);
-
 #endif /* JBWM_CLIENT_STRUCT_H */
