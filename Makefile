@@ -8,7 +8,7 @@
 # However, it may not work correctly with clang.
 #CFLAGS+=-flto
 # Enable all warnings
-CFLAGS+=-Wall -Wextra -pedantic
+CFLAGS+=-Wall -Wextra
 #CFLAGS+=-Werror
 
 # Uncomment if you use firefox with flash fullscreen videos.

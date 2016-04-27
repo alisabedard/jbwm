@@ -22,16 +22,15 @@ __attribute__((nonnull))
 static void set_geometry(Client * restrict c,
 	XWindowAttributes * restrict attr)
 {
-	XSizeHints *restrict g = &(c->size);
 	const Dim dim = { attr->width, attr->height };
 	const bool valid = (dim.w >= c->size.min_width)
 	    && (dim.h >= c->size.min_height);
 	c->size.width = valid ? dim.w : c->size.min_width;
 	c->size.height = valid ? dim.h : c->size.min_height;
 	const bool pos = (attr->map_state == IsViewable)
-	    || (g->flags & USPosition);
-	g->x=pos ? attr->x : (c->screen->size.w>>1)-(g->width>>1);
-	g->y=pos ? attr->y : (c->screen->size.h>>1)-(g->height>>1);
+	    || (c->size.flags & USPosition);
+	c->size.x=pos ? attr->x : (c->screen->size.w>>1)-(c->size.width>>1);
+	c->size.y=pos ? attr->y : (c->screen->size.h>>1)-(c->size.height>>1);
 }
 
 #ifdef EWMH
@@ -118,7 +117,7 @@ static void reparent(Client * restrict c)
 }
 
 void make_new_client(Window w, ScreenInfo * s)
-{	
+{
 	LOG("make_new_client(%d,s)", (int)w);
 	assert(s);
 	Client *c = calloc(1, sizeof(Client));
