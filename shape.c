@@ -14,14 +14,13 @@
 static bool is_shaped(Client * c)
 {
 	assert(c);
-	bool s;
-	int d;
-	return XShapeQueryExtents(jbwm.dpy, c->window, (int *)&s, &d, &d, 
-		(unsigned int *) &d, (unsigned int *) &d, &d, &d, &d,
-		(unsigned int *) &d, (unsigned int *) &d) && s;
+	int s, d;
+	unsigned int u;
+	return XShapeQueryExtents(jbwm.dpy, c->window, &s, &d, &d,
+		&u, &u, &d, &d, &d, &u, &u) && s;
 }
 
-void set_shape(Client * restrict c)
+void set_shape(Client * c)
 {
 	assert(c);
 	if(c->flags & JB_SHAPED) {
@@ -31,7 +30,7 @@ void set_shape(Client * restrict c)
 	}
 }
 
-void setup_shaped(Client * restrict c)
+void setup_shaped(Client * c)
 {
 	assert(c);
 	if (is_shaped(c)) {
