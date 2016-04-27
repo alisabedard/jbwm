@@ -10,25 +10,15 @@
 #include <stdbool.h>
 #include <X11/Xlib.h>
 
-// Free result with XFree if not NULL
-char * get_title(const Window w);
 
 void client_to_vdesk(Client * restrict c, const uint8_t d);
-
-Status xmsg(const Window w, const Atom a, const long x);
-
-void send_wm_delete(const Client * restrict c);
-
 Client *find_client(Window w);
-
-void select_client(Client * c);
-
-void stick(Client * c);
-
+// Free result with XFree if not NULL
+char * get_title(const Window w);
 void remove_client(Client * c);
-
-void send_config(Client * c);
-
+void select_client(Client * c);
+void send_wm_delete(const Client * restrict c);
 void set_wm_state(Client * restrict c, const int state);
+void stick(Client * c);
 
 #endif /* JBWM_CLIENT_H */
