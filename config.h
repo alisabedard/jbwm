@@ -31,12 +31,16 @@
 #define TITLEBAR_SHADE_BG       "#797"
 #define TITLEBAR_RESIZE_BG      "#779"
 
-#define GRAB_MASK Mod4Mask
-#define LOCK_MASK LockMask
-#define MOD_MASK ControlMask
+enum {
+	GRAB_MASK = Mod4Mask,
+	LOCK_MASK = LockMask,
+	MOD_MASK = ControlMask
+};
 
-#define JBWM_BORDER 1
-#define JBWM_SNAP 12
-#define JBWM_RESIZE_INCREMENT 20
+enum {
+	JBWM_BORDER = 1,
+	JBWM_SNAP = 12,
+	JBWM_RESIZE_INCREMENT = 20
+};
 
 #endif//JBWM_CONFIG_H
