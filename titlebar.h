@@ -7,6 +7,8 @@
 
 #ifdef USE_TBAR
 
+#include "jbwmenv.h"
+
 void shade(Client * restrict c);
 void update_titlebar(Client * c);
 

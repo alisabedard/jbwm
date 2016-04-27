@@ -2,7 +2,6 @@
 CFLAGS=-O0
 CFLAGS+=-ggdb
 CFLAGS+=-DDEBUG
-CFLAGS+=-DXDEBUG
 # Profile
 CFLAGS+=-pg
 # Enable all warnings

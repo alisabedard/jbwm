@@ -3,13 +3,8 @@
 // Copyright 1999-2015, Ciaran Anscomb <jbwm@6809.org.uk>
 // See README for license and other details.
 
-#include <stdint.h>
-#include <stdnoreturn.h>
-#ifdef USE_SHAPE
-#include <X11/extensions/shape.h>
-#endif
-#include <X11/Xatom.h>
-#include <X11/Xlib.h>
+#include "events.h"
+
 #include "button_event.h"
 #include "client.h"
 #include "ewmh.h"
@@ -19,6 +14,12 @@
 #include "new.h"
 #include "screen.h"
 #include "titlebar.h"
+#ifdef DEBUG
+#include "util.h"
+#endif//DEBUG
+
+#include <stdnoreturn.h>
+#include <X11/Xatom.h>
 
 static ScreenInfo *find_screen(const Window root)
 {
@@ -85,15 +86,6 @@ static void handle_wm_hints(Client * c)
 
 	XFree(h);
 }
-
-#ifdef DEBUG
-void print_atom(const Atom a, const unsigned int line)
-{
-	char *an = XGetAtomName(jbwm.dpy, a);
-	fprintf(stderr, "\t%s:%d %s(%lu)\n", __FILE__, line, an, a);
-	XFree(an);
-}
-#endif//DEBUG
 
 static void handle_property_change(XPropertyEvent * e)
 {

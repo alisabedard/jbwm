@@ -6,6 +6,7 @@
 #ifndef SCREENINFO_H
 #define SCREENINFO_H
 
+#include <stdint.h>
 #include <X11/Xlib.h>
 #include "geometry.h"
 
@@ -18,7 +19,7 @@ typedef struct ScreenInfo {
 #endif//EWMH
 	GC gc;
 	struct {
-		unsigned long fg, bg, fc;
+		uint32_t fg, bg, fc;
 	} pixels;
 } ScreenInfo;
 

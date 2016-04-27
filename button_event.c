@@ -3,10 +3,9 @@
 // Copyright 1999-2015, Ciaran Anscomb <jbwm@6809.org.uk>
 // See README for license and other details.
 
-#include <stdint.h>
-#include <X11/Xlib.h>
+#include "button_event.h"
+
 #include "client.h"
-#include "client_t.h"
 #include "jbwmenv.h"
 #include "screen.h"
 #include "titlebar.h"
@@ -26,7 +25,7 @@ static void button1_event(XButtonEvent * e
 	    && (p.y < TDIM)) {	// Close button
 		/* This fixes a bug where deleting a shaded window will cause
 		   the parent window to stick around as a ghost window. */
-		if (f & JB_SHADED) 
+		if (f & JB_SHADED)
 			shade(c);
 
 		send_wm_delete(c);

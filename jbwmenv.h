@@ -6,11 +6,12 @@
 #ifndef JBWM_ENVIRONMENT_H
 #define JBWM_ENVIRONMENT_H
 
+#include "client_t.h"
+
 #include <stdbool.h>
 #ifdef USE_XFT
 #include <X11/Xft/Xft.h>
 #endif//USE_XFT
-#include "client_t.h"
 
 typedef struct {
 	bool need_cleanup;

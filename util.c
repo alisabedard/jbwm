@@ -3,8 +3,8 @@
 // Copyright 1999-2015, Ciaran Anscomb <jbwm@6809.org.uk>
 // See README for license and other details.
 
-#include <stdlib.h>
-#include <X11/Xlib.h>
+#include "util.h"
+
 #include "jbwmenv.h"
 
 __attribute__((nonnull(2)))
@@ -12,7 +12,7 @@ unsigned long pixel(const uint8_t screen, const char * restrict name)
 {
 	XColor c;
 	XAllocNamedColor(jbwm.dpy, DefaultColormap(jbwm.dpy, screen),
-		name, &c, &(XColor){0});
+		name, &c, &(XColor){});
 	return c.pixel;
 }
 
@@ -37,4 +37,14 @@ void jbwm_grab_button(const Window w, const unsigned int mask,
 		    ButtonPressMask | ButtonReleaseMask, GrabModeAsync,
 		    GrabModeSync, None, None);
 }
+
+#ifdef DEBUG
+void print_atom(const Atom a, const uint16_t line)
+{
+	char *an = XGetAtomName(jbwm.dpy, a);
+	fprintf(stderr, "\t%s:%d %s(%lu)\n", __FILE__, line, an, a);
+	XFree(an);
+}
+#endif//DEBUG
+
 

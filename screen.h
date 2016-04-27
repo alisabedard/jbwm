@@ -6,9 +6,7 @@
 #ifndef JBWM_SCREEN_H
 #define JBWM_SCREEN_H
 
-#include <stdint.h>
 #include "client_t.h"
-#include "ScreenInfo.h"
 
 void drag(Client * restrict c);
 void moveresize(Client * restrict c);

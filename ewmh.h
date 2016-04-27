@@ -8,8 +8,7 @@
 
 #ifdef EWMH
 
-#include <stdint.h>
-#include <X11/Xlib.h>
+#include "ScreenInfo.h"
 
 typedef struct {
 	uint8_t count;

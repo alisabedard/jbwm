@@ -1,10 +1,26 @@
-// Copyright 2016, Jeffrey E. Bedard <jefbed@gmail.com>
+// jbwm - Minimalist Window Manager for X
+// Copyright 2008-2016, Jeffrey E. Bedard <jefbed@gmail.com>
+// Copyright 1999-2015, Ciaran Anscomb <jbwm@6809.org.uk>
+// See README for license and other details.
+
+#include "mwm.h"
+
+
+#include "jbwmenv.h"
+#include "log.h"
+#include "util.h"
+
+#include <assert.h>
+#include <X11/Xatom.h>
+
+#if 0
 #include <assert.h>
 #include <X11/Xlib.h>
-#include "atoms.h"
+
 #include "client.h"
 #include "log.h"
 #include "util.h"
+#endif
 
 // flags:
 #define MWM_HINTS_FUNCTIONS     (1L << 0)

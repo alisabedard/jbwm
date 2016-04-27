@@ -3,25 +3,24 @@
 // Copyright 1999-2015, Ciaran Anscomb <jbwm@6809.org.uk>
 // See README for license and other details.
 
-#include <assert.h>
-#include <stdbool.h>
-#include <stdint.h>
-#include <stdlib.h>
-#include <X11/Xatom.h>
-#include <X11/Xlib.h>
-#include "atoms.h"
-#include "client_t.h"
+#include "client.h"
+
 #include "ewmh.h"
 #include "jbwmenv.h"
 #include "log.h"
 #include "screen.h"
 #include "titlebar.h"
+#include "util.h"
+
+#include <assert.h>
+#include <stdlib.h>
+#include <X11/Xatom.h>
 
 // Free result with XFree if not NULL
 char * get_title(const Window w)
 {
 	XTextProperty tp;
-	if (!XGetWMName(jbwm.dpy, w, &tp)) 
+	if (!XGetWMName(jbwm.dpy, w, &tp))
 		  return NULL;
 	return (char *)tp.value;
 }
@@ -163,7 +162,7 @@ void remove_client(Client * c)
 // Returns 0 on failure.  
 Status xmsg(const Window w, const Atom a, const long x)
 {
-	XLOG("xmsg");
+	LOG("xmsg");
 	return XSendEvent(jbwm.dpy, w, false, NoEventMask, &(XEvent){
 		.xclient.type = ClientMessage,.xclient.window = w,
 		.xclient.message_type = a,.xclient.format = 32,

@@ -94,6 +94,7 @@ tbonly:
 	make -f Makefile.tbonly
 
 check:
+	CFLAGS='-Werror'
 	make clean
 	make -f Makefile.clang
 	make clean

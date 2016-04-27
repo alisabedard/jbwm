@@ -3,22 +3,20 @@
 // Copyright 1999-2015, Ciaran Anscomb <jbwm@6809.org.uk>
 // See README for license and other details.
 
+#include "titlebar.h"
+
+#include "client.h"
+#include "config.h"
+#include "ewmh.h"
+#include "log.h"
+#include "screen.h"
+#include "util.h"
+
 #include <assert.h>
-#include <stdint.h>
 #include <string.h>
-#include <X11/Xlib.h>
 #ifdef USE_XFT
 #include <X11/Xft/Xft.h>
 #endif//USE_XFT
-#include "client.h"
-#include "client_t.h"
-#include "config.h"
-#include "ewmh.h"
-#include "jbwmenv.h"
-#include "log.h"
-#include "screen.h"
-#include "titlebar.h"
-#include "util.h"
 
 void shade(Client * restrict c)
 {

@@ -3,18 +3,14 @@
 // Copyright 1999-2015, Ciaran Anscomb <jbwm@6809.org.uk>
 // See README for license and other details.
 
-#include <stdbool.h>
-#include <stdint.h>
+#include "keys.h"
+
 #include <stdlib.h>
-#include <X11/keysymdef.h>
-#include <X11/Xlib.h>
 #include "client.h"
 #include "config.h"
 #include "jbwmenv.h"
-#include "keys.h"
 #include "log.h"
 #include "screen.h"
-#include "ScreenInfo.h"
 #include "snap.h"
 #include "titlebar.h"
 

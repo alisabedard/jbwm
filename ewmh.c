@@ -3,20 +3,17 @@
 // Copyright 1999-2015, Ciaran Anscomb <jbwm@6809.org.uk>
 // See README for license and other details.
 
-#include <stdbool.h>
-#include <unistd.h>
-#include <X11/Xatom.h>
-#include <X11/Xlib.h>
-#include "atoms.h"
-#include "client.h"
-#include "client_t.h"
-#include "events.h"
 #include "ewmh.h"
+
+#include "client.h"
 #include "jbwmenv.h"
 #include "log.h"
-#include "new.h"
 #include "screen.h"
 #include "util.h"
+
+#include <unistd.h>
+#include <stdlib.h>
+#include <X11/Xatom.h>
 
 EWMHEnvironment ewmh;
 
@@ -268,7 +265,7 @@ void ewmh_client_message(XClientMessageEvent * e)
 {
 	const Atom t = e->message_type;
 #ifdef DEBUG
-	puts("----CLIENTMESSAGE----");
+	fprintf(stderr, "----CLIENTMESSAGE----");
 	print_atom(t, __LINE__);
 	print_atom(e->data.l[0], __LINE__);
 	print_atom(e->data.l[1], __LINE__);

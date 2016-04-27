@@ -6,6 +6,8 @@
 #ifndef JBWM_NEW_H
 #define JBWM_NEW_H
 
-void make_new_client(Window w, ScreenInfo * s);
+#include "ScreenInfo.h"
 
-#endif /* JBWM_NEW_H */
+void make_new_client(Window w, ScreenInfo * restrict s);
+
+#endif//!JBWM_NEW_H

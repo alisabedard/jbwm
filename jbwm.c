@@ -3,19 +3,27 @@
 // Copyright 1999-2015, Ciaran Anscomb <jbwm@6809.org.uk>
 // See README for license and other details.
 
-#include <string.h>
-#ifdef USE_ARGV
-#include <unistd.h>
-#endif//USE_ARGV
-#include <X11/cursorfont.h>
+#include "jbwmenv.h"
+
 #include "config.h"
 #include "events.h"
 #include "ewmh.h"
-#include "jbwmenv.h"
 #include "keys.h"
 #include "log.h"
 #include "new.h"
 #include "util.h"
+
+#ifdef STDIO
+#include <stdio.h>
+#endif//STDIO
+#include <stdlib.h>
+#include <stdnoreturn.h>
+#ifdef USE_ARGV
+#include <string.h>
+#include <unistd.h>
+#endif//USE_ARGV
+#include <X11/cursorfont.h>
+#include <X11/Xproto.h>
 
 // Main application data structure.
 JBWMEnvironment jbwm;
@@ -29,7 +37,7 @@ typedef struct {
 
 /* Used for overriding the default WM modifiers */
 __attribute__((warn_unused_result))
-static unsigned int parse_modifiers(char * restrict arg)
+static uint16_t parse_modifiers(char * restrict arg)
 {
 	LOG("parse_modifiers()");
 /* *INDENT-OFF* */
@@ -49,12 +57,13 @@ static unsigned int parse_modifiers(char * restrict arg)
 	return 0;
 }
 
-static void parse_argv(int argc, char **argv, Options * restrict o)
+static void parse_argv(uint8_t argc, char **argv, Options * restrict o)
 {
 	LOG("parse_argv(%d,%s...)", argc, argv[0]);
-	const char *optstring = "1:2:b:d:f:s:V";
+	const char *optstring = "1:2:b:d:f:hs:V";
 
-	for (int opt; (opt = getopt(argc, argv, optstring)) != -1;) {
+	int8_t opt;
+	while((opt=getopt(argc, argv, optstring)) != -1) {
 		switch (opt) {
 		case '1':
 			jbwm.keymasks.grab = parse_modifiers(optarg);
@@ -81,13 +90,11 @@ static void parse_argv(int argc, char **argv, Options * restrict o)
 			break;
 #ifdef STDIO
 		case 'V':
-			puts(VERSION);
+			fprintf(stdout, VERSION);
 			exit(0);
-
 		default:	/* Usage */
-			fprintf(stderr, "%s [%s]\n", argv[0], optstring);
+			fprintf(stdout, "%s [%s]\n", argv[0], optstring);
 #else//!STDIO
-
 		default:
 #endif//STDIO
 			exit(1);
@@ -97,6 +104,18 @@ static void parse_argv(int argc, char **argv, Options * restrict o)
 #else//!USE_ARGV
 #define parse_argv(a, b, o)
 #endif//USE_ARGV
+
+static noreturn void jbwm_error(const char * msg
+#ifndef STDIO
+	__attribute__((unused))
+#endif//!STDIO
+	)
+{
+#ifdef STDIO
+	perror(msg);
+#endif//STDIO
+	exit(1);
+}
 
 #ifdef USE_TBAR
 static void setup_fonts(void)
@@ -114,7 +133,7 @@ static void setup_fonts(void)
 #endif//USE_XFT
 
 	if (!jbwm.font)
-		ERROR("Cannot load any font");
+		jbwm_error("Cannot load any font");
 }
 #else//!USE_TBAR
 #define setup_fonts()
@@ -144,7 +163,7 @@ static void setup_clients(ScreenInfo * restrict s)
 	unsigned int nwins;
 	Window *wins;
 
-	if (!XQueryTree(jbwm.dpy, s->root, &(Window){0}, 
+	if (!XQueryTree(jbwm.dpy, s->root, &(Window){0},
 		&(Window){0}, &wins, &nwins))
 		return;
 
@@ -214,7 +233,7 @@ int handle_xerror(Display * dpy __attribute__ ((unused)), XErrorEvent * e)
 {
 	if ((e->error_code == BadAccess)
 	    && (e->request_code == X_ChangeWindowAttributes)) {
-		ERROR("ROOT");
+		jbwm_error("ROOT");
 	}
 
 	return 0;		// Ignore everything else.
@@ -233,7 +252,7 @@ int main(
 	parse_argv(argc, argv, &o);
 
 	if (!(jbwm.dpy = XOpenDisplay(NULL)))
-		ERROR("DISPLAY");
+		jbwm_error("DISPLAY");
 
 	XSetErrorHandler(handle_xerror);
 	ewmh_init();

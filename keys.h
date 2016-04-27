@@ -6,8 +6,8 @@
 #ifndef __KEYS_H
 #define __KEYS_H
 
-#include <X11/keysymdef.h>
-#include <X11/Xlib.h>
+#include "ScreenInfo.h"
+#include <X11/keysym.h>
 
 void jbwm_handle_key_event(XKeyEvent * restrict e);
 

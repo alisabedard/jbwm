@@ -3,12 +3,10 @@
 // Copyright 1999-2015, Ciaran Anscomb <jbwm@6809.org.uk>
 // See README for license and other details.
 
-#include <assert.h>
-#include <stdlib.h>
-#include <X11/Xlib.h>
-#include "atoms.h"
-#include "client_t.h"
+#include "new.h"
+
 #include "config.h"
+#include "client_t.h"
 #include "ewmh.h"
 #include "jbwmenv.h"
 #include "log.h"
@@ -16,7 +14,10 @@
 #include "screen.h"
 #include "shape.h"
 #include "util.h"
-#include "titlebar.h"
+
+#include <assert.h>
+#include <stdlib.h>
+#include <X11/Xatom.h>
 
 __attribute__((nonnull))
 static void set_geometry(Client * restrict c,
@@ -116,7 +117,7 @@ static void reparent(Client * restrict c)
 	XMapWindow(jbwm.dpy, c->window);
 }
 
-void make_new_client(Window w, ScreenInfo * s)
+void make_new_client(Window w, ScreenInfo * restrict s)
 {
 	LOG("make_new_client(%d,s)", (int)w);
 	assert(s);
