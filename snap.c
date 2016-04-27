@@ -12,7 +12,7 @@
 #include "log.h"
 #include "titlebar.h"
 
-__attribute__ ((const, hot, warn_unused_result))
+__attribute__ ((const, hot, warn_unused_result, regparm(2)))
 static int16_t sborder(const int16_t xy, const int16_t edge)
 {
 	if(abs(xy+edge) < JBWM_SNAP)
@@ -31,7 +31,7 @@ void snap_border(Client *restrict c)
 	g->y=sborder(g->y, g->height + b - c->screen->size.h);
 }
 
-__attribute__ ((const, hot, warn_unused_result))
+__attribute__ ((const, hot, warn_unused_result, regparm(2)))
 static inline int16_t absmin(const int16_t a, const int16_t b)
 {
 	return abs(a) < abs(b) ? a : b;

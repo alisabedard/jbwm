@@ -47,9 +47,21 @@ $(PROG): $(OBJS)
 
 all: $(PROG)
 
-strip: $(PROG)
-	strip --strip-all --remove-section=.comment \
-		--remove-section=.note $(PROG)
+strip: 
+	strip -s \
+		-R .comment \
+		-R .note \
+		-R .gnu.version \
+		-R .note.gnu.build-id \
+		-R .note.ABI-tag \
+		-R .gnu.hash \
+		-R .jcr \
+		-R .plt.got \
+		-R .eh_frame \
+		-R .eh_frame_hdr \
+		-R .got \
+		-R .rela.dyn \
+		$(PROG)
 
 INSTALL=install -c
 INSTALL_PROG=$(INSTALL) 
@@ -82,7 +94,7 @@ debug:
 small:
 	make clean
 	make -f Makefile.small
-	strip jbwm
+	make strip
 	ls -l jbwm
 
 clang:

@@ -202,16 +202,6 @@ void set_maximized(Client * restrict c)
 	c->flags |= JB_MAXIMIZED;
 }
 
-void maximize(Client * restrict c)
-{
-	LOG("maximize");
-	assert(c);
-	// Honor !MWM_FUNC_MAXIMIZE
-	// Maximizing shaped windows is buggy, so return.
-	if (!(c->flags & (JB_NO_MAX | JB_SHAPED)))
-		c->flags&JB_MAXIMIZED?unset_maximized(c):set_maximized(c);
-}
-
 void unset_fullscreen(Client * restrict c)
 {
 	LOG("unset_fullscreen");
@@ -248,17 +238,6 @@ void set_fullscreen(Client * restrict c)
 	ewmh_add_state(c->window, ewmh.atoms[WM_STATE_FULLSCREEN]);
 	update_titlebar(c);
 	c->flags |= JB_IS_FS;
-}
-
-void fullscreen(Client * restrict c)
-{
-	assert(c);
-	if(c->flags&JB_NO_MAX)
-		  return;
-	if(c->flags&JB_IS_FS)
-		  unset_fullscreen(c);
-	else
-		  set_fullscreen(c);
 }
 
 void hide(Client * restrict c)

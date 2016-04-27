@@ -6,16 +6,22 @@
 #ifndef JBWM__LOG_H__
 #define JBWM__LOG_H__
 
-#if defined(DEBUG) && defined(STDIO)
+#ifdef DEBUG
+
+#include <stdio.h>
+
 #define LOG(...) \
 	{\
 		fprintf(stderr, "%s:%d:  ", __FILE__, __LINE__);\
 		fprintf(stderr, __VA_ARGS__);\
 		putc('\n', stderr);\
 	}
-#else// !DEBUG || !STDIO
+
+#else//!DEBUG
+
 #define LOG(...)
 #define MARK()
-#endif// DEBUG && STDIO
+
+#endif//DEBUG
 
 #endif /* JBWM__LOG_H__ */

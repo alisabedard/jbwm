@@ -159,8 +159,8 @@ void remove_client(Client * c)
 	free(c);
 }
 
-// Returns 0 on failure.  
-Status xmsg(const Window w, const Atom a, const long x)
+// Returns 0 on failure.
+static Status xmsg(const Window w, const Atom a, const long x)
 {
 	LOG("xmsg");
 	return XSendEvent(jbwm.dpy, w, false, NoEventMask, &(XEvent){
@@ -180,7 +180,7 @@ static bool has_delete_proto(const Client * restrict c)
 		while(i--)
 			if((found=(p[i]==client_atoms[I_DEL_WIN])))
 				break;
-		// Should be freed here, otherwise p has no alloc.  
+		// Should be freed here, otherwise p has no alloc.
 		XFree(p);
 	}
 	return found;

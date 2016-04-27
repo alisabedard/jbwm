@@ -21,7 +21,8 @@ static void point(Client * c, const int x, const int y)
 }
 
 static void
-keymv(Client * c, XKeyEvent * e, int *xy, int *wh, const int8_t sign)
+keymv(Client * c, XKeyEvent * e, int * restrict xy, int * restrict wh,
+	const int8_t sign)
 {
 	/* These operations invalid when maximized.  */
 	if (c->flags & JB_MAXIMIZED)
@@ -85,11 +86,20 @@ static void handle_client_key_event(XKeyEvent * e, Client * c, KeySym key)
 		break;
 
 	case KEY_FS:
-		fullscreen(c);
+		if(c->flags&JB_NO_MAX)
+			return;
+		if(c->flags&JB_IS_FS)
+			unset_fullscreen(c);
+		else
+			set_fullscreen(c);
 		break;
 
 	case KEY_MAX:
-		maximize(c);
+		// Honor !MWM_FUNC_MAXIMIZE
+		// Maximizing shaped windows is buggy, so return.
+		if (!(c->flags & (JB_NO_MAX | JB_SHAPED)))
+			c->flags&JB_MAXIMIZED?unset_maximized(c)
+				:set_maximized(c);
 		break;
 
 	case KEY_MAX_H:
@@ -167,7 +177,6 @@ void jbwm_handle_key_event(XKeyEvent * restrict e)
 	ScreenInfo *s = c ? c->screen : jbwm.screens;
 	const bool mod = e->state & jbwm.keymasks.mod;
 	bool zero_desk = false;
-	uint8_t new_desk;
 
 	switch (key) {
 	case KEY_NEW:
@@ -194,18 +203,15 @@ void jbwm_handle_key_event(XKeyEvent * restrict e)
 	case XK_8:
 	case XK_9:
 		// First desktop 0, per wm-spec
-		new_desk = zero_desk ? 10 : key - XK_1;
-		cond_client_to_desk(c, s, new_desk, mod);
+		cond_client_to_desk(c, s, zero_desk ? 10 : key - XK_1, mod);
 		break;
 
 	case KEY_PREVDESK:
-		new_desk = s->vdesk - 1;
-		cond_client_to_desk(c, s, new_desk, mod);
+		cond_client_to_desk(c, s, s->vdesk - 1, mod);
 		break;
 
 	case KEY_NEXTDESK:
-		new_desk = s->vdesk + 1;
-		cond_client_to_desk(c, s, new_desk, mod);
+		cond_client_to_desk(c, s, s->vdesk + 1, mod);
 		break;
 
 	default:
@@ -214,6 +220,7 @@ void jbwm_handle_key_event(XKeyEvent * restrict e)
 	}
 }
 
+__attribute__((nonnull(1,2)))
 static void
 grab(ScreenInfo * restrict s, KeySym * restrict ks, const unsigned int mask)
 {
@@ -223,6 +230,7 @@ grab(ScreenInfo * restrict s, KeySym * restrict ks, const unsigned int mask)
 			 GrabModeAsync, GrabModeAsync);
 }
 
+__attribute__((nonnull(1)))
 void grab_keys_for_screen(ScreenInfo * restrict s)
 {
 	grab(s, (KeySym[]){JBWM_KEYS_TO_GRAB}, 0);

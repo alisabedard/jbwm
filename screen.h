@@ -8,23 +8,20 @@
 
 #include "client_t.h"
 
+enum {DESKTOPS=10};
+
 void drag(Client * restrict c);
+void maximize_horz(Client * restrict c);
+void maximize_vert(Client * restrict c);
 void moveresize(Client * restrict c);
 void resize(Client * restrict c);
-void hide(Client * restrict c);
-void unhide(Client * restrict c);
-uint8_t switch_vdesk(ScreenInfo * s, const uint8_t v);
-void maximize_horz(Client * restrict c);
 void restore_horz(Client * restrict c);
-void maximize_vert(Client * restrict c);
 void restore_vert(Client * restrict c);
 void set_fullscreen(Client * restrict c);
-void unset_fullscreen(Client * restrict c);
 void set_maximized(Client * restrict c);
+uint8_t switch_vdesk(ScreenInfo * s, const uint8_t v);
+void unset_fullscreen(Client * restrict c);
+void unhide(Client * restrict c);
 void unset_maximized(Client * restrict c);
-void maximize(Client * restrict c);
-void fullscreen(Client * restrict c);
-
-enum {DESKTOPS=10};
 
 #endif /* JBWM_SCREEN_H */
