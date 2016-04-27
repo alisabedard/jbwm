@@ -4,5 +4,5 @@
 # See README for license and other details.
 
 CC=clang
-CFLAGS=-Os
+#CFLAGS=-Os
 include Makefile
