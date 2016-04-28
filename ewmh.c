@@ -15,7 +15,8 @@
 #include <stdlib.h>
 #include <X11/Xatom.h>
 
-EWMHEnvironment ewmh;
+//EWMHEnvironment ewmh;
+Atom ewmh[EWMH_ATOMS_COUNT];
 
 static char * atom_names [] = {
 	"_NET_SUPPORTED",
@@ -69,15 +70,13 @@ static char * atom_names [] = {
 
 void ewmh_init(void)
 {
-	ewmh.count = sizeof(atom_names) / sizeof(char *);
-	LOG("atom_names: %d\n", ewmh.count);
-	ewmh.atoms=malloc(ewmh.count*sizeof(Atom));
-	XInternAtoms(jbwm.dpy, atom_names, ewmh.count, false, ewmh.atoms);
+	LOG("atom_names: %d\n", EWMH_ATOMS_COUNT);
+	XInternAtoms(jbwm.dpy, atom_names, EWMH_ATOMS_COUNT, false, ewmh);
 }
 
 static inline void set_desktop_viewport(void)
 {
-	XPROP(jbwm.screens->root, ewmh.atoms[DESKTOP_VIEWPORT], XA_CARDINAL,
+	XPROP(jbwm.screens->root, ewmh[DESKTOP_VIEWPORT], XA_CARDINAL,
 		(&(long[]){0, 0}), 2);
 }
 
@@ -91,10 +90,10 @@ void ewmh_update_client_list(void)
 	for (Client * i = jbwm.head; i && (count < MAX_CLIENTS); i = i->next)
 		wl[count++] = i->window;
 
-	XPROP(jbwm.screens->root, ewmh.atoms[CLIENT_LIST],
+	XPROP(jbwm.screens->root, ewmh[CLIENT_LIST],
 		XA_WINDOW, &wl, count);
 	// FIXME: Does not correctly report stacking order.
-	XPROP(jbwm.screens->root, ewmh.atoms[CLIENT_LIST_STACKING],
+	XPROP(jbwm.screens->root, ewmh[CLIENT_LIST_STACKING],
 		XA_WINDOW, &wl, count);
 }
 
@@ -102,7 +101,7 @@ void ewmh_update_client_list(void)
 void ewmh_remove_state(const Window w, const Atom state)
 {
 	unsigned long n;
-	Atom *a = get_property(w, ewmh.atoms[WM_STATE], &n);
+	Atom *a = get_property(w, ewmh[WM_STATE], &n);
 
 	if (a) {
 		const unsigned long nitems = n;
@@ -111,7 +110,7 @@ void ewmh_remove_state(const Window w, const Atom state)
 			if (a[n] == state)
 				a[n] = 0;
 
-		XPROP(w, ewmh.atoms[WM_STATE], XA_ATOM, &a, nitems);
+		XPROP(w, ewmh[WM_STATE], XA_ATOM, &a, nitems);
 		XFree(a);
 	}
 }
@@ -119,7 +118,7 @@ void ewmh_remove_state(const Window w, const Atom state)
 bool ewmh_get_state(const Window w, const Atom state)
 {
 	unsigned long n;
-	Atom *a = get_property(w, ewmh.atoms[WM_STATE], &n);
+	Atom *a = get_property(w, ewmh[WM_STATE], &n);
 
 	if (!a)
 		return false;
@@ -136,17 +135,17 @@ bool ewmh_get_state(const Window w, const Atom state)
 
 void ewmh_add_state(const Window w, const Atom state)
 {
-	XChangeProperty(jbwm.dpy, w, ewmh.atoms[WM_STATE],
+	XChangeProperty(jbwm.dpy, w, ewmh[WM_STATE],
 		XA_ATOM, 32, PropModePrepend,
 		(unsigned char *)&state, 1);
 }
 
 static void set_number_of_desktops(const Window r)
 {
-	XPROP(r, ewmh.atoms[NUMBER_OF_DESKTOPS], XA_CARDINAL,
+	XPROP(r, ewmh[NUMBER_OF_DESKTOPS], XA_CARDINAL,
 		&(long){DESKTOPS}, 1);
 	set_desktop_viewport();
-	XPROP(r, ewmh.atoms[VIRTUAL_ROOTS], XA_WINDOW, &r, 1);
+	XPROP(r, ewmh[VIRTUAL_ROOTS], XA_WINDOW, &r, 1);
 }
 
 /*      Reference, per wm-spec:
@@ -195,7 +194,7 @@ static void check_state(XClientMessageEvent * e,	// event data
 			const AtomIndex t,	// state to test
 			Client *c)
 {
-	const Atom state = ewmh.atoms[t];
+	const Atom state = ewmh[t];
 	// 2 atoms can be set at once
 	long * l = &e->data.l[0];
 	const bool set = l[1] == (long)state || l[2] == (long)state;
@@ -251,20 +250,20 @@ void ewmh_client_message(XClientMessageEvent * e)
 	Client *c = find_client(e->window);
 	ScreenInfo *s = c ? c->screen : jbwm.screens;
 	const long val = e->data.l[0];
-	if (t == ewmh.atoms[CURRENT_DESKTOP])
+	if (t == ewmh[CURRENT_DESKTOP])
 		switch_vdesk(s, val);
-	else if (t == ewmh.atoms[WM_DESKTOP] && c)
+	else if (t == ewmh[WM_DESKTOP] && c)
 		client_to_vdesk(c, val);
-	else if (t == ewmh.atoms[DESKTOP_VIEWPORT])
+	else if (t == ewmh[DESKTOP_VIEWPORT])
 		set_desktop_viewport();
-	else if (t == ewmh.atoms[NUMBER_OF_DESKTOPS])
+	else if (t == ewmh[NUMBER_OF_DESKTOPS])
 		set_number_of_desktops(s->root);
-	else if (t == ewmh.atoms[ACTIVE_WINDOW] && val == 2 && c)
+	else if (t == ewmh[ACTIVE_WINDOW] && val == 2 && c)
 		select_client(c);
-	else if (t == ewmh.atoms[CLOSE_WINDOW] && e->data.l[1] == 2 && c)
+	else if (t == ewmh[CLOSE_WINDOW] && e->data.l[1] == 2 && c)
 		send_wm_delete(c);
 	// If something else moves the window:
-	else if (t == ewmh.atoms[MOVERESIZE_WINDOW]) {
+	else if (t == ewmh[MOVERESIZE_WINDOW]) {
 		const uint8_t src = (val >> 12) & 3;
 		if (src == 2) {
 			const int vm = (val >> 8) & 0x0f;
@@ -276,12 +275,12 @@ void ewmh_client_message(XClientMessageEvent * e)
 		}
 	}
 	// If user moves window (client-side titlebars):
-	else if (t == ewmh.atoms[WM_MOVERESIZE] && c) {
+	else if (t == ewmh[WM_MOVERESIZE] && c) {
 		XRaiseWindow(jbwm.dpy, c->parent);
 		drag(c);
-	} else if (t == ewmh.atoms[WM_STATE] && c)
+	} else if (t == ewmh[WM_STATE] && c)
 		handle_wm_state_changes(e, c);
-	else if (t == ewmh.atoms[WM_CHANGE_STATE] && c) {
+	else if (t == ewmh[WM_CHANGE_STATE] && c) {
 		if (val == 3)	// Minimize (lower)
 			XLowerWindow(jbwm.dpy, c->parent);
 	}
@@ -290,16 +289,16 @@ void ewmh_client_message(XClientMessageEvent * e)
 void set_ewmh_allowed_actions(const Window w)
 {
 	const Atom a[] = {
-		ewmh.atoms[WM_ALLOWED_ACTIONS],
-		ewmh.atoms[WM_ACTION_MOVE],
-		ewmh.atoms[WM_ACTION_RESIZE], ewmh.atoms[WM_ACTION_CLOSE],
-		ewmh.atoms[WM_ACTION_SHADE],
-		ewmh.atoms[WM_ACTION_FULLSCREEN],
-		ewmh.atoms[WM_ACTION_CHANGE_DESKTOP],
-		ewmh.atoms[WM_ACTION_ABOVE],
-		ewmh.atoms[WM_ACTION_BELOW],
-		ewmh.atoms[WM_ACTION_MAXIMIZE_HORZ],
-		ewmh.atoms[WM_ACTION_MAXIMIZE_VERT]
+		ewmh[WM_ALLOWED_ACTIONS],
+		ewmh[WM_ACTION_MOVE],
+		ewmh[WM_ACTION_RESIZE], ewmh[WM_ACTION_CLOSE],
+		ewmh[WM_ACTION_SHADE],
+		ewmh[WM_ACTION_FULLSCREEN],
+		ewmh[WM_ACTION_CHANGE_DESKTOP],
+		ewmh[WM_ACTION_ABOVE],
+		ewmh[WM_ACTION_BELOW],
+		ewmh[WM_ACTION_MAXIMIZE_HORZ],
+		ewmh[WM_ACTION_MAXIMIZE_VERT]
 	};
 	XPROP(w, a[0], XA_ATOM, &a, sizeof(a) / sizeof(Atom));
 }
@@ -309,11 +308,11 @@ static void init_desktops(ScreenInfo * restrict s)
 {
 	const Window r = s->root;
 	const unsigned long workarea[4] = { 0, 0, s->size.w, s->size.h };
-	XPROP(r, ewmh.atoms[DESKTOP_VIEWPORT], XA_CARDINAL, &workarea[0], 2);
-	XPROP(r, ewmh.atoms[DESKTOP_GEOMETRY], XA_CARDINAL, &workarea[2], 2);
-	XPROP(r, ewmh.atoms[CURRENT_DESKTOP], XA_CARDINAL, &s->vdesk, 1);
+	XPROP(r, ewmh[DESKTOP_VIEWPORT], XA_CARDINAL, &workarea[0], 2);
+	XPROP(r, ewmh[DESKTOP_GEOMETRY], XA_CARDINAL, &workarea[2], 2);
+	XPROP(r, ewmh[CURRENT_DESKTOP], XA_CARDINAL, &s->vdesk, 1);
 	static const unsigned char n = DESKTOPS;
-	XPROP(r, ewmh.atoms[NUMBER_OF_DESKTOPS], XA_CARDINAL, &n, 1);
+	XPROP(r, ewmh[NUMBER_OF_DESKTOPS], XA_CARDINAL, &n, 1);
 }
 
 __attribute__((nonnull(1)))
@@ -321,22 +320,22 @@ static void init_supporting(ScreenInfo * restrict s)
 {
 	s->supporting = XCreateSimpleWindow(jbwm.dpy, s->root,
 		0, 0, 1, 1, 0, 0, 0);
-	XPROP(s->root, ewmh.atoms[SUPPORTING_WM_CHECK],
+	XPROP(s->root, ewmh[SUPPORTING_WM_CHECK],
 		XA_WINDOW, &(s->supporting), 1);
-	XPROP(s->supporting, ewmh.atoms[SUPPORTING_WM_CHECK],
+	XPROP(s->supporting, ewmh[SUPPORTING_WM_CHECK],
 		XA_WINDOW, &(s->supporting), 1);
-	XPROP(s->supporting, ewmh.atoms[WM_NAME], XA_STRING, "jbwm", 4);
-	XPROP(s->supporting, ewmh.atoms[WM_PID], XA_CARDINAL,
+	XPROP(s->supporting, ewmh[WM_NAME], XA_STRING, "jbwm", 4);
+	XPROP(s->supporting, ewmh[WM_PID], XA_CARDINAL,
 		&(pid_t){getpid()}, 1);
 }
 
 __attribute__((nonnull(1)))
 void setup_ewmh_for_screen(ScreenInfo * restrict s)
 {
-	XPROP(s->root, ewmh.atoms[SUPPORTED], XA_ATOM, ewmh.atoms, ewmh.count);
-	XPROP(s->root, ewmh.atoms[WM_NAME], XA_STRING, "jbwm", 4);
+	XPROP(s->root, ewmh[SUPPORTED], XA_ATOM, ewmh, EWMH_ATOMS_COUNT);
+	XPROP(s->root, ewmh[WM_NAME], XA_STRING, "jbwm", 4);
 	// Set this to the root window until we have some clients.
-	XPROP(s->root, ewmh.atoms[CLIENT_LIST], XA_WINDOW, &s->root, 1);
+	XPROP(s->root, ewmh[CLIENT_LIST], XA_WINDOW, &s->root, 1);
 	init_desktops(s);
 	init_supporting(s);
 }

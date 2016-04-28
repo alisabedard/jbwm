@@ -8,6 +8,6 @@
 
 #include "ScreenInfo.h"
 
-void make_new_client(Window w, ScreenInfo * restrict s);
+void make_new_client(const Window w, ScreenInfo * restrict s);
 
 #endif//!JBWM_NEW_H

@@ -11,14 +11,14 @@
 
 enum {
 	JB_STICKY = 1, JB_REMOVE = (1<<1), JB_ACTIVE = (1<<2),
-	JB_SHADED = (1<<3), JB_DONT_MANAGE = (1<<4), JB_NO_TB = (1<<5),
+	JB_SHADED = (1<<3), JB_IS_FS = (1<<4), JB_NO_TB = (1<<5),
 	JB_MAXIMIZED = (1<<6), JB_NO_MIN = (1<<7), JB_NO_RESIZE = (1<<8),
 	JB_TEAROFF = (1<<9), JB_NO_BORDER = (1<<10), JB_NO_CLOSE = (1<<11),
 	JB_NO_MAX = (1<<12), JB_NO_MOVE = (1<<13), JB_MODAL = (1<<14),
 	JB_SHAPED = (1<<15), JB_NO_RESIZE_DECOR = (1<<16),
 	JB_NO_CLOSE_DECOR = (1<<17), JB_NO_MIN_DECOR = (1<<18),
 	JB_NO_MAX_DECOR = (1<<19), JB_MAX_HORZ = (1<<20),
-	JB_MAX_VERT = (1<<21), JB_FULLSCREEN = (1<<22), JB_IS_FS = (1<<23) 
+	JB_MAX_VERT = (1<<21), JB_FULLSCREEN = (1<<22)
 };
 
 typedef struct Client Client;

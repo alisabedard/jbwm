@@ -19,34 +19,20 @@
 #include <stdlib.h>
 #include <X11/Xatom.h>
 
-__attribute__((nonnull))
-static void set_geometry(Client * c, XWindowAttributes * attr)
-{
-	const Dim dim = { attr->width, attr->height };
-	const bool valid = (dim.w >= c->size.min_width)
-	    && (dim.h >= c->size.min_height);
-	c->size.width = valid ? dim.w : c->size.min_width;
-	c->size.height = valid ? dim.h : c->size.min_height;
-	const bool pos = (attr->map_state == IsViewable)
-	    || (c->size.flags & USPosition);
-	c->size.x=pos ? attr->x : (c->screen->size.w>>1)-(c->size.width>>1);
-	c->size.y=pos ? attr->y : (c->screen->size.h>>1)-(c->size.height>>1);
-}
-
 #ifdef EWMH
 __attribute__((nonnull))
-static void wm_desktop(Client * c)
+static void wm_desktop(const Window w, uint8_t * restrict vdesk)
 {
 	unsigned long nitems;
-	unsigned long *lprop = get_property(c->window,
-		ewmh.atoms[WM_DESKTOP], &nitems);
+	unsigned long *lprop = get_property(w,
+		ewmh[WM_DESKTOP], &nitems);
 
 	if (lprop && nitems && (lprop[0] < 9))
-		c->vdesk = lprop[0];
+		*vdesk = lprop[0];
 
 	if (!lprop)
-		XPROP(c->window, ewmh.atoms[WM_DESKTOP],
-			XA_CARDINAL, &(c->vdesk), 1);
+		XPROP(w, ewmh[WM_DESKTOP],
+			XA_CARDINAL, vdesk, 1);
 	else
 		XFree(lprop);
 }
@@ -57,10 +43,9 @@ static void wm_desktop(Client * c)
 __attribute__((nonnull))
 static void init_properties(Client * c)
 {
-	assert(c->screen);
-	c->vdesk = c->screen->vdesk;
 	handle_mwm_hints(c);
-	wm_desktop(c);
+	c->vdesk = c->screen->vdesk;
+	wm_desktop(c->window, &c->vdesk);
 }
 
 #ifdef FIX_FIREFOX
@@ -89,7 +74,15 @@ static void init_geometry(Client * c)
 	XGetWindowAttributes(jbwm.dpy, c->window, &attr);
 	c->cmap = attr.colormap;
 	XGetWMNormalHints(jbwm.dpy, c->window, &(c->size), &(long){0});
-	set_geometry(c, &attr);
+	const Dim dim = { attr.width, attr.height };
+	const bool valid = (dim.w >= c->size.min_width)
+	    && (dim.h >= c->size.min_height);
+	c->size.width = valid ? dim.w : c->size.min_width;
+	c->size.height = valid ? dim.h : c->size.min_height;
+	const bool pos = (attr.map_state == IsViewable)
+	    || (c->size.flags & USPosition);
+	c->size.x=pos ? attr.x : (c->screen->size.w>>1)-(c->size.width>>1);
+	c->size.y=pos ? attr.y : (c->screen->size.h>>1)-(c->size.height>>1);
 
 	// Test if the reparent that is to come would trigger an unmap event.
 	if (attr.map_state == IsViewable)
@@ -116,7 +109,7 @@ static void reparent(Client * c) // use of restrict here is a bug
 	XMapWindow(jbwm.dpy, c->window);
 }
 
-void make_new_client(Window w, ScreenInfo * s)
+void make_new_client(const Window w, ScreenInfo * s)
 {
 	LOG("make_new_client(%d,s)", (int)w);
 	assert(s);
@@ -129,10 +122,6 @@ void make_new_client(Window w, ScreenInfo * s)
 	c->border = JBWM_BORDER;
 	init_properties(c);
 	init_geometry(c);
-
-	if (c->flags & JB_DONT_MANAGE)
-		return;
-
 	XSelectInput(jbwm.dpy, c->window, EnterWindowMask
 		| PropertyChangeMask | ColormapChangeMask);
 	reparent(c);

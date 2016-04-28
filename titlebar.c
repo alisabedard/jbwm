@@ -36,7 +36,7 @@ void shade(Client * restrict c)
 		XMapWindow(jbwm.dpy, c->window);
 		moveresize(c);
 		set_wm_state(c, NormalState);
-		ewmh_remove_state(c->window, ewmh.atoms[WM_STATE_SHADED]);
+		ewmh_remove_state(c->window, ewmh[WM_STATE_SHADED]);
 	} else {		// Shade the client
 		c->old_size.height = c->size.height;
 		c->ignore_unmap++;
@@ -44,7 +44,7 @@ void shade(Client * restrict c)
 		c->size.height = 0;
 		c->flags |= JB_SHADED;
 		set_wm_state(c, IconicState);
-		ewmh_add_state(c->window, ewmh.atoms[WM_STATE_SHADED]);
+		ewmh_add_state(c->window, ewmh[WM_STATE_SHADED]);
 		select_client(c);
 	}
 }

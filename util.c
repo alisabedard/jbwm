@@ -21,10 +21,9 @@ __attribute__((warn_unused_result))
 void *get_property(Window w, Atom property, unsigned long * restrict num_items)
 {
 	unsigned char *prop;
-	// Recycle property as dummy variable.
 	if (XGetWindowProperty(jbwm.dpy, w, property, 0L, 1024LL,
-		false, AnyPropertyType, &property, (int*)&property, num_items,
-		(unsigned long *)&property, &prop) == Success)
+		false, AnyPropertyType, &property, &(int){0}, num_items,
+		&(unsigned long){0}, &prop) == Success)
 		return prop;
 	return NULL;
 }

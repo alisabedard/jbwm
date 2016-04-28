@@ -57,7 +57,7 @@ enum { CA_SZ=3 };
 static Atom client_atoms[CA_SZ];
 enum { I_PROTOS, I_DEL_WIN, I_WM_STATE };
 
-static void setup_client_atoms()
+static void setup_client_atoms(void)
 {
 	if(client_atoms[0])
 		  return; // Already initialized
@@ -83,6 +83,10 @@ static void unselect_current(void)
 
 void select_client(Client * c)
 {
+#ifdef MWM
+	if(jbwm.current && (jbwm.current->flags & JB_MODAL))
+		  return;
+#endif//MWM
 	c->flags |= JB_ACTIVE;
 	unselect_current();
 	XInstallColormap(jbwm.dpy, c->cmap);
@@ -91,7 +95,7 @@ void select_client(Client * c)
 		? c->screen->pixels.fc : c->screen->pixels.fg);
 	jbwm.current=c;
 #ifdef EWMH
-	XPROP(c->screen->root, ewmh.atoms[ACTIVE_WINDOW],
+	XPROP(c->screen->root, ewmh[ACTIVE_WINDOW],
 		XA_WINDOW, &(c->parent), 1);
 #endif//EWMH
 }
@@ -139,15 +143,15 @@ void remove_client(Client * c)
 	assert(c);
 	if (c->flags & JB_REMOVE) {
 #ifdef EWMH
-		XDeleteProperty(jbwm.dpy, c->window, ewmh.atoms[WM_DESKTOP]);
-		XDeleteProperty(jbwm.dpy, c->window, ewmh.atoms[WM_STATE]);
+		XDeleteProperty(jbwm.dpy, c->window, ewmh[WM_DESKTOP]);
+		XDeleteProperty(jbwm.dpy, c->window, ewmh[WM_STATE]);
 #endif//EWMH
 		set_wm_state(c, WithdrawnState);
 	}
 #ifdef EWMH
 	else
 		XDeleteProperty(jbwm.dpy, c->window,
-			ewmh.atoms[WM_ALLOWED_ACTIONS]);
+			ewmh[WM_ALLOWED_ACTIONS]);
 
 #endif//EWMH
 	unparent_window(c);

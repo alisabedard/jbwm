@@ -10,12 +10,6 @@
 
 #include "ScreenInfo.h"
 
-typedef struct {
-	uint8_t count;
-	Atom *atoms;
-} EWMHEnvironment;
-
-extern EWMHEnvironment ewmh;
 void ewmh_update_client_list(void);
 void ewmh_remove_state(const Window w, const Atom state);
 void ewmh_add_state(const Window w, const Atom state);
@@ -45,8 +39,20 @@ WM_ACTION_MOVE, WM_ACTION_RESIZE, WM_ACTION_CLOSE,
 WM_STATE, WM_STATE_STICKY, WM_STATE_MAXIMIZED_VERT,
     WM_STATE_MAXIMIZED_HORZ, WM_STATE_SHADED, WM_STATE_HIDDEN,
     WM_STATE_FULLSCREEN, WM_STATE_ABOVE, WM_STATE_BELOW,
-    WM_STATE_DEMANDS_ATTENTION, WM_STATE_FOCUSED, WM_STATE_SKIP_PAGER
+    WM_STATE_DEMANDS_ATTENTION, WM_STATE_FOCUSED, WM_STATE_SKIP_PAGER,
+// The following entry must be last:
+    EWMH_ATOMS_COUNT
 } AtomIndex;
+
+extern Atom ewmh[];
+#if 0
+typedef struct {
+	uint8_t count;
+	Atom atoms[EWMH_ATOMS_COUNT];
+} EWMHEnvironment;
+
+extern EWMHEnvironment ewmh;
+#endif
 
 #else//!EWMH
 #define ewmh_update_client_list()

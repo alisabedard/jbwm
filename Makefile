@@ -9,6 +9,7 @@
 #CFLAGS+=-flto
 # Enable all warnings
 CFLAGS+=-Wall -Wextra
+CFLAGS+=-fstrict-aliasing -Wstrict-aliasing=2
 #CFLAGS+=-Werror
 
 # Uncomment if you use firefox with flash fullscreen videos.

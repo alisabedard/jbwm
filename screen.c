@@ -21,25 +21,23 @@
 enum {MouseMask=(ButtonPressMask|ButtonReleaseMask|PointerMotionMask)};
 
 __attribute__ ((hot))
-static void draw_outline(Client * c)
+static void draw_outline(Client * restrict c)
 {
-	/* restrict, as all changes will occur through g */
-	XSizeHints *restrict g = &(c->size);
 	const uint8_t offset = c->flags & JB_NO_TB ? 0 : TDIM;
 	XDrawRectangle(jbwm.dpy, c->screen->root, c->screen->gc,
-		g->x, g->y - offset,
-		g->width + c->border,
-		g->height + c->border + offset);
+		c->size.x, c->size.y - offset,
+		c->size.width + c->border,
+		c->size.height + c->border + offset);
 }
 
 static void configure(XSizeHints * restrict g, const Window w)
 {
 	XSendEvent(jbwm.dpy, w, true, StructureNotifyMask, (XEvent *)
-		&(XConfigureEvent){.x = g->x,.y = g->y, .width = g->width,
-		.height = g->height, .type = ConfigureNotify, .event = w });
+		&(XConfigureEvent){.x = g->x, .y = g->y, .width = g->width,
+		.height = g->width, .type = ConfigureNotify, .event = w });
 }
 
-static void grab_pointer(const Window w)
+static inline void grab_pointer(const Window w)
 {
 	XGrabPointer(jbwm.dpy, w, false, MouseMask, GrabModeAsync,
 		GrabModeAsync, None, jbwm.cursor, CurrentTime);
@@ -71,11 +69,10 @@ resize_loop:
 
 static XPoint get_mouse_position(Window w)
 {
-	XPoint p;
-	// Recycle w as dummy variable.
-	XQueryPointer(jbwm.dpy, w, &w, &w, (int *)&p.x, (int *)&p.y, (int *)&w,
-		      (int *)&w, (unsigned int *)&w);
-	return p;
+	int x, y, d;
+	XQueryPointer(jbwm.dpy, w, &w, &w, &x, &y,
+		&d, &d, &(unsigned int){0});
+	return (XPoint){x, y};
 }
 
 void drag(Client * restrict c)
@@ -126,7 +123,7 @@ void restore_horz(Client * restrict c)
 	c->flags^=JB_MAX_HORZ;
 	c->size.x=c->old_size.x;
 	c->size.width=c->old_size.width;
-	ewmh_remove_state(c->window, ewmh.atoms[WM_STATE_MAXIMIZED_HORZ]);
+	ewmh_remove_state(c->window, ewmh[WM_STATE_MAXIMIZED_HORZ]);
 }
 
 void maximize_horz(Client * restrict c)
@@ -139,7 +136,7 @@ void maximize_horz(Client * restrict c)
 	c->old_size.width=c->size.width;
 	c->size.x=0;
 	c->size.width=c->screen->size.w;
-	ewmh_add_state(c->window, ewmh.atoms[WM_STATE_MAXIMIZED_HORZ]);
+	ewmh_add_state(c->window, ewmh[WM_STATE_MAXIMIZED_HORZ]);
 	c->flags|=JB_MAX_HORZ;
 	// Offset if not fullscreen
 	if(!(c->flags&JB_FULLSCREEN)) {
@@ -155,7 +152,7 @@ void restore_vert(Client * restrict c)
 		c->size.y=c->old_size.y;
 		c->size.height=c->old_size.height;
 		ewmh_remove_state(c->window,
-			ewmh.atoms[WM_STATE_MAXIMIZED_VERT]);
+			ewmh[WM_STATE_MAXIMIZED_VERT]);
 	}
 }
 
@@ -169,7 +166,7 @@ void maximize_vert(Client * restrict c)
 	c->old_size.height=c->size.height;
 	c->size.y=0;
 	c->size.height=c->screen->size.h;
-	ewmh_add_state(c->window, ewmh.atoms[WM_STATE_MAXIMIZED_VERT]);
+	ewmh_add_state(c->window, ewmh[WM_STATE_MAXIMIZED_VERT]);
 	c->flags|=JB_MAX_VERT;
 	// Offset the titlebar if not fullscreen
 	if(!(c->flags&JB_FULLSCREEN)) {
@@ -212,7 +209,7 @@ void unset_fullscreen(Client * restrict c)
 	restore_horz(c);
 	restore_vert(c);
 	XSetWindowBorderWidth(jbwm.dpy, c->parent, c->border);
-	ewmh_remove_state(c->window, ewmh.atoms[WM_STATE_FULLSCREEN]);
+	ewmh_remove_state(c->window, ewmh[WM_STATE_FULLSCREEN]);
 	update_titlebar(c);
 	c->flags &= ~JB_IS_FS;
 }
@@ -235,7 +232,7 @@ void set_fullscreen(Client * restrict c)
 	maximize_horz(c);
 	maximize_vert(c);
 	XSetWindowBorderWidth(jbwm.dpy, c->parent, 0);
-	ewmh_add_state(c->window, ewmh.atoms[WM_STATE_FULLSCREEN]);
+	ewmh_add_state(c->window, ewmh[WM_STATE_FULLSCREEN]);
 	update_titlebar(c);
 	c->flags |= JB_IS_FS;
 }
@@ -279,7 +276,7 @@ uint8_t switch_vdesk(ScreenInfo * s, const uint8_t v)
 
 	s->vdesk = v;
 #ifdef EWMH
-	XPROP(s->root, ewmh.atoms[CURRENT_DESKTOP],
+	XPROP(s->root, ewmh[CURRENT_DESKTOP],
 		XA_CARDINAL, &(s->vdesk), 1);
 #endif//EWMH
 	return s->vdesk;
