@@ -162,13 +162,40 @@ static void set_number_of_desktops(const Window r)
         _NET_WM_STATE_TOGGLE        2    toggle property
   other data.l[] elements = 0 */
 
-static void check_state(XClientMessageEvent * e,	// event data
-			const Atom state,	// state to test
-			Client *c,
-			// callback:
-			void (*state_cb) (const bool, // true if add
-			Client *))
+static void set_state(Client * restrict c, const bool add, const AtomIndex t)
 {
+	switch(t) {
+	case WM_STATE_FULLSCREEN:
+		add?set_fullscreen(c):unset_fullscreen(c);
+		break;
+	case WM_STATE_STICKY:
+		if(add) c->flags |= JB_STICKY;
+		else c->flags &= ~JB_STICKY;
+		break;
+	case WM_STATE_ABOVE:
+		if(add) XRaiseWindow(jbwm.dpy, c->parent);
+		else XLowerWindow(jbwm.dpy, c->parent);
+		break;
+	case WM_STATE_BELOW:
+		if(add) XLowerWindow(jbwm.dpy, c->parent);
+		else XRaiseWindow(jbwm.dpy, c->parent);
+		break;
+	case WM_STATE_MAXIMIZED_VERT:
+		add?maximize_vert(c):restore_vert(c);
+		break;
+	case WM_STATE_MAXIMIZED_HORZ:
+		add?maximize_horz(c):restore_horz(c);
+		break;
+	default:
+		break;
+	}
+}
+
+static void check_state(XClientMessageEvent * e,	// event data
+			const AtomIndex t,	// state to test
+			Client *c)
+{
+	const Atom state = ewmh.atoms[t];
 	// 2 atoms can be set at once
 	long * l = &e->data.l[0];
 	const bool set = l[1] == (long)state || l[2] == (long)state;
@@ -176,20 +203,19 @@ static void check_state(XClientMessageEvent * e,	// event data
 	switch (e->data.l[0]) {
 	default:
 	case 0:	// remove
-		state_cb(false, c);
+		set_state(c, false, t);
 		ewmh_remove_state(e->window, state);
 		break;
 
 	case 1:	// add
-		state_cb(true, c);
+		set_state(c, true, t);
 		ewmh_add_state(e->window, state);
 		break;
 
 	case 2:{	// toggle
 			const bool add =
 			    !ewmh_get_state(e->window, state);
-			state_cb(false, c);
-
+			set_state(c, add, t);
 			if (add)
 				  ewmh_add_state(e->window, state);
 			else
@@ -198,66 +224,16 @@ static void check_state(XClientMessageEvent * e,	// event data
 	}
 }
 
-__attribute__((cold))
-static void layer(const bool above, const Window w)
-{
-	if(above)
-		  XRaiseWindow(jbwm.dpy, w);
-	else
-		  XLowerWindow(jbwm.dpy, w);
-}
-
-__attribute__((nonnull(2),cold))
-static void above_cb(const bool add, Client * c)
-{
-	add?layer(true, c->parent):layer(false, c->parent);
-}
-
-__attribute__((nonnull(2),cold))
-static void below_cb(const bool add, Client * c)
-{
-	add?layer(false, c->parent):layer(true, c->parent);
-}
-
-__attribute__((nonnull(2)))
-static void fullscreen_cb(const bool add, Client * c)
-{
-	add?set_fullscreen(c):unset_fullscreen(c);
-}
-
-__attribute__((nonnull(2)))
-static void max_h_cb(const bool add, Client * c)
-{
-	add?maximize_horz(c):restore_horz(c);
-}
-
-__attribute__((nonnull(2)))
-static void
-max_v_cb(const bool add, Client * c)
-{
-	add?maximize_vert(c):restore_vert(c);
-}
-
-__attribute__((nonnull(2),cold))
-static void
-stick_cb(const bool add, Client * c)
-{
-	if(add)
-		  c->flags |= JB_STICKY;
-	else
-		  c->flags &= ~JB_STICKY;
-}
-
 __attribute__((nonnull(1,2)))
 static void handle_wm_state_changes(XClientMessageEvent * restrict e,
 	Client * restrict c)
 {
-	check_state(e, ewmh.atoms[WM_STATE_ABOVE], c, above_cb);
-	check_state(e, ewmh.atoms[WM_STATE_BELOW], c, below_cb);
-	check_state(e, ewmh.atoms[WM_STATE_FULLSCREEN], c, fullscreen_cb);
-	check_state(e, ewmh.atoms[WM_STATE_MAXIMIZED_HORZ], c, max_h_cb);
-	check_state(e, ewmh.atoms[WM_STATE_MAXIMIZED_VERT], c, max_v_cb);
-	check_state(e, ewmh.atoms[WM_STATE_STICKY], c, stick_cb);
+	check_state(e, WM_STATE_ABOVE, c);
+	check_state(e, WM_STATE_BELOW, c);
+	check_state(e, WM_STATE_FULLSCREEN, c);
+	check_state(e, WM_STATE_MAXIMIZED_HORZ, c);
+	check_state(e, WM_STATE_MAXIMIZED_VERT, c);
+	check_state(e, WM_STATE_STICKY, c);
 }
 
 __attribute__((nonnull))
@@ -275,10 +251,9 @@ void ewmh_client_message(XClientMessageEvent * e)
 	Client *c = find_client(e->window);
 	ScreenInfo *s = c ? c->screen : jbwm.screens;
 	const long val = e->data.l[0];
-
 	if (t == ewmh.atoms[CURRENT_DESKTOP])
 		switch_vdesk(s, val);
-	if (t == ewmh.atoms[WM_DESKTOP] && c)
+	else if (t == ewmh.atoms[WM_DESKTOP] && c)
 		client_to_vdesk(c, val);
 	else if (t == ewmh.atoms[DESKTOP_VIEWPORT])
 		set_desktop_viewport();
