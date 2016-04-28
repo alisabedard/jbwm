@@ -21,7 +21,8 @@ static void point(Client * restrict c, const int x, const int y)
 }
 
 static void
-keymv(Client * c, const bool mod, int * xy, int * wh, const int8_t sign)
+keymv(Client * c, const bool mod, int * restrict xy,
+	int * restrict wh, const int8_t sign)
 {
 	/* These operations invalid when maximized.  */
 	if (c->flags & JB_MAXIMIZED)
@@ -52,7 +53,7 @@ keymv(Client * c, const bool mod, int * xy, int * wh, const int8_t sign)
 }
 
 static void handle_client_key_event(const bool mod,
-	Client * restrict c, const KeySym key)
+	Client * c, const KeySym key)
 {
 	XSizeHints *g = &(c->size);
 
@@ -169,7 +170,7 @@ cond_client_to_desk(Client * c, ScreenInfo * s, const uint8_t d, const bool mod)
 		switch_vdesk(s, d);
 }
 
-void jbwm_handle_key_event(XKeyEvent * restrict e)
+void jbwm_handle_key_event(XKeyEvent * e)
 {
 	const KeySym key = XLookupKeysym(e, 0);
 	Client *c = jbwm.current;
@@ -230,7 +231,7 @@ grab(ScreenInfo * restrict s, KeySym * restrict ks, const unsigned int mask)
 }
 
 __attribute__((nonnull(1)))
-void grab_keys_for_screen(ScreenInfo * restrict s)
+void grab_keys_for_screen(ScreenInfo * s)
 {
 	grab(s, (KeySym[]){JBWM_KEYS_TO_GRAB}, 0);
 	grab(s, (KeySym[]){JBWM_ALT_KEYS_TO_GRAB}, jbwm.keymasks.mod);

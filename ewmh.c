@@ -81,7 +81,7 @@ static inline void set_desktop_viewport(void)
 		(&(long[]){0, 0}), 2);
 }
 
-void ewmh_update_client_list()
+void ewmh_update_client_list(void)
 {
 #define MAX_CLIENTS 1024
 	// Prevent data from disappearing after return.
@@ -293,7 +293,6 @@ void ewmh_client_message(XClientMessageEvent * e)
 		const uint8_t src = (val >> 12) & 3;
 		if (src == 2) {
 			const int vm = (val >> 8) & 0x0f;
-			//const int grav = val & 0xff;
 			XConfigureWindow(e->display, e->window,
 				vm, &(XWindowChanges){
 				.x = e->data.l[1], .y = e->data.l[2],
