@@ -10,7 +10,6 @@
 # Enable all warnings
 CFLAGS+=-Wall -Wextra
 CFLAGS+=-fstrict-aliasing -Wstrict-aliasing=2
-CFLAGS+=-Wlogical-op -Wmissing-prototypes
 
 # Uncomment if you use firefox with flash fullscreen videos.
 #DEFINES += -DFIX_FIREFOX

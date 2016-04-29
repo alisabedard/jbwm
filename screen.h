@@ -19,7 +19,7 @@ void restore_horz(Client * restrict c);
 void restore_vert(Client * restrict c);
 void set_fullscreen(Client * restrict c);
 void set_maximized(Client * restrict c);
-uint8_t switch_vdesk(ScreenInfo * s, const uint8_t v);
+uint8_t switch_vdesk(ScreenInfo * s, uint8_t v);
 void unset_fullscreen(Client * restrict c);
 void unhide(Client * restrict c);
 void unset_maximized(Client * restrict c);

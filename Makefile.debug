@@ -13,6 +13,10 @@ CFLAGS+=-Wsuggest-attribute=noreturn
 CFLAGS+=-Wsuggest-attribute=format
 CFLAGS+=-Wlarger-than=512 -Wframe-larger-than=512 -Wstack-usage=512
 CFLAGS+=-Wcast-qual -Wcast-align -Wjump-misses-init
+CFLAGS+=-Wlogical-op -Wmissing-prototypes
+#CFLAGS+=-Wpadded
+CFLAGS+=-Wredundant-decls -Wpointer-sign
+
 
 DEFINES += -DUSE_ARGV 
 DEFINES += -DSTDIO

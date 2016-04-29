@@ -247,7 +247,7 @@ void unhide(Client * restrict c)
 	set_wm_state(c, NormalState);
 }
 
-uint8_t switch_vdesk(ScreenInfo * s, const uint8_t v)
+uint8_t switch_vdesk(ScreenInfo * s, uint8_t v)
 {
 	LOG("switch_vdesk");
 	assert(s);
@@ -268,7 +268,7 @@ uint8_t switch_vdesk(ScreenInfo * s, const uint8_t v)
 	s->vdesk = v;
 #ifdef EWMH
 	XPROP(s->root, ewmh[CURRENT_DESKTOP],
-		XA_CARDINAL, &(s->vdesk), 1);
+		XA_CARDINAL, &v, 1);
 #endif//EWMH
 	return s->vdesk;
 }

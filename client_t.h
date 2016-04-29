@@ -13,6 +13,16 @@
 typedef struct Client Client;
 
 struct Client {
+	XRectangle old_size;
+	XSizeHints size;
+	Window window, parent;
+#ifdef USE_TBAR
+	Window titlebar;
+#endif//USE_TBAR
+	Colormap cmap;
+	ScreenInfo *screen;
+	Client *next;
+
 	uint8_t vdesk : 4;
 	uint8_t ignore_unmap : 4;
 	uint8_t border;
@@ -44,15 +54,6 @@ struct Client {
 		bool modal : 1;
 		bool tearoff : 1;
 	} opt;
-	Colormap cmap;
-	Window window, parent;
-#ifdef USE_TBAR
-	Window titlebar;
-#endif				//USE_TBAR
-	XRectangle old_size;
-	ScreenInfo *screen;
-	Client *next;
-	XSizeHints size;
 };
 
 #endif /* JBWM_CLIENT_STRUCT_H */

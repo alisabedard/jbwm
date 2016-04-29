@@ -11,13 +11,13 @@
 #include "geometry.h"
 
 typedef struct ScreenInfo {
-	uint8_t screen, vdesk;
-	Dim size;
-	Window root;
+	Window root : 32;
 #ifdef EWMH
-	Window supporting;
+	Window supporting : 32;
 #endif//EWMH
 	GC gc;
+	Dim size;
+	uint8_t screen : 4, vdesk : 4;
 	struct {
 		uint32_t fg, bg, fc;
 	} pixels;
