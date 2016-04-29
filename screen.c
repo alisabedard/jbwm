@@ -23,7 +23,7 @@ enum {MouseMask=(ButtonPressMask|ButtonReleaseMask|PointerMotionMask)};
 __attribute__ ((hot))
 static void draw_outline(Client * restrict c)
 {
-	const uint8_t offset = c->flags & JB_NO_TB ? 0 : TDIM;
+	const uint8_t offset = c->opt.no_titlebar ? 0 : TDIM;
 	XDrawRectangle(jbwm.dpy, c->screen->root, c->screen->gc,
 		c->size.x, c->size.y - offset,
 		c->size.width + c->border,
@@ -46,12 +46,12 @@ static inline void grab_pointer(const Window w)
 void resize(Client * restrict c)
 {
 	LOG("resize");
-	if (c->flags & (JB_NO_RESIZE | JB_SHADED))
+	if (c->opt.no_resize || c->opt.shaded)
 		  return;
 	grab_pointer(c->screen->root);
 	XEvent ev;
-	XWarpPointer(jbwm.dpy, None, c->window,
-		0, 0, 0, 0, c->size.width, c->size.height);
+	XWarpPointer(jbwm.dpy, None, c->window, 0, 0, 0, 0,
+		c->size.width, c->size.height);
 resize_loop:
 	XMaskEvent(jbwm.dpy, MouseMask, &ev);
 	if (ev.type == MotionNotify) {
@@ -80,7 +80,7 @@ void drag(Client * restrict c)
 	LOG("drag");
 	grab_pointer(c->screen->root);
 	const XPoint op = { c->size.x, c->size.y};
-	XPoint p=get_mouse_position(c->screen->root);
+	XPoint p = get_mouse_position(c->screen->root);
 	XEvent ev;
 drag_begin:
 	XMaskEvent(jbwm.dpy, MouseMask, &ev);
@@ -102,7 +102,7 @@ drag_begin:
 void moveresize(Client * restrict c)
 {
 	LOG("moveresize");
-	const uint8_t offset = (c->flags & (JB_NO_TB | JB_FULLSCREEN))
+	const uint8_t offset = c->opt.no_titlebar || c->opt.fullscreen
 		? 0 : TDIM;
 	XMoveResizeWindow(jbwm.dpy, c->parent,
 		c->size.x, c->size.y - offset,
@@ -118,11 +118,10 @@ void restore_horz(Client * restrict c)
 {
 	LOG("restore_horz");
 	assert(c);
-	if(!(c->flags & JB_MAX_HORZ))
-		  return;
-	c->flags^=JB_MAX_HORZ;
-	c->size.x=c->old_size.x;
-	c->size.width=c->old_size.width;
+	if (!c->opt.max_horz) return;
+	c->opt.max_horz = false;
+	c->size.x = c->old_size.x;
+	c->size.width = c->old_size.width;
 	ewmh_remove_state(c->window, ewmh[WM_STATE_MAXIMIZED_HORZ]);
 }
 
@@ -130,27 +129,26 @@ void maximize_horz(Client * restrict c)
 {
 	LOG("maximize_horz");
 	assert(c);
-	if (c->flags & JB_MAX_HORZ)
-		 return;
-	c->old_size.x=c->size.x;
-	c->old_size.width=c->size.width;
-	c->size.x=0;
-	c->size.width=c->screen->size.w;
+	if (c->opt.max_horz) return;
+	c->old_size.x = c->size.x;
+	c->old_size.width = c->size.width;
+	c->size.x = 0;
+	c->size.width = c->screen->size.w;
 	ewmh_add_state(c->window, ewmh[WM_STATE_MAXIMIZED_HORZ]);
-	c->flags|=JB_MAX_HORZ;
+	c->opt.max_horz = true;
 	// Offset if not fullscreen
-	if(!(c->flags&JB_FULLSCREEN)) {
-		c->size.width-=2*c->border;
+	if (c->opt.fullscreen) {
+		c->size.width -= c->border<<1;
 	}
 }
 void restore_vert(Client * restrict c)
 {
 	LOG("restore_vert");
 	assert(c);
-	if (c->flags & JB_MAX_VERT) {
-		c->flags^=JB_MAX_VERT;
-		c->size.y=c->old_size.y;
-		c->size.height=c->old_size.height;
+	if (c->opt.max_vert) {
+		c->opt.max_vert = false;
+		c->size.y = c->old_size.y;
+		c->size.height = c->old_size.height;
 		ewmh_remove_state(c->window,
 			ewmh[WM_STATE_MAXIMIZED_VERT]);
 	}
@@ -160,18 +158,17 @@ void maximize_vert(Client * restrict c)
 {
 	LOG("maximize_vert");
 	assert(c);
-	if (c->flags & JB_MAX_VERT)
-		 return;
-	c->old_size.y=c->size.y;
-	c->old_size.height=c->size.height;
-	c->size.y=0;
-	c->size.height=c->screen->size.h;
+	if (c->opt.max_vert) return;
+	c->old_size.y = c->size.y;
+	c->old_size.height = c->size.height;
+	c->size.y = 0;
+	c->size.height = c->screen->size.h;
 	ewmh_add_state(c->window, ewmh[WM_STATE_MAXIMIZED_VERT]);
-	c->flags|=JB_MAX_VERT;
+	c->opt.max_vert = true;
 	// Offset the titlebar if not fullscreen
-	if(!(c->flags&JB_FULLSCREEN)) {
-		c->size.y+=TDIM+c->border;
-		c->size.height-=TDIM+4*c->border;
+	if (!c->opt.fullscreen) {
+		c->size.y += TDIM+c->border;
+		c->size.height -= TDIM+(c->border<<2);
 		moveresize(c);
 	}
 }
@@ -181,63 +178,57 @@ void unset_maximized(Client * restrict c)
 	LOG("unset_maximized");
 	assert(c);
 	// Don't restore a fullscreen window.
-	if(!(c->flags&JB_MAXIMIZED)||(c->flags&JB_FULLSCREEN))
+	if(!c->opt.maximized || c->opt.fullscreen)
 		  return;
 	restore_horz(c);
 	restore_vert(c);
-	c->flags &= ~JB_MAXIMIZED;
+	c->opt.maximized = false;
 }
 
 void set_maximized(Client * restrict c)
 {
 	LOG("set_maximized");
 	assert(c);
-	if(c->flags&JB_MAXIMIZED)
-		  return;
+	if(c->opt.maximized) return; // Already maximized
 	maximize_horz(c);
 	maximize_vert(c);
-	c->flags |= JB_MAXIMIZED;
+	c->opt.maximized = true;
 }
 
 void unset_fullscreen(Client * restrict c)
 {
 	LOG("unset_fullscreen");
 	assert(c);
-	if(!(c->flags&JB_IS_FS))
-		  return;
-	c->flags &= ~JB_FULLSCREEN;
+	if(!c->opt.is_fullscreen) return;
+	c->opt.fullscreen = false; // Reflects desired status
 	restore_horz(c);
 	restore_vert(c);
 	XSetWindowBorderWidth(jbwm.dpy, c->parent, c->border);
 	ewmh_remove_state(c->window, ewmh[WM_STATE_FULLSCREEN]);
 	update_titlebar(c);
-	c->flags &= ~JB_IS_FS;
+	c->opt.is_fullscreen = false; // Reflects current status
 }
 
 void set_fullscreen(Client * restrict c)
 {
 	LOG("set_fullscreen");
 	assert(c);
-	if(c->flags&JB_IS_FS)
-		  return;
+	if(c->opt.is_fullscreen) return; // Already fullscreen
 	/* The following checks remove conflicts between fullscreen
 	   mode and maximized modes.  */
-	if(c->flags&JB_MAXIMIZED)
-		  unset_maximized(c);
-	if(c->flags&JB_MAX_HORZ)
-		  restore_horz(c);
-	if(c->flags&JB_MAX_VERT)
-		  restore_vert(c);
-	c->flags |= JB_FULLSCREEN;
+	if(c->opt.maximized) unset_maximized(c);
+	if(c->opt.max_horz) restore_horz(c);
+	if(c->opt.max_vert) restore_vert(c);
+	c->opt.fullscreen = true; // Reflect desired status
 	maximize_horz(c);
 	maximize_vert(c);
 	XSetWindowBorderWidth(jbwm.dpy, c->parent, 0);
 	ewmh_add_state(c->window, ewmh[WM_STATE_FULLSCREEN]);
 	update_titlebar(c);
-	c->flags |= JB_IS_FS;
+	c->opt.is_fullscreen = true; // Reflect current status
 }
 
-void hide(Client * restrict c)
+static void hide(Client * restrict c)
 {
 	LOG("hide");
 	assert(c);
@@ -265,7 +256,7 @@ uint8_t switch_vdesk(ScreenInfo * s, const uint8_t v)
 		return s->vdesk;
 
 	for (Client * c = jbwm.head; c; c = c->next) {
-		if (c->flags & JB_STICKY) {
+		if (c->opt.sticky) {
 			unhide(c);
 			continue;
 		}

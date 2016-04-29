@@ -24,15 +24,14 @@ void shade(Client * restrict c)
 	assert(c);
 
 	// Honor !MWM_FUNC_MINIMIZE
-	if (c->flags & JB_NO_MIN)
-		return;
+	if (c->opt.no_min) return;
 
 	/* This implements window shading, a substitute
 	   for iconification.  */
-	if (c->flags & JB_SHADED) {
+	if (c->opt.shaded) {
 		// Unshade
 		c->size.height = c->old_size.height;
-		c->flags &= ~JB_SHADED;
+		c->opt.shaded = false;
 		XMapWindow(jbwm.dpy, c->window);
 		moveresize(c);
 		set_wm_state(c, NormalState);
@@ -42,7 +41,7 @@ void shade(Client * restrict c)
 		c->ignore_unmap++;
 		XUnmapWindow(jbwm.dpy, c->window);
 		c->size.height = 0;
-		c->flags |= JB_SHADED;
+		c->opt.shaded = true;
 		set_wm_state(c, IconicState);
 		ewmh_add_state(c->window, ewmh[WM_STATE_SHADED]);
 		select_client(c);
@@ -64,7 +63,7 @@ static void setup_gcs(ScreenInfo * restrict s)
 
 static void new_titlebar(Client * restrict c)
 {
-	if (c->flags & (JB_NO_TB|JB_SHAPED))
+	if (c->opt.no_titlebar || c->opt.shaped)
 		return;
 
 	c->titlebar = XCreateSimpleWindow(jbwm.dpy, c->parent, 0, 0,
@@ -127,14 +126,12 @@ static void draw_titlebar(Client * restrict c)
 	const unsigned short w = c->size.width;
 	const Window t = c->titlebar;
 	XClearWindow(jbwm.dpy, t);
-	const uint32_t f = c->flags;
-	if (!(f & JB_NO_CLOSE_DECOR))
+	if (!c->opt.no_close_decor)
 		draw(t, jbwm.gc.close, 0);
-	if(f & JB_TEAROFF)
-		  return;
-	if (!(f & JB_NO_MIN_DECOR))
+	if (c->opt.tearoff) return;
+	if (!c->opt.no_min_decor)
 		draw(t, jbwm.gc.shade, w-TDIM);
-	if (!(f & JB_NO_MIN_DECOR))
+	if (!c->opt.no_resize_decor)
 		draw(t, jbwm.gc.resize, w-(TDIM<<1));
 	draw_title(c);
 }
@@ -143,10 +140,10 @@ void update_titlebar(Client * c)
 {
 	assert(c);
 
-	if (c->flags & (JB_NO_TB | JB_SHAPED))
-		return;
+	if (c->opt.no_titlebar || c->opt.shaped)
+		  return;
 
-	if (c->flags & JB_FULLSCREEN) {
+	if (c->opt.fullscreen) {
 		/* May generate BadWindow on subsequent invocations,
 		   however the error handler makes such irrelevant.  */
 		XDestroyWindow(jbwm.dpy, c->titlebar);
@@ -164,3 +161,4 @@ void update_titlebar(Client * c)
 	XMoveResizeWindow(jbwm.dpy, c->titlebar, 0, 0, c->size.width, TDIM);
 	draw_titlebar(c);
 }
+

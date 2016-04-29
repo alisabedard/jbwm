@@ -43,4 +43,6 @@ enum {
 	JBWM_RESIZE_INCREMENT = 20
 };
 
+#define JBWM_NAME "jbwm"
+
 #endif//JBWM_CONFIG_H

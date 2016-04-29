@@ -3,14 +3,14 @@
 // Copyright 1999-2015, Ciaran Anscomb <jbwm@6809.org.uk>
 // See README for license and other details.
 
-#include <stdint.h>
-#include <stdlib.h>
-#include <X11/Xlib.h>
-#include "client_t.h"
+#include "snap.h"
+
 #include "config.h"
 #include "jbwmenv.h"
 #include "log.h"
 #include "titlebar.h"
+
+#include <stdlib.h>
 
 __attribute__ ((const, hot, warn_unused_result, regparm(2)))
 static int16_t sborder(const int16_t xy, const int16_t edge)
@@ -27,7 +27,7 @@ void snap_border(Client *restrict c)
 	const uint8_t b = 2 * c->border;
 	g->x=sborder(g->x, 0 - b);
 	g->x=sborder(g->x, g->width - c->screen->size.w + b);
-	g->y=sborder(g->y, 0 - (c->flags & JB_NO_TB ? 0 : TDIM));
+	g->y=sborder(g->y, 0 - (c->opt.no_titlebar?0:TDIM));
 	g->y=sborder(g->y, g->height + b - c->screen->size.h);
 }
 

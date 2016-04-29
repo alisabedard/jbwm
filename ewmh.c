@@ -74,15 +74,9 @@ void ewmh_init(void)
 	XInternAtoms(jbwm.dpy, atom_names, EWMH_ATOMS_COUNT, false, ewmh);
 }
 
-static inline void set_desktop_viewport(void)
-{
-	XPROP(jbwm.screens->root, ewmh[DESKTOP_VIEWPORT], XA_CARDINAL,
-		(&(long[]){0, 0}), 2);
-}
-
 void ewmh_update_client_list(void)
 {
-#define MAX_CLIENTS 1024
+	enum { MAX_CLIENTS = 64 };
 	// Prevent data from disappearing after return.
 	static Window wl[MAX_CLIENTS];
 	register size_t count = 0;
@@ -115,36 +109,34 @@ void ewmh_remove_state(const Window w, const Atom state)
 	}
 }
 
-bool ewmh_get_state(const Window w, const Atom state)
+static bool ewmh_get_state(const Window w, const Atom state)
 {
 	unsigned long n;
 	Atom *a = get_property(w, ewmh[WM_STATE], &n);
 
-	if (!a)
-		return false;
-
 	bool found = false;
-
-	while (n--)
-		if ((found = (a[n] == state)))
-			break;
-
-	XFree(a);
+	if (a) {
+		while (n--)
+			if ((found = (a[n] == state)))
+				break;
+		XFree(a);
+	}
 	return found;
 }
 
-void ewmh_add_state(const Window w, const Atom state)
+void ewmh_add_state(const Window w, Atom state)
 {
 	XChangeProperty(jbwm.dpy, w, ewmh[WM_STATE],
 		XA_ATOM, 32, PropModePrepend,
 		(unsigned char *)&state, 1);
 }
 
-static void set_number_of_desktops(const Window r)
+static void set_root_vdesk(const Window r)
 {
 	XPROP(r, ewmh[NUMBER_OF_DESKTOPS], XA_CARDINAL,
 		&(long){DESKTOPS}, 1);
-	set_desktop_viewport();
+	XPROP(r, ewmh[DESKTOP_VIEWPORT], XA_CARDINAL,
+		(&(long[]){0, 0}), 2);
 	XPROP(r, ewmh[VIRTUAL_ROOTS], XA_WINDOW, &r, 1);
 }
 
@@ -168,8 +160,7 @@ static void set_state(Client * restrict c, const bool add, const AtomIndex t)
 		add?set_fullscreen(c):unset_fullscreen(c);
 		break;
 	case WM_STATE_STICKY:
-		if(add) c->flags |= JB_STICKY;
-		else c->flags &= ~JB_STICKY;
+		c->opt.sticky=add;
 		break;
 	case WM_STATE_ABOVE:
 		if(add) XRaiseWindow(jbwm.dpy, c->parent);
@@ -212,8 +203,7 @@ static void check_state(XClientMessageEvent * e,	// event data
 		break;
 
 	case 2:{	// toggle
-			const bool add =
-			    !ewmh_get_state(e->window, state);
+			const bool add = !ewmh_get_state(e->window, state);
 			set_state(c, add, t);
 			if (add)
 				  ewmh_add_state(e->window, state);
@@ -254,10 +244,9 @@ void ewmh_client_message(XClientMessageEvent * e)
 		switch_vdesk(s, val);
 	else if (t == ewmh[WM_DESKTOP] && c)
 		client_to_vdesk(c, val);
-	else if (t == ewmh[DESKTOP_VIEWPORT])
-		set_desktop_viewport();
-	else if (t == ewmh[NUMBER_OF_DESKTOPS])
-		set_number_of_desktops(s->root);
+	else if ((t == ewmh[NUMBER_OF_DESKTOPS])
+		|| (t == ewmh[DESKTOP_VIEWPORT]))
+		set_root_vdesk(s->root);
 	else if (t == ewmh[ACTIVE_WINDOW] && val == 2 && c)
 		select_client(c);
 	else if (t == ewmh[CLOSE_WINDOW] && e->data.l[1] == 2 && c)
@@ -303,40 +292,32 @@ void set_ewmh_allowed_actions(const Window w)
 	XPROP(w, a[0], XA_ATOM, &a, sizeof(a) / sizeof(Atom));
 }
 
-__attribute__((nonnull(1)))
-static void init_desktops(ScreenInfo * restrict s)
+static void init_desktops(const Window r, const Dim sz, const uint8_t vdesk)
 {
-	const Window r = s->root;
-	const unsigned long workarea[4] = { 0, 0, s->size.w, s->size.h };
-	XPROP(r, ewmh[DESKTOP_VIEWPORT], XA_CARDINAL, &workarea[0], 2);
-	XPROP(r, ewmh[DESKTOP_GEOMETRY], XA_CARDINAL, &workarea[2], 2);
-	XPROP(r, ewmh[CURRENT_DESKTOP], XA_CARDINAL, &s->vdesk, 1);
-	static const unsigned char n = DESKTOPS;
-	XPROP(r, ewmh[NUMBER_OF_DESKTOPS], XA_CARDINAL, &n, 1);
+	XPROP(r, ewmh[DESKTOP_GEOMETRY], XA_CARDINAL, &sz, 2);
+	XPROP(r, ewmh[CURRENT_DESKTOP], XA_CARDINAL, &vdesk, 1);
+	set_root_vdesk(r);
 }
 
-__attribute__((nonnull(1)))
-static void init_supporting(ScreenInfo * restrict s)
+static Window init_supporting(const Window r)
 {
-	s->supporting = XCreateSimpleWindow(jbwm.dpy, s->root,
-		0, 0, 1, 1, 0, 0, 0);
-	XPROP(s->root, ewmh[SUPPORTING_WM_CHECK],
-		XA_WINDOW, &(s->supporting), 1);
-	XPROP(s->supporting, ewmh[SUPPORTING_WM_CHECK],
-		XA_WINDOW, &(s->supporting), 1);
-	XPROP(s->supporting, ewmh[WM_NAME], XA_STRING, "jbwm", 4);
-	XPROP(s->supporting, ewmh[WM_PID], XA_CARDINAL,
-		&(pid_t){getpid()}, 1);
+	Window w = XCreateSimpleWindow(jbwm.dpy, r, 0, 0, 1, 1, 0, 0, 0);
+	XPROP(r, ewmh[SUPPORTING_WM_CHECK], XA_WINDOW, &w, 1);
+	XPROP(w, ewmh[SUPPORTING_WM_CHECK], XA_WINDOW, &w, 1);
+	XPROP(w, ewmh[WM_NAME], XA_STRING, "jbwm", 4);
+	XPROP(w, ewmh[WM_PID], XA_CARDINAL, &(pid_t){getpid()}, 1);
+	return w;
 }
 
 __attribute__((nonnull(1)))
 void setup_ewmh_for_screen(ScreenInfo * restrict s)
 {
-	XPROP(s->root, ewmh[SUPPORTED], XA_ATOM, ewmh, EWMH_ATOMS_COUNT);
-	XPROP(s->root, ewmh[WM_NAME], XA_STRING, "jbwm", 4);
+	const Window r = s->root;
+	XPROP(r, ewmh[SUPPORTED], XA_ATOM, ewmh, EWMH_ATOMS_COUNT);
+	XPROP(r, ewmh[WM_NAME], XA_STRING, "jbwm", 4);
 	// Set this to the root window until we have some clients.
-	XPROP(s->root, ewmh[CLIENT_LIST], XA_WINDOW, &s->root, 1);
-	init_desktops(s);
-	init_supporting(s);
+	XPROP(r, ewmh[CLIENT_LIST], XA_WINDOW, &r, 1);
+	init_desktops(r, s->size, s->vdesk);
+	s->supporting=init_supporting(r);
 }
 

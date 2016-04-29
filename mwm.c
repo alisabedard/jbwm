@@ -12,7 +12,7 @@
 
 #include <assert.h>
 #include <X11/Xatom.h>
-
+// These are MWM-specific hints
 enum {
 // flags:
 	MWM_HINTS_FUNCTIONS = (1L << 0), MWM_HINTS_DECORATIONS = (1L << 1),
@@ -37,91 +37,52 @@ enum {
 };
 
 // status:
-#define MWM_TEAROFF_WINDOW 1
+enum { MWM_TEAROFF_WINDOW = 1 };
 
 static void process_flags(Client * c)
 {
-	if (c->flags & JB_NO_BORDER)
-		  c->border = 0;
-
-	if (c->flags & JB_TEAROFF) {
-		c->border = 0;
-		c->flags |= JB_NO_RESIZE | JB_NO_MIN | JB_NO_MAX;
+	if (c->opt.tearoff) {
+		c->opt.no_border = c->opt.no_resize = c->opt.no_min
+			= c->opt.no_max = true;
 	}
-}
-
-__attribute__((const))
-static inline uint32_t hint(const uint32_t hint_flags,
-	const uint32_t hint, const uint32_t assoc_flag,
-	const uint32_t client_flags) // client_flags last for chained calling
-{
-	/* flags stored in Client.flags indicate negative options,
-	   so invert test logic.  */
-	if(hint_flags & hint)
-		  return client_flags;
-	return client_flags | assoc_flag;
-}
-
-__attribute__((const))
-static uint32_t mwm_hints_decor(const uint32_t client_flags, const unsigned long f)
-{
-	if (f & MWM_DECOR_ALL)
-		  return client_flags;
-	return hint(f, MWM_DECOR_BORDER, JB_NO_RESIZE_DECOR,
-		hint(f, MWM_DECOR_RESIZEH, JB_NO_RESIZE_DECOR,
-		hint(f, MWM_DECOR_TITLE, JB_NO_TB,
-		hint(f, MWM_DECOR_MENU, JB_NO_CLOSE_DECOR,
-		hint(f, MWM_DECOR_MINIMIZE, JB_NO_MIN_DECOR,
-		hint(f, MWM_DECOR_MAXIMIZE, JB_NO_MAX_DECOR,
-		client_flags)))))); // <== input
-}
-
-__attribute__((const))
-static uint32_t mwm_hints_func(const uint32_t client_flags, const unsigned long f)
-{
-	if (f & MWM_FUNC_ALL)
-		  return client_flags;
-	return hint(f, MWM_FUNC_RESIZE, JB_NO_RESIZE_DECOR|JB_NO_RESIZE_DECOR,
-		hint(f, MWM_FUNC_CLOSE, JB_NO_CLOSE_DECOR|JB_NO_CLOSE,
-		hint(f, MWM_FUNC_MINIMIZE, JB_NO_MIN_DECOR|JB_NO_MIN,
-		hint(f, MWM_FUNC_MAXIMIZE, JB_NO_MAX_DECOR|JB_NO_MAX,
-		hint(f, MWM_FUNC_MOVE, JB_NO_MOVE,
-		client_flags))))); // <== input
+	if (c->opt.no_border)
+		  c->border = 0;
 }
 
 void handle_mwm_hints(Client * c)
 {
 	static Atom mwm_hints;
-	assert(c);
 	if(!mwm_hints)
 		  mwm_hints=XInternAtom(jbwm.dpy, "_MOTIF_WM_HINTS", false);
-	unsigned long n;
 	struct {
 		unsigned long flags, functions, decor, input_mode, status;
-	} *m = get_property(c->window, mwm_hints, &n);
+	} *m = get_property(c->window, mwm_hints, &(long unsigned int){0});
+	if(!m) return;
 
-	if (!m) return;
-
-	if (m->flags & MWM_HINTS_FUNCTIONS)
-		  c->flags=mwm_hints_func(c->flags, m->functions);
-
-	if (m->flags & MWM_HINTS_DECORATIONS)
-		  c->flags=mwm_hints_decor(c->flags, m->decor);
-
-	if (m->flags & MWM_HINTS_STATUS) {
-		LOG("MWM_HINTS_STATUS");
-
-		if (m->status & MWM_TEAROFF_WINDOW)
-			  c->flags |= JB_TEAROFF;
+	if (m->flags & MWM_HINTS_FUNCTIONS) {
+		c->opt.no_resize=!(m->functions&MWM_FUNC_RESIZE);
+		c->opt.no_close=!(m->functions&MWM_FUNC_CLOSE);
+		c->opt.no_min=!(m->functions&MWM_FUNC_MINIMIZE);
+		c->opt.no_max=!(m->functions&MWM_FUNC_MAXIMIZE);
+		c->opt.no_move=!(m->functions&MWM_FUNC_MOVE);
 	}
 
-	if (m->flags & MWM_HINTS_INPUT_MODE) {
-		LOG("MWM_HINTS_INPUT_MODE");
-
-		if (m->input_mode)
-			  c->flags |= JB_MODAL;
+	if (m->flags & MWM_HINTS_DECORATIONS) {
+		c->opt.no_resize_decor=!(m->decor&MWM_DECOR_RESIZEH)
+			|| !(m->decor&MWM_DECOR_BORDER);
+		c->opt.no_titlebar=!(m->decor&MWM_DECOR_TITLE);
+		c->opt.no_close_decor=!(m->decor&MWM_DECOR_MENU);
+		c->opt.no_min_decor=!(m->decor&MWM_DECOR_MINIMIZE);
+		c->opt.no_max_decor=!(m->decor&MWM_DECOR_MAXIMIZE);
 	}
+
+	if (m->flags & MWM_HINTS_STATUS)
+		c->opt.tearoff = m->status & MWM_TEAROFF_WINDOW;
+
+	if (m->flags & MWM_HINTS_INPUT_MODE)
+		c->opt.modal = m->input_mode;
 
 	XFree(m);
 	process_flags(c);
+
 }

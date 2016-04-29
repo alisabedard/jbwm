@@ -20,19 +20,17 @@ static void button1_event(XButtonEvent * e
 #ifdef USE_TBAR
 	const uint16_t w = c->size.width;
 	const XPoint p = { e->x, e->y };
-	const uint32_t f = c->flags;
-	if (!(f & JB_NO_CLOSE) && (p.x < TDIM)
+	if (!c->opt.no_close && (p.x < TDIM)
 	    && (p.y < TDIM)) {	// Close button
 		/* This fixes a bug where deleting a shaded window will cause
 		   the parent window to stick around as a ghost window. */
-		if (f & JB_SHADED)
-			shade(c);
-
+		if (c->opt.shaded) shade(c);
 		send_wm_delete(c);
-	} else if(!(f & JB_NO_RESIZE) && (p.x > w - TDIM)) { // Resize button
+	} else if(!c->opt.no_resize && (p.x > w - TDIM)) { // Resize button
 		resize(c);
 	}
-	else if (!(f & JB_NO_MIN) && (p.x > w - TDIM - TDIM && p.y < TDIM)) {
+	else if (!c->opt.no_min && (p.x > w - TDIM - TDIM)
+		&& (p.y < TDIM)) {
 		shade(c);
 	}
 	else			// Handle
@@ -45,7 +43,7 @@ void jbwm_handle_button_event(XButtonEvent * e)
 	Client *c = find_client(e->window);
 
 	// Return if invalid event or maximized
-	if (!c || c->flags & JB_MAXIMIZED)
+	if (!c || c->opt.maximized)
 		return;
 
 	switch (e->button) {
@@ -63,7 +61,7 @@ void jbwm_handle_button_event(XButtonEvent * e)
 		   users especially, where it is difficult
 		   to register a middle button press, even
 		   with X Emulate3Buttons enabled.  */
-		c->flags & JB_SHADED ? drag(c) : resize(c);
+		c->opt.shaded?drag(c):resize(c);
 		break;
 	}
 }

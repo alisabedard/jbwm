@@ -45,14 +45,6 @@ WM_STATE, WM_STATE_STICKY, WM_STATE_MAXIMIZED_VERT,
 } AtomIndex;
 
 extern Atom ewmh[];
-#if 0
-typedef struct {
-	uint8_t count;
-	Atom atoms[EWMH_ATOMS_COUNT];
-} EWMHEnvironment;
-
-extern EWMHEnvironment ewmh;
-#endif
 
 #else//!EWMH
 #define ewmh_update_client_list()

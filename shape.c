@@ -3,13 +3,12 @@
 // Copyright 1999-2015, Ciaran Anscomb <jbwm@6809.org.uk>
 // See README for license and other details.
 
-#include <assert.h>
-#include <stdbool.h>
-#include <stdint.h>
-#include <X11/extensions/shape.h>
-#include "client_t.h"
+#include "shape.h"
+
 #include "jbwmenv.h"
 #include "log.h"
+#include <assert.h>
+#include <X11/extensions/shape.h>
 
 static bool is_shaped(Client * c)
 {
@@ -22,7 +21,7 @@ static bool is_shaped(Client * c)
 void set_shape(Client * c)
 {
 	assert(c);
-	if(c->flags & JB_SHAPED) {
+	if(c->opt.shaped) {
 		LOG("XShapeCombineShape: %d", (int)c->window);
 		XShapeCombineShape(jbwm.dpy, c->parent, ShapeBounding,
 			1, 1, c->window, ShapeBounding, ShapeSet);
@@ -35,7 +34,7 @@ void setup_shaped(Client * c)
 	if (is_shaped(c)) {
 		LOG("Window %d is shaped", (int)c->window);
 		c->border = 0;
-		c->flags |= JB_NO_TB | JB_SHAPED;
+		c->opt.no_titlebar=c->opt.shaped=true;
 	}
 }
 

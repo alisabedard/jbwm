@@ -6,6 +6,13 @@ CFLAGS+=-DDEBUG
 CFLAGS+=-pg
 # Enable all warnings
 CFLAGS+=-W -Wall -Wextra -Werror
+CFLAGS+=-Wuninitialized -Wstrict-overflow=5
+CFLAGS+=-Wsuggest-attribute=pure
+CFLAGS+=-Wsuggest-attribute=const
+CFLAGS+=-Wsuggest-attribute=noreturn
+CFLAGS+=-Wsuggest-attribute=format
+CFLAGS+=-Wlarger-than=512 -Wframe-larger-than=512 -Wstack-usage=512
+CFLAGS+=-Wcast-qual -Wcast-align -Wjump-misses-init
 
 DEFINES += -DUSE_ARGV 
 DEFINES += -DSTDIO

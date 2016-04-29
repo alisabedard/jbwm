@@ -20,24 +20,22 @@
 #include <X11/Xatom.h>
 
 #ifdef EWMH
-__attribute__((nonnull))
-static void wm_desktop(const Window w, uint8_t * restrict vdesk)
+static uint8_t wm_desktop(const Window w, uint8_t vdesk)
 {
 	unsigned long nitems;
 	unsigned long *lprop = get_property(w,
 		ewmh[WM_DESKTOP], &nitems);
 
 	if (lprop && nitems && (lprop[0] < 9))
-		*vdesk = lprop[0];
+		vdesk = lprop[0];
 
 	if (!lprop)
 		XPROP(w, ewmh[WM_DESKTOP],
-			XA_CARDINAL, vdesk, 1);
-	else
-		XFree(lprop);
+			XA_CARDINAL, &vdesk, 1);
+	else XFree(lprop);
+
+	return vdesk;
 }
-#else//!EWMH
-#define wm_desktop(c)
 #endif//EWMH
 
 __attribute__((nonnull))
@@ -45,7 +43,9 @@ static void init_properties(Client * c)
 {
 	handle_mwm_hints(c);
 	c->vdesk = c->screen->vdesk;
-	wm_desktop(c->window, &c->vdesk);
+#ifdef EWMH
+	c->vdesk = wm_desktop(c->window, c->vdesk);
+#endif//EWMH
 }
 
 #ifdef FIX_FIREFOX

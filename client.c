@@ -40,7 +40,7 @@ void client_to_vdesk(Client * c, const uint8_t d)
  * used all over the place.  return the client that has specified window as
  * either window or parent
  */
-__attribute__ ((hot))
+__attribute__ ((hot,pure))
 Client *find_client(const Window w)
 {
 	Client *c=jbwm.head;
@@ -78,22 +78,23 @@ static void unselect_current(void)
 	if(!jbwm.current) return;
 	XSetWindowBorder(jbwm.dpy, jbwm.current->parent,
 		jbwm.current->screen->pixels.bg);
-	jbwm.current->flags ^= JB_ACTIVE;
+	jbwm.current->opt.active = false;
 }
 
 void select_client(Client * c)
 {
 #ifdef MWM
-	if(jbwm.current && (jbwm.current->flags & JB_MODAL))
+	if(jbwm.current && jbwm.current->opt.modal)
 		  return;
 #endif//MWM
-	c->flags |= JB_ACTIVE;
+	c->opt.active = true;
 	unselect_current();
 	XInstallColormap(jbwm.dpy, c->cmap);
-	XSetInputFocus(jbwm.dpy, c->window, RevertToPointerRoot, CurrentTime);
-	XSetWindowBorder(jbwm.dpy, c->parent, c->flags & JB_STICKY
+	XSetInputFocus(jbwm.dpy, c->window,
+		RevertToPointerRoot, CurrentTime);
+	XSetWindowBorder(jbwm.dpy, c->parent, c->opt.sticky
 		? c->screen->pixels.fc : c->screen->pixels.fg);
-	jbwm.current=c;
+	jbwm.current = c;
 #ifdef EWMH
 	XPROP(c->screen->root, ewmh[ACTIVE_WINDOW],
 		XA_WINDOW, &(c->parent), 1);
@@ -105,7 +106,7 @@ void stick(Client * c)
 	LOG("stick");
 	assert(c);
 	c->vdesk = c->screen->vdesk;
-	c->flags ^= JB_STICKY;	// toggle
+	c->opt.sticky ^= true; // toggle
 	select_client(c);
 	update_titlebar(c);
 }
@@ -141,7 +142,7 @@ void remove_client(Client * c)
 {
 	LOG("remove_client");
 	assert(c);
-	if (c->flags & JB_REMOVE) {
+	if (c->opt.remove) {
 #ifdef EWMH
 		XDeleteProperty(jbwm.dpy, c->window, ewmh[WM_DESKTOP]);
 		XDeleteProperty(jbwm.dpy, c->window, ewmh[WM_STATE]);
@@ -168,9 +169,9 @@ static Status xmsg(const Window w, const Atom a, const long x)
 {
 	LOG("xmsg");
 	return XSendEvent(jbwm.dpy, w, false, NoEventMask, &(XEvent){
-		.xclient.type = ClientMessage,.xclient.window = w,
-		.xclient.message_type = a,.xclient.format = 32,
-		.xclient.data.l[0] = x,.xclient.data.l[1] = CurrentTime
+		.xclient.type = ClientMessage, .xclient.window = w,
+		.xclient.message_type = a, .xclient.format = 32,
+		.xclient.data.l[0] = x, .xclient.data.l[1] = CurrentTime
 	});
 }
 

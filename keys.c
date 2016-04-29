@@ -14,7 +14,7 @@
 #include "snap.h"
 #include "titlebar.h"
 
-static void point(Client * restrict c, const int x, const int y)
+static void point(Client * restrict c, const int16_t x, const int16_t y)
 {
 	XRaiseWindow(jbwm.dpy, c->parent);
 	XWarpPointer(jbwm.dpy, None, c->window, 0, 0, 0, 0, x, y);
@@ -25,18 +25,13 @@ keymv(Client * c, const bool mod, int * restrict xy,
 	int * restrict wh, const int8_t sign)
 {
 	/* These operations invalid when maximized.  */
-	if (c->flags & JB_MAXIMIZED)
-		return;
+	if (c->opt.maximized) return;
 
 	const int8_t d = sign * JBWM_RESIZE_INCREMENT;
 
-	//if ((e->state & jbwm.keymasks.mod) && (*wh > 0)) {
 	if (mod && (*wh > 0)) {
 #ifdef USE_SHAPE
-
-		if (c->flags & JB_SHAPED)
-			goto move;
-
+		if (c->opt.shaped) goto move;
 #endif//USE_SHAPE
 		*wh += d;
 	} else
@@ -88,34 +83,23 @@ static void handle_client_key_event(const bool mod,
 		break;
 
 	case KEY_FS:
-		if(c->flags&JB_NO_MAX)
-			return;
-		if(c->flags&JB_IS_FS)
-			unset_fullscreen(c);
-		else
-			set_fullscreen(c);
+		if (c->opt.no_max) return;
+		c->opt.is_fullscreen?unset_fullscreen(c):set_fullscreen(c);
 		break;
 
 	case KEY_MAX:
 		// Honor !MWM_FUNC_MAXIMIZE
 		// Maximizing shaped windows is buggy, so return.
-		if (!(c->flags & (JB_NO_MAX | JB_SHAPED)))
-			c->flags&JB_MAXIMIZED?unset_maximized(c)
-				:set_maximized(c);
+		if(c->opt.shaped || c->opt.no_max) return;
+		c->opt.maximized?unset_maximized(c):set_maximized(c);
 		break;
 
 	case KEY_MAX_H:
-		if(c->flags&JB_MAX_HORZ)
-			  restore_horz(c);
-		else
-			  maximize_horz(c);
+		c->opt.max_horz?restore_horz(c):maximize_horz(c);
 		break;
 
 	case KEY_MAX_V:
-		if(c->flags&JB_MAX_VERT)
-			  restore_vert(c);
-		else
-			  maximize_vert(c);
+		c->opt.max_vert?restore_vert(c):maximize_vert(c);
 		break;
 
 	case KEY_STICK:
@@ -222,7 +206,7 @@ void jbwm_handle_key_event(XKeyEvent * e)
 
 __attribute__((nonnull(1,2)))
 static void
-grab(ScreenInfo * restrict s, KeySym * restrict ks, const unsigned int mask)
+grab(ScreenInfo * restrict s, KeySym * restrict ks, const uint32_t mask)
 {
 	for (; *ks; ks++)
 		XGrabKey(jbwm.dpy, XKeysymToKeycode(jbwm.dpy, *ks),
@@ -231,7 +215,7 @@ grab(ScreenInfo * restrict s, KeySym * restrict ks, const unsigned int mask)
 }
 
 __attribute__((nonnull(1)))
-void grab_keys_for_screen(ScreenInfo * s)
+void grab_keys_for_screen(ScreenInfo * restrict s)
 {
 	grab(s, (KeySym[]){JBWM_KEYS_TO_GRAB}, 0);
 	grab(s, (KeySym[]){JBWM_ALT_KEYS_TO_GRAB}, jbwm.keymasks.mod);

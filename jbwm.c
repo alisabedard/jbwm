@@ -228,8 +228,8 @@ static void setup_screens(Options * restrict o)
 		setup_screen(i, o);
 }
 
-
-int handle_xerror(Display * dpy __attribute__ ((unused)), XErrorEvent * e)
+__attribute__((pure))
+static int handle_xerror(Display * dpy __attribute__ ((unused)), XErrorEvent * e)
 {
 	if ((e->error_code == BadAccess)
 	    && (e->request_code == X_ChangeWindowAttributes)) {
