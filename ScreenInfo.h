@@ -17,10 +17,10 @@ typedef struct ScreenInfo {
 #endif//EWMH
 	GC gc;
 	Dim size;
-	uint8_t screen : 4, vdesk : 4;
 	struct {
 		uint32_t fg, bg, fc;
 	} pixels;
+	uint8_t screen : 4, vdesk : 4;
 } ScreenInfo;
 
 #endif /* not SCREENINFO_H */

@@ -90,7 +90,7 @@ static void parse_argv(uint8_t argc, char **argv, Options * restrict o)
 			break;
 #ifdef STDIO
 		case 'V':
-			fprintf(stdout, VERSION);
+			fprintf(stdout, "%s\n", VERSION);
 			exit(0);
 		default:	/* Usage */
 			fprintf(stdout, "%s [%s]\n", argv[0], optstring);

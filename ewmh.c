@@ -181,6 +181,7 @@ static void set_state(Client * restrict c, const bool add, const AtomIndex t)
 	}
 }
 
+__attribute__((nonnull(1,3)))
 static void check_state(XClientMessageEvent * e,	// event data
 			const AtomIndex t,	// state to test
 			Client *c)

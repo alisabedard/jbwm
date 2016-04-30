@@ -6,10 +6,10 @@
 #CFLAGS+=-ggdb
 # Link time optimization greatly reduces binary size:
 # However, it may not work correctly with clang.
-#CFLAGS+=-flto -O3 -ggdb
+#CFLAGS+=-flto -O3
+#CFLAGS+=-ggdb
 # Enable all warnings
 CFLAGS+=-Wall -Wextra
-CFLAGS+=-fstrict-aliasing -Wstrict-aliasing=2
 
 # Uncomment if you use firefox with flash fullscreen videos.
 #DEFINES += -DFIX_FIREFOX

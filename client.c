@@ -53,26 +53,6 @@ Client *find_client(const Window w)
 	return c;
 }
 
-enum { CA_SZ=3 };
-static Atom client_atoms[CA_SZ];
-enum { I_PROTOS, I_DEL_WIN, I_WM_STATE };
-
-static void setup_client_atoms(void)
-{
-	if(client_atoms[0])
-		  return; // Already initialized
-	char *names[]={"WM_PROTOCOLS", "WM_DELETE_WINDOW", "WM_STATE"};
-	XInternAtoms(jbwm.dpy, names, CA_SZ, true, client_atoms);
-}
-
-void set_wm_state(Client * c, const int state)
-{
-	assert(c);
-	LOG("set_wm_state(%d, %d)", (int)c->window, state);
-	setup_client_atoms();
-	XPROP(c->window, client_atoms[I_WM_STATE], XA_CARDINAL, &state, 1);
-}
-
 static void unselect_current(void)
 {
 	if(!jbwm.current) return;
@@ -111,59 +91,6 @@ void stick(Client * c)
 	update_titlebar(c);
 }
 
-static void relink_window_list(Client * c)
-{
-	LOG("relink_window_list");
-
-	if (jbwm.head == c)
-		jbwm.head = c->next;
-	else
-		for (Client * p = jbwm.head; p && p->next; p = p->next)
-			if (p->next == c) {
-				p->next = c->next;
-				return;
-			}
-}
-
-static void unparent_window(Client * c)
-{
-	LOG("unparent_window");
-	XReparentWindow(jbwm.dpy, c->window, c->screen->root,
-		c->size.x, c->size.y);
-	XRemoveFromSaveSet(jbwm.dpy, c->window);
-
-	if (c->parent)
-		XDestroyWindow(jbwm.dpy, c->parent);
-
-	c->parent = 0;
-}
-
-void remove_client(Client * c)
-{
-	LOG("remove_client");
-	assert(c);
-	if (c->opt.remove) {
-#ifdef EWMH
-		XDeleteProperty(jbwm.dpy, c->window, ewmh[WM_DESKTOP]);
-		XDeleteProperty(jbwm.dpy, c->window, ewmh[WM_STATE]);
-#endif//EWMH
-		set_wm_state(c, WithdrawnState);
-	}
-#ifdef EWMH
-	else
-		XDeleteProperty(jbwm.dpy, c->window,
-			ewmh[WM_ALLOWED_ACTIONS]);
-
-#endif//EWMH
-	unparent_window(c);
-	relink_window_list(c);
-
-	if (jbwm.current == c)
-		jbwm.current = NULL;
-
-	free(c);
-}
-
 // Returns 0 on failure.
 static Status xmsg(const Window w, const Atom a, const long x)
 {
@@ -175,6 +102,25 @@ static Status xmsg(const Window w, const Atom a, const long x)
 	});
 }
 
+enum { CA_PROTOS, CA_DEL_WIN, CA_WM_STATE, CA_SZ };
+static Atom client_atoms[CA_SZ];
+
+static void setup_client_atoms(void)
+{
+	if(client_atoms[0]) return; // Already initialized
+	char *names[]={"WM_PROTOCOLS", "WM_DELETE_WINDOW", "WM_STATE"};
+	XInternAtoms(jbwm.dpy, names, CA_SZ, true, client_atoms);
+}
+
+__attribute__((nonnull))
+void set_wm_state(Client * restrict c, const int state)
+{
+	LOG("set_wm_state(%d, %d)", (int)c->window, state);
+	setup_client_atoms();
+	XPROP(c->window, client_atoms[CA_WM_STATE], XA_CARDINAL, &state, 1);
+}
+
+__attribute__((nonnull))
 static bool has_delete_proto(const Client * c)
 {
 	bool found=false;
@@ -183,7 +129,7 @@ static bool has_delete_proto(const Client * c)
 	if(XGetWMProtocols(jbwm.dpy, c->window, &p, &i)) {
 		assert(p);
 		while(i--)
-			if((found=(p[i]==client_atoms[I_DEL_WIN])))
+			if((found=(p[i]==client_atoms[CA_DEL_WIN])))
 				break;
 		// Should be freed here, otherwise p has no alloc.
 		XFree(p);
@@ -191,14 +137,14 @@ static bool has_delete_proto(const Client * c)
 	return found;
 }
 
+__attribute__((nonnull))
 void send_wm_delete(const Client * restrict c)
 {
-	assert(c);
 	setup_client_atoms();
 	if(has_delete_proto(c)) {
 		assert(c->window);
-		xmsg(c->window, client_atoms[I_PROTOS],
-			client_atoms[I_DEL_WIN]);
+		xmsg(c->window, client_atoms[CA_PROTOS],
+			client_atoms[CA_DEL_WIN]);
 	}
 	else {
 		assert(c->window);

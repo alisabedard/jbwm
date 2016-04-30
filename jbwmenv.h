@@ -14,7 +14,6 @@
 #endif//USE_XFT
 
 typedef struct {
-	Cursor cursor;
 	Display *restrict dpy;
 	// Client tracking:
 	Client *current;
@@ -37,7 +36,9 @@ typedef struct {
 		uint16_t grab, mod;
 	} keymasks;
 
-	bool need_cleanup;
+	Cursor cursor:32;
+
+	bool need_cleanup:1;
 } JBWMEnvironment;
 
 extern JBWMEnvironment jbwm;

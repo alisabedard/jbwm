@@ -18,6 +18,7 @@
 #include "util.h"
 #endif//DEBUG
 
+#include <stdlib.h>
 #include <stdnoreturn.h>
 #include <X11/Xatom.h>
 
@@ -32,16 +33,55 @@ static ScreenInfo *find_screen(const Window root)
 	return NULL;
 }
 
+static void relink_window_list(Client * c)
+{
+	LOG("relink_window_list");
+
+	if (jbwm.head == c)
+		jbwm.head = c->next;
+	else
+		for (Client * p = jbwm.head; p && p->next; p = p->next)
+			if (p->next == c) {
+				p->next = c->next;
+				return;
+			}
+}
+
+static void unparent_window(Client * c)
+{
+	LOG("unparent_window");
+	XReparentWindow(jbwm.dpy, c->window, c->screen->root,
+		c->size.x, c->size.y);
+	XRemoveFromSaveSet(jbwm.dpy, c->window);
+
+	if (c->parent)
+		XDestroyWindow(jbwm.dpy, c->parent);
+
+	c->parent = 0;
+}
+
 static void cleanup(void)
 {
 	LOG("cleanup()");
 	jbwm.need_cleanup = false;
-	Client *i;
 
-	for (Client * c = jbwm.head; c; c = i) {
+	for (Client * i, * c = jbwm.head; c; c = i) {
+		//Client *i = c->next;
 		i = c->next;
-		if (c->opt.remove)
-			remove_client(c);
+		if (c->opt.remove) {
+#ifdef EWMH
+			XDeleteProperty(jbwm.dpy, c->window, ewmh[WM_DESKTOP]);
+			XDeleteProperty(jbwm.dpy, c->window, ewmh[WM_STATE]);
+#endif//EWMH
+			set_wm_state(c, WithdrawnState);
+			unparent_window(c);
+			relink_window_list(c);
+
+			if (jbwm.current == c)
+				jbwm.current = NULL;
+
+			free(c);
+		}
 		if (!i) return;
 	}
 }
@@ -115,7 +155,7 @@ static void handle_enter_event(XCrossingEvent * restrict e)
 	Client * c = find_client(e->window);
 	if(c) {
 		/* Only deal with the parent window, prevent multiple enter
- 		 * events.  */
+		 * events.  */
 		if(e->window != c->parent)
 			return;
 		select_client(c);

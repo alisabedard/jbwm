@@ -55,7 +55,8 @@ void handle_mwm_hints(Client * c)
 	if(!mwm_hints)
 		  mwm_hints=XInternAtom(jbwm.dpy, "_MOTIF_WM_HINTS", false);
 	struct {
-		unsigned long flags, functions, decor, input_mode, status;
+		unsigned long flags:32, functions:32, decor:32,
+			      input_mode:32, status:32;
 	} *m = get_property(c->window, mwm_hints, &(long unsigned int){0});
 	if(!m) return;
 

@@ -18,10 +18,10 @@
 #include <X11/Xft/Xft.h>
 #endif//USE_XFT
 
+__attribute__((nonnull))
 void shade(Client * restrict c)
 {
 	LOG("shade");
-	assert(c);
 
 	// Honor !MWM_FUNC_MINIMIZE
 	if (c->opt.no_min) return;
@@ -136,10 +136,9 @@ static void draw_titlebar(Client * restrict c)
 	draw_title(c);
 }
 
+__attribute__((nonnull))
 void update_titlebar(Client * c)
 {
-	assert(c);
-
 	if (c->opt.no_titlebar || c->opt.shaped)
 		  return;
 

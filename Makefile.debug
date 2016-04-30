@@ -16,7 +16,7 @@ CFLAGS+=-Wcast-qual -Wcast-align -Wjump-misses-init
 CFLAGS+=-Wlogical-op -Wmissing-prototypes
 #CFLAGS+=-Wpadded
 CFLAGS+=-Wredundant-decls -Wpointer-sign
-
+CFLAGS+=-fstrict-aliasing -Wstrict-aliasing=2
 
 DEFINES += -DUSE_ARGV 
 DEFINES += -DSTDIO

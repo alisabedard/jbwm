@@ -20,7 +20,7 @@
 
 enum {MouseMask=(ButtonPressMask|ButtonReleaseMask|PointerMotionMask)};
 
-__attribute__ ((hot))
+__attribute__ ((hot,nonnull))
 static void draw_outline(Client * restrict c)
 {
 	const uint8_t offset = c->opt.no_titlebar ? 0 : TDIM;
@@ -30,6 +30,7 @@ static void draw_outline(Client * restrict c)
 		c->size.height + c->border + offset);
 }
 
+__attribute__((nonnull))
 static void configure(XSizeHints * restrict g, const Window w)
 {
 	XSendEvent(jbwm.dpy, w, true, StructureNotifyMask, (XEvent *)
@@ -43,6 +44,7 @@ static inline void grab_pointer(const Window w)
 		GrabModeAsync, None, jbwm.cursor, CurrentTime);
 }
 
+__attribute__((nonnull))
 void resize(Client * restrict c)
 {
 	LOG("resize");
@@ -75,6 +77,7 @@ static XPoint get_mouse_position(Window w)
 	return (XPoint){x, y};
 }
 
+__attribute__((nonnull))
 void drag(Client * restrict c)
 {
 	LOG("drag");
@@ -99,6 +102,7 @@ drag_begin:
 	configure(&(c->size), c->window);
 }
 
+__attribute__((nonnull))
 void moveresize(Client * restrict c)
 {
 	LOG("moveresize");
@@ -114,10 +118,10 @@ void moveresize(Client * restrict c)
 	set_shape(c);
 }
 
+__attribute__((nonnull))
 void restore_horz(Client * restrict c)
 {
 	LOG("restore_horz");
-	assert(c);
 	if (!c->opt.max_horz) return;
 	c->opt.max_horz = false;
 	c->size.x = c->old_size.x;
@@ -125,10 +129,10 @@ void restore_horz(Client * restrict c)
 	ewmh_remove_state(c->window, ewmh[WM_STATE_MAXIMIZED_HORZ]);
 }
 
+__attribute__((nonnull))
 void maximize_horz(Client * restrict c)
 {
 	LOG("maximize_horz");
-	assert(c);
 	if (c->opt.max_horz) return;
 	c->old_size.x = c->size.x;
 	c->old_size.width = c->size.width;
@@ -141,10 +145,11 @@ void maximize_horz(Client * restrict c)
 		c->size.width -= c->border<<1;
 	}
 }
+
+__attribute__((nonnull))
 void restore_vert(Client * restrict c)
 {
 	LOG("restore_vert");
-	assert(c);
 	if (c->opt.max_vert) {
 		c->opt.max_vert = false;
 		c->size.y = c->old_size.y;
@@ -154,10 +159,10 @@ void restore_vert(Client * restrict c)
 	}
 }
 
+__attribute__((nonnull))
 void maximize_vert(Client * restrict c)
 {
 	LOG("maximize_vert");
-	assert(c);
 	if (c->opt.max_vert) return;
 	c->old_size.y = c->size.y;
 	c->old_size.height = c->size.height;
@@ -173,10 +178,10 @@ void maximize_vert(Client * restrict c)
 	}
 }
 
+__attribute__((nonnull))
 void unset_maximized(Client * restrict c)
 {
 	LOG("unset_maximized");
-	assert(c);
 	// Don't restore a fullscreen window.
 	if(!c->opt.maximized || c->opt.fullscreen)
 		  return;
@@ -185,20 +190,20 @@ void unset_maximized(Client * restrict c)
 	c->opt.maximized = false;
 }
 
+__attribute__((nonnull))
 void set_maximized(Client * restrict c)
 {
 	LOG("set_maximized");
-	assert(c);
 	if(c->opt.maximized) return; // Already maximized
 	maximize_horz(c);
 	maximize_vert(c);
 	c->opt.maximized = true;
 }
 
+__attribute__((nonnull))
 void unset_fullscreen(Client * restrict c)
 {
 	LOG("unset_fullscreen");
-	assert(c);
 	if(!c->opt.is_fullscreen) return;
 	c->opt.fullscreen = false; // Reflects desired status
 	restore_horz(c);
@@ -209,10 +214,10 @@ void unset_fullscreen(Client * restrict c)
 	c->opt.is_fullscreen = false; // Reflects current status
 }
 
+__attribute__((nonnull))
 void set_fullscreen(Client * restrict c)
 {
 	LOG("set_fullscreen");
-	assert(c);
 	if(c->opt.is_fullscreen) return; // Already fullscreen
 	/* The following checks remove conflicts between fullscreen
 	   mode and maximized modes.  */
@@ -228,10 +233,10 @@ void set_fullscreen(Client * restrict c)
 	c->opt.is_fullscreen = true; // Reflect current status
 }
 
+__attribute__((nonnull))
 static void hide(Client * restrict c)
 {
 	LOG("hide");
-	assert(c);
 	/* This will generate an unmap event.  Tell event handler
 	 * to ignore it.  */
 	c->ignore_unmap++;
@@ -239,18 +244,18 @@ static void hide(Client * restrict c)
 	set_wm_state(c, IconicState);
 }
 
+__attribute__((nonnull))
 void unhide(Client * restrict c)
 {
 	LOG("unhide");
-	assert(c);
 	XMapWindow(jbwm.dpy, c->parent);
 	set_wm_state(c, NormalState);
 }
 
+__attribute__((nonnull))
 uint8_t switch_vdesk(ScreenInfo * s, uint8_t v)
 {
 	LOG("switch_vdesk");
-	assert(s);
 
 	if (v == s->vdesk || v > DESKTOPS)
 		return s->vdesk;

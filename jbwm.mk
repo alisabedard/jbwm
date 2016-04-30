@@ -3,7 +3,7 @@
 # Copyright 1999-2015, Ciaran Anscomb <jbwm@6809.org.uk>
 # See README for license and other details.
 
-version = 1.45
+version = 1.46
 
 PROG=jbwm
 distname = $(PROG)-$(version)
