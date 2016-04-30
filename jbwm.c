@@ -17,7 +17,9 @@
 #include <stdio.h>
 #endif//STDIO
 #include <stdlib.h>
+#ifndef NETBSD
 #include <stdnoreturn.h>
+#endif//NETBSD
 #ifdef USE_ARGV
 #include <string.h>
 #include <unistd.h>
@@ -105,7 +107,12 @@ static void parse_argv(uint8_t argc, char **argv, Options * restrict o)
 #define parse_argv(a, b, o)
 #endif//USE_ARGV
 
-static noreturn void jbwm_error(const char * msg
+#ifdef NETBSD
+__attribute__((noreturn))
+#else//!NETBSD
+noreturn
+#endif//!NETBSD
+static void jbwm_error(const char * msg
 #ifndef STDIO
 	__attribute__((unused))
 #endif//!STDIO

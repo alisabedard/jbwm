@@ -19,7 +19,9 @@
 #endif//DEBUG
 
 #include <stdlib.h>
+#ifndef NETBSD
 #include <stdnoreturn.h>
+#endif//NETBSD
 #include <X11/Xatom.h>
 
 static ScreenInfo *find_screen(const Window root)
@@ -33,6 +35,7 @@ static ScreenInfo *find_screen(const Window root)
 	return NULL;
 }
 
+// Relink c's linked list to exclude c
 static void relink_window_list(Client * c)
 {
 	LOG("relink_window_list");
@@ -47,34 +50,16 @@ static void relink_window_list(Client * c)
 			}
 }
 
-static void unparent_window(Client * c)
-{
-	LOG("unparent_window");
-	XReparentWindow(jbwm.dpy, c->window, c->screen->root,
-		c->size.x, c->size.y);
-	XRemoveFromSaveSet(jbwm.dpy, c->window);
-
-	if (c->parent)
-		XDestroyWindow(jbwm.dpy, c->parent);
-
-	c->parent = 0;
-}
-
 static void cleanup(void)
 {
 	LOG("cleanup()");
 	jbwm.need_cleanup = false;
 
 	for (Client * i, * c = jbwm.head; c; c = i) {
-		//Client *i = c->next;
 		i = c->next;
 		if (c->opt.remove) {
-#ifdef EWMH
-			XDeleteProperty(jbwm.dpy, c->window, ewmh[WM_DESKTOP]);
-			XDeleteProperty(jbwm.dpy, c->window, ewmh[WM_STATE]);
-#endif//EWMH
-			set_wm_state(c, WithdrawnState);
-			unparent_window(c);
+			if(c->parent)
+				  XDestroyWindow(jbwm.dpy, c->parent);
 			relink_window_list(c);
 
 			if (jbwm.current == c)
@@ -182,14 +167,19 @@ static void handle_expose_event(XEvent * ev)
 
 static void handle_configure_request(XConfigureRequestEvent * e)
 {
-	XConfigureWindow(jbwm.dpy, e->window, e->value_mask, 
+	XConfigureWindow(jbwm.dpy, e->window, e->value_mask,
 		&(XWindowChanges){ .x = e->x, .y = e->y,
 		.width = e->width, .height = e->height,
 		.border_width = e->border_width,
 		.sibling = e->above, .stack_mode = e->detail});
 }
 
-noreturn void main_event_loop(void)
+#ifdef NETBSD
+__attribute__((noreturn))
+#else//!NETBSD
+noreturn
+#endif//NETBSD
+void main_event_loop(void)
 {
 	XEvent ev;
  head:

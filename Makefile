@@ -14,6 +14,9 @@ CFLAGS+=-Wall -Wextra
 # Uncomment if you use firefox with flash fullscreen videos.
 #DEFINES += -DFIX_FIREFOX
 
+# Uncomment if you use NetBSD gcc
+#DEFINES += -DNETBSD
+
 # Uncomment to enable SHAPE extension support
 include shape.mk
 
