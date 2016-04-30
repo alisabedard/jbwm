@@ -10,33 +10,22 @@
 #include "screen.h"
 #include "titlebar.h"
 
-static void button1_event(XButtonEvent * e
-#ifndef USE_TBAR
-			  __attribute__ ((unused))
-#endif//!USE_TBAR
-			  , Client * c)
-{
-	XRaiseWindow(jbwm.dpy, c->parent);
 #ifdef USE_TBAR
+static void titlebar_event(Client * c, const uint16_t x)
+{
 	const uint16_t w = c->size.width;
-	const XPoint p = { e->x, e->y };
-	if (!c->opt.no_close && (p.x < TDIM)
-	    && (p.y < TDIM)) {	// Close button
+	if (!c->opt.no_close && (x < TDIM)) {
 		/* This fixes a bug where deleting a shaded window will cause
 		   the parent window to stick around as a ghost window. */
 		if (c->opt.shaded) shade(c);
 		send_wm_delete(c);
-	} else if(!c->opt.no_resize && (p.x > w - TDIM)) { // Resize button
+	} else if(!c->opt.no_resize && (x > w - TDIM)) { // Resize button
 		resize(c);
-	}
-	else if (!c->opt.no_min && (p.x > w - TDIM - TDIM)
-		&& (p.y < TDIM)) {
+	} else if(!c->opt.no_min && (x > w - (TDIM<<1))) {
 		shade(c);
-	}
-	else			// Handle
-#endif//USE_TBAR
-		drag(c);	// Move the window
+	} else drag(c);
 }
+#endif//USE_TBAR
 
 void jbwm_handle_button_event(XButtonEvent * e)
 {
@@ -48,7 +37,12 @@ void jbwm_handle_button_event(XButtonEvent * e)
 
 	switch (e->button) {
 	case Button1:
-		button1_event(e, c);
+#ifdef USE_TBAR
+		if(e->window==c->titlebar)
+			titlebar_event(c, e->x);
+		else
+#endif//USE_TBAR
+			drag(c);
 		break;
 
 	case Button2:
