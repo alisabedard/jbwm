@@ -14,6 +14,7 @@
 #include "screen.h"
 #include "shape.h"
 #include "util.h"
+#include "titlebar.h"
 
 #include <assert.h>
 #include <stdlib.h>
@@ -22,18 +23,14 @@
 #ifdef EWMH
 static uint8_t wm_desktop(const Window w, uint8_t vdesk)
 {
-	unsigned long nitems;
-	unsigned long *lprop = get_property(w,
-		ewmh[WM_DESKTOP], &nitems);
-
-	if (lprop && nitems && (lprop[0] < 9))
+	unsigned long *lprop = get_property(w, ewmh[WM_DESKTOP],
+		&(unsigned long){0});
+	if(lprop) {
 		vdesk = lprop[0];
-
-	if (!lprop)
-		XPROP(w, ewmh[WM_DESKTOP],
-			XA_CARDINAL, &vdesk, 1);
-	else XFree(lprop);
-
+		XFree(lprop);
+	} else {
+		XPROP(w, ewmh[WM_DESKTOP], XA_CARDINAL, &vdesk, 1);
+	}
 	return vdesk;
 }
 #endif//EWMH
@@ -47,8 +44,7 @@ static void init_properties(Client * c)
 	c->vdesk = wm_desktop(c->window, c->vdesk);
 	// Required by wm-spec 1.4:
 	XPROP(c->window, ewmh[FRAME_EXTENTS], XA_CARDINAL,
-		(&(Atom[]){c->border, c->border,
-		c->border, c->border}), 4);
+		(&(Atom[]){1, 1, 1+TDIM, 1}), 4);
 #endif//EWMH
 }
 
