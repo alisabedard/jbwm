@@ -18,7 +18,6 @@
 #include <X11/Xft/Xft.h>
 #endif//USE_XFT
 
-__attribute__((nonnull))
 void shade(Client * restrict c)
 {
 	LOG("shade");
@@ -79,7 +78,7 @@ static void new_titlebar(Client * restrict c)
 #ifdef USE_XFT
 static void
 draw_xft(Client * restrict c, const XPoint * restrict p,
-	 char *restrict name, const size_t l)
+	 char * restrict name, const size_t l)
 {
 	XGlyphInfo e;
 	XftTextExtentsUtf8(jbwm.dpy, jbwm.font, (XftChar8 *) name, l, &e);
@@ -99,8 +98,6 @@ draw_xft(Client * restrict c, const XPoint * restrict p,
 	XftColorFree(jbwm.dpy, v, cm, &color);
 }
 #endif//USE_XFT
-
-GC tbgc;
 
 static void draw_title(Client * restrict c)
 {
@@ -136,7 +133,6 @@ static void draw_titlebar(Client * restrict c)
 	draw_title(c);
 }
 
-__attribute__((nonnull))
 void update_titlebar(Client * c)
 {
 	if (c->opt.no_titlebar || c->opt.shaped)

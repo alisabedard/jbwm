@@ -44,7 +44,6 @@ static inline void grab_pointer(const Window w)
 		GrabModeAsync, None, jbwm.cursor, CurrentTime);
 }
 
-__attribute__((nonnull))
 void resize(Client * restrict c)
 {
 	LOG("resize");
@@ -77,7 +76,6 @@ static XPoint get_mouse_position(Window w)
 	return (XPoint){x, y};
 }
 
-__attribute__((nonnull))
 void drag(Client * restrict c)
 {
 	LOG("drag");
@@ -102,7 +100,6 @@ drag_begin:
 	configure(&(c->size), c->window);
 }
 
-__attribute__((nonnull))
 void moveresize(Client * restrict c)
 {
 	LOG("moveresize");
@@ -118,7 +115,6 @@ void moveresize(Client * restrict c)
 	set_shape(c);
 }
 
-__attribute__((nonnull))
 void restore_horz(Client * restrict c)
 {
 	LOG("restore_horz");
@@ -129,7 +125,6 @@ void restore_horz(Client * restrict c)
 	ewmh_remove_state(c->window, ewmh[WM_STATE_MAXIMIZED_HORZ]);
 }
 
-__attribute__((nonnull))
 void maximize_horz(Client * restrict c)
 {
 	LOG("maximize_horz");
@@ -146,7 +141,6 @@ void maximize_horz(Client * restrict c)
 	}
 }
 
-__attribute__((nonnull))
 void restore_vert(Client * restrict c)
 {
 	LOG("restore_vert");
@@ -159,7 +153,6 @@ void restore_vert(Client * restrict c)
 	}
 }
 
-__attribute__((nonnull))
 void maximize_vert(Client * restrict c)
 {
 	LOG("maximize_vert");
@@ -178,7 +171,6 @@ void maximize_vert(Client * restrict c)
 	}
 }
 
-__attribute__((nonnull))
 void unset_maximized(Client * restrict c)
 {
 	LOG("unset_maximized");
@@ -190,7 +182,6 @@ void unset_maximized(Client * restrict c)
 	c->opt.maximized = false;
 }
 
-__attribute__((nonnull))
 void set_maximized(Client * restrict c)
 {
 	LOG("set_maximized");
@@ -200,7 +191,6 @@ void set_maximized(Client * restrict c)
 	c->opt.maximized = true;
 }
 
-__attribute__((nonnull))
 void unset_fullscreen(Client * restrict c)
 {
 	LOG("unset_fullscreen");
@@ -214,7 +204,6 @@ void unset_fullscreen(Client * restrict c)
 	c->opt.is_fullscreen = false; // Reflects current status
 }
 
-__attribute__((nonnull))
 void set_fullscreen(Client * restrict c)
 {
 	LOG("set_fullscreen");
@@ -233,7 +222,6 @@ void set_fullscreen(Client * restrict c)
 	c->opt.is_fullscreen = true; // Reflect current status
 }
 
-__attribute__((nonnull))
 static void hide(Client * restrict c)
 {
 	LOG("hide");
@@ -244,7 +232,6 @@ static void hide(Client * restrict c)
 	set_wm_state(c, IconicState);
 }
 
-__attribute__((nonnull))
 void unhide(Client * restrict c)
 {
 	LOG("unhide");
@@ -252,7 +239,6 @@ void unhide(Client * restrict c)
 	set_wm_state(c, NormalState);
 }
 
-__attribute__((nonnull))
 uint8_t switch_vdesk(ScreenInfo * s, uint8_t v)
 {
 	LOG("switch_vdesk");

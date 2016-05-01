@@ -11,7 +11,8 @@
 #include "titlebar.h"
 
 #ifdef USE_TBAR
-static void titlebar_event(Client * c, const uint16_t x)
+__attribute__((nonnull))
+static void titlebar_event(Client * restrict c, const uint16_t x)
 {
 	const uint16_t w = c->size.width;
 	if (!c->opt.no_close && (x < TDIM)) {
@@ -19,22 +20,15 @@ static void titlebar_event(Client * c, const uint16_t x)
 		   the parent window to stick around as a ghost window. */
 		if (c->opt.shaded) shade(c);
 		send_wm_delete(c);
-	} else if(!c->opt.no_resize && (x > w - TDIM)) { // Resize button
-		resize(c);
-	} else if(!c->opt.no_min && (x > w - (TDIM<<1))) {
-		shade(c);
-	} else drag(c);
+	} else if (!c->opt.no_resize && (x > w - TDIM)) resize(c);
+	else if (!c->opt.no_min && (x > w - (TDIM<<1))) shade(c);
+	else drag(c);
 }
 #endif//USE_TBAR
 
-void jbwm_handle_button_event(XButtonEvent * e)
+void jbwm_handle_button_event(XButtonEvent * restrict e, Client * restrict c)
 {
-	Client *c = find_client(e->window);
-
-	// Return if invalid event or maximized
-	if (!c || c->opt.maximized)
-		return;
-
+	if (c->opt.maximized) return; // Invalid when maximized
 	switch (e->button) {
 	case Button1:
 #ifdef USE_TBAR

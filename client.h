@@ -11,13 +11,13 @@
 #include <X11/Xlib.h>
 
 
-void client_to_vdesk(Client * c, const uint8_t d);
-Client *find_client(Window w);
+void client_to_vdesk(Client * restrict c, const uint8_t d);
+Client *find_client(Window w) __attribute__((hot,pure));
 // Free result with XFree if not NULL
-char * get_title(const Window w);
-void select_client(Client * c);
-void send_wm_delete(const Client * restrict c);
-void set_wm_state(Client * c, const int state);
-void stick(Client * c);
+char * get_title(const Window w) __attribute__((pure));
+void select_client(Client * c) __attribute__((nonnull));
+void send_wm_delete(const Client * restrict c) __attribute__((nonnull));
+void set_wm_state(Client * c, const int state) __attribute__((nonnull));
+void stick(Client * c) __attribute__((nonnull,cold));
 
 #endif /* JBWM_CLIENT_H */

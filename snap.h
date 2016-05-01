@@ -10,8 +10,8 @@
 
 #include "client_t.h"
 
-void snap_border(Client * restrict c);
-void snap_client(Client * c);
+void snap_border(Client * restrict c) __attribute__((nonnull));
+void snap_client(Client * c) __attribute__((nonnull));
 
 #else//!USE_SNAP
 

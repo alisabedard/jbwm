@@ -10,6 +10,8 @@
 #include <assert.h>
 #include <X11/extensions/shape.h>
 
+// Declared with pure attribute, as value may not change between calls.
+__attribute__((pure))
 static bool is_shaped(Client * c)
 {
 	int s, d;

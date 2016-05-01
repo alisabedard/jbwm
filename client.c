@@ -25,7 +25,7 @@ char * get_title(const Window w)
 	return (char *)tp.value;
 }
 
-void client_to_vdesk(Client * c, const uint8_t d)
+void client_to_vdesk(Client * restrict c, const uint8_t d)
 {
 	LOG("client_to_vdesk");
 	assert(c);
@@ -40,7 +40,6 @@ void client_to_vdesk(Client * c, const uint8_t d)
  * used all over the place.  return the client that has specified window as
  * either window or parent
  */
-__attribute__ ((hot,pure))
 Client *find_client(const Window w)
 {
 	Client *c=jbwm.head;
@@ -59,6 +58,9 @@ static void unselect_current(void)
 	XSetWindowBorder(jbwm.dpy, jbwm.current->parent,
 		jbwm.current->screen->pixels.bg);
 	jbwm.current->opt.active = false;
+#ifdef EWMH
+	ewmh_remove_state(jbwm.current->window, ewmh[WM_STATE_FOCUSED]);
+#endif//EWMH
 }
 
 void select_client(Client * c)
@@ -78,6 +80,7 @@ void select_client(Client * c)
 #ifdef EWMH
 	XPROP(c->screen->root, ewmh[ACTIVE_WINDOW],
 		XA_WINDOW, &(c->parent), 1);
+	ewmh_add_state(c->window, ewmh[WM_STATE_FOCUSED]);
 #endif//EWMH
 }
 
@@ -89,6 +92,10 @@ void stick(Client * c)
 	c->opt.sticky ^= true; // toggle
 	select_client(c);
 	update_titlebar(c);
+#ifdef EWMH
+	c->opt.sticky?ewmh_add_state(c->window, ewmh[WM_STATE_STICKY])
+		:ewmh_remove_state(c->window, ewmh[WM_STATE_STICKY]);
+#endif//EWMH
 }
 
 // Returns 0 on failure.
@@ -120,13 +127,12 @@ void set_wm_state(Client * restrict c, const int state)
 	XPROP(c->window, client_atoms[CA_WM_STATE], XA_CARDINAL, &state, 1);
 }
 
-__attribute__((nonnull))
-static bool has_delete_proto(const Client * c)
+static bool has_delete_proto(const Window w)
 {
 	bool found=false;
 	Atom *p;
 	int i;
-	if(XGetWMProtocols(jbwm.dpy, c->window, &p, &i)) {
+	if(XGetWMProtocols(jbwm.dpy, w, &p, &i)) {
 		assert(p);
 		while(i--)
 			if((found=(p[i]==client_atoms[CA_DEL_WIN])))
@@ -137,17 +143,14 @@ static bool has_delete_proto(const Client * c)
 	return found;
 }
 
-__attribute__((nonnull))
 void send_wm_delete(const Client * restrict c)
 {
 	setup_client_atoms();
-	if(has_delete_proto(c)) {
-		assert(c->window);
+	if(has_delete_proto(c->window)) {
 		xmsg(c->window, client_atoms[CA_PROTOS],
 			client_atoms[CA_DEL_WIN]);
 	}
 	else {
-		assert(c->window);
 		XKillClient(jbwm.dpy, c->window);
 	}
 }

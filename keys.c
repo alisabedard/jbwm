@@ -53,35 +53,14 @@ static void handle_client_key_event(const bool mod,
 	XSizeHints *g = &(c->size);
 
 	switch (key) {
-	case KEY_LEFT:
-		keymv(c, mod, &(g->x), &(g->width), -1);
-		break;
-
-	case KEY_DOWN:
-		keymv(c, mod, &(g->y), &(g->height), 1);
-		break;
-
-	case KEY_UP:
-		keymv(c, mod, &(g->y), &(g->height), -1);
-		break;
-
-	case KEY_RIGHT:
-		keymv(c, mod, &(g->x), &(g->width), 1);
-		break;
-
-	case KEY_KILL:
-		send_wm_delete(c);
-		break;
-
+	case KEY_LEFT: keymv(c, mod, &(g->x), &(g->width), -1); break;
+	case KEY_DOWN: keymv(c, mod, &(g->y), &(g->height), 1); break;
+	case KEY_UP: keymv(c, mod, &(g->y), &(g->height), -1); break;
+	case KEY_RIGHT: keymv(c, mod, &(g->x), &(g->width), 1); break;
+	case KEY_KILL: send_wm_delete(c); break;
 	case KEY_LOWER:
-	case KEY_ALTLOWER:
-		XLowerWindow(jbwm.dpy, c->parent);
-		break;
-
-	case KEY_RAISE:
-		XRaiseWindow(jbwm.dpy, c->parent);
-		break;
-
+	case KEY_ALTLOWER: XLowerWindow(jbwm.dpy, c->parent); break;
+	case KEY_RAISE: XRaiseWindow(jbwm.dpy, c->parent); break;
 	case KEY_FS:
 		if (c->opt.no_max) return;
 		c->opt.is_fullscreen?unset_fullscreen(c):set_fullscreen(c);
@@ -102,16 +81,9 @@ static void handle_client_key_event(const bool mod,
 		c->opt.max_vert?restore_vert(c):maximize_vert(c);
 		break;
 
-	case KEY_STICK:
-		stick(c);
-		break;
-
-	case KEY_MOVE:
-		drag(c);
-		break;
-
-	case KEY_SHADE:
-		shade(c);
+	case KEY_STICK: stick(c); break;
+	case KEY_MOVE: drag(c); break;
+	case KEY_SHADE: shade(c);
 	}
 }
 
@@ -123,24 +95,19 @@ static void next(void)
 	do {
 		if (c) {
 			c = c->next;
-
 			if (!c && !jbwm.current)
 				return;
 		}
-
 		if (!c) c = jbwm.head;
-
 		if (!c || (c == jbwm.current))
 			return;
-
 	} while (c->vdesk != c->screen->vdesk);
-
-	if (!c) return;
-
-	unhide(c);
-	select_client(c);
-	point(c, 0, 0);
-	point(c, c->size.width, c->size.height);
+	if(c) {
+		unhide(c);
+		select_client(c);
+		point(c, 0, 0);
+		point(c, c->size.width, c->size.height);
+	}
 }
 
 static void
@@ -176,16 +143,8 @@ void jbwm_handle_key_event(XKeyEvent * e)
 
 	case XK_0:
 		zero_desk = true;
-
-	case XK_1:
-	case XK_2:
-	case XK_3:
-	case XK_4:
-	case XK_5:
-	case XK_6:
-	case XK_7:
-	case XK_8:
-	case XK_9:
+	case XK_1: case XK_2: case XK_3: case XK_4: case XK_5: case XK_6:
+	case XK_7: case XK_8: case XK_9:
 		// First desktop 0, per wm-spec
 		cond_client_to_desk(c, s, zero_desk ? 10 : key - XK_1, mod);
 		break;
@@ -214,7 +173,6 @@ grab(ScreenInfo * restrict s, KeySym * restrict ks, const uint32_t mask)
 			 GrabModeAsync, GrabModeAsync);
 }
 
-__attribute__((nonnull(1)))
 void grab_keys_for_screen(ScreenInfo * restrict s)
 {
 	grab(s, (KeySym[]){JBWM_KEYS_TO_GRAB}, 0);

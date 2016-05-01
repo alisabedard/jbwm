@@ -45,6 +45,10 @@ static void init_properties(Client * c)
 	c->vdesk = c->screen->vdesk;
 #ifdef EWMH
 	c->vdesk = wm_desktop(c->window, c->vdesk);
+	// Required by wm-spec 1.4:
+	XPROP(c->window, ewmh[FRAME_EXTENTS], XA_CARDINAL,
+		(&(Atom[]){c->border, c->border,
+		c->border, c->border}), 4);
 #endif//EWMH
 }
 

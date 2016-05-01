@@ -18,7 +18,7 @@
 //EWMHEnvironment ewmh;
 Atom ewmh[EWMH_ATOMS_COUNT];
 
-static char * atom_names [] = {
+static char * atom_names [] = { // This list must match 1:1 with enum
 	"_NET_SUPPORTED",
 	"_NET_CURRENT_DESKTOP",
 	"_NET_NUMBER_OF_DESKTOPS",
@@ -30,9 +30,9 @@ static char * atom_names [] = {
 	"_NET_CLOSE_WINDOW",
 	"_NET_CLIENT_LIST",
 	"_NET_RESTACK_WINDOW",
-	"_NET_REQUEST_FRAME_EXTENTS",
 	"_NET_VIRTUAL_ROOTS",
 	"_NET_CLIENT_LIST_STACKING",
+	"_NET_FRAME_EXTENTS",
 	"_NET_WM_ALLOWED_ACTIONS",
 	"_NET_WM_NAME",
 	"_NET_WM_DESKTOP",
@@ -42,8 +42,6 @@ static char * atom_names [] = {
 	"_NET_WM_WINDOW_TYPE",
 	"_NET_WM_STRUT_PARTIAL",
 	"WM_CHANGE_STATE",
-	"_NET_WM_USER_TIME",
-	"_NET_WM_OPAQUE_REGION",
 	"_NET_WM_ACTION_MOVE",
 	"_NET_WM_ACTION_RESIZE",
 	"_NET_WM_ACTION_CLOSE",
@@ -63,9 +61,7 @@ static char * atom_names [] = {
 	"_NET_WM_STATE_FULLSCREEN",
 	"_NET_WM_STATE_ABOVE",
 	"_NET_WM_STATE_BELOW",
-	"_NET_WM_STATE_DEMANDS_ATTENTION",
 	"_NET_WM_STATE_FOCUSED",
-	"_NET_WM_STATE_SKIP_PAGER"
 };
 
 void ewmh_init(void)
@@ -153,7 +149,9 @@ static void set_root_vdesk(const Window r)
         _NET_WM_STATE_TOGGLE        2    toggle property
   other data.l[] elements = 0 */
 
-static void set_state(Client * restrict c, const bool add, const AtomIndex t)
+__attribute__((nonnull(1)))
+static void set_state(Client * restrict c,
+	const bool add, const AtomIndex t)
 {
 	switch(t) {
 	case WM_STATE_FULLSCREEN:
@@ -226,8 +224,8 @@ static void handle_wm_state_changes(XClientMessageEvent * restrict e,
 	check_state(e, WM_STATE_STICKY, c);
 }
 
-__attribute__((nonnull))
-void ewmh_client_message(XClientMessageEvent * e)
+void ewmh_client_message(XClientMessageEvent * restrict e,
+	Client * restrict c)
 {
 	const Atom t = e->message_type;
 #ifdef DEBUG
@@ -238,7 +236,6 @@ void ewmh_client_message(XClientMessageEvent * e)
 	print_atom(e->data.l[2], __LINE__);
 	print_atom(e->data.l[3], __LINE__);
 #endif//DEBUG
-	Client *c = find_client(e->window);
 	ScreenInfo *s = c ? c->screen : jbwm.screens;
 	const long val = e->data.l[0];
 	if (t == ewmh[CURRENT_DESKTOP])

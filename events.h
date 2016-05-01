@@ -8,8 +8,6 @@
 
 #include "client_t.h"
 
-void main_event_loop(void);
-
-void jbwm_current_to_head(void);
+void main_event_loop(void) __attribute__((noreturn));
 
 #endif /* ! JBWM_EVENTS_H */

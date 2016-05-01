@@ -14,9 +14,7 @@
 #include "new.h"
 #include "screen.h"
 #include "titlebar.h"
-#ifdef DEBUG
 #include "util.h"
-#endif//DEBUG
 
 #include <stdlib.h>
 #ifndef NETBSD
@@ -24,6 +22,7 @@
 #endif//NETBSD
 #include <X11/Xatom.h>
 
+__attribute__((pure)) // Return does not change between calls
 static ScreenInfo *find_screen(const Window root)
 {
 	uint8_t i = ScreenCount(jbwm.dpy);
@@ -71,31 +70,16 @@ static void cleanup(void)
 	}
 }
 
-static void handle_unmap_event(XUnmapEvent * e)
+static void handle_unmap_event(Client * restrict c)
 {
-	Client *c = find_client(e->window);
-
-	if (!c) return;
-
-	LOG("handle_unmap_event(e): %d ignores remaining", c->ignore_unmap);
+	LOG("handle_unmap_event(e): %d ignores remaining",
+		c->ignore_unmap);
 
 	if (c->ignore_unmap < 1) {
 		LOG("!c->ignore_unmap");
 		c->opt.remove = true;
 		jbwm.need_cleanup = true;
-	} else
-		c->ignore_unmap--;
-}
-
-static void handle_colormap_change(XColormapEvent * e)
-{
-	LOG("handle_colormap_change(e)");
-	Client *c = find_client(e->window);
-
-	if (c && e->new) {
-		c->cmap = e->colormap;
-		XInstallColormap(jbwm.dpy, c->cmap);
-	}
+	} else c->ignore_unmap--;
 }
 
 static void handle_wm_hints(Client * c)
@@ -112,17 +96,12 @@ static void handle_wm_hints(Client * c)
 	XFree(h);
 }
 
-static void handle_property_change(XPropertyEvent * e)
+static void handle_property_change(XPropertyEvent * restrict e,
+	Client * restrict c)
 {
-	Client *c = find_client(e->window);
-
-	if (!c) return;
-
 	const Atom a = e->atom;
 
-#ifdef DEBUG
-		print_atom(a, __LINE__);
-#endif//DEBUG
+	print_atom(a, __LINE__);
 
 	if (a == XA_WM_HINTS)
 		handle_wm_hints(c);
@@ -130,40 +109,9 @@ static void handle_property_change(XPropertyEvent * e)
 #ifdef USE_TBAR
 	else if (a == XA_WM_NAME)
 		update_titlebar(c);
-	else
-		  moveresize(c);
+	else moveresize(c);
 #endif//USE_TBAR
 }
-
-static void handle_enter_event(XCrossingEvent * restrict e)
-{
-	Client * c = find_client(e->window);
-	if(c) {
-		/* Only deal with the parent window, prevent multiple enter
-		 * events.  */
-		if(e->window != c->parent)
-			return;
-		select_client(c);
-	}
-}
-
-#ifdef USE_TBAR
-static void handle_expose_event(XEvent * ev)
-{
-	// Ignore extra expose events
-	if (ev->xexpose.count == 0) {
-		LOG("handle_expose_event");
-		const Window w = ev->xexpose.window;
-		Client *c = find_client(w);
-
-		if (!c)
-			return;
-
-		if (w == c->titlebar)
-			update_titlebar(c);
-	}
-}
-#endif//USE_TBAR
 
 static void handle_configure_request(XConfigureRequestEvent * e)
 {
@@ -174,68 +122,61 @@ static void handle_configure_request(XConfigureRequestEvent * e)
 		.sibling = e->above, .stack_mode = e->detail});
 }
 
-#ifdef NETBSD
-__attribute__((noreturn))
-#else//!NETBSD
-noreturn
-#endif//NETBSD
 void main_event_loop(void)
 {
 	XEvent ev;
+	Client * c;
  head:
 	XNextEvent(jbwm.dpy, &ev);
-
+	c=find_client(ev.xany.window);
 	switch (ev.type) {
 	case EnterNotify:
-		handle_enter_event(&ev.xcrossing);
-		break;
+		if(c && (ev.xcrossing.window == c->parent))
+			  select_client(c);
+		goto head;
 
 	case UnmapNotify:
-		handle_unmap_event(&ev.xunmap);
+		if (c) handle_unmap_event(c);
 		break;
 
 	case PropertyNotify:
-		handle_property_change(&ev.xproperty);
-		break;
+		if (c) handle_property_change(&ev.xproperty, c);
+		goto head;
 
 	case MapRequest:
-		if (!find_client(ev.xmaprequest.window))
-			make_new_client(ev.xmaprequest.window,
-					find_screen(ev.xmaprequest.parent));
-
-		break;
+		if (!c) make_new_client(ev.xmaprequest.window,
+			find_screen(ev.xmaprequest.parent));
+		goto head;
 
 	case KeyPress:
 		jbwm_handle_key_event(&ev.xkey);
 		break;
 #ifdef USE_TBAR
-
 	case Expose:
-		handle_expose_event(&ev);
-		break;
-#endif
+		if (c && ev.xexpose.count == 0)
+			  update_titlebar(c);
+		goto head;
+#endif//USE_TBAR
 
 	case ButtonPress:
-		jbwm_handle_button_event(&ev.xbutton);
+		if(c) jbwm_handle_button_event(&ev.xbutton, c);
 		break;
 
 	case ConfigureRequest:
 		handle_configure_request(&ev.xconfigurerequest);
-		break;
+		goto head;
 
 	case ConfigureNotify:
-		if (!ev.xconfigure.override_redirect) {
-			Client *c = find_client(ev.xconfigure.window);
-
-			if (c)
-				moveresize(c);
-		}
-
-		break;
+		if (c && !ev.xconfigure.override_redirect)
+			  moveresize(c);
+		goto head;
 
 	case ColormapNotify:
-		handle_colormap_change(&ev.xcolormap);
-		break;
+		if (c && ev.xcolormap.new) {
+			c->cmap = ev.xcolormap.colormap;
+			XInstallColormap(jbwm.dpy, c->cmap);
+		}
+		goto head;
 
 #ifdef EWMH
 	case CreateNotify:
@@ -244,39 +185,21 @@ void main_event_loop(void)
 		break;
 
 	case ClientMessage:
-		ewmh_client_message(&ev.xclient);
+		ewmh_client_message(&ev.xclient, c);
 		break;
 #endif//EWMH
 
-#if defined(DEBUG) && defined(XDEBUG)
-
-	case MapNotify:
-		LOG("MapNotify");
-		break;
-
-	case MappingNotify:
-		LOG("MappingNotify");
-		break;
-
-	case KeyRelease:
-		LOG("KeyRelease");
-		break;
-
-	case ReparentNotify:
-		LOG("ReparentNotify");
-		break;
-
-	case ButtonRelease:
-		LOG("ButtonRelease");
-		break;
-
+#ifdef DEBUG
+	case MapNotify: LOG("MapNotify"); break;
+	case MappingNotify: LOG("MappingNotify"); break;
+	case KeyRelease: LOG("KeyRelease"); break;
+	case ReparentNotify: LOG("ReparentNotify"); break;
+	case ButtonRelease: LOG("ButtonRelease"); break;
+#endif//DEBUG
 	default:
 		LOG("Unhandled event (%d)", ev.type);
-#endif//DEBUG&&XDEBUG
+		goto head;
 	}
-
-	if (jbwm.need_cleanup)
-		cleanup();
-
+	if (jbwm.need_cleanup) cleanup();
 	goto head;
 }
