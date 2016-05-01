@@ -29,7 +29,6 @@ static char * atom_names [] = { // This list must match 1:1 with enum
 	"_NET_MOVERESIZE_WINDOW",
 	"_NET_CLOSE_WINDOW",
 	"_NET_CLIENT_LIST",
-	"_NET_RESTACK_WINDOW",
 	"_NET_VIRTUAL_ROOTS",
 	"_NET_CLIENT_LIST_STACKING",
 	"_NET_FRAME_EXTENTS",

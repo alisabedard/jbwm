@@ -52,25 +52,6 @@ static void init_properties(Client * c)
 #endif//EWMH
 }
 
-#ifdef FIX_FIREFOX
-static void fix_firefox(Client * c)
-{
-	// Hack to make flash videos in firefox fullscreen:
-	char * name = get_title(c->window);
-	if(!name) return;
-	if(!strncmp(name, "plugin-container", 16)) {
-		const uint8_t b = c->border; // save before next call
-		set_fullscreen(c);
-		c->size.x-=b;
-		c->size.y-=b;
-		moveresize(c);
-	}
-	XFree(name);
-}
-#else//!FIX_FIREFOX
-#define fix_firefox(c)
-#endif//FIX_FIREFOX
-
 __attribute__((nonnull))
 static void init_geometry(Client * c)
 {
