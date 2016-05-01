@@ -103,7 +103,7 @@ static void draw_title(Client * restrict c)
 {
 	char * name = get_title(c->window);
 	if(!name) return; // No title could be loaded, abort
-	const XPoint p = { TDIM + 4, jbwm.font->ascent - JBWM_BORDER };
+	const XPoint p = { TDIM + 4, jbwm.font->ascent };
 #ifdef USE_XFT
 	draw_xft(c, &p, name, strlen(name));
 #else//!USE_XFT

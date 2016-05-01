@@ -72,7 +72,6 @@ static void init_geometry(Client * c)
 	// Test if the reparent that is to come would trigger an unmap event.
 	if (attr.map_state == IsViewable)
 		c->ignore_unmap++;
-	fix_firefox(c); // fix flash plugin-container bug
 }
 
 static void reparent(Client * c) // use of restrict here is a bug
@@ -104,7 +103,7 @@ void make_new_client(const Window w, ScreenInfo * s)
 	jbwm.head = c;
 	c->screen = s;
 	c->window = w;
-	c->border = JBWM_BORDER;
+	c->border = 1;
 	init_properties(c);
 	init_geometry(c);
 	XSelectInput(jbwm.dpy, c->window, EnterWindowMask

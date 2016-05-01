@@ -198,7 +198,6 @@ void main_event_loop(void)
 #endif//DEBUG
 	default:
 		LOG("Unhandled event (%d)", ev.type);
-		goto head;
 	}
 	if (jbwm.need_cleanup) cleanup();
 	goto head;

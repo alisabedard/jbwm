@@ -38,7 +38,6 @@ enum {
 };
 
 enum {
-	JBWM_BORDER = 1,
 	JBWM_SNAP = 12,
 	JBWM_RESIZE_INCREMENT = 20
 };

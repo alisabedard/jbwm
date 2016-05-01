@@ -183,7 +183,6 @@ static void setup_screen_elements(const uint8_t i)
 	ScreenInfo *restrict s = &jbwm.screens[i];
 	s->screen = i;
 	s->root = RootWindow(jbwm.dpy, i);
-	s->vdesk = 0;
 	s->size.w = DisplayWidth(jbwm.dpy, i);
 	s->size.h = DisplayHeight(jbwm.dpy, i);
 }
@@ -191,12 +190,13 @@ static void setup_screen_elements(const uint8_t i)
 static void setup_gc(ScreenInfo * restrict s, Options * restrict o)
 {
 	allocate_colors(s, o);
-	unsigned long vm =
-	    GCFunction | GCSubwindowMode | GCLineWidth | GCForeground |
-	    GCBackground;
-	XGCValues gv = {.foreground = s->pixels.fg, .background = s->pixels.bg,
-		.function = GXxor, .subwindow_mode = IncludeInferiors,
-		.line_width = JBWM_BORDER
+	unsigned long vm = GCFunction | GCSubwindowMode
+		| GCLineWidth | GCForeground | GCBackground;
+	XGCValues gv = {.foreground = s->pixels.fg,
+		.background = s->pixels.bg,
+		.function = GXxor,
+		.subwindow_mode = IncludeInferiors,
+		.line_width = 1
 	};
 #if defined(USE_TBAR) && !defined(USE_XFT)
 	gv.font = jbwm.font->fid;
