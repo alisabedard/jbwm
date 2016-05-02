@@ -38,7 +38,6 @@ struct Client {
 		bool shaped : 1;
 		bool is_fullscreen : 1;
 		bool no_titlebar : 1;
-		bool maximized : 1;
 		bool no_min : 1;
 		bool no_resize : 1;
 		bool no_max : 1;

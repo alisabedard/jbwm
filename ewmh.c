@@ -165,10 +165,10 @@ static void set_state(Client * restrict c,
 		else XRaiseWindow(jbwm.dpy, c->parent);
 		break;
 	case WM_STATE_MAXIMIZED_VERT:
-		add?maximize_vert(c):restore_vert(c);
+		add?set_vert(c):unset_vert(c);
 		break;
 	case WM_STATE_MAXIMIZED_HORZ:
-		add?maximize_horz(c):restore_horz(c);
+		add?set_horz(c):unset_horz(c);
 		break;
 	default:
 		break;

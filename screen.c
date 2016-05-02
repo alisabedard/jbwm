@@ -70,9 +70,9 @@ resize_loop:
 
 static XPoint get_mouse_position(Window w)
 {
-	int x, y, d;
+	int x, y;
 	XQueryPointer(jbwm.dpy, w, &w, &w, &x, &y,
-		&d, &d, &(unsigned int){0});
+		&(int){0}, &(int){0}, &(unsigned int){0});
 	return (XPoint){x, y};
 }
 
@@ -115,9 +115,9 @@ void moveresize(Client * restrict c)
 	set_shape(c);
 }
 
-void restore_horz(Client * restrict c)
+void unset_horz(Client * restrict c)
 {
-	LOG("restore_horz");
+	LOG("unset_horz");
 	if (!c->opt.max_horz) return;
 	c->opt.max_horz = false;
 	c->size.x = c->old_size.x;
@@ -125,9 +125,9 @@ void restore_horz(Client * restrict c)
 	ewmh_remove_state(c->window, ewmh[WM_STATE_MAXIMIZED_HORZ]);
 }
 
-void maximize_horz(Client * restrict c)
+void set_horz(Client * restrict c)
 {
-	LOG("maximize_horz");
+	LOG("set_horz");
 	if (c->opt.max_horz) return;
 	c->old_size.x = c->size.x;
 	c->old_size.width = c->size.width;
@@ -141,9 +141,9 @@ void maximize_horz(Client * restrict c)
 	}
 }
 
-void restore_vert(Client * restrict c)
+void unset_vert(Client * restrict c)
 {
-	LOG("restore_vert");
+	LOG("unset_vert");
 	if (c->opt.max_vert) {
 		c->opt.max_vert = false;
 		c->size.y = c->old_size.y;
@@ -153,9 +153,9 @@ void restore_vert(Client * restrict c)
 	}
 }
 
-void maximize_vert(Client * restrict c)
+void set_vert(Client * restrict c)
 {
-	LOG("maximize_vert");
+	LOG("set_vert");
 	if (c->opt.max_vert) return;
 	c->old_size.y = c->size.y;
 	c->old_size.height = c->size.height;
@@ -171,33 +171,13 @@ void maximize_vert(Client * restrict c)
 	}
 }
 
-void unset_maximized(Client * restrict c)
-{
-	LOG("unset_maximized");
-	// Don't restore a fullscreen window.
-	if(!c->opt.maximized || c->opt.fullscreen)
-		  return;
-	restore_horz(c);
-	restore_vert(c);
-	c->opt.maximized = false;
-}
-
-void set_maximized(Client * restrict c)
-{
-	LOG("set_maximized");
-	if(c->opt.maximized) return; // Already maximized
-	maximize_horz(c);
-	maximize_vert(c);
-	c->opt.maximized = true;
-}
-
 void unset_fullscreen(Client * restrict c)
 {
 	LOG("unset_fullscreen");
 	if(!c->opt.is_fullscreen) return;
 	c->opt.fullscreen = false; // Reflects desired status
-	restore_horz(c);
-	restore_vert(c);
+	unset_horz(c);
+	unset_vert(c);
 	XSetWindowBorderWidth(jbwm.dpy, c->parent, c->border);
 	ewmh_remove_state(c->window, ewmh[WM_STATE_FULLSCREEN]);
 	update_titlebar(c);
@@ -209,13 +189,12 @@ void set_fullscreen(Client * restrict c)
 	LOG("set_fullscreen");
 	if(c->opt.is_fullscreen) return; // Already fullscreen
 	/* The following checks remove conflicts between fullscreen
-	   mode and maximized modes.  */
-	if(c->opt.maximized) unset_maximized(c);
-	if(c->opt.max_horz) restore_horz(c);
-	if(c->opt.max_vert) restore_vert(c);
+	   mode and setd modes.  */
+	if(c->opt.max_horz) unset_horz(c);
+	if(c->opt.max_vert) unset_vert(c);
 	c->opt.fullscreen = true; // Reflect desired status
-	maximize_horz(c);
-	maximize_vert(c);
+	set_horz(c);
+	set_vert(c);
 	XSetWindowBorderWidth(jbwm.dpy, c->parent, 0);
 	ewmh_add_state(c->window, ewmh[WM_STATE_FULLSCREEN]);
 	update_titlebar(c);

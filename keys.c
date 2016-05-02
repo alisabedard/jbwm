@@ -24,25 +24,18 @@ static void
 keymv(Client * c, const bool mod, int * restrict xy,
 	int * restrict wh, const int8_t sign)
 {
-	/* These operations invalid when maximized.  */
-	if (c->opt.maximized) return;
+	/* These operations invalid when fullscreen.  */
+	if (c->opt.fullscreen) return;
 
 	const int8_t d = sign * JBWM_RESIZE_INCREMENT;
 
 	if (mod && (*wh > 0)) {
-#ifdef USE_SHAPE
 		if (c->opt.shaped) goto move;
-#endif//USE_SHAPE
 		*wh += d;
 	} else
-#ifdef USE_SHAPE
  move:
-#endif//USE_SHAPE
 		*xy += d;
-
-#ifdef USE_SNAP
 	snap_border(c);
-#endif//USE_SNAP
 	moveresize(c);
 	point(c, 1, 1);
 }
@@ -50,13 +43,19 @@ keymv(Client * c, const bool mod, int * restrict xy,
 static void handle_client_key_event(const bool mod,
 	Client * c, const KeySym key)
 {
-	XSizeHints *g = &(c->size);
-
 	switch (key) {
-	case KEY_LEFT: keymv(c, mod, &(g->x), &(g->width), -1); break;
-	case KEY_DOWN: keymv(c, mod, &(g->y), &(g->height), 1); break;
-	case KEY_UP: keymv(c, mod, &(g->y), &(g->height), -1); break;
-	case KEY_RIGHT: keymv(c, mod, &(g->x), &(g->width), 1); break;
+	case KEY_LEFT:
+		keymv(c, mod, &(c->size.x), &(c->size.width), -1);
+		break;
+	case KEY_DOWN:
+		keymv(c, mod, &(c->size.y), &(c->size.height), 1);
+		break;
+	case KEY_UP:
+		keymv(c, mod, &(c->size.y), &(c->size.height), -1);
+		break;
+	case KEY_RIGHT:
+		keymv(c, mod, &(c->size.x), &(c->size.width), 1);
+		break;
 	case KEY_KILL: send_wm_delete(c); break;
 	case KEY_LOWER:
 	case KEY_ALTLOWER: XLowerWindow(jbwm.dpy, c->parent); break;
@@ -65,25 +64,27 @@ static void handle_client_key_event(const bool mod,
 		if (c->opt.no_max) return;
 		c->opt.is_fullscreen?unset_fullscreen(c):set_fullscreen(c);
 		break;
-
 	case KEY_MAX:
 		// Honor !MWM_FUNC_MAXIMIZE
 		// Maximizing shaped windows is buggy, so return.
 		if(c->opt.shaped || c->opt.no_max) return;
-		c->opt.maximized?unset_maximized(c):set_maximized(c);
+		if(c->opt.max_horz && c->opt.max_vert) {
+			unset_horz(c);
+			unset_vert(c);
+		} else {
+			set_horz(c);
+			set_vert(c);
+		}
 		break;
-
 	case KEY_MAX_H:
-		c->opt.max_horz?restore_horz(c):maximize_horz(c);
+		c->opt.max_horz?unset_horz(c):set_horz(c);
 		break;
-
 	case KEY_MAX_V:
-		c->opt.max_vert?restore_vert(c):maximize_vert(c);
+		c->opt.max_vert?unset_vert(c):set_vert(c);
 		break;
-
 	case KEY_STICK: stick(c); break;
 	case KEY_MOVE: drag(c); break;
-	case KEY_SHADE: shade(c);
+	case KEY_SHADE: shade(c); break;
 	}
 }
 
@@ -167,7 +168,7 @@ __attribute__((nonnull(1,2)))
 static void
 grab(ScreenInfo * restrict s, KeySym * restrict ks, const uint32_t mask)
 {
-	for (; *ks; ks++)
+	while(*(ks++))
 		XGrabKey(jbwm.dpy, XKeysymToKeycode(jbwm.dpy, *ks),
 			 jbwm.keymasks.grab | mask, s->root, true,
 			 GrabModeAsync, GrabModeAsync);

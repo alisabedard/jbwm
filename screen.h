@@ -11,17 +11,15 @@
 enum {DESKTOPS=10};
 
 void drag(Client * restrict c) __attribute__((nonnull));
-void maximize_horz(Client * restrict c) __attribute__((nonnull));
-void maximize_vert(Client * restrict c) __attribute__((nonnull));
+void set_horz(Client * restrict c) __attribute__((nonnull));
+void set_vert(Client * restrict c) __attribute__((nonnull));
 void moveresize(Client * restrict c) __attribute__((nonnull));
 void resize(Client * restrict c) __attribute__((nonnull));
-void restore_horz(Client * restrict c) __attribute__((nonnull));
-void restore_vert(Client * restrict c) __attribute__((nonnull));
+void unset_horz(Client * restrict c) __attribute__((nonnull));
+void unset_vert(Client * restrict c) __attribute__((nonnull));
 void set_fullscreen(Client * restrict c) __attribute__((nonnull));
-void set_maximized(Client * restrict c) __attribute__((nonnull));
 uint8_t switch_vdesk(ScreenInfo * s, uint8_t v) __attribute__((nonnull));
 void unset_fullscreen(Client * restrict c) __attribute__((nonnull));
 void unhide(Client * restrict c) __attribute__((nonnull));
-void unset_maximized(Client * restrict c) __attribute__((nonnull));
 
 #endif /* JBWM_SCREEN_H */

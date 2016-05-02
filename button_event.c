@@ -28,7 +28,6 @@ static void titlebar_event(Client * restrict c, const uint16_t x)
 
 void jbwm_handle_button_event(XButtonEvent * restrict e, Client * restrict c)
 {
-	if (c->opt.maximized) return; // Invalid when maximized
 	switch (e->button) {
 	case Button1:
 #ifdef USE_TBAR

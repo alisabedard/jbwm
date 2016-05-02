@@ -72,21 +72,15 @@ static void parse_argv(uint8_t argc, char **argv, Options * restrict o)
 			jbwm.keymasks.mod = parse_modifiers(optarg);
 			break;
 
-		case 'b':
-			o->bg = optarg;
-			break;
+		case 'b': o->bg = optarg; break;
 
 		case 'd':
 			setenv("DISPLAY", optarg, 1);
 			break;
 
-		case 'f':
-			o->fg = optarg;
-			break;
+		case 'f': o->fg = optarg; break;
 
-		case 's':
-			o->fc = optarg;
-			break;
+		case 's': o->fc = optarg; break;
 #ifdef STDIO
 		case 'V':
 			fprintf(stdout, "%s\n", VERSION);
@@ -95,8 +89,7 @@ static void parse_argv(uint8_t argc, char **argv, Options * restrict o)
 			fprintf(stdout, "%s [%s]\n", argv[0], optstring);
 #else//!STDIO
 		default:
-#endif//STDIO
-			exit(1);
+#endif//STDIO exit(1);
 		}
 	}
 }
