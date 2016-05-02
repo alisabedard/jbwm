@@ -168,7 +168,7 @@ __attribute__((nonnull(1,2)))
 static void
 grab(ScreenInfo * restrict s, KeySym * restrict ks, const uint32_t mask)
 {
-	while(*(ks++))
+	for (; *ks; ks++)
 		XGrabKey(jbwm.dpy, XKeysymToKeycode(jbwm.dpy, *ks),
 			 jbwm.keymasks.grab | mask, s->root, true,
 			 GrabModeAsync, GrabModeAsync);
