@@ -1,0 +1,8 @@
+#!/bin/sh
+DPY=":1"
+DIM="800x600"
+exec Xephyr -screen $DIM\
+	     -resizeable\
+	     -sw-cursor\
+	     $DPY
+
