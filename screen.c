@@ -46,6 +46,7 @@ static inline void grab_pointer(const Window w)
 
 void resize(Client * restrict c)
 {
+	XRaiseWindow(jbwm.dpy, c->parent);
 	LOG("resize");
 	if (c->opt.no_resize || c->opt.shaded)
 		  return;
@@ -79,6 +80,7 @@ static XPoint get_mouse_position(Window w)
 void drag(Client * restrict c)
 {
 	LOG("drag");
+	XRaiseWindow(jbwm.dpy, c->parent);
 	grab_pointer(c->screen->root);
 	const XPoint op = { c->size.x, c->size.y};
 	XPoint p = get_mouse_position(c->screen->root);

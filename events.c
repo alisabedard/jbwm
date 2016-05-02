@@ -17,9 +17,6 @@
 #include "util.h"
 
 #include <stdlib.h>
-#ifndef NETBSD
-#include <stdnoreturn.h>
-#endif//NETBSD
 #include <X11/Xatom.h>
 
 __attribute__((pure)) // Return does not change between calls
@@ -57,6 +54,10 @@ static void cleanup(void)
 	for (Client * i, * c = jbwm.head; c; c = i) {
 		i = c->next;
 		if (c->opt.remove) {
+			set_wm_state(c, WithdrawnState);
+			XReparentWindow(jbwm.dpy, c->window, c->screen->root,
+				c->size.x, c->size.y);
+			XRemoveFromSaveSet(jbwm.dpy, c->window);
 			if(c->parent)
 				  XDestroyWindow(jbwm.dpy, c->parent);
 			relink_window_list(c);
@@ -133,7 +134,7 @@ void main_event_loop(void)
 	case EnterNotify:
 		if(c && (ev.xcrossing.window == c->parent))
 			  select_client(c);
-		goto head;
+		break;
 
 	case UnmapNotify:
 		if (c) handle_unmap_event(c);
@@ -141,12 +142,12 @@ void main_event_loop(void)
 
 	case PropertyNotify:
 		if (c) handle_property_change(&ev.xproperty, c);
-		goto head;
+		break;
 
 	case MapRequest:
 		if (!c) make_new_client(ev.xmaprequest.window,
 			find_screen(ev.xmaprequest.parent));
-		goto head;
+		break;
 
 	case KeyPress:
 		jbwm_handle_key_event(&ev.xkey);
@@ -155,7 +156,7 @@ void main_event_loop(void)
 	case Expose:
 		if (c && ev.xexpose.count == 0)
 			  update_titlebar(c);
-		goto head;
+		break;
 #endif//USE_TBAR
 
 	case ButtonPress:
@@ -164,19 +165,19 @@ void main_event_loop(void)
 
 	case ConfigureRequest:
 		handle_configure_request(&ev.xconfigurerequest);
-		goto head;
+		break;
 
 	case ConfigureNotify:
 		if (c && !ev.xconfigure.override_redirect)
 			  moveresize(c);
-		goto head;
+		break;
 
 	case ColormapNotify:
 		if (c && ev.xcolormap.new) {
 			c->cmap = ev.xcolormap.colormap;
 			XInstallColormap(jbwm.dpy, c->cmap);
 		}
-		goto head;
+		break;
 
 #ifdef EWMH
 	case CreateNotify:
