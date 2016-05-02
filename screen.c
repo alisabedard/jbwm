@@ -138,7 +138,7 @@ void set_horz(Client * restrict c)
 	ewmh_add_state(c->window, ewmh[WM_STATE_MAXIMIZED_HORZ]);
 	c->opt.max_horz = true;
 	// Offset if not fullscreen
-	if (c->opt.fullscreen) {
+	if (!c->opt.fullscreen) {
 		c->size.width -= c->border<<1;
 	}
 }
