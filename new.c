@@ -23,14 +23,24 @@
 #ifdef EWMH
 static uint8_t wm_desktop(const Window w, uint8_t vdesk)
 {
-	unsigned long *lprop = get_property(w, ewmh[WM_DESKTOP],
-		&(unsigned long){0});
+	LOG("wm_desktop(): vdesk is %d\n", vdesk);
+	size_t n;
+	unsigned long *lprop = get_property(w, ewmh[WM_DESKTOP], &n);
+#ifdef DEBUG
 	if(lprop) {
-		vdesk = lprop[0];
-		XFree(lprop);
-	} else {
-		XPROP(w, ewmh[WM_DESKTOP], XA_CARDINAL, &vdesk, 1);
+		LOG("\tlprop is set, n is %lu\n", n);
 	}
+	if(n) {
+		LOG("\tlprop[0] = %d\n", (int)lprop[0]);
+	}
+#endif//DEBUG
+	if(lprop && n && lprop[0] < DESKTOPS)
+		vdesk = lprop[0];
+	else
+		  XPROP(w, ewmh[WM_DESKTOP], XA_CARDINAL, &vdesk, 1);
+	if(lprop)
+		  XFree(lprop);
+	LOG("vdesk is %d\n", vdesk);
 	return vdesk;
 }
 #endif//EWMH

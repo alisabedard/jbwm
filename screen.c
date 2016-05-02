@@ -230,6 +230,7 @@ static void hide(Client * restrict c)
 	c->ignore_unmap++;
 	XUnmapWindow(jbwm.dpy, c->parent);
 	set_wm_state(c, IconicState);
+	ewmh_add_state(c->window, ewmh[WM_STATE_HIDDEN]);
 }
 
 void unhide(Client * restrict c)
@@ -237,6 +238,7 @@ void unhide(Client * restrict c)
 	LOG("unhide");
 	XMapWindow(jbwm.dpy, c->parent);
 	set_wm_state(c, NormalState);
+	ewmh_remove_state(c->window, ewmh[WM_STATE_HIDDEN]);
 }
 
 uint8_t switch_vdesk(ScreenInfo * s, uint8_t v)

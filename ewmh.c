@@ -38,7 +38,6 @@ static char * atom_names [] = { // This list must match 1:1 with enum
 	"_NET_WM_MOVERESIZE",
 	"_NET_WM_PID",
 	"_NET_WM_WINDOW_TYPE",
-	"WM_CHANGE_STATE",
 	"_NET_WM_ACTION_MOVE",
 	"_NET_WM_ACTION_RESIZE",
 	"_NET_WM_ACTION_CLOSE",
@@ -138,12 +137,12 @@ static void set_root_vdesk(const Window r)
   message_type = _NET_WM_STATE
   format = 32
   data.l[0] = the action, as listed below
-  data.l[1] = first property to alter
-  data.l[2] = second property to alter
-  data.l[3] = source indication:
         _NET_WM_STATE_REMOVE        0    remove/unset property
         _NET_WM_STATE_ADD           1    add/set property
         _NET_WM_STATE_TOGGLE        2    toggle property
+  data.l[1] = first property to alter
+  data.l[2] = second property to alter
+  data.l[3] = source indication
   other data.l[] elements = 0 */
 
 __attribute__((nonnull(1)))
@@ -221,6 +220,26 @@ static void handle_wm_state_changes(XClientMessageEvent * restrict e,
 	check_state(e, WM_STATE_STICKY, c);
 }
 
+static bool client_specific_message(XClientMessageEvent * restrict e,
+	Client * restrict c, const Atom t)
+{
+	if (t == ewmh[WM_DESKTOP])
+		client_to_vdesk(c, e->data.l[0]);
+	// If user moves window (client-side titlebars):
+	else if (t == ewmh[WM_MOVERESIZE]) {
+		XRaiseWindow(jbwm.dpy, c->parent);
+		drag(c);
+	} else if (t == ewmh[WM_STATE])
+		handle_wm_state_changes(e, c);
+	else if (t == ewmh[ACTIVE_WINDOW])
+		select_client(c);
+	else if (t == ewmh[CLOSE_WINDOW])
+		send_wm_delete(c);
+	else
+		  return false;
+	return true;
+}
+
 void ewmh_client_message(XClientMessageEvent * restrict e,
 	Client * restrict c)
 {
@@ -234,39 +253,21 @@ void ewmh_client_message(XClientMessageEvent * restrict e,
 	print_atom(e->data.l[3], __LINE__);
 #endif//DEBUG
 	ScreenInfo *s = c ? c->screen : jbwm.screens;
-	const long val = e->data.l[0];
-	if (t == ewmh[CURRENT_DESKTOP])
-		switch_vdesk(s, val);
-	else if (t == ewmh[WM_DESKTOP] && c)
-		client_to_vdesk(c, val);
-	else if ((t == ewmh[NUMBER_OF_DESKTOPS])
-		|| (t == ewmh[DESKTOP_VIEWPORT]))
-		set_root_vdesk(s->root);
-	else if (t == ewmh[ACTIVE_WINDOW] && val == 2 && c)
-		select_client(c);
-	else if (t == ewmh[CLOSE_WINDOW] && e->data.l[1] == 2 && c)
-		send_wm_delete(c);
-	// If something else moves the window:
-	else if (t == ewmh[MOVERESIZE_WINDOW]) {
-		const uint8_t src = (val >> 12) & 3;
-		if (src == 2) {
-			const int vm = (val >> 8) & 0x0f;
-			XConfigureWindow(e->display, e->window,
-				vm, &(XWindowChanges){
-				.x = e->data.l[1], .y = e->data.l[2],
-				.width = e->data.l[3],
-				.height = e->data.l[4]});
+	if(!client_specific_message(e, c, t)) {
+		if (t == ewmh[CURRENT_DESKTOP])
+			switch_vdesk(s, e->data.l[0]);
+		// If something else moves the window:
+		else if (t == ewmh[MOVERESIZE_WINDOW]) {
+			const uint8_t src = (e->data.l[0] >> 12) & 3;
+			if (src == 2) {
+				const int vm = (e->data.l[0] >> 8) & 0x0f;
+				XConfigureWindow(e->display, e->window,
+					vm, &(XWindowChanges){
+					.x = e->data.l[1], .y = e->data.l[2],
+					.width = e->data.l[3],
+					.height = e->data.l[4]});
+			}
 		}
-	}
-	// If user moves window (client-side titlebars):
-	else if (t == ewmh[WM_MOVERESIZE] && c) {
-		XRaiseWindow(jbwm.dpy, c->parent);
-		drag(c);
-	} else if (t == ewmh[WM_STATE] && c)
-		handle_wm_state_changes(e, c);
-	else if (t == ewmh[WM_CHANGE_STATE] && c) {
-		if (val == 3)	// Minimize (lower)
-			XLowerWindow(jbwm.dpy, c->parent);
 	}
 }
 
@@ -275,7 +276,8 @@ void set_ewmh_allowed_actions(const Window w)
 	const Atom a[] = {
 		ewmh[WM_ALLOWED_ACTIONS],
 		ewmh[WM_ACTION_MOVE],
-		ewmh[WM_ACTION_RESIZE], ewmh[WM_ACTION_CLOSE],
+		ewmh[WM_ACTION_RESIZE],
+		ewmh[WM_ACTION_CLOSE],
 		ewmh[WM_ACTION_SHADE],
 		ewmh[WM_ACTION_FULLSCREEN],
 		ewmh[WM_ACTION_CHANGE_DESKTOP],

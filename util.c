@@ -18,7 +18,7 @@ unsigned long pixel(const uint8_t screen, const char * restrict name)
 
 #if defined(EWMH) || defined(MWM)
 __attribute__((warn_unused_result))
-void *get_property(Window w, Atom property, unsigned long * restrict num_items)
+void *get_property(Window w, Atom property, size_t * restrict num_items)
 {
 	unsigned char *prop;
 	if (XGetWindowProperty(jbwm.dpy, w, property, 0L, 1024LL,

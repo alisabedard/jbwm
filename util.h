@@ -18,7 +18,7 @@ unsigned long pixel(const uint8_t screen, const char * restrict name);
 #if defined(EWMH) || defined(MWM)
 
 void *get_property(Window w, Atom property,
-	unsigned long * restrict num_items);
+	size_t * restrict num_items);
 
 #endif//EWMH||MWM
 
