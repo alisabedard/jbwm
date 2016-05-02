@@ -113,7 +113,7 @@ void moveresize(Client * restrict c)
 	XMoveResizeWindow(jbwm.dpy, c->window,
 		0, offset,
 		c->size.width, c->size.height);
-	if(offset) { update_titlebar(c); }
+	if(offset) { update_titlebar(c); } // Avoid shaped and fullscreen
 	set_shape(c);
 }
 
@@ -146,7 +146,7 @@ void set_horz(Client * restrict c)
 void unset_vert(Client * restrict c)
 {
 	LOG("unset_vert");
-	if (c->opt.max_vert) {
+	if (c->opt.max_vert && !c->opt.shaded) {
 		c->opt.max_vert = false;
 		c->size.y = c->old_size.y;
 		c->size.height = c->old_size.height;
@@ -158,7 +158,7 @@ void unset_vert(Client * restrict c)
 void set_vert(Client * restrict c)
 {
 	LOG("set_vert");
-	if (c->opt.max_vert) return;
+	if (c->opt.max_vert || c->opt.shaded) return;
 	c->old_size.y = c->size.y;
 	c->old_size.height = c->size.height;
 	c->size.y = 0;
@@ -176,20 +176,20 @@ void set_vert(Client * restrict c)
 void unset_fullscreen(Client * restrict c)
 {
 	LOG("unset_fullscreen");
-	if(!c->opt.is_fullscreen) return;
+	if(!c->opt.fullscreen) return;
 	c->opt.fullscreen = false; // Reflects desired status
 	unset_horz(c);
 	unset_vert(c);
 	XSetWindowBorderWidth(jbwm.dpy, c->parent, c->border);
 	ewmh_remove_state(c->window, ewmh[WM_STATE_FULLSCREEN]);
 	update_titlebar(c);
-	c->opt.is_fullscreen = false; // Reflects current status
 }
 
 void set_fullscreen(Client * restrict c)
 {
 	LOG("set_fullscreen");
-	if(c->opt.is_fullscreen) return; // Already fullscreen
+	if(c->opt.fullscreen || c->opt.shaded)
+		  return;
 	/* The following checks remove conflicts between fullscreen
 	   mode and setd modes.  */
 	if(c->opt.max_horz) unset_horz(c);
@@ -200,15 +200,11 @@ void set_fullscreen(Client * restrict c)
 	XSetWindowBorderWidth(jbwm.dpy, c->parent, 0);
 	ewmh_add_state(c->window, ewmh[WM_STATE_FULLSCREEN]);
 	update_titlebar(c);
-	c->opt.is_fullscreen = true; // Reflect current status
 }
 
 static void hide(Client * restrict c)
 {
 	LOG("hide");
-	/* This will generate an unmap event.  Tell event handler
-	 * to ignore it.  */
-	c->ignore_unmap++;
 	XUnmapWindow(jbwm.dpy, c->parent);
 	set_wm_state(c, IconicState);
 	ewmh_add_state(c->window, ewmh[WM_STATE_HIDDEN]);

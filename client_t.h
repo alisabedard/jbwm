@@ -24,8 +24,8 @@ struct Client {
 	Client *next;
 
 	uint8_t vdesk : 4;
-	uint8_t ignore_unmap : 4;
-	uint8_t border;
+	uint8_t border : 1;
+	uint8_t ignore_unmap : 3;
 #ifdef USE_TBAR
 	uint16_t exposed_width;
 #endif//USE_TBAR

@@ -23,7 +23,7 @@ void shade(Client * restrict c)
 	LOG("shade");
 
 	// Honor !MWM_FUNC_MINIMIZE
-	if (c->opt.no_min) return;
+	if (c->opt.no_min || c->opt.fullscreen) return;
 
 	/* This implements window shading, a substitute
 	   for iconification.  */
@@ -138,9 +138,8 @@ void update_titlebar(Client * c)
 	if (c->opt.no_titlebar || c->opt.shaped)
 		  return;
 
-	if (c->opt.fullscreen) {
-		/* May generate BadWindow on subsequent invocations,
-		   however the error handler makes such irrelevant.  */
+	if (c->opt.fullscreen && c->titlebar) {
+		c->ignore_unmap++;
 		XDestroyWindow(jbwm.dpy, c->titlebar);
 		c->titlebar = 0;
 		return;

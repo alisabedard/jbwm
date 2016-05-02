@@ -35,23 +35,39 @@ static ScreenInfo *find_screen(const Window root)
 static void relink_window_list(Client * c)
 {
 	LOG("relink_window_list");
-
-	if (jbwm.head == c)
+	if (jbwm.current == c) // Remove selection target
+		jbwm.current = NULL;
+	if (jbwm.head == c) {
 		jbwm.head = c->next;
-	else
-		for (Client * p = jbwm.head; p && p->next; p = p->next)
-			if (p->next == c) {
-				p->next = c->next;
-				return;
-			}
+		return;
+	}
+	for (Client * p = jbwm.head; p && p->next; p = p->next) {
+		if (p->next == c) { // Close the link
+			p->next = c->next;
+			return;
+		}
+	}
 }
 
 static void cleanup(void)
 {
 	LOG("cleanup()");
 	jbwm.need_cleanup = false;
-
-	for (Client * i, * c = jbwm.head; c; c = i) {
+	for(Client * i, * c = jbwm.head; c; c=i) {
+		i=c->next;
+		if(c->opt.remove) {
+			XReparentWindow(jbwm.dpy, c->window,
+				c->screen->root,
+				c->size.x, c->size.y);
+			XRemoveFromSaveSet(jbwm.dpy, c->window);
+			XDestroyWindow(jbwm.dpy, c->parent);
+			relink_window_list(c);
+			free(c);
+		}
+		if(!i) return;
+	}
+#if 0
+	for (Client * c = jbwm.head; c; c = i) {
 		i = c->next;
 		if (c->opt.remove) {
 			set_wm_state(c, WithdrawnState);
@@ -60,6 +76,7 @@ static void cleanup(void)
 			XRemoveFromSaveSet(jbwm.dpy, c->window);
 			if(c->parent)
 				  XDestroyWindow(jbwm.dpy, c->parent);
+			c->parent=0; // Ensure it is not referenced again.
 			relink_window_list(c);
 
 			if (jbwm.current == c)
@@ -69,18 +86,7 @@ static void cleanup(void)
 		}
 		if (!i) return;
 	}
-}
-
-static void handle_unmap_event(Client * restrict c)
-{
-	LOG("handle_unmap_event(e): %d ignores remaining",
-		c->ignore_unmap);
-
-	if (c->ignore_unmap < 1) {
-		LOG("!c->ignore_unmap");
-		c->opt.remove = true;
-		jbwm.need_cleanup = true;
-	} else c->ignore_unmap--;
+#endif
 }
 
 static void handle_wm_hints(Client * c)
@@ -137,7 +143,10 @@ void main_event_loop(void)
 		break;
 
 	case UnmapNotify:
-		if (c) handle_unmap_event(c);
+		if (!c) break;
+		LOG("UnmapNotify: ignore_unmap is %d", c->ignore_unmap);
+		if (!c->ignore_unmap--)
+			c->opt.remove=jbwm.need_cleanup=true;
 		break;
 
 	case PropertyNotify:

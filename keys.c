@@ -43,6 +43,7 @@ keymv(Client * c, const bool mod, int * restrict xy,
 static void handle_client_key_event(const bool mod,
 	Client * c, const KeySym key)
 {
+	LOG("handle_client_key_event: %d", (int)key);
 	switch (key) {
 	case KEY_LEFT:
 		keymv(c, mod, &(c->size.x), &(c->size.width), -1);
@@ -61,8 +62,10 @@ static void handle_client_key_event(const bool mod,
 	case KEY_ALTLOWER: XLowerWindow(jbwm.dpy, c->parent); break;
 	case KEY_RAISE: XRaiseWindow(jbwm.dpy, c->parent); break;
 	case KEY_FS:
+		LOG("KEY_FS, c->opt.fullscreen:%d\n",
+			(int)c->opt.fullscreen);
 		if (c->opt.no_max) return;
-		c->opt.is_fullscreen?unset_fullscreen(c):set_fullscreen(c);
+		c->opt.fullscreen?unset_fullscreen(c):set_fullscreen(c);
 		break;
 	case KEY_MAX:
 		// Honor !MWM_FUNC_MAXIMIZE
@@ -124,6 +127,7 @@ cond_client_to_desk(Client * c, ScreenInfo * s, const uint8_t d, const bool mod)
 
 void jbwm_handle_key_event(XKeyEvent * e)
 {
+	LOG("jbwm_handle_key_event");
 	const KeySym key = XLookupKeysym(e, 0);
 	Client *c = jbwm.current;
 	ScreenInfo *s = c ? c->screen : jbwm.screens;
