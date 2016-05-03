@@ -93,14 +93,15 @@ static void handle_wm_hints(Client * c)
 {
 	LOG("handle_wm_hints");
 	XWMHints *h = XGetWMHints(jbwm.dpy, c->window);
+	if(h) {
+		if (h->flags & XUrgencyHint) {
+			switch_vdesk(c->screen, c->screen->vdesk);
+			unhide(c);
+			XRaiseWindow(jbwm.dpy, c->parent);
+		}
 
-	if (h->flags & XUrgencyHint) {
-		switch_vdesk(c->screen, c->screen->vdesk);
-		unhide(c);
-		XRaiseWindow(jbwm.dpy, c->parent);
+		XFree(h);
 	}
-
-	XFree(h);
 }
 
 static void handle_property_change(XPropertyEvent * restrict e,
