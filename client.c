@@ -65,10 +65,7 @@ static void unselect_current(void)
 
 void select_client(Client * c)
 {
-#ifdef MWM
-	if(jbwm.current && jbwm.current->opt.modal)
-		  return;
-#endif//MWM
+	if(!c) return;
 	c->opt.active = true;
 	unselect_current();
 	XInstallColormap(jbwm.dpy, c->cmap);
