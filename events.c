@@ -11,6 +11,7 @@
 #include "jbwmenv.h"
 #include "keys.h"
 #include "log.h"
+#include "mwm.h"
 #include "new.h"
 #include "screen.h"
 #include "titlebar.h"
@@ -51,7 +52,7 @@ static void relink_window_list(Client * c)
 
 static void cleanup(void)
 {
-	LOG("cleanup()");
+	LOG("cleanup");
 	jbwm.need_cleanup = false;
 	for(Client * i, * c = jbwm.head; c; c=i) {
 		i=c->next;
@@ -66,27 +67,6 @@ static void cleanup(void)
 		}
 		if(!i) return;
 	}
-#if 0
-	for (Client * c = jbwm.head; c; c = i) {
-		i = c->next;
-		if (c->opt.remove) {
-			set_wm_state(c, WithdrawnState);
-			XReparentWindow(jbwm.dpy, c->window, c->screen->root,
-				c->size.x, c->size.y);
-			XRemoveFromSaveSet(jbwm.dpy, c->window);
-			if(c->parent)
-				  XDestroyWindow(jbwm.dpy, c->parent);
-			c->parent=0; // Ensure it is not referenced again.
-			relink_window_list(c);
-
-			if (jbwm.current == c)
-				jbwm.current = NULL;
-
-			free(c);
-		}
-		if (!i) return;
-	}
-#endif
 }
 
 static void handle_wm_hints(Client * c)
@@ -95,8 +75,7 @@ static void handle_wm_hints(Client * c)
 	XWMHints *h = XGetWMHints(jbwm.dpy, c->window);
 	if(h) {
 		if (h->flags & XUrgencyHint) {
-			switch_vdesk(c->screen, c->screen->vdesk);
-			unhide(c);
+			switch_vdesk(c->screen, c->vdesk);
 			XRaiseWindow(jbwm.dpy, c->parent);
 		}
 
@@ -107,22 +86,27 @@ static void handle_wm_hints(Client * c)
 static void handle_property_change(XPropertyEvent * restrict e,
 	Client * restrict c)
 {
-	const Atom a = e->atom;
-
-	print_atom(a, __LINE__);
-
-	if (a == XA_WM_HINTS)
-		handle_wm_hints(c);
-
+	LOG("handle_property_change");
+	print_atom(e->atom, __LINE__);
+	if(e->state != PropertyNewValue)
+		  return;
+	switch(e->atom) {
 #ifdef USE_TBAR
-	else if (a == XA_WM_NAME)
+	case XA_WM_NAME:
 		update_titlebar(c);
-	else moveresize(c);
+		break;
 #endif//USE_TBAR
+	case XA_WM_HINTS:
+		handle_wm_hints(c);
+		break;
+	default:
+		moveresize(c);
+	}
 }
 
 static void handle_configure_request(XConfigureRequestEvent * e)
 {
+	LOG("handle_configure_request");
 	XConfigureWindow(jbwm.dpy, e->window, e->value_mask,
 		&(XWindowChanges){ .x = e->x, .y = e->y,
 		.width = e->width, .height = e->height,
@@ -144,10 +128,12 @@ void main_event_loop(void)
 		break;
 
 	case UnmapNotify:
-		if (!c) break;
-		LOG("UnmapNotify: ignore_unmap is %d", c->ignore_unmap);
-		if (!c->ignore_unmap--)
-			c->opt.remove=jbwm.need_cleanup=true;
+		if(c) {
+			LOG("UnmapNotify: ignore_unmap is %d",
+				c->ignore_unmap);
+			c->opt.remove=jbwm.need_cleanup=(c->ignore_unmap<1);
+			c->ignore_unmap--; // Decrement here!
+		}
 		break;
 
 	case PropertyNotify:
@@ -164,7 +150,7 @@ void main_event_loop(void)
 		break;
 #ifdef USE_TBAR
 	case Expose:
-		if (c && ev.xexpose.count == 0)
+		if (c && !ev.xexpose.count)
 			  update_titlebar(c);
 		break;
 #endif//USE_TBAR
@@ -177,13 +163,9 @@ void main_event_loop(void)
 		handle_configure_request(&ev.xconfigurerequest);
 		break;
 
-	case ConfigureNotify:
-		if (c && !ev.xconfigure.override_redirect)
-			  moveresize(c);
-		break;
-
 	case ColormapNotify:
 		if (c && ev.xcolormap.new) {
+			LOG("ColormapNotify");
 			c->cmap = ev.xcolormap.colormap;
 			XInstallColormap(jbwm.dpy, c->cmap);
 		}
@@ -191,7 +173,9 @@ void main_event_loop(void)
 
 #ifdef EWMH
 	case CreateNotify:
+		LOG("CreateNotify");
 	case DestroyNotify:
+		LOG("->>DestroyNotify");
 		ewmh_update_client_list();
 		break;
 
@@ -201,8 +185,10 @@ void main_event_loop(void)
 #endif//EWMH
 
 #ifdef DEBUG
+	case ConfigureNotify: LOG("ConfigureNotify"); break;
 	case MapNotify: LOG("MapNotify"); break;
 	case MappingNotify: LOG("MappingNotify"); break;
+	case MotionNotify: LOG("MotionNotify"); break;
 	case KeyRelease: LOG("KeyRelease"); break;
 	case ReparentNotify: LOG("ReparentNotify"); break;
 	case ButtonRelease: LOG("ButtonRelease"); break;

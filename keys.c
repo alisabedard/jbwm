@@ -10,6 +10,7 @@
 #include "config.h"
 #include "jbwmenv.h"
 #include "log.h"
+#include "max.h"
 #include "screen.h"
 #include "snap.h"
 #include "titlebar.h"
@@ -21,7 +22,7 @@ static void point(Client * restrict c, const int16_t x, const int16_t y)
 }
 
 static void
-keymv(Client * c, const bool mod, int * restrict xy,
+keymv(Client * restrict c, const bool mod, int * restrict xy,
 	int * restrict wh, const int8_t sign)
 {
 	/* These operations invalid when fullscreen.  */
@@ -29,11 +30,9 @@ keymv(Client * c, const bool mod, int * restrict xy,
 
 	const int8_t d = sign * JBWM_RESIZE_INCREMENT;
 
-	if (mod && (*wh > 0)) {
-		if (c->opt.shaped) goto move;
+	if (mod && (*wh > 0) && !c->opt.shaped && !c->opt.no_resize)
 		*wh += d;
-	} else
- move:
+	else
 		*xy += d;
 	snap_border(c);
 	moveresize(c);

@@ -35,11 +35,12 @@ static void configure(XSizeHints * restrict g, const Window w)
 {
 	XSendEvent(jbwm.dpy, w, true, StructureNotifyMask, (XEvent *)
 		&(XConfigureEvent){.x = g->x, .y = g->y, .width = g->width,
-		.height = g->width, .type = ConfigureNotify, .event = w });
+		.height = g->height, .type = ConfigureNotify, .event = w });
 }
 
 static inline void grab_pointer(const Window w)
 {
+		LOG("ColormapNotify");
 	XGrabPointer(jbwm.dpy, w, false, MouseMask, GrabModeAsync,
 		GrabModeAsync, None, jbwm.cursor, CurrentTime);
 }
@@ -66,7 +67,6 @@ resize_loop:
 	}
 	XUngrabPointer(jbwm.dpy, CurrentTime);
 	moveresize(c);
-	configure(&c->size, c->window);
 }
 
 static XPoint get_mouse_position(Window w)
@@ -85,7 +85,7 @@ void drag(Client * restrict c)
 	const XPoint op = { c->size.x, c->size.y};
 	XPoint p = get_mouse_position(c->screen->root);
 	XEvent ev;
-drag_begin:
+drag_loop:
 	XMaskEvent(jbwm.dpy, MouseMask, &ev);
 	if(ev.type == MotionNotify) {
 		if(c->border) draw_outline(c); // clear
@@ -94,12 +94,13 @@ drag_begin:
 		snap_client(c);
 		if(c->border) draw_outline(c); // draw
 		else moveresize(c);
-		goto drag_begin;
+		goto drag_loop;
 	}
 	if(c->border) draw_outline(c); // clear
 	XUngrabPointer(jbwm.dpy, CurrentTime);
 	moveresize(c);
-	configure(&(c->size), c->window);
+	if(!c->opt.tearoff)
+		configure(&(c->size), c->window);
 }
 
 void moveresize(Client * restrict c)
@@ -115,91 +116,7 @@ void moveresize(Client * restrict c)
 		c->size.width, c->size.height);
 	if(offset) { update_titlebar(c); } // Avoid shaped and fullscreen
 	set_shape(c);
-}
-
-void unset_horz(Client * restrict c)
-{
-	LOG("unset_horz");
-	if (!c->opt.max_horz) return;
-	c->opt.max_horz = false;
-	c->size.x = c->old_size.x;
-	c->size.width = c->old_size.width;
-	ewmh_remove_state(c->window, ewmh[WM_STATE_MAXIMIZED_HORZ]);
-}
-
-void set_horz(Client * restrict c)
-{
-	LOG("set_horz");
-	if (c->opt.max_horz) return;
-	c->old_size.x = c->size.x;
-	c->old_size.width = c->size.width;
-	c->size.x = 0;
-	c->size.width = c->screen->size.w;
-	ewmh_add_state(c->window, ewmh[WM_STATE_MAXIMIZED_HORZ]);
-	c->opt.max_horz = true;
-	// Offset if not fullscreen
-	if (!c->opt.fullscreen) {
-		c->size.width -= c->border<<1;
-	}
-}
-
-void unset_vert(Client * restrict c)
-{
-	LOG("unset_vert");
-	if (c->opt.max_vert && !c->opt.shaded) {
-		c->opt.max_vert = false;
-		c->size.y = c->old_size.y;
-		c->size.height = c->old_size.height;
-		ewmh_remove_state(c->window,
-			ewmh[WM_STATE_MAXIMIZED_VERT]);
-	}
-}
-
-void set_vert(Client * restrict c)
-{
-	LOG("set_vert");
-	if (c->opt.max_vert || c->opt.shaded) return;
-	c->old_size.y = c->size.y;
-	c->old_size.height = c->size.height;
-	c->size.y = 0;
-	c->size.height = c->screen->size.h;
-	ewmh_add_state(c->window, ewmh[WM_STATE_MAXIMIZED_VERT]);
-	c->opt.max_vert = true;
-	// Offset the titlebar if not fullscreen
-	if (!c->opt.fullscreen) {
-		c->size.y += TDIM+c->border;
-		c->size.height -= TDIM+(c->border<<2);
-		moveresize(c);
-	}
-}
-
-void unset_fullscreen(Client * restrict c)
-{
-	LOG("unset_fullscreen");
-	if(!c->opt.fullscreen) return;
-	c->opt.fullscreen = false; // Reflects desired status
-	unset_horz(c);
-	unset_vert(c);
-	XSetWindowBorderWidth(jbwm.dpy, c->parent, c->border);
-	ewmh_remove_state(c->window, ewmh[WM_STATE_FULLSCREEN]);
-	update_titlebar(c);
-}
-
-void set_fullscreen(Client * restrict c)
-{
-	LOG("set_fullscreen");
-	if(c->opt.fullscreen || c->opt.shaded)
-		  return;
-	/* The following checks remove conflicts between fullscreen
-	   mode and setd modes.  */
-	if(c->opt.max_horz) unset_horz(c);
-	if(c->opt.max_vert) unset_vert(c);
-	c->opt.fullscreen = true; // Reflect desired status
-	set_horz(c);
-	set_vert(c);
-	XSetWindowBorderWidth(jbwm.dpy, c->parent, 0);
-	ewmh_add_state(c->window, ewmh[WM_STATE_FULLSCREEN]);
-	update_titlebar(c);
+	//configure(&(c->size), c->window);
 }
 
 static void hide(Client * restrict c)

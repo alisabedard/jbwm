@@ -22,10 +22,9 @@ struct Client {
 	Colormap cmap;
 	ScreenInfo *screen;
 	Client *next;
-
+	int8_t ignore_unmap;
 	uint8_t vdesk : 4;
 	uint8_t border : 1;
-	uint8_t ignore_unmap : 3;
 #ifdef USE_TBAR
 	uint16_t exposed_width;
 #endif//USE_TBAR
@@ -47,10 +46,10 @@ struct Client {
 		bool no_resize_decor : 1;
 		bool no_close_decor : 1;
 		bool no_min_decor : 1;
-		bool no_max_decor : 1;
+		//bool no_max_decor : 1;
 		bool max_horz : 1;
 		bool max_vert : 1;
-		bool modal : 1;
+		//bool modal : 1;
 		bool tearoff : 1;
 	} opt;
 };

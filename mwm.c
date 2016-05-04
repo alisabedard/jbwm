@@ -45,8 +45,7 @@ static void process_flags(Client * c)
 		c->opt.no_border = c->opt.no_resize = c->opt.no_min
 			= c->opt.no_max = true;
 	}
-	if (c->opt.no_border)
-		  c->border = 0;
+	c->border=!c->opt.no_border;
 }
 
 void handle_mwm_hints(Client * c)
@@ -54,36 +53,61 @@ void handle_mwm_hints(Client * c)
 	static Atom mwm_hints;
 	if(!mwm_hints)
 		  mwm_hints=XInternAtom(jbwm.dpy, "_MOTIF_WM_HINTS", false);
-	struct {
-		unsigned long flags:32, functions:32, decor:32,
-			      input_mode:32, status:32;
+	struct { // paraphrased from MwmUtil.h
+		unsigned long flags, functions, decor;
+		long input_mode;
+		unsigned long status;
 	} *m = get_property(c->window, mwm_hints, &(long unsigned int){0});
+
 	if(!m) return;
 
-	if (m->flags & MWM_HINTS_FUNCTIONS) {
+	if (m->flags & MWM_HINTS_STATUS) {
+		LOG("MWM_HINTS_STATUS");
+		c->opt.tearoff = m->status & MWM_TEAROFF_WINDOW;
+		goto mwm_end;
+	}
+
+	if (m->flags & MWM_HINTS_FUNCTIONS
+		&& !(m->functions&MWM_FUNC_ALL)) {
+		LOG("MWM_HINTS_FUNCTIONS");
 		c->opt.no_resize=!(m->functions&MWM_FUNC_RESIZE);
 		c->opt.no_close=!(m->functions&MWM_FUNC_CLOSE);
 		c->opt.no_min=!(m->functions&MWM_FUNC_MINIMIZE);
 		c->opt.no_max=!(m->functions&MWM_FUNC_MAXIMIZE);
 		c->opt.no_move=!(m->functions&MWM_FUNC_MOVE);
+		LOG("\topts: %d, %d, %d, %d, %d",
+			c->opt.no_resize,
+			c->opt.no_close,
+			c->opt.no_min,
+			c->opt.no_max,
+			c->opt.no_move);
 	}
 
-	if (m->flags & MWM_HINTS_DECORATIONS) {
-		c->opt.no_resize_decor=!(m->decor&MWM_DECOR_RESIZEH)
-			|| !(m->decor&MWM_DECOR_BORDER);
+	if (m->flags & MWM_HINTS_DECORATIONS
+		&& !(m->decor&MWM_DECOR_ALL)) {
+		LOG("MWM_HINTS_DECORATIONS");
+		c->opt.no_border=!(m->decor&MWM_DECOR_BORDER);
+		c->opt.no_resize_decor=!(m->decor&MWM_DECOR_RESIZEH);
 		c->opt.no_titlebar=!(m->decor&MWM_DECOR_TITLE);
 		c->opt.no_close_decor=!(m->decor&MWM_DECOR_MENU);
 		c->opt.no_min_decor=!(m->decor&MWM_DECOR_MINIMIZE);
-		c->opt.no_max_decor=!(m->decor&MWM_DECOR_MAXIMIZE);
+		//c->opt.no_max_decor=!(m->decor&MWM_DECOR_MAXIMIZE);
+		LOG("\topts: %d, %d, %d, %d",
+			c->opt.no_resize_decor,
+			c->opt.no_titlebar,
+			c->opt.no_close_decor,
+			c->opt.no_min_decor);
 	}
 
-	if (m->flags & MWM_HINTS_STATUS)
-		c->opt.tearoff = m->status & MWM_TEAROFF_WINDOW;
-
-	if (m->flags & MWM_HINTS_INPUT_MODE)
+// FIXME:  Modal dialogs not yet implemented
+#if 0
+	if (m->flags & MWM_HINTS_INPUT_MODE) {
+		LOG("MWM_HINTS_INPUT_MODE");
 		c->opt.modal = m->input_mode;
-
+	}
+#endif
+mwm_end:
 	XFree(m);
 	process_flags(c);
-
 }
+

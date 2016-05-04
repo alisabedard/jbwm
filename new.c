@@ -76,7 +76,7 @@ static void init_geometry(Client * c)
 	c->size.y=pos ? attr.y : (c->screen->size.h>>1)-(c->size.height>>1);
 
 	// Test if the reparent that is to come would trigger an unmap event.
-	c->ignore_unmap += attr.map_state == IsViewable;
+	c->ignore_unmap=attr.map_state==IsViewable;
 }
 
 static void reparent(Client * c) // use of restrict here is a bug

@@ -8,6 +8,7 @@
 #include "client.h"
 #include "jbwmenv.h"
 #include "log.h"
+#include "max.h"
 #include "screen.h"
 #include "util.h"
 

@@ -89,7 +89,7 @@ draw_xft(Client * restrict c, const XPoint * restrict p,
 	XftColor color;
 	XftColorAllocName(jbwm.dpy, v, cm, DEF_fg, &color);
 	/* Prevent the text from going over the resize button.  */
-	const unsigned short max_width = c->size.width - 3 * TDIM;
+	const uint16_t max_width = c->size.width - 3 * TDIM;
 	XftDrawStringUtf8(xd, &color, jbwm.font, p->x, p->y,
 			  (XftChar8 *) name,
 			  e.width > max_width

@@ -39,7 +39,7 @@ LDFLAGS += $(LDPATH) $(LIBS)
 #LDFLAGS += -static 
 
 SRCS += client.c events.c jbwm.c new.c screen.c 
-SRCS += button_event.c keys.c util.c
+SRCS += button_event.c keys.c util.c max.c
 OBJS = $(SRCS:.c=.o)
 
 $(PROG): $(OBJS) 

@@ -53,7 +53,6 @@ snap_dim(const int16_t cxy, const uint16_t cwh, const int16_t cixy,
 
 void snap_client(Client * c)
 {
-	LOG("snap_client");
 	snap_border(c);
 	// Snap to other windows:
 	XSizeHints *restrict g = &(c->size);
