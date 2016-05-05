@@ -3,6 +3,7 @@
 #include "max.h"
 
 #include "ewmh.h"
+#include "jbwmenv.h"
 #include "log.h"
 #include "screen.h"
 #include "titlebar.h"
