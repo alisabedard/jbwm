@@ -8,9 +8,9 @@
 
 #ifndef TERMINAL_CMD
 #ifndef DEBIAN
-#define TERMINAL_CMD "urxvt &"
+#define TERMINAL_CMD "xterm&"
 #else /* DEBIAN */
-#define TERMINAL_CMD "x-terminal-emulator &"
+#define TERMINAL_CMD "x-terminal-emulator&"
 #endif /* !DEBIAN */
 #endif /* !TERMINAL_CMD */
 

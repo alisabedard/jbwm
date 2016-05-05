@@ -45,6 +45,7 @@ void shade(Client * restrict c)
 		ewmh_add_state(c->window, ewmh[WM_STATE_SHADED]);
 		select_client(c);
 	}
+	update_titlebar(c);
 }
 
 static GC colorgc(ScreenInfo * restrict s, const char *restrict colorname)
@@ -113,23 +114,23 @@ static void draw_title(Client * restrict c)
 	XFree(name);
 }
 
-static void draw(const Window t, GC gc, const int x)
+static void draw(const Window t, GC gc, const uint16_t x)
 {
 	XFillRectangle(jbwm.dpy, t, gc, x, 0, TDIM, TDIM);
 }
 
 static void draw_titlebar(Client * restrict c)
 {
-	const unsigned short w = c->size.width;
 	const Window t = c->titlebar;
 	XClearWindow(jbwm.dpy, t);
 	if (!c->opt.no_close_decor)
 		draw(t, jbwm.gc.close, 0);
 	if (c->opt.tearoff) return;
+	const uint16_t w = c->size.width-TDIM;
+	if (!c->opt.no_resize_decor && !c->opt.shaded)
+		draw(t, jbwm.gc.resize, w);
 	if (!c->opt.no_min_decor)
 		draw(t, jbwm.gc.shade, w-TDIM);
-	if (!c->opt.no_resize_decor)
-		draw(t, jbwm.gc.resize, w-(TDIM<<1));
 	draw_title(c);
 }
 

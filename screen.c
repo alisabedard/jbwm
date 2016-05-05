@@ -40,7 +40,6 @@ static void configure(XSizeHints * restrict g, const Window w)
 
 static inline void grab_pointer(const Window w)
 {
-		LOG("ColormapNotify");
 	XGrabPointer(jbwm.dpy, w, false, MouseMask, GrabModeAsync,
 		GrabModeAsync, None, jbwm.cursor, CurrentTime);
 }
