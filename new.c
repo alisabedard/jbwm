@@ -65,11 +65,10 @@ static void init_geometry(Client * c)
 	XGetWindowAttributes(jbwm.dpy, c->window, &attr);
 	c->cmap = attr.colormap;
 	XGetWMNormalHints(jbwm.dpy, c->window, &(c->size), &(long){0});
-	const Dim dim = { attr.width, attr.height };
-	const bool valid = (dim.w >= c->size.min_width)
-	    && (dim.h >= c->size.min_height);
-	c->size.width = valid ? dim.w : c->size.min_width;
-	c->size.height = valid ? dim.h : c->size.min_height;
+	c->size.width = (attr.width >= c->size.min_width)
+		? attr.width : c->size.min_width;
+	c->size.height = (attr.height >= c->size.min_height)
+		? attr.height : c->size.min_height;
 	const bool pos = (attr.map_state == IsViewable)
 	    || (c->size.flags & USPosition);
 	c->size.x=pos ? attr.x : (c->screen->size.w>>1)-(c->size.width>>1);
