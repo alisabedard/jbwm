@@ -19,9 +19,11 @@ void ewmh_remove_state(const Window w, const Atom state)
 	if (a) {
 		const unsigned long nitems = n;
 
-		while (n--)
+		while (n) {
 			if (a[n] == state)
 				a[n] = 0;
+			n--;
+		}
 
 		XPROP(w, ewmh[WM_STATE], XA_ATOM, &a, nitems);
 		XFree(a);
