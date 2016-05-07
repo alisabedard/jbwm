@@ -7,7 +7,7 @@
 # Link time optimization greatly reduces binary size:
 # However, it may not work correctly with clang.
 #CFLAGS+=-flto -O3
-CFLAGS+=-ggdb
+#CFLAGS+=-ggdb
 # Enable all warnings
 CFLAGS+=-Wall -Wextra
 

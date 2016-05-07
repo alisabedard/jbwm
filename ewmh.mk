@@ -1,3 +1,3 @@
 DEFINES += -DEWMH
-EXTRASRCS += ewmh.c
+EXTRASRCS += ewmh.c ewmh_state.c
 

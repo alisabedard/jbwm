@@ -8,6 +8,7 @@
 #include "client.h"
 #include "config.h"
 #include "ewmh.h"
+#include "ewmh_state.h"
 #include "log.h"
 #include "screen.h"
 #include "util.h"

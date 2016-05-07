@@ -8,6 +8,7 @@
 #include "button_event.h"
 #include "client.h"
 #include "ewmh.h"
+#include "ewmh_state.h"
 #include "jbwmenv.h"
 #include "keys.h"
 #include "log.h"

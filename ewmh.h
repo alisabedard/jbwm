@@ -11,10 +11,6 @@
 #include "client_t.h"
 
 void ewmh_update_client_list(void);
-void ewmh_remove_state(const Window w, const Atom state);
-void ewmh_add_state(const Window w, const Atom state);
-void ewmh_client_message(XClientMessageEvent * restrict e,
-	Client * restrict c) __attribute__((nonnull(1)));
 void set_ewmh_allowed_actions(const Window w);
 void setup_ewmh_for_screen(ScreenInfo * restrict s)
 	__attribute__((nonnull));
@@ -49,9 +45,6 @@ extern Atom ewmh[];
 
 #else//!EWMH
 #define ewmh_update_client_list()
-#define ewmh_remove_state(w, s)
-#define ewmh_add_state(w, s)
-#define ewmh_client_message(e)
 #define set_ewmh_allowed_actions(w)
 #define setup_ewmh_for_screen(s)
 #define ewmh_init()

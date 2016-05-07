@@ -7,6 +7,7 @@
 
 #include "client.h"
 #include "ewmh.h"
+#include "ewmh_state.h"
 #include "jbwmenv.h"
 #include "log.h"
 #include "shape.h"
