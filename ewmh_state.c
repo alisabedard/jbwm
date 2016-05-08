@@ -25,7 +25,7 @@ void ewmh_remove_state(const Window w, const Atom state)
 			n--;
 		}
 
-		XPROP(w, ewmh[WM_STATE], XA_ATOM, &a, nitems);
+		XPROP(w, ewmh[WM_STATE], XA_ATOM, a, nitems);
 		XFree(a);
 	}
 }
@@ -37,8 +37,8 @@ static bool ewmh_get_state(const Window w, const Atom state)
 
 	bool found = false;
 	if (a) {
-		while (n--)
-			if ((found = (a[n] == state)))
+		while (n)
+			if ((found = (a[n--] == state)))
 				break;
 		XFree(a);
 	}

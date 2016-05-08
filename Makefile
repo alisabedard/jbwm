@@ -2,8 +2,8 @@
 # Copyright 1999-2015, Ciaran Anscomb <jbwm@6809.org.uk>
 # See README for license and other details.
 
-# Debugging symbols
-#CFLAGS+=-ggdb
+# Debugging symbols, enabled to be able to debug core dumps
+CFLAGS+=-ggdb
 # Link time optimization greatly reduces binary size:
 # However, it may not work correctly with clang.
 #CFLAGS+=-flto -O3
