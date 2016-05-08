@@ -19,10 +19,9 @@ void ewmh_remove_state(const Window w, const Atom state)
 	if (a) {
 		const unsigned long nitems = n;
 
-		while (n) {
+		while (n--) { // decrement here to prevent offset error
 			if (a[n] == state)
 				a[n] = 0;
-			n--;
 		}
 
 		XPROP(w, ewmh[WM_STATE], XA_ATOM, a, nitems);
@@ -37,8 +36,8 @@ static bool ewmh_get_state(const Window w, const Atom state)
 
 	bool found = false;
 	if (a) {
-		while (n)
-			if ((found = (a[n--] == state)))
+		while (n--) // prevent offset error
+			if ((found = (a[n] == state)))
 				break;
 		XFree(a);
 	}
