@@ -5,7 +5,6 @@
 
 #include "keys.h"
 
-#include <stdlib.h>
 #include "client.h"
 #include "config.h"
 #include "jbwmenv.h"
@@ -15,14 +14,15 @@
 #include "snap.h"
 #include "titlebar.h"
 
+#include <stdlib.h>
+
 static void point(Client * restrict c, const int16_t x, const int16_t y)
 {
 	XRaiseWindow(jbwm.dpy, c->parent);
 	XWarpPointer(jbwm.dpy, None, c->window, 0, 0, 0, 0, x, y);
 }
 
-static void
-keymv(Client * restrict c, const bool mod, int * restrict xy,
+static void keymv(Client * restrict c, const bool mod, int * restrict xy,
 	int * restrict wh, const int8_t sign)
 {
 	/* These operations invalid when fullscreen.  */
