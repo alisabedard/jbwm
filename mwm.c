@@ -5,13 +5,13 @@
 
 #include "mwm.h"
 
-
 #include "jbwmenv.h"
 #include "log.h"
 #include "util.h"
 
 #include <assert.h>
 #include <X11/Xatom.h>
+
 // These are MWM-specific hints
 enum {
 // flags:
@@ -28,14 +28,6 @@ enum {
 	MWM_DECOR_MAXIMIZE = (1L << 6)
 };
 
-// input_mode:
-enum {
-	MWM_INPUT_MODELESS,
-	MWM_INPUT_PRIMARY_APPLICATION_MODAL,
-	MWM_INPUT_SYSTEM_MODAL,
-	MWM_INPUT_FULL_APPLICATION_MODAL
-};
-
 // status:
 enum { MWM_TEAROFF_WINDOW = 1 };
 
@@ -50,6 +42,7 @@ static void process_flags(Client * c)
 
 void handle_mwm_hints(Client * c)
 {
+	assert(c);
 	static Atom mwm_hints;
 	if(!mwm_hints)
 		  mwm_hints=XInternAtom(jbwm.dpy, "_MOTIF_WM_HINTS", false);
@@ -98,14 +91,6 @@ void handle_mwm_hints(Client * c)
 			c->opt.no_close_decor,
 			c->opt.no_min_decor);
 	}
-
-// FIXME:  Modal dialogs not yet implemented
-#if 0
-	if (m->flags & MWM_HINTS_INPUT_MODE) {
-		LOG("MWM_HINTS_INPUT_MODE");
-		c->opt.modal = m->input_mode;
-	}
-#endif
 mwm_end:
 	XFree(m);
 	process_flags(c);
