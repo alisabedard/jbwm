@@ -15,6 +15,7 @@ CFLAGS+=-Wall -Wextra
 include shape.mk
 
 # Titlebar Xft support:
+# Warning: valgrind reports that xft leaks memory.
 #include xft.mk
 
 # Uncomment to enable parsing command line arguments.
