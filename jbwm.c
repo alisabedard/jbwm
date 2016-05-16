@@ -122,7 +122,6 @@ static void setup_fonts(void)
 
 	if (!jbwm.font)
 		jbwm.font = XLoadQueryFont(jbwm.dpy, FALLBACK_FONT);
-
 #endif//USE_XFT
 
 	if (!jbwm.font)

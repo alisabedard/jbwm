@@ -7,6 +7,7 @@
 
 #include "jbwmenv.h"
 #include "log.h"
+
 #include <assert.h>
 #include <X11/extensions/shape.h>
 
