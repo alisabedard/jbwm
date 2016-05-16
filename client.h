@@ -7,9 +7,6 @@
 #define JBWM_CLIENT_H
 
 #include "client_t.h"
-#include <stdbool.h>
-#include <X11/Xlib.h>
-
 
 void client_to_vdesk(Client * restrict c, const uint8_t d);
 Client *find_client(Window w) __attribute__((hot,pure));
