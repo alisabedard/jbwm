@@ -20,9 +20,6 @@ point releases, starting at x.x.1, if made soon after minor releases.  Such
 releases may be delayed if a new minor release cycle has been started, unless a
 bug is reported.  
 
-## KNOWN ISSUES
-* More EWMH support needed, particularly to enable pagers and window placement.
-
 ## INSTALLATION
 Edit configuration options in Makefile and config.h, then build:
 ```sh
