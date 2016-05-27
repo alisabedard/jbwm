@@ -16,10 +16,13 @@
 #ifdef STDIO
 #include <stdio.h>
 #endif//STDIO
+
 #include <stdlib.h>
+
 #ifdef USE_ARGV
 #include <unistd.h>
 #endif//USE_ARGV
+
 #include <X11/cursorfont.h>
 #include <X11/Xproto.h>
 
@@ -38,8 +41,8 @@ __attribute__((warn_unused_result))
 static uint16_t parse_modifiers(char * restrict arg)
 {
 	LOG("parse_modifiers()");
-	size_t s; // strlen
-	for(s=0; arg[s]; s++)
+	size_t s = 0; // strlen
+	while(arg[++s])
 		  ;
 	if(s>3) { // switch based on the 4th character
 		switch(arg[3]) {
