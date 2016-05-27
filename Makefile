@@ -3,7 +3,7 @@
 # See README for license and other details.
 
 # Debugging symbols, enabled to be able to debug core dumps
-CFLAGS+=-ggdb
+#CFLAGS+=-ggdb
 # Link time optimization greatly reduces binary size:
 # However, it may not work correctly with clang.
 #CFLAGS+=-flto -O3

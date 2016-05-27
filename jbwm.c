@@ -18,7 +18,6 @@
 #endif//STDIO
 #include <stdlib.h>
 #ifdef USE_ARGV
-#include <string.h>
 #include <unistd.h>
 #endif//USE_ARGV
 #include <X11/cursorfont.h>
@@ -39,21 +38,30 @@ __attribute__((warn_unused_result))
 static uint16_t parse_modifiers(char * restrict arg)
 {
 	LOG("parse_modifiers()");
-/* *INDENT-OFF* */
-	const struct {
-		const char *name;
-		const uint16_t mask;
-	} m[] = { { "shift", ShiftMask}, { "lock", LockMask},
-		{ "control", ControlMask}, { "mod", Mod1Mask},
-		{ "mod1", Mod1Mask}, { "mod2", Mod2Mask}, { "mod3", Mod3Mask},
-		{ "mod4", Mod4Mask}, { "mod5", Mod5Mask} };
-/* *INDENT-ON* */
-
-	for (uint8_t i = 0; i < 9; i++)
-		if (!strcmp(m[i].name, arg))
-			return m[i].mask;
-
-	return 0;
+	size_t s; // strlen
+	for(s=0; arg[s]; s++)
+		  ;
+	if(s>3) { // switch based on the 4th character
+		switch(arg[3]) {
+		case 'f': // shift
+			return ShiftMask;
+		case 'k': // lock
+			return LockMask;
+		case 't': // control
+		case 'l': // ctrl
+			return ControlMask;
+		case '2': // mod2
+			return Mod2Mask;
+		case '3': // mod3
+			return Mod3Mask;
+		case '4': // mod4
+			return Mod4Mask;
+		case '5': // mod5
+			return Mod5Mask;
+		}
+	}
+	// everything else becomes mod1
+	return Mod1Mask;
 }
 
 static void parse_argv(uint8_t argc, char **argv, Options * restrict o)

@@ -14,7 +14,6 @@
 #include "util.h"
 
 #include <assert.h>
-#include <string.h>
 #ifdef USE_XFT
 #include <X11/Xft/Xft.h>
 #endif//USE_XFT
@@ -106,11 +105,14 @@ static void draw_title(Client * restrict c)
 	char * name = get_title(c->window);
 	if(!name) return; // No title could be loaded, abort
 	const XPoint p = { TDIM + 4, jbwm.font->ascent };
+	size_t l; // strlen
+	for(l=0; name[l]; l++)
+		  ;
 #ifdef USE_XFT
-	draw_xft(c, &p, name, strlen(name));
+	draw_xft(c, &p, name, l);
 #else//!USE_XFT
-	XDrawString(jbwm.dpy, c->titlebar, c->screen->gc, p.x, p.y,
-		name, strlen(name));
+	XDrawString(jbwm.dpy, c->titlebar, c->screen->gc,
+		p.x, p.y, name, l);
 #endif//USE_XFT
 	XFree(name);
 }
