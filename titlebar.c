@@ -117,7 +117,7 @@ static void draw_title(Client * restrict c)
 	XFree(name);
 }
 
-static void draw(const Window t, GC gc, const uint16_t x)
+static inline void draw(const Window t, GC gc, const uint16_t x)
 {
 	XFillRectangle(jbwm.dpy, t, gc, x, 0, TDIM, TDIM);
 }
@@ -137,15 +137,20 @@ static void draw_titlebar(Client * restrict c)
 	draw_title(c);
 }
 
+static void remove_titlebar(Client * restrict c)
+{
+	c->ignore_unmap++;
+	XDestroyWindow(jbwm.dpy, c->titlebar);
+	c->titlebar = 0;
+}
+
 void update_titlebar(Client * c)
 {
 	if (c->opt.no_titlebar || c->opt.shaped)
 		  return;
 
 	if (c->opt.fullscreen && c->titlebar) {
-		c->ignore_unmap++;
-		XDestroyWindow(jbwm.dpy, c->titlebar);
-		c->titlebar = 0;
+		remove_titlebar(c);
 		return;
 	}
 
