@@ -125,7 +125,6 @@ static void handle_property_change(XPropertyEvent * restrict e,
 static void handle_configure_request(XConfigureRequestEvent * e)
 {
 	LOG("handle_configure_request");
-	return;
 	XConfigureWindow(jbwm.dpy, e->window, e->value_mask,
 		&(XWindowChanges){ .x = e->x, .y = e->y,
 		.width = e->width, .height = e->height,
@@ -194,6 +193,7 @@ void main_event_loop(void)
 	case DestroyNotify:
 		if(c)
 			  c->ignore_unmap=0;
+		// fall through.
 #ifdef EWMH
 	case CreateNotify:
 		ewmh_update_client_list();
