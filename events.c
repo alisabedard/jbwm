@@ -57,7 +57,8 @@ static void cleanup(void)
 	jbwm.need_cleanup = false;
 	for(Client * i, * c = jbwm.head; i && c; c=i) {
 		i=c->next;
-		if(c->opt.remove) {
+		if(!c->opt.remove)
+			  continue;
 			// Per ICCM + EWMH:
 #ifdef EWMH
 			XDeleteProperty(jbwm.dpy, c->window,
@@ -73,7 +74,6 @@ static void cleanup(void)
 				XDestroyWindow(jbwm.dpy, c->parent);
 			relink_window_list(c);
 			free(c);
-		}
 	}
 }
 
@@ -154,6 +154,12 @@ void main_event_loop(void)
 			  update_titlebar(c);
 		break;
 #endif//USE_TBAR
+#ifdef EWMH
+	case CreateNotify:
+	case DestroyNotify:
+		ewmh_update_client_list();
+		break;
+#endif//EWMH
 	case UnmapNotify:
 		if(c) {
 			LOG("UnmapNotify: ignore_unmap is %d",
@@ -161,8 +167,6 @@ void main_event_loop(void)
 			c->opt.remove=jbwm.need_cleanup=(--c->ignore_unmap<1);
 		}
 		break;
-
-	
 	case MapRequest:
 		LOG("MapRequest, send_event:%d", ev.xmaprequest.send_event);
 		/* This check fixes a race condition in libreoffice dialogs,
@@ -175,23 +179,9 @@ void main_event_loop(void)
 				find_screen(ev.xmaprequest.parent));
 		}
 		break;
-
-
-
 	case ConfigureRequest:
 		handle_configure_request(&ev.xconfigurerequest);
 		break;
-
-#ifdef EWMH
-	case DestroyNotify:
-	case CreateNotify:
-		ewmh_update_client_list();
-		break;
-	case ClientMessage:
-		ewmh_client_message(&ev.xclient, c);
-		break;
-#endif//EWMH
-
 	case PropertyNotify:
 		if (c) handle_property_change(&ev.xproperty, c);
 		break;
@@ -202,18 +192,15 @@ void main_event_loop(void)
 			XInstallColormap(jbwm.dpy, c->cmap);
 		}
 		break;
-
-#ifdef XDEBUG
-	case ConfigureNotify: LOG("ConfigureNotify"); break;
-	case MapNotify: LOG("MapNotify"); break;
-	case MappingNotify: LOG("MappingNotify"); break;
-	case MotionNotify: LOG("MotionNotify"); break;
-	case KeyRelease: LOG("KeyRelease"); break;
-	case ReparentNotify: LOG("ReparentNotify"); break;
-	case ButtonRelease: LOG("ButtonRelease"); break;
-#endif//XDEBUG
+#ifdef EWMH
+	case ClientMessage:
+		ewmh_client_message(&ev.xclient, c);
+		break;
+#endif//EWMH
+#ifdef DEBUG
 	default:
 		LOG("Unhandled event (%d)", ev.type);
+#endif//DEBUG
 	}
 	if (jbwm.need_cleanup) cleanup();
 
