@@ -88,26 +88,35 @@ static void handle_property_change(XPropertyEvent * restrict e,
 	Client * restrict c)
 {
 	LOG("handle_property_change");
-	print_atom(e->atom, __LINE__);
 	if(e->state != PropertyNewValue)
 		  return;
-	switch(e->atom) {
+#ifdef EWMH
+	if (e->atom == ewmh[WM_STATE]) {
+		LOG("\t ewmh _NET_WM_STATE prop, returning");
+		return;
+	}
+#endif//EWMH
+	print_atom(e->atom, __FILE__, __LINE__);
+	switch (e->atom) {
 #ifdef USE_TBAR
 	case XA_WM_NAME:
 		update_titlebar(c);
-		break;
+		return;
 #endif//USE_TBAR
 	case XA_WM_HINTS:
 		handle_wm_hints(c);
-		break;
+		return;
 	default:
 		moveresize(c);
+		return;
 	}
 }
 
 static void handle_configure_request(XConfigureRequestEvent * e)
 {
+	return;
 	LOG("handle_configure_request");
+	LOG("send_event? %s\n", e->send_event?"true":"false");
 	XConfigureWindow(jbwm.dpy, e->window, e->value_mask,
 		&(XWindowChanges){ .x = e->x, .y = e->y,
 		.width = e->width, .height = e->height,
@@ -142,6 +151,7 @@ void main_event_loop(void)
 		break;
 
 	case MapRequest:
+		LOG("MapRequest, send_event:%d", ev.xmaprequest.send_event);
 		if (!c) make_new_client(ev.xmaprequest.window,
 			find_screen(ev.xmaprequest.parent));
 		break;
@@ -172,14 +182,20 @@ void main_event_loop(void)
 		}
 		break;
 
-#ifdef EWMH
 	case CreateNotify:
 		LOG("CreateNotify");
 	case DestroyNotify:
 		LOG("->>DestroyNotify");
+#if 0
+		if(c)
+			  c->ignore_unmap=0;
+#endif
 		ewmh_update_client_list();
 		break;
-
+	case ReparentNotify:
+		LOG("ReparentNotify");
+		break;
+#ifdef EWMH
 	case ClientMessage:
 		ewmh_client_message(&ev.xclient, c);
 		break;
@@ -191,7 +207,7 @@ void main_event_loop(void)
 	case MappingNotify: LOG("MappingNotify"); break;
 	case MotionNotify: LOG("MotionNotify"); break;
 	case KeyRelease: LOG("KeyRelease"); break;
-	case ReparentNotify: LOG("ReparentNotify"); break;
+	//case ReparentNotify: LOG("ReparentNotify"); break;
 	case ButtonRelease: LOG("ButtonRelease"); break;
 #endif//DEBUG
 	default:

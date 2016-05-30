@@ -26,9 +26,9 @@ void jbwm_grab_button(const Window w, const unsigned int mask,
 		 const unsigned int btn);
 
 #ifdef DEBUG
-void print_atom(const Atom a, const uint16_t line);
+void print_atom(const Atom a, const char * src, const uint16_t line);
 #else//!DEBUG
-#define print_atom(a, l)
+#define print_atom(a, s, l)
 #endif//DEBUG
 
 #endif//!JBWM_UTIL_H

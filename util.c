@@ -38,10 +38,10 @@ void jbwm_grab_button(const Window w, const unsigned int mask,
 }
 
 #ifdef DEBUG
-void print_atom(const Atom a, const uint16_t line)
+void print_atom(const Atom a, const char * src, const uint16_t line)
 {
 	char *an = XGetAtomName(jbwm.dpy, a);
-	fprintf(stderr, "\t%s:%d %s(%lu)\n", __FILE__, line, an, a);
+	fprintf(stderr, "\t%s:%d %s(%lu)\n", src, line, an, a);
 	XFree(an);
 }
 #endif//DEBUG

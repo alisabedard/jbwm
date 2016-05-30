@@ -83,6 +83,9 @@ static void set_state(Client * restrict c,
 		if(add) XLowerWindow(jbwm.dpy, c->parent);
 		else XRaiseWindow(jbwm.dpy, c->parent);
 		break;
+	case WM_STATE_HIDDEN:
+		c->ignore_unmap++;
+		break;
 	case WM_STATE_MAXIMIZED_VERT:
 		add?set_vert(c):unset_vert(c);
 		break;
@@ -165,11 +168,11 @@ void ewmh_client_message(XClientMessageEvent * restrict e,
 	const Atom t = e->message_type;
 #ifdef DEBUG
 	fprintf(stderr, "----CLIENTMESSAGE----");
-	print_atom(t, __LINE__);
-	print_atom(e->data.l[0], __LINE__);
-	print_atom(e->data.l[1], __LINE__);
-	print_atom(e->data.l[2], __LINE__);
-	print_atom(e->data.l[3], __LINE__);
+	print_atom(t, __FILE__, __LINE__);
+	print_atom(e->data.l[0], __FILE__, __LINE__);
+	print_atom(e->data.l[1], __FILE__, __LINE__);
+	print_atom(e->data.l[2], __FILE__, __LINE__);
+	print_atom(e->data.l[3], __FILE__, __LINE__);
 #endif//DEBUG
 	ScreenInfo *s = c ? c->screen : jbwm.screens;
 	if(!client_specific_message(e, c, t)) {
