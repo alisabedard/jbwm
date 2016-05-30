@@ -30,7 +30,7 @@ void jbwm_grab_button(const Window w, const unsigned int mask,
 void jbputs(const char * string);
 
 #ifdef DEBUG
-void print_atom(const Atom a, const char * src, const uint16_t line)
+void print_atom(const Atom a, const char * src, const uint16_t line);
 #else//!DEBUG
 #define print_atom(a, s, l)
 #endif//DEBUG

@@ -202,7 +202,10 @@ void main_event_loop(void)
 		LOG("Unhandled event (%d)", ev.type);
 #endif//DEBUG
 	}
-	if (jbwm.need_cleanup) cleanup();
+	if (jbwm.need_cleanup) {
+		cleanup();
+		last=0; // Fix ignoring every other new window
+	}
 
 	goto head;
 }

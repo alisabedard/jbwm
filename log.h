@@ -8,13 +8,15 @@
 
 #ifdef DEBUG
 
+#include "util.h"
+
 #include <stdio.h>
 #include <unistd.h>
 
 #define LOG(...) \
 	{\
-		jbputs(__FILE__); jbputs(":"); jbputs(__LINE__);\
-		jbputs("> ");\
+		jbputs(__FILE__ ":");\
+		dprintf(STDERR_FILENO, "%d> ", __LINE__);\
 		dprintf(STDERR_FILENO, __VA_ARGS__);\
 		jbputs("\n");\
 	}
