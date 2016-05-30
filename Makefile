@@ -8,6 +8,7 @@
 # However, it may not work correctly with clang.
 #CFLAGS+=-flto -O3
 #CFLAGS+=-ggdb
+CFLAGS+=-fomit-frame-pointer
 # Enable all warnings
 CFLAGS+=-Wall -Wextra
 

@@ -44,6 +44,10 @@ OBJS = $(SRCS:.c=.o)
 
 $(PROG): $(OBJS) 
 	$(CC) $(CFLAGS) $(OBJS) -o $@ $(LDFLAGS)
+	strip $(PROG) -o $(PROG).tmp
+	ls -l $(PROG).tmp >> sz.log
+	rm -f $(PROG).tmp
+	tail sz.log
 
 all: $(PROG)
 

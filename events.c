@@ -55,11 +55,10 @@ static void cleanup(void)
 {
 	LOG("cleanup");
 	jbwm.need_cleanup = false;
-	for(Client * i, * c = jbwm.head; c; c=i) {
+	for(Client * i, * c = jbwm.head; i && c; c=i) {
 		i=c->next;
 		if(c->opt.remove) {
-			XGrabServer(jbwm.dpy);
-			// Per ICCM + EWMH
+			// Per ICCM + EWMH:
 #ifdef EWMH
 			XDeleteProperty(jbwm.dpy, c->window,
 				ewmh[WM_STATE]);
@@ -74,9 +73,7 @@ static void cleanup(void)
 				XDestroyWindow(jbwm.dpy, c->parent);
 			relink_window_list(c);
 			free(c);
-			XUngrabServer(jbwm.dpy);
 		}
-		if(!i) return;
 	}
 }
 
@@ -141,81 +138,74 @@ void main_event_loop(void)
 	XNextEvent(jbwm.dpy, &ev);
 	c=find_client(ev.xany.window);
 	switch (ev.type) {
+	case KeyPress:
+		jbwm_handle_key_event(&ev.xkey);
+		break;
+	case ButtonPress:
+		if(c) jbwm_handle_button_event(&ev.xbutton, c);
+		break;
 	case EnterNotify:
 		if(c && (ev.xcrossing.window == c->parent))
 			  select_client(c);
-		goto head;
-
+		break;
+#ifdef USE_TBAR
+	case Expose:
+		if (c && !ev.xexpose.count)
+			  update_titlebar(c);
+		break;
+#endif//USE_TBAR
 	case UnmapNotify:
 		if(c) {
 			LOG("UnmapNotify: ignore_unmap is %d",
 				c->ignore_unmap);
-			c->ignore_unmap--; // Decrement here!
-			c->opt.remove=jbwm.need_cleanup=(c->ignore_unmap<1);
-			//c->ignore_unmap--; // Decrement here!
+			c->opt.remove=jbwm.need_cleanup=(--c->ignore_unmap<1);
 		}
 		break;
 
-	case PropertyNotify:
-		if (c) handle_property_change(&ev.xproperty, c);
-		goto head;
-
+	
 	case MapRequest:
 		LOG("MapRequest, send_event:%d", ev.xmaprequest.send_event);
+		/* This check fixes a race condition in libreoffice dialogs,
+		   where an attempt is made to request mapping twice.  */
 		if(ev.xmaprequest.window == last)
-			  goto head;
+			  break;
 		if (!c) {
 			last = ev.xmaprequest.window;
 			make_new_client(ev.xmaprequest.window,
 				find_screen(ev.xmaprequest.parent));
 		}
-		goto head;
-
-	case KeyPress:
-		jbwm_handle_key_event(&ev.xkey);
-		goto head;
-#ifdef USE_TBAR
-	case Expose:
-		if (c && !ev.xexpose.count)
-			  update_titlebar(c);
-		goto head;
-#endif//USE_TBAR
-
-	case ButtonPress:
-		if(c) jbwm_handle_button_event(&ev.xbutton, c);
 		break;
+
+
 
 	case ConfigureRequest:
 		handle_configure_request(&ev.xconfigurerequest);
-		goto head;
+		break;
 
+#ifdef EWMH
+	case DestroyNotify:
+	case CreateNotify:
+		ewmh_update_client_list();
+		break;
+	case ClientMessage:
+		ewmh_client_message(&ev.xclient, c);
+		break;
+#endif//EWMH
+
+	case PropertyNotify:
+		if (c) handle_property_change(&ev.xproperty, c);
+		break;
 	case ColormapNotify:
 		if (c && ev.xcolormap.new) {
 			LOG("ColormapNotify");
 			c->cmap = ev.xcolormap.colormap;
 			XInstallColormap(jbwm.dpy, c->cmap);
 		}
-		goto head;
-	case DestroyNotify:
-		if(c)
-			  c->ignore_unmap=0;
-		// fall through.
-#ifdef EWMH
-	case CreateNotify:
-		ewmh_update_client_list();
-		goto head;
-	case ClientMessage:
-		ewmh_client_message(&ev.xclient, c);
 		break;
-#endif//EWMH
 
 #ifdef XDEBUG
-	case ConfigureNotify:
-		LOG("ConfigureNotify");
-		break;
-	case MapNotify:
-		LOG("MapNotify");
-		break;
+	case ConfigureNotify: LOG("ConfigureNotify"); break;
+	case MapNotify: LOG("MapNotify"); break;
 	case MappingNotify: LOG("MappingNotify"); break;
 	case MotionNotify: LOG("MotionNotify"); break;
 	case KeyRelease: LOG("KeyRelease"); break;
@@ -223,8 +213,9 @@ void main_event_loop(void)
 	case ButtonRelease: LOG("ButtonRelease"); break;
 #endif//XDEBUG
 	default:
-			    LOG("Unhandled event (%d)", ev.type);
+		LOG("Unhandled event (%d)", ev.type);
 	}
 	if (jbwm.need_cleanup) cleanup();
+
 	goto head;
 }
