@@ -168,7 +168,7 @@ void ewmh_client_message(XClientMessageEvent * restrict e,
 {
 	const Atom t = e->message_type;
 #ifdef EWMH_DEBUG
-	fprintf(stderr, "----CLIENTMESSAGE----");
+	dprintf(STDERR_FILENO, "----CLIENTMESSAGE----");
 	print_atom(t, __FILE__, __LINE__);
 	print_atom(e->data.l[0], __FILE__, __LINE__);
 	print_atom(e->data.l[1], __FILE__, __LINE__);

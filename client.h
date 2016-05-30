@@ -8,7 +8,8 @@
 
 #include "client_t.h"
 
-void client_to_vdesk(Client * restrict c, const uint8_t d);
+void client_to_vdesk(Client * restrict c, const uint8_t d)
+	__attribute((nonnull));
 Client *find_client(Window w) __attribute__((hot,pure));
 // Free result with XFree if not NULL
 char * get_title(const Window w) __attribute__((pure));

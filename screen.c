@@ -15,7 +15,6 @@
 #include "titlebar.h"
 #include "util.h"
 
-#include <assert.h>
 #include <stdlib.h>
 #include <X11/Xatom.h>
 

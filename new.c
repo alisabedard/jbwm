@@ -16,7 +16,6 @@
 #include "util.h"
 #include "titlebar.h"
 
-#include <assert.h>
 #include <stdlib.h>
 #include <X11/Xatom.h>
 
@@ -91,9 +90,7 @@ static void reparent(Client * c) // use of restrict here is a bug
 void make_new_client(const Window w, ScreenInfo * s)
 {
 	LOG("make_new_client(%d,s)", (int)w);
-	assert(s);
 	Client *c = calloc(1, sizeof(Client));
-	assert(c);
 	XGrabServer(jbwm.dpy);
 	c->next = jbwm.head;
 	jbwm.head = c;

@@ -9,7 +9,6 @@
 #include "log.h"
 #include "util.h"
 
-#include <assert.h>
 #include <X11/Xatom.h>
 
 // These are MWM-specific hints
@@ -42,7 +41,6 @@ static void process_flags(Client * c)
 
 void handle_mwm_hints(Client * c)
 {
-	assert(c);
 	static Atom mwm_hints;
 	if(!mwm_hints)
 		  mwm_hints=XInternAtom(jbwm.dpy, "_MOTIF_WM_HINTS", false);

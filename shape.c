@@ -8,7 +8,6 @@
 #include "jbwmenv.h"
 #include "log.h"
 
-#include <assert.h>
 #include <X11/extensions/shape.h>
 
 // Declared with pure attribute, as value may not change between calls.
@@ -23,7 +22,6 @@ static bool is_shaped(Client * c)
 
 void set_shape(Client * c)
 {
-	assert(c);
 	if(c->opt.shaped) {
 		LOG("XShapeCombineShape: %d", (int)c->window);
 		XShapeCombineShape(jbwm.dpy, c->parent, ShapeBounding,
@@ -33,7 +31,6 @@ void set_shape(Client * c)
 
 void setup_shaped(Client * c)
 {
-	assert(c);
 	if (is_shaped(c)) {
 		LOG("Window %d is shaped", (int)c->window);
 		c->border = 0;

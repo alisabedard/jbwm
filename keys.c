@@ -22,15 +22,16 @@ static void point(Client * restrict c, const int16_t x, const int16_t y)
 	XWarpPointer(jbwm.dpy, None, c->window, 0, 0, 0, 0, x, y);
 }
 
-static void keymv(Client * restrict c, const bool mod, int * restrict xy,
-	int * restrict wh, const int8_t sign)
+static void keymv(Client * restrict c, int * restrict xy,
+	int * restrict wh, const bool mod, const int8_t sign)
 {
 	/* These operations invalid when fullscreen.  */
 	if (c->opt.fullscreen) return;
 
 	const int8_t d = sign * JBWM_RESIZE_INCREMENT;
 
-	if (mod && (*wh > 0) && !c->opt.shaped && !c->opt.no_resize)
+	if (mod && (*wh > JBWM_RESIZE_INCREMENT)
+		&& !c->opt.shaped && !c->opt.no_resize)
 		*wh += d;
 	else
 		*xy += d;
@@ -45,16 +46,16 @@ static void handle_client_key_event(const bool mod,
 	LOG("handle_client_key_event: %d", (int)key);
 	switch (key) {
 	case KEY_LEFT:
-		keymv(c, mod, &(c->size.x), &(c->size.width), -1);
+		keymv(c, &(c->size.x), &(c->size.width), mod, -1);
 		break;
 	case KEY_DOWN:
-		keymv(c, mod, &(c->size.y), &(c->size.height), 1);
+		keymv(c, &(c->size.y), &(c->size.height), mod, 1);
 		break;
 	case KEY_UP:
-		keymv(c, mod, &(c->size.y), &(c->size.height), -1);
+		keymv(c, &(c->size.y), &(c->size.height), mod, -1);
 		break;
 	case KEY_RIGHT:
-		keymv(c, mod, &(c->size.x), &(c->size.width), 1);
+		keymv(c, &(c->size.x), &(c->size.width), mod, 1);
 		break;
 	case KEY_KILL: send_wm_delete(c); break;
 	case KEY_LOWER:

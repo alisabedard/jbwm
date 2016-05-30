@@ -13,8 +13,6 @@
 #include "titlebar.h"
 #include "util.h"
 
-#include <assert.h>
-#include <stdlib.h>
 #include <X11/Xatom.h>
 
 // Free result with XFree if not NULL
@@ -29,7 +27,6 @@ char * get_title(const Window w)
 void client_to_vdesk(Client * restrict c, const uint8_t d)
 {
 	LOG("client_to_vdesk");
-	assert(c);
 	const uint8_t p = c->vdesk;
 	c->vdesk = d;
 	// use switch_vdesk to validate d:
@@ -85,7 +82,6 @@ void select_client(Client * c)
 void stick(Client * c)
 {
 	LOG("stick");
-	assert(c);
 	c->vdesk = c->screen->vdesk;
 	c->opt.sticky ^= true; // toggle
 	select_client(c);
@@ -131,7 +127,6 @@ static bool has_delete_proto(const Window w)
 	Atom *p;
 	int i;
 	if(XGetWMProtocols(jbwm.dpy, w, &p, &i)) {
-		assert(p);
 		while(i--)
 			if((found=(p[i]==client_atoms[CA_DEL_WIN])))
 				break;

@@ -7,6 +7,7 @@
 #define JBWM_UTIL_H
 
 #include <stdint.h>
+#include <unistd.h>
 #include <X11/Xlib.h>
 
 #define XPROP(win, prop, type, data, size) XChangeProperty(jbwm.dpy, win, \
@@ -25,8 +26,11 @@ void *get_property(Window w, Atom property,
 void jbwm_grab_button(const Window w, const unsigned int mask,
 		 const unsigned int btn);
 
+// Print string to stderr, without trailing \n
+void jbputs(const char * string);
+
 #ifdef DEBUG
-void print_atom(const Atom a, const char * src, const uint16_t line);
+void print_atom(const Atom a, const char * src, const uint16_t line)
 #else//!DEBUG
 #define print_atom(a, s, l)
 #endif//DEBUG

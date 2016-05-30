@@ -13,7 +13,6 @@
 #include "screen.h"
 #include "util.h"
 
-#include <assert.h>
 #ifdef USE_XFT
 #include <X11/Xft/Xft.h>
 #endif//USE_XFT

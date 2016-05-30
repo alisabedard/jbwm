@@ -92,15 +92,14 @@ static void parse_argv(uint8_t argc, char **argv, Options * restrict o)
 		case 'f': o->fg = optarg; break;
 
 		case 's': o->fc = optarg; break;
-#ifdef STDIO
 		case 'V':
-			fprintf(stdout, "%s\n", VERSION);
+			jbputs(VERSION "\n");
 			exit(0);
 		default:	/* Usage */
-			fprintf(stdout, "%s [%s]\n", argv[0], optstring);
-#else//!STDIO
-		default:
-#endif//STDIO
+			jbputs(argv[0]);
+			jbputs(" -[");
+			jbputs(optstring);
+			jbputs("]\n");
 			exit(1);
 		}
 	}
@@ -165,11 +164,10 @@ static void allocate_colors(ScreenInfo * restrict s,
 static void setup_clients(ScreenInfo * restrict s)
 {
 	unsigned int nwins;
-	Window *wins;
+	Window *wins, dw;
 
-	if (!XQueryTree(jbwm.dpy, s->root, &(Window){0},
-		&(Window){0}, &wins, &nwins))
-		return;
+	if (!XQueryTree(jbwm.dpy, s->root, &dw, &dw, &wins, &nwins))
+		return; // failed
 
 	while (nwins--) {
 		XWindowAttributes a;

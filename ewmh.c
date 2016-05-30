@@ -12,11 +12,8 @@
 #include "screen.h"
 #include "util.h"
 
-#include <unistd.h>
-#include <stdlib.h>
 #include <X11/Xatom.h>
 
-//EWMHEnvironment ewmh;
 Atom ewmh[EWMH_ATOMS_COUNT];
 
 static char * atom_names [] = { // This list must match 1:1 with enum
@@ -137,6 +134,6 @@ void setup_ewmh_for_screen(ScreenInfo * restrict s)
 	// Set this to the root window until we have some clients.
 	XPROP(r, ewmh[CLIENT_LIST], XA_WINDOW, &r, 1);
 	init_desktops(r, s->size, s->vdesk);
-	s->supporting=init_supporting(r);
+	s->supporting = init_supporting(r);
 }
 

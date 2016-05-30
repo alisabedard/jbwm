@@ -9,12 +9,14 @@
 #ifdef DEBUG
 
 #include <stdio.h>
+#include <unistd.h>
 
 #define LOG(...) \
 	{\
-		fprintf(stderr, "%s:%d:  ", __FILE__, __LINE__);\
-		fprintf(stderr, __VA_ARGS__);\
-		putc('\n', stderr);\
+		jbputs(__FILE__); jbputs(":"); jbputs(__LINE__);\
+		jbputs("> ");\
+		dprintf(STDERR_FILENO, __VA_ARGS__);\
+		jbputs("\n");\
 	}
 
 #else//!DEBUG

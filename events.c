@@ -55,26 +55,28 @@ static void cleanup(void)
 {
 	LOG("cleanup");
 	jbwm.need_cleanup = false;
-	for(Client * i, * c = jbwm.head; i && c; c=i) {
-		i=c->next;
-		if(!c->opt.remove)
+	Client * c = jbwm.head;
+	Client * i;
+	do {
+		i = c->next;
+		if (!c->opt.remove)
 			  continue;
-			// Per ICCM + EWMH:
+		// Per ICCM + EWMH:
 #ifdef EWMH
-			XDeleteProperty(jbwm.dpy, c->window,
-				ewmh[WM_STATE]);
-			XDeleteProperty(jbwm.dpy, c->window,
-				ewmh[WM_DESKTOP]);
+		XDeleteProperty(jbwm.dpy, c->window,
+			ewmh[WM_STATE]);
+		XDeleteProperty(jbwm.dpy, c->window,
+			ewmh[WM_DESKTOP]);
 #endif//EWMH
-			XReparentWindow(jbwm.dpy, c->window,
-				c->screen->root,
-				c->size.x, c->size.y);
-			XRemoveFromSaveSet(jbwm.dpy, c->window);
-			if(c->parent)
-				XDestroyWindow(jbwm.dpy, c->parent);
-			relink_window_list(c);
-			free(c);
-	}
+		XReparentWindow(jbwm.dpy, c->window,
+			c->screen->root,
+			c->size.x, c->size.y);
+		XRemoveFromSaveSet(jbwm.dpy, c->window);
+		if(c->parent)
+			  XDestroyWindow(jbwm.dpy, c->parent);
+		relink_window_list(c);
+		free(c);
+	} while(i && (c = i));
 }
 
 static void handle_wm_hints(Client * c)
@@ -86,7 +88,6 @@ static void handle_wm_hints(Client * c)
 			switch_vdesk(c->screen, c->vdesk);
 			XRaiseWindow(jbwm.dpy, c->parent);
 		}
-
 		XFree(h);
 	}
 }
@@ -161,11 +162,10 @@ void main_event_loop(void)
 		break;
 #endif//EWMH
 	case UnmapNotify:
-		if(c) {
-			LOG("UnmapNotify: ignore_unmap is %d",
-				c->ignore_unmap);
-			c->opt.remove=jbwm.need_cleanup=(--c->ignore_unmap<1);
-		}
+		if(!c)
+			  break;
+		LOG("UnmapNotify: ignore_unmap is %d", c->ignore_unmap);
+		c->opt.remove=jbwm.need_cleanup=(--c->ignore_unmap<1);
 		break;
 	case MapRequest:
 		LOG("MapRequest, send_event:%d", ev.xmaprequest.send_event);
@@ -173,11 +173,11 @@ void main_event_loop(void)
 		   where an attempt is made to request mapping twice.  */
 		if(ev.xmaprequest.window == last)
 			  break;
-		if (!c) {
-			last = ev.xmaprequest.window;
-			make_new_client(ev.xmaprequest.window,
-				find_screen(ev.xmaprequest.parent));
-		}
+		if(c)
+			  break;
+		last = ev.xmaprequest.window;
+		make_new_client(ev.xmaprequest.window,
+			find_screen(ev.xmaprequest.parent));
 		break;
 	case ConfigureRequest:
 		handle_configure_request(&ev.xconfigurerequest);

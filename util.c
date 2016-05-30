@@ -7,6 +7,8 @@
 
 #include "jbwmenv.h"
 
+#include <unistd.h>
+
 __attribute__((nonnull(2)))
 unsigned long pixel(const uint8_t screen, const char * restrict name)
 {
@@ -37,11 +39,19 @@ void jbwm_grab_button(const Window w, const unsigned int mask,
 		    GrabModeSync, None, None);
 }
 
+// Print string to stderr
+void jbputs(const char * string)
+{
+	size_t s = 0;
+	while(string[++s]);
+	write(STDERR_FILENO, string, s);
+}
+
 #ifdef DEBUG
 void print_atom(const Atom a, const char * src, const uint16_t line)
 {
 	char *an = XGetAtomName(jbwm.dpy, a);
-	fprintf(stderr, "\t%s:%d %s(%lu)\n", src, line, an, a);
+	dprintf(STDERR_FILENO, "\t%s:%d %s(%lu)\n", src, line, an, a);
 	XFree(an);
 }
 #endif//DEBUG
