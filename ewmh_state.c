@@ -4,6 +4,7 @@
 #include "client.h"
 #include "ewmh.h"
 #include "jbwmenv.h"
+#include "log.h"
 #include "max.h"
 #include "screen.h"
 #include "util.h"
@@ -82,6 +83,9 @@ static void set_state(Client * restrict c,
 	case WM_STATE_BELOW:
 		if(add) XLowerWindow(jbwm.dpy, c->parent);
 		else XRaiseWindow(jbwm.dpy, c->parent);
+		break;
+	case WM_STATE_HIDDEN:
+		LOG("HIDDEN");
 		break;
 	case WM_STATE_MAXIMIZED_VERT:
 		add?set_vert(c):unset_vert(c);
@@ -163,30 +167,31 @@ void ewmh_client_message(XClientMessageEvent * restrict e,
 	Client * restrict c)
 {
 	const Atom t = e->message_type;
-#ifdef DEBUG
+#ifdef EWMH_DEBUG
 	fprintf(stderr, "----CLIENTMESSAGE----");
-	print_atom(t, __LINE__);
-	print_atom(e->data.l[0], __LINE__);
-	print_atom(e->data.l[1], __LINE__);
-	print_atom(e->data.l[2], __LINE__);
-	print_atom(e->data.l[3], __LINE__);
-#endif//DEBUG
+	print_atom(t, __FILE__, __LINE__);
+	print_atom(e->data.l[0], __FILE__, __LINE__);
+	print_atom(e->data.l[1], __FILE__, __LINE__);
+	print_atom(e->data.l[2], __FILE__, __LINE__);
+	print_atom(e->data.l[3], __FILE__, __LINE__);
+#endif//EWMH_DEBUG
 	ScreenInfo *s = c ? c->screen : jbwm.screens;
-	if(!client_specific_message(e, c, t)) {
-		if (t == ewmh[CURRENT_DESKTOP])
-			switch_vdesk(s, e->data.l[0]);
-		// If something else moves the window:
-		else if (t == ewmh[MOVERESIZE_WINDOW]) {
-			const uint8_t src = (e->data.l[0] >> 12) & 3;
-			if (src == 2) {
-				const int vm = (e->data.l[0] >> 8) & 0x0f;
-				XConfigureWindow(e->display, e->window,
-					vm, &(XWindowChanges){
-					.x = e->data.l[1], .y = e->data.l[2],
-					.width = e->data.l[3],
-					.height = e->data.l[4]});
-			}
-		}
+	if(client_specific_message(e, c, t))
+		  return;
+
+	if (t == ewmh[CURRENT_DESKTOP])
+		  switch_vdesk(s, e->data.l[0]);
+	// If something else moves the window:
+	else if (t == ewmh[MOVERESIZE_WINDOW]) {
+		const uint8_t src = (e->data.l[0] >> 12) & 3;
+		if (src != 2)
+			  return;
+		const int vm = (e->data.l[0] >> 8) & 0x0f;
+		XConfigureWindow(e->display, e->window,
+			vm, &(XWindowChanges){
+			.x = e->data.l[1], .y = e->data.l[2],
+			.width = e->data.l[3],
+			.height = e->data.l[4]});
 	}
 }
 
