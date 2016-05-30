@@ -171,8 +171,10 @@ void main_event_loop(void)
 		LOG("MapRequest, send_event:%d", ev.xmaprequest.send_event);
 		/* This check fixes a race condition in libreoffice dialogs,
 		   where an attempt is made to request mapping twice.  */
-		if(c || ev.xmaprequest.window == last)
-			  break;
+		if(c || ev.xmaprequest.window == last) {
+			last = 0; // only need to do this once.
+			break;
+		}
 		last = ev.xmaprequest.window;
 		make_new_client(ev.xmaprequest.window,
 			find_screen(ev.xmaprequest.parent));
