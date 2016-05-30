@@ -30,7 +30,7 @@ static void keymv(Client * restrict c, int * restrict xy,
 
 	const int8_t d = sign * JBWM_RESIZE_INCREMENT;
 
-	if (mod && (*wh > JBWM_RESIZE_INCREMENT)
+	if (mod && (*wh > JBWM_RESIZE_INCREMENT<<1)
 		&& !c->opt.shaped && !c->opt.no_resize)
 		*wh += d;
 	else
