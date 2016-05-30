@@ -23,24 +23,15 @@
 #ifdef EWMH
 static uint8_t wm_desktop(const Window w, uint8_t vdesk)
 {
-	LOG("wm_desktop(): vdesk is %d\n", vdesk);
 	size_t n;
 	unsigned long *lprop = get_property(w, ewmh[WM_DESKTOP], &n);
-#ifdef DEBUG
-	if(lprop) {
-		LOG("\tlprop is set, n is %lu\n", n);
-	}
-	if(n) {
-		LOG("\tlprop[0] = %d\n", (int)lprop[0]);
-	}
-#endif//DEBUG
 	if(lprop && n && lprop[0] < DESKTOPS)
 		vdesk = lprop[0];
 	else
 		  XPROP(w, ewmh[WM_DESKTOP], XA_CARDINAL, &vdesk, 1);
 	if(lprop)
 		  XFree(lprop);
-	LOG("vdesk is %d\n", vdesk);
+	LOG("wm_desktop(): vdesk is %d\n", vdesk);
 	return vdesk;
 }
 #endif//EWMH
@@ -103,6 +94,7 @@ void make_new_client(const Window w, ScreenInfo * s)
 	assert(s);
 	Client *c = calloc(1, sizeof(Client));
 	assert(c);
+	XGrabServer(jbwm.dpy);
 	c->next = jbwm.head;
 	jbwm.head = c;
 	c->screen = s;
@@ -116,4 +108,5 @@ void make_new_client(const Window w, ScreenInfo * s)
 	unhide(c);
 	jbwm_grab_button(w, jbwm.keymasks.grab, AnyButton);
 	set_ewmh_allowed_actions(w);
+	XUngrabServer(jbwm.dpy);
 }

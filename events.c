@@ -58,13 +58,23 @@ static void cleanup(void)
 	for(Client * i, * c = jbwm.head; c; c=i) {
 		i=c->next;
 		if(c->opt.remove) {
+			XGrabServer(jbwm.dpy);
+			// Per ICCM + EWMH
+#ifdef EWMH
+			XDeleteProperty(jbwm.dpy, c->window,
+				ewmh[WM_STATE]);
+			XDeleteProperty(jbwm.dpy, c->window,
+				ewmh[WM_DESKTOP]);
+#endif//EWMH
 			XReparentWindow(jbwm.dpy, c->window,
 				c->screen->root,
 				c->size.x, c->size.y);
 			XRemoveFromSaveSet(jbwm.dpy, c->window);
-			XDestroyWindow(jbwm.dpy, c->parent);
+			if(c->parent)
+				XDestroyWindow(jbwm.dpy, c->parent);
 			relink_window_list(c);
 			free(c);
+			XUngrabServer(jbwm.dpy);
 		}
 		if(!i) return;
 	}
@@ -88,26 +98,34 @@ static void handle_property_change(XPropertyEvent * restrict e,
 	Client * restrict c)
 {
 	LOG("handle_property_change");
-	print_atom(e->atom, __LINE__);
 	if(e->state != PropertyNewValue)
 		  return;
-	switch(e->atom) {
+#ifdef EWMH
+	if (e->atom == ewmh[WM_STATE]) {
+		LOG("\t ewmh _NET_WM_STATE prop, returning");
+		return;
+	}
+#endif//EWMH
+	print_atom(e->atom, __FILE__, __LINE__);
+	switch (e->atom) {
 #ifdef USE_TBAR
 	case XA_WM_NAME:
 		update_titlebar(c);
-		break;
+		return;
 #endif//USE_TBAR
 	case XA_WM_HINTS:
 		handle_wm_hints(c);
-		break;
+		return;
 	default:
 		moveresize(c);
+		return;
 	}
 }
 
 static void handle_configure_request(XConfigureRequestEvent * e)
 {
 	LOG("handle_configure_request");
+	return;
 	XConfigureWindow(jbwm.dpy, e->window, e->value_mask,
 		&(XWindowChanges){ .x = e->x, .y = e->y,
 		.width = e->width, .height = e->height,
@@ -126,34 +144,36 @@ void main_event_loop(void)
 	case EnterNotify:
 		if(c && (ev.xcrossing.window == c->parent))
 			  select_client(c);
-		break;
+		goto head;
 
 	case UnmapNotify:
 		if(c) {
 			LOG("UnmapNotify: ignore_unmap is %d",
 				c->ignore_unmap);
-			c->opt.remove=jbwm.need_cleanup=(c->ignore_unmap<1);
 			c->ignore_unmap--; // Decrement here!
+			c->opt.remove=jbwm.need_cleanup=(c->ignore_unmap<1);
+			//c->ignore_unmap--; // Decrement here!
 		}
 		break;
 
 	case PropertyNotify:
 		if (c) handle_property_change(&ev.xproperty, c);
-		break;
+		goto head;
 
 	case MapRequest:
+		LOG("MapRequest, send_event:%d", ev.xmaprequest.send_event);
 		if (!c) make_new_client(ev.xmaprequest.window,
 			find_screen(ev.xmaprequest.parent));
-		break;
+		goto head;
 
 	case KeyPress:
 		jbwm_handle_key_event(&ev.xkey);
-		break;
+		goto head;
 #ifdef USE_TBAR
 	case Expose:
 		if (c && !ev.xexpose.count)
 			  update_titlebar(c);
-		break;
+		goto head;
 #endif//USE_TBAR
 
 	case ButtonPress:
@@ -162,7 +182,7 @@ void main_event_loop(void)
 
 	case ConfigureRequest:
 		handle_configure_request(&ev.xconfigurerequest);
-		break;
+		goto head;
 
 	case ColormapNotify:
 		if (c && ev.xcolormap.new) {
@@ -170,16 +190,14 @@ void main_event_loop(void)
 			c->cmap = ev.xcolormap.colormap;
 			XInstallColormap(jbwm.dpy, c->cmap);
 		}
-		break;
-
+		goto head;
+	case DestroyNotify:
+		if(c)
+			  c->ignore_unmap=0;
 #ifdef EWMH
 	case CreateNotify:
-		LOG("CreateNotify");
-	case DestroyNotify:
-		LOG("->>DestroyNotify");
 		ewmh_update_client_list();
-		break;
-
+		goto head;
 	case ClientMessage:
 		ewmh_client_message(&ev.xclient, c);
 		break;
@@ -191,7 +209,7 @@ void main_event_loop(void)
 	case MappingNotify: LOG("MappingNotify"); break;
 	case MotionNotify: LOG("MotionNotify"); break;
 	case KeyRelease: LOG("KeyRelease"); break;
-	case ReparentNotify: LOG("ReparentNotify"); break;
+	//case ReparentNotify: LOG("ReparentNotify"); break;
 	case ButtonRelease: LOG("ButtonRelease"); break;
 #endif//DEBUG
 	default:
