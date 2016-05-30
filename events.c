@@ -135,6 +135,7 @@ static void handle_configure_request(XConfigureRequestEvent * e)
 void main_event_loop(void)
 {
 	XEvent ev;
+	static Window last;
 	Client * c;
  head:
 	XNextEvent(jbwm.dpy, &ev);
@@ -161,8 +162,13 @@ void main_event_loop(void)
 
 	case MapRequest:
 		LOG("MapRequest, send_event:%d", ev.xmaprequest.send_event);
-		if (!c) make_new_client(ev.xmaprequest.window,
-			find_screen(ev.xmaprequest.parent));
+		if(ev.xmaprequest.window == last)
+			  goto head;
+		if (!c) {
+			last = ev.xmaprequest.window;
+			make_new_client(ev.xmaprequest.window,
+				find_screen(ev.xmaprequest.parent));
+		}
 		goto head;
 
 	case KeyPress:
@@ -203,17 +209,21 @@ void main_event_loop(void)
 		break;
 #endif//EWMH
 
-#ifdef DEBUG
-	case ConfigureNotify: LOG("ConfigureNotify"); break;
-	case MapNotify: LOG("MapNotify"); break;
+#ifdef XDEBUG
+	case ConfigureNotify:
+		LOG("ConfigureNotify");
+		break;
+	case MapNotify:
+		LOG("MapNotify");
+		break;
 	case MappingNotify: LOG("MappingNotify"); break;
 	case MotionNotify: LOG("MotionNotify"); break;
 	case KeyRelease: LOG("KeyRelease"); break;
-	//case ReparentNotify: LOG("ReparentNotify"); break;
+	case ReparentNotify: LOG("ReparentNotify"); break;
 	case ButtonRelease: LOG("ButtonRelease"); break;
-#endif//DEBUG
+#endif//XDEBUG
 	default:
-		LOG("Unhandled event (%d)", ev.type);
+			    LOG("Unhandled event (%d)", ev.type);
 	}
 	if (jbwm.need_cleanup) cleanup();
 	goto head;
