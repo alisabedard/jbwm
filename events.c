@@ -165,15 +165,13 @@ void main_event_loop(void)
 		if(!c)
 			  break;
 		LOG("UnmapNotify: ignore_unmap is %d", c->ignore_unmap);
-		c->opt.remove=jbwm.need_cleanup=(--c->ignore_unmap<1);
+		c->opt.remove=jbwm.need_cleanup=(c->ignore_unmap--<1);
 		break;
 	case MapRequest:
 		LOG("MapRequest, send_event:%d", ev.xmaprequest.send_event);
 		/* This check fixes a race condition in libreoffice dialogs,
 		   where an attempt is made to request mapping twice.  */
-		if(ev.xmaprequest.window == last)
-			  break;
-		if(c)
+		if(c || ev.xmaprequest.window == last)
 			  break;
 		last = ev.xmaprequest.window;
 		make_new_client(ev.xmaprequest.window,
