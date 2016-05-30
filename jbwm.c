@@ -242,15 +242,15 @@ static int handle_xerror(Display * restrict dpy __attribute__ ((unused)),
 		jbwm_error("ROOT");
 	}
 
-	return 0;		// Ignore everything else.
+	return 0; // Ignore everything else.
 }
 
 int main(
 #ifdef USE_ARGV
 		int argc, char **argv)
-#else				//!USE_ARGV
+#else//!USE_ARGV
 		void)
-#endif				//USE_ARGV
+#endif//USE_ARGV
 {
 	jbwm.keymasks.grab = GRAB_MASK;
 	jbwm.keymasks.mod = MOD_MASK;
