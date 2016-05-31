@@ -133,7 +133,6 @@ static void handle_configure_request(XConfigureRequestEvent * e)
 void main_event_loop(void)
 {
 	XEvent ev;
-	static Window last;
 	Client * c;
  head:
 	XNextEvent(jbwm.dpy, &ev);
@@ -171,11 +170,9 @@ void main_event_loop(void)
 		LOG("MapRequest, send_event:%d", ev.xmaprequest.send_event);
 		/* This check fixes a race condition in libreoffice dialogs,
 		   where an attempt is made to request mapping twice.  */
-		if(c || ev.xmaprequest.window == last) {
-			last = 0; // only need to do this once.
+		if(c || ev.xmaprequest.window == jbwm.last)
 			break;
-		}
-		last = ev.xmaprequest.window;
+		jbwm.last = ev.xmaprequest.window;
 		make_new_client(ev.xmaprequest.window,
 			find_screen(ev.xmaprequest.parent));
 		break;
@@ -204,7 +201,7 @@ void main_event_loop(void)
 	}
 	if (jbwm.need_cleanup) {
 		cleanup();
-		last=0; // Fix ignoring every other new window
+		jbwm.last=0; // Fix ignoring every other new window
 	}
 
 	goto head;

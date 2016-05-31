@@ -26,7 +26,7 @@ typedef struct {
 	XFontStruct *font;
 #endif//USE_XFT
 #endif//USE_TBAR
-
+	Window last;
 #ifdef USE_TBAR
 	struct {
 		GC close, shade, resize;
