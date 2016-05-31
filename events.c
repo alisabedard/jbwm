@@ -98,12 +98,6 @@ static void handle_property_change(XPropertyEvent * restrict e,
 	LOG("handle_property_change");
 	if(e->state != PropertyNewValue)
 		  return;
-#ifdef EWMH
-	if (e->atom == ewmh[WM_STATE]) {
-		LOG("\t ewmh _NET_WM_STATE prop, returning");
-		return;
-	}
-#endif//EWMH
 	print_atom(e->atom, __FILE__, __LINE__);
 	switch (e->atom) {
 #ifdef USE_TBAR
