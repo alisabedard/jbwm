@@ -7,7 +7,7 @@
 
 typedef uint32_t pixel_t;
 
-xcb_connection_t * jb_get_xcb_connection(int * screen);
+xcb_connection_t * jb_get_xcb_connection(const char * display, int * screen);
 
 xcb_screen_t * jb_get_xcb_screen(xcb_connection_t * x);
 

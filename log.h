@@ -2,6 +2,7 @@
 #ifndef JB_LOG_H
 #define JB_LOG_H
 
+#include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -23,5 +24,10 @@
 #else//!DEBUG
 #define LOG(...)
 #endif//DEBUG
+
+// Used for simplistic profiling and code path testing:
+#define VCOUNT(v) {\
+	static uint32_t v; ++v; printf(#v ": %d\n", v);\
+}
 
 #endif//!JB_LOG_H

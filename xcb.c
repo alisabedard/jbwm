@@ -13,9 +13,9 @@ static void xerr(xcb_connection_t * x, const char * msg)
         ERROR("%s", msg ? msg : "Could not open DISPLAY");
 }
 
-xcb_connection_t * jb_get_xcb_connection(int * screen)
+xcb_connection_t * jb_get_xcb_connection(const char * display, int * screen)
 {
-        xcb_connection_t * x = xcb_connect(NULL, screen);
+        xcb_connection_t * x = xcb_connect(display, screen);
         switch(xcb_connection_has_error(x)) {
         case 0: // Success
                 break;
