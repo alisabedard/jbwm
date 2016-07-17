@@ -34,7 +34,7 @@ fd_t jb_open(const char * path, const int flags)
 bool jb_check(const bool val, const char * msg)
 {
 	if (!val)
-		perror(msg);
+		perror(msg ? msg : "Error");
 	return !val;
 }
 
