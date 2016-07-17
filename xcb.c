@@ -2,6 +2,9 @@
 #include "xcb.h"
 
 #include "log.h"
+#include "util.h"
+
+#include <string.h>
 
 __attribute__((noreturn,nonnull(1)))
 static void xerr(xcb_connection_t * x, const char * msg)
@@ -35,6 +38,22 @@ xcb_connection_t * jb_get_xcb_connection(int * screen)
 xcb_screen_t * jb_get_xcb_screen(xcb_connection_t * x)
 {
         return xcb_setup_roots_iterator(xcb_get_setup(x)).data;
+}
+
+pixel_t jb_get_pixel(xcb_connection_t * x, const xcb_colormap_t cmap,
+	const char * color)
+{
+	xcb_alloc_named_color_cookie_t c
+	= xcb_alloc_named_color(x, cmap, strlen(color), color);
+	xcb_alloc_named_color_reply_t * r
+	= xcb_alloc_named_color_reply(x, c, NULL);
+	if (!r) {
+		WARN("Could not allocate color %s", color);
+		return 0;
+	}
+	pixel_t p = r->pixel;
+	free(r);
+	return p;
 }
 
 
