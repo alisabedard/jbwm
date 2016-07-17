@@ -6,10 +6,14 @@
 
 #undef MAX
 #define MAX(a,b) ((a) > (b) ? (a) : (b))
+
 #undef MIN
 #define MIN(a,b) ((a) < (b) ? (a) : (b))
+
 #undef SWAP
-#define SWAP(type, a, b) { type x; x = a; a = b; b = x;
+#define SWAP(type, a, b) {\
+	type x; x = a; a = b; b = x;\
+}
 
 #undef likely
 #define likely(x)       __builtin_expect((x), true)
