@@ -14,4 +14,7 @@ xcb_screen_t * jb_get_xcb_screen(xcb_connection_t * x);
 pixel_t jb_get_pixel(xcb_connection_t * x, const xcb_colormap_t cmap,
 	const char * color);
 
+pixel_t jb_get_rgb_pixel(xcb_connection_t * x, const xcb_colormap_t cm,
+	const int16_t r, const int16_t g, const int16_t b);
+
 #endif//!JB_XCB_H

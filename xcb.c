@@ -47,13 +47,22 @@ pixel_t jb_get_pixel(xcb_connection_t * x, const xcb_colormap_t cmap,
 	= xcb_alloc_named_color(x, cmap, strlen(color), color);
 	xcb_alloc_named_color_reply_t * r
 	= xcb_alloc_named_color_reply(x, c, NULL);
-	if (!r) {
-		WARN("Could not allocate color %s", color);
+	if (jb_check(r, "Could not allocate color"))
 		return 0;
-	}
 	pixel_t p = r->pixel;
 	free(r);
 	return p;
 }
 
+pixel_t jb_get_rgb_pixel(xcb_connection_t * x, const xcb_colormap_t cm,
+	const int16_t r, const int16_t g, const int16_t b)
+{
+	xcb_alloc_color_cookie_t c = xcb_alloc_color(x, cm, r, g, b);
+	xcb_alloc_color_reply_t * rpl = xcb_alloc_color_reply(x, c, NULL);
+	if(jb_check(rpl, "Could not allocate RGB color"))
+		return 0;
+	const pixel_t p = rpl->pixel;
+	free(rpl);
+	return p;
+}
 
