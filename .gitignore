@@ -2,4 +2,6 @@
 *.a
 sz.log
 .gitignore.*
+*.swp
+*.swo
 
