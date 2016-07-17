@@ -10,7 +10,8 @@ __attribute__((noreturn,nonnull(1)))
 static void xerr(xcb_connection_t * x, const char * msg)
 {
         xcb_disconnect(x);
-        ERROR("%s", msg ? msg : "Could not open DISPLAY");
+	perror(msg);
+	exit(1);
 }
 
 xcb_connection_t * jb_get_xcb_connection(const char * display, int * screen)
