@@ -11,6 +11,11 @@
 #undef SWAP
 #define SWAP(type, a, b) { type x; x = a; a = b; b = x;
 
+#undef likely
+#define likely(x)       __builtin_expect((x), true)
+#undef unlikely
+#define unlikely(x)     __builtin_expect((x), false)
+
 typedef int fd_t;
 
 // Close the FD, print an error message if unsuccessful
