@@ -5,7 +5,10 @@
 #include "log.h"
 
 #include <errno.h>
+#include <fcntl.h>
 #include <stdio.h>
+#include <sys/stat.h>
+#include <sys/types.h>
 #include <unistd.h>
 
 void jb_close(const fd_t fd)
@@ -18,11 +21,20 @@ void jb_close(const fd_t fd)
 	perror(buf);
 }
 
+fd_t jb_open(const char * path, const int flags)
+{
+	fd_t r = open(path, flags);
+	const uint8_t sz = 64;
+	char buf[sz];
+	snprintf(buf, sz, "Could not open %s", path);
+	jb_check(r != -1, buf);
+	return r;
+}
+
 bool jb_check(const bool val, const char * msg)
 {
-	if (!val) {
-		WARN("%s", msg);
-	}
+	if (!val)
+		perror(msg);
 	return !val;
 }
 
