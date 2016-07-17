@@ -18,4 +18,11 @@ void jb_close(const fd_t fd)
 	perror(buf);
 }
 
+bool jb_check(const bool val, const char * msg)
+{
+	if (!val) {
+		WARN("%s", msg);
+	}
+	return val;
+}
 
