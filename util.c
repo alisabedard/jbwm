@@ -23,6 +23,6 @@ bool jb_check(const bool val, const char * msg)
 	if (!val) {
 		WARN("%s", msg);
 	}
-	return val;
+	return !val;
 }
 
