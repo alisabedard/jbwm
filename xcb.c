@@ -3,7 +3,7 @@
 
 #include "log.h"
 
-__attribute__((noreturn))
+__attribute__((noreturn,nonnull(1)))
 static void xerr(xcb_connection_t * x, const char * msg)
 {
         xcb_disconnect(x);
