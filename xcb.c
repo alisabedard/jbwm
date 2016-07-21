@@ -79,3 +79,9 @@ pixel_t jb_set_bg(xcb_connection_t * x, const xcb_gc_t gc, const pixel_t p)
 	return p;
 }
 
+void jb_draw_string(xcb_connection_t * x, const xcb_window_t w,
+	const xcb_gc_t gc, const xcb_point_t pos, const char * text)
+{
+	xcb_image_text_8(x, strlen(text), w, gc, pos.x, pos.y, text);
+}
+
