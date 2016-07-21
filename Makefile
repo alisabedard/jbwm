@@ -19,9 +19,6 @@ objs=util.o xcb.o
 
 installdir=${DESTDIR}${PREFIX}
 
-all: libjb.a ${objs}
-	ls -l libjb.a >> sz.log; tail sz.log
-
 libjb.a: ${objs}
 	ar rcs libjb.a ${objs}
 
