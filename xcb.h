@@ -17,4 +17,8 @@ pixel_t jb_get_pixel(xcb_connection_t * x, const xcb_colormap_t cmap,
 pixel_t jb_get_rgb_pixel(xcb_connection_t * x, const xcb_colormap_t cm,
 	const int16_t r, const int16_t g, const int16_t b);
 
+pixel_t jb_set_fg(xcb_connection_t * x, const xcb_gc_t gc, const pixel_t p);
+
+pixel_t jb_set_bg(xcb_connection_t * x, const xcb_gc_t gc, const pixel_t p);
+
 #endif//!JB_XCB_H

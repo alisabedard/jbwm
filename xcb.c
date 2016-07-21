@@ -67,3 +67,15 @@ pixel_t jb_get_rgb_pixel(xcb_connection_t * x, const xcb_colormap_t cm,
 	return p;
 }
 
+pixel_t jb_set_fg(xcb_connection_t * x, const xcb_gc_t gc, const pixel_t p)
+{
+	xcb_change_gc(x, gc, XCB_GC_FOREGROUND, &(uint32_t){p});
+	return p;
+}
+
+pixel_t jb_set_bg(xcb_connection_t * x, const xcb_gc_t gc, const pixel_t p)
+{
+	xcb_change_gc(x, gc, XCB_GC_BACKGROUND, &(uint32_t){p});
+	return p;
+}
+
