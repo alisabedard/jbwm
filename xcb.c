@@ -85,3 +85,12 @@ void jb_draw_string(xcb_connection_t * x, const xcb_window_t w,
 	xcb_image_text_8(x, strlen(text), w, gc, pos.x, pos.y, text);
 }
 
+xcb_atom_t jb_get_atom(xcb_connection_t * x, const char * name)
+{
+	xcb_intern_atom_reply_t * r = xcb_intern_atom_reply(x,
+		xcb_intern_atom(x, false, strlen(name), name), NULL);
+	const xcb_atom_t a = r->atom;
+	free(r);
+	return a;
+}
+
