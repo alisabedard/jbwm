@@ -26,9 +26,6 @@ void *get_property(Window w, Atom property,
 void jbwm_grab_button(const Window w, const unsigned int mask,
 		 const unsigned int btn);
 
-// Print string to stderr, without trailing \n
-void jbputs(const char * string);
-
 #ifdef DEBUG
 void print_atom(const Atom a, const char * src, const uint16_t line);
 #else//!DEBUG

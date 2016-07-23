@@ -78,28 +78,26 @@ static void parse_argv(uint8_t argc, char **argv, Options * restrict o)
 		case '1':
 			jbwm.keymasks.grab = parse_modifiers(optarg);
 			break;
-
 		case '2':
 			jbwm.keymasks.mod = parse_modifiers(optarg);
 			break;
-
-		case 'b': o->bg = optarg; break;
-
+		case 'b':
+			o->bg = optarg;
+			break;
 		case 'd':
 			setenv("DISPLAY", optarg, 1);
 			break;
-
-		case 'f': o->fg = optarg; break;
-
-		case 's': o->fc = optarg; break;
+		case 'f':
+			o->fg = optarg;
+			break;
+		case 's':
+			o->fc = optarg;
+			break;
 		case 'V':
-			jbputs(VERSION "\n");
+			puts(VERSION);
 			exit(0);
-		default:	/* Usage */
-			jbputs(argv[0]);
-			jbputs(" -[");
-			jbputs(optstring);
-			jbputs("]\n");
+		default: // usage
+			printf("%s -[ %s ]\n", argv[0], optstring);
 			exit(1);
 		}
 	}

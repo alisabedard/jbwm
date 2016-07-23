@@ -34,7 +34,6 @@ static bool ewmh_get_state(const Window w, const Atom state)
 {
 	unsigned long n;
 	Atom *a = get_property(w, ewmh[WM_STATE], &n);
-
 	bool found = false;
 	if (a) {
 		while (n--) // prevent offset error
@@ -124,10 +123,8 @@ static void check_state(XClientMessageEvent * e,	// event data
 	case 2:{	// toggle
 			const bool add = !ewmh_get_state(e->window, state);
 			set_state(c, add, t);
-			if (add)
-				  ewmh_add_state(e->window, state);
-			else
-				  ewmh_remove_state(e->window, state);
+			(add ? ewmh_add_state : ewmh_remove_state)
+				(e->window, state);
 		}
 	}
 }
@@ -177,9 +174,8 @@ void ewmh_client_message(XClientMessageEvent * restrict e,
 	print_atom(e->data.l[3], __FILE__, __LINE__);
 #endif//EWMH_DEBUG
 	ScreenInfo *s = c ? c->screen : jbwm.screens;
-	if(client_specific_message(e, c, t))
+	if(c && client_specific_message(e, c, t))
 		  return;
-
 	if (t == ewmh[CURRENT_DESKTOP])
 		  switch_vdesk(s, e->data.l[0]);
 	// If something else moves the window:

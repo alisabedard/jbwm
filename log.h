@@ -8,23 +8,16 @@
 
 #ifdef DEBUG
 
-#include "util.h"
-
 #include <stdio.h>
-#include <unistd.h>
-
-#define LOG(...) \
-	{\
-		jbputs(__FILE__ ":");\
-		dprintf(STDERR_FILENO, "%d> ", __LINE__);\
-		dprintf(STDERR_FILENO, __VA_ARGS__);\
-		jbputs("\n");\
-	}
+#define LOG(...)\
+{\
+	fprintf(stderr, __VA_ARGS__);\
+	fprintf(stderr, " @ %s:%d\n", __FILE__, __LINE__);\
+}
 
 #else//!DEBUG
 
 #define LOG(...)
-#define MARK()
 
 #endif//DEBUG
 

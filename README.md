@@ -3,9 +3,7 @@
 
 ## FEATURES of JBWM
 * *Virtual desktops* with Meta-{1-0}
-* 15K binary size (with gcc 5.3.0 on linux/amd64) for minimal configuration
-	- Takes only 13kb on a Raspberry PI, minimal configuration
-	- Run 'make small'
+* Tiny binary size
 * *Titlebar* support if wanted
 * *Xft* support if wanted
 * *EWMH* support if wanted

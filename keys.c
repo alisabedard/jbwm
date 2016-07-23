@@ -15,14 +15,17 @@
 #include "titlebar.h"
 #include "util.h"
 
+#include <stdio.h>
 #include <stdlib.h>
 
+__attribute__((nonnull))
 static void point(Client * restrict c, const int16_t x, const int16_t y)
 {
 	XRaiseWindow(jbwm.dpy, c->parent);
 	XWarpPointer(jbwm.dpy, None, c->window, 0, 0, 0, 0, x, y);
 }
 
+__attribute__((nonnull))
 static void keymv(Client * restrict c, int * restrict xy,
 	int * restrict wh, const bool mod, const int8_t sign)
 {
@@ -38,8 +41,9 @@ static void keymv(Client * restrict c, int * restrict xy,
 	point(c, 1, 1);
 }
 
+__attribute__((nonnull))
 static void handle_client_key_event(const bool mod,
-	Client * c, const KeySym key)
+	Client * restrict c, const KeySym key)
 {
 	LOG("handle_client_key_event: %d", (int)key);
 	switch (key) {
@@ -60,28 +64,25 @@ static void handle_client_key_event(const bool mod,
 	case KEY_ALTLOWER: XLowerWindow(jbwm.dpy, c->parent); break;
 	case KEY_RAISE: XRaiseWindow(jbwm.dpy, c->parent); break;
 	case KEY_FS:
-		LOG("KEY_FS, c->opt.fullscreen:%d\n",
-			(int)c->opt.fullscreen);
-		if (c->opt.no_max) return;
-		c->opt.fullscreen?unset_fullscreen(c):set_fullscreen(c);
+		if (!c->opt.no_max)
+			(c->opt.fullscreen ? unset_fullscreen
+			 : set_fullscreen)(c);
 		break;
-	case KEY_MAX:
+	case KEY_MAX: {
 		// Honor !MWM_FUNC_MAXIMIZE
 		// Maximizing shaped windows is buggy, so return.
-		if(c->opt.shaped || c->opt.no_max) return;
-		if(c->opt.max_horz && c->opt.max_vert) {
-			unset_horz(c);
-			unset_vert(c);
-		} else {
-			set_horz(c);
-			set_vert(c);
-		}
+		if(c->opt.shaped || c->opt.no_max)
+			break;
+		const bool max = c->opt.max_horz && c->opt.max_vert;
+		(max ? unset_horz : set_horz)(c);
+		(max ? unset_vert : set_vert)(c);
+	}
 		break;
 	case KEY_MAX_H:
-		c->opt.max_horz?unset_horz(c):set_horz(c);
+		(c->opt.max_horz ? unset_horz : set_horz)(c);
 		break;
 	case KEY_MAX_V:
-		c->opt.max_vert?unset_vert(c):set_vert(c);
+		(c->opt.max_vert ? unset_vert : set_vert)(c);
 		break;
 	case KEY_STICK: stick(c); break;
 	case KEY_MOVE: drag(c); break;
@@ -89,38 +90,37 @@ static void handle_client_key_event(const bool mod,
 	}
 }
 
-static void next(void)
+static Client * get_next_on_vdesk(void)
 {
-	LOG("next()");
 	Client *c = jbwm.current;
-
 	do {
 		if (c) {
 			c = c->next;
 			if (!c && !jbwm.current)
-				return;
+				break;
 		}
 		if (!c) c = jbwm.head;
 		if (!c || (c == jbwm.current))
-			return;
+			break;
 	} while (c->vdesk != c->screen->vdesk);
-	if(c) {
-		unhide(c);
-		select_client(c);
-		point(c, 0, 0);
-		point(c, c->size.width, c->size.height);
-	}
+	return c;
 }
 
-static void
-cond_client_to_desk(Client * c, ScreenInfo * s, const uint8_t d, const bool mod)
+static void next(void)
 {
-	LOG("mod: %d, c valid? %d\n", mod, c ? 1 : 0);
+	Client * c = get_next_on_vdesk();
+	if (!c)
+		return;
+	unhide(c);
+	select_client(c);
+	point(c, 0, 0);
+	point(c, c->size.width, c->size.height);
+}
 
-	if (mod && c)
-		client_to_vdesk(c, d);
-	else
-		switch_vdesk(s, d);
+static void cond_client_to_desk(Client * c, ScreenInfo * s,
+	const uint8_t d, const bool mod)
+{
+	mod && c ? client_to_vdesk(c, d) : switch_vdesk(s, d);
 }
 
 void jbwm_handle_key_event(XKeyEvent * e)
@@ -129,14 +129,18 @@ void jbwm_handle_key_event(XKeyEvent * e)
 	const KeySym key = XLookupKeysym(e, 0);
 	Client *c = jbwm.current;
 	ScreenInfo *s = c ? c->screen : jbwm.screens;
-	const bool mod = e->state & jbwm.keymasks.mod;
-	bool zero_desk = false;
+	struct {
+		uint8_t vdesk:4;
+		bool mod:1;
+		bool zero:1;
+	} opt = {s->vdesk, e->state & jbwm.keymasks.mod, 0};
 
 	switch (key) {
 	case KEY_NEW: {
 		const int r = system(TERMINAL_CMD);
 		if (!WIFEXITED(r) || WEXITSTATUS(r)) {
-			jbputs("Could not execute terminal command\n");
+			fputs("Could not execute terminal command\n",
+				stderr);
 		}
 		break;
 	}
@@ -146,27 +150,27 @@ void jbwm_handle_key_event(XKeyEvent * e)
 		next();
 		break;
 	case XK_0:
-		zero_desk = true;
+		opt.zero = true;
 	case XK_1: case XK_2: case XK_3: case XK_4: case XK_5: case XK_6:
 	case XK_7: case XK_8: case XK_9:
 		// First desktop 0, per wm-spec
-		cond_client_to_desk(c, s, zero_desk ? 10 : key - XK_1, mod);
+		cond_client_to_desk(c, s, opt.zero ? 10 : key - XK_1, opt.mod);
 		break;
 	case KEY_PREVDESK:
-		cond_client_to_desk(c, s, s->vdesk - 1, mod);
+		cond_client_to_desk(c, s, s->vdesk - 1, opt.mod);
 		break;
 	case KEY_NEXTDESK:
-		cond_client_to_desk(c, s, s->vdesk + 1, mod);
+		cond_client_to_desk(c, s, s->vdesk + 1, opt.mod);
 		break;
 	default:
-		if (c) handle_client_key_event(e->state
-			& jbwm.keymasks.mod, c, key);
+		if (c)
+			handle_client_key_event(opt.mod, c, key);
 	}
 }
 
 __attribute__((nonnull(1,2)))
-static void
-grab(ScreenInfo * restrict s, KeySym * restrict ks, const uint32_t mask)
+static void grab(ScreenInfo * restrict s, KeySym * restrict ks,
+	const uint32_t mask)
 {
 	for (; *ks; ++ks)
 		XGrabKey(jbwm.dpy, XKeysymToKeycode(jbwm.dpy, *ks),
