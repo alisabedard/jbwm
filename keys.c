@@ -13,6 +13,7 @@
 #include "screen.h"
 #include "snap.h"
 #include "titlebar.h"
+#include "util.h"
 
 #include <stdlib.h>
 
@@ -26,15 +27,12 @@ static void keymv(Client * restrict c, int * restrict xy,
 	int * restrict wh, const bool mod, const int8_t sign)
 {
 	/* These operations invalid when fullscreen.  */
-	if (c->opt.fullscreen) return;
-
+	if (c->opt.fullscreen)
+		return;
 	const int8_t d = sign * JBWM_RESIZE_INCREMENT;
 
-	if (mod && (*wh > JBWM_RESIZE_INCREMENT<<1)
-		&& !c->opt.shaped && !c->opt.no_resize)
-		*wh += d;
-	else
-		*xy += d;
+	*(mod && (*wh > JBWM_RESIZE_INCREMENT<<1)
+		&& !c->opt.shaped && !c->opt.no_resize ? wh : xy) += d;
 	snap_border(c);
 	moveresize(c);
 	point(c, 1, 1);
@@ -135,17 +133,18 @@ void jbwm_handle_key_event(XKeyEvent * e)
 	bool zero_desk = false;
 
 	switch (key) {
-	case KEY_NEW:
-		system(TERMINAL_CMD);
+	case KEY_NEW: {
+		const int r = system(TERMINAL_CMD);
+		if (!WIFEXITED(r) || WEXITSTATUS(r)) {
+			jbputs("Could not execute terminal command\n");
+		}
 		break;
-
+	}
 	case KEY_QUIT:
 		exit(0);
-
 	case KEY_NEXT:
 		next();
 		break;
-
 	case XK_0:
 		zero_desk = true;
 	case XK_1: case XK_2: case XK_3: case XK_4: case XK_5: case XK_6:
@@ -153,15 +152,12 @@ void jbwm_handle_key_event(XKeyEvent * e)
 		// First desktop 0, per wm-spec
 		cond_client_to_desk(c, s, zero_desk ? 10 : key - XK_1, mod);
 		break;
-
 	case KEY_PREVDESK:
 		cond_client_to_desk(c, s, s->vdesk - 1, mod);
 		break;
-
 	case KEY_NEXTDESK:
 		cond_client_to_desk(c, s, s->vdesk + 1, mod);
 		break;
-
 	default:
 		if (c) handle_client_key_event(e->state
 			& jbwm.keymasks.mod, c, key);
