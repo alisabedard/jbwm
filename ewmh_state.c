@@ -65,10 +65,11 @@ void ewmh_add_state(const Window w, Atom state)
   data.l[3] = source indication
   other data.l[] elements = 0 */
 
-__attribute__((nonnull(1)))
 static void set_state(Client * restrict c,
 	const bool add, const AtomIndex t)
 {
+	if (!c)
+		return;
 	switch(t) {
 	case WM_STATE_FULLSCREEN:
 		add?set_fullscreen(c):unset_fullscreen(c);
