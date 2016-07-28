@@ -2,6 +2,7 @@
 #ifndef JB_XCB_H
 #define JB_XCB_H
 
+#include <stdbool.h>
 #include <stdint.h>
 #include <xcb/xcb.h>
 
@@ -25,5 +26,8 @@ void jb_draw_string(xcb_connection_t * x, const xcb_window_t w,
 	const xcb_gc_t gc, const xcb_point_t pos, const char * text);
 
 xcb_atom_t jb_get_atom(xcb_connection_t * x, const char * name);
+
+bool jb_next_event_timed(xcb_connection_t * x,
+	xcb_generic_event_t ** e, const uint32_t delay);
 
 #endif//!JB_XCB_H
