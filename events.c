@@ -24,11 +24,11 @@
 __attribute__((pure)) // Return does not change between calls
 static ScreenInfo *find_screen(const Window root)
 {
-	uint8_t i = ScreenCount(jbwm.dpy);
+	uint8_t i = ScreenCount(jbwm.d);
 
 	while (i--)
-		if (jbwm.screens[i].root == root)
-			return &jbwm.screens[i];
+		if (jbwm.s[i].root == root)
+			return &jbwm.s[i];
 
 	return NULL;
 }
@@ -63,17 +63,17 @@ static void cleanup(void)
 			  continue;
 		// Per ICCM + EWMH:
 #ifdef EWMH
-		XDeleteProperty(jbwm.dpy, c->window,
+		XDeleteProperty(jbwm.d, c->window,
 			ewmh[WM_STATE]);
-		XDeleteProperty(jbwm.dpy, c->window,
+		XDeleteProperty(jbwm.d, c->window,
 			ewmh[WM_DESKTOP]);
 #endif//EWMH
-		XReparentWindow(jbwm.dpy, c->window,
+		XReparentWindow(jbwm.d, c->window,
 			c->screen->root,
 			c->size.x, c->size.y);
-		XRemoveFromSaveSet(jbwm.dpy, c->window);
+		XRemoveFromSaveSet(jbwm.d, c->window);
 		if(c->parent)
-			  XDestroyWindow(jbwm.dpy, c->parent);
+			  XDestroyWindow(jbwm.d, c->parent);
 		relink_window_list(c);
 		free(c);
 	} while(i && (c = i));
@@ -82,11 +82,11 @@ static void cleanup(void)
 static void handle_wm_hints(Client * c)
 {
 	LOG("handle_wm_hints");
-	XWMHints *h = XGetWMHints(jbwm.dpy, c->window);
+	XWMHints *h = XGetWMHints(jbwm.d, c->window);
 	if(h) {
 		if (h->flags & XUrgencyHint) {
 			switch_vdesk(c->screen, c->vdesk);
-			XRaiseWindow(jbwm.dpy, c->parent);
+			XRaiseWindow(jbwm.d, c->parent);
 		}
 		XFree(h);
 	}
@@ -117,7 +117,7 @@ static void handle_property_change(XPropertyEvent * restrict e,
 static void handle_configure_request(XConfigureRequestEvent * e)
 {
 	LOG("handle_configure_request");
-	XConfigureWindow(jbwm.dpy, e->window, e->value_mask,
+	XConfigureWindow(jbwm.d, e->window, e->value_mask,
 		&(XWindowChanges){ .x = e->x, .y = e->y,
 		.width = e->width, .height = e->height,
 		.border_width = e->border_width,
@@ -129,7 +129,7 @@ void main_event_loop(void)
 	XEvent ev;
 	Client * c;
  head:
-	XNextEvent(jbwm.dpy, &ev);
+	XNextEvent(jbwm.d, &ev);
 	c=find_client(ev.xany.window);
 	switch (ev.type) {
 	case KeyPress:
@@ -180,7 +180,7 @@ void main_event_loop(void)
 		if (c && ev.xcolormap.new) {
 			LOG("ColormapNotify");
 			c->cmap = ev.xcolormap.colormap;
-			XInstallColormap(jbwm.dpy, c->cmap);
+			XInstallColormap(jbwm.d, c->cmap);
 		}
 		break;
 #ifdef EWMH

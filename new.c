@@ -52,9 +52,9 @@ __attribute__((nonnull))
 static void init_geometry(Client * c)
 {
 	XWindowAttributes attr;
-	XGetWindowAttributes(jbwm.dpy, c->window, &attr);
+	XGetWindowAttributes(jbwm.d, c->window, &attr);
 	c->cmap = attr.colormap;
-	XGetWMNormalHints(jbwm.dpy, c->window, &(c->size), &(long){0});
+	XGetWMNormalHints(jbwm.d, c->window, &(c->size), &(long){0});
 	c->size.width = (attr.width >= c->size.min_width)
 		? attr.width : c->size.min_width;
 	c->size.height = (attr.height >= c->size.min_height)
@@ -72,7 +72,7 @@ static void reparent(Client * c) // use of restrict here is a bug
 {
 	LOG("reparent()");
 	setup_shaped(c);
-	c->parent = XCreateWindow(jbwm.dpy, c->screen->root,
+	c->parent = XCreateWindow(jbwm.d, c->screen->root,
 		c->size.x, c->size.y,
 		c->size.width, c->size.height, c->border,
 		CopyFromParent, CopyFromParent, CopyFromParent,
@@ -82,16 +82,16 @@ static void reparent(Client * c) // use of restrict here is a bug
 				| SubstructureNotifyMask
 				| ButtonPressMask
 				| EnterWindowMask});
-	XAddToSaveSet(jbwm.dpy, c->window);
-	XReparentWindow(jbwm.dpy, c->window, c->parent, 0, 0);
-	XMapWindow(jbwm.dpy, c->window);
+	XAddToSaveSet(jbwm.d, c->window);
+	XReparentWindow(jbwm.d, c->window, c->parent, 0, 0);
+	XMapWindow(jbwm.d, c->window);
 }
 
 void make_new_client(const jbwm_window_t w, ScreenInfo * s)
 {
 	LOG("make_new_client(%d,s)", (int)w);
 	Client *c = calloc(1, sizeof(Client));
-	XGrabServer(jbwm.dpy);
+	XGrabServer(jbwm.d);
 	c->next = jbwm.head;
 	jbwm.head = c;
 	c->screen = s;
@@ -99,11 +99,11 @@ void make_new_client(const jbwm_window_t w, ScreenInfo * s)
 	c->border = 1;
 	init_properties(c);
 	init_geometry(c);
-	XSelectInput(jbwm.dpy, c->window, EnterWindowMask
+	XSelectInput(jbwm.d, c->window, EnterWindowMask
 		| PropertyChangeMask | ColormapChangeMask);
 	reparent(c);
 	unhide(c);
 	jbwm_grab_button(w, jbwm.keymasks.grab, AnyButton);
 	set_ewmh_allowed_actions(w);
-	XUngrabServer(jbwm.dpy);
+	XUngrabServer(jbwm.d);
 }

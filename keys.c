@@ -21,8 +21,8 @@
 __attribute__((nonnull))
 static void point(Client * restrict c, const int16_t x, const int16_t y)
 {
-	XRaiseWindow(jbwm.dpy, c->parent);
-	XWarpPointer(jbwm.dpy, None, c->window, 0, 0, 0, 0, x, y);
+	XRaiseWindow(jbwm.d, c->parent);
+	XWarpPointer(jbwm.d, None, c->window, 0, 0, 0, 0, x, y);
 }
 
 __attribute__((nonnull))
@@ -61,8 +61,8 @@ static void handle_client_key_event(const bool mod,
 		break;
 	case KEY_KILL: send_wm_delete(c); break;
 	case KEY_LOWER:
-	case KEY_ALTLOWER: XLowerWindow(jbwm.dpy, c->parent); break;
-	case KEY_RAISE: XRaiseWindow(jbwm.dpy, c->parent); break;
+	case KEY_ALTLOWER: XLowerWindow(jbwm.d, c->parent); break;
+	case KEY_RAISE: XRaiseWindow(jbwm.d, c->parent); break;
 	case KEY_FS:
 		if (!c->opt.no_max)
 			(c->opt.fullscreen ? unset_fullscreen
@@ -128,7 +128,7 @@ void jbwm_handle_key_event(XKeyEvent * e)
 	LOG("jbwm_handle_key_event");
 	const KeySym key = XLookupKeysym(e, 0);
 	Client *c = jbwm.current;
-	ScreenInfo *s = c ? c->screen : jbwm.screens;
+	ScreenInfo *s = c ? c->screen : jbwm.s;
 	struct {
 		uint8_t vdesk:4;
 		bool mod:1;
@@ -173,7 +173,7 @@ static void grab(ScreenInfo * restrict s, KeySym * restrict ks,
 	const uint32_t mask)
 {
 	for (; *ks; ++ks)
-		XGrabKey(jbwm.dpy, XKeysymToKeycode(jbwm.dpy, *ks),
+		XGrabKey(jbwm.d, XKeysymToKeycode(jbwm.d, *ks),
 			 jbwm.keymasks.grab | mask, s->root, true,
 			 GrabModeAsync, GrabModeAsync);
 }

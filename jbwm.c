@@ -123,14 +123,14 @@ static void jbwm_error(const char * msg
 static void setup_fonts(void)
 {
 #ifdef USE_XFT
-	jbwm.font = XftFontOpen(jbwm.dpy, DefaultScreen(jbwm.dpy),
+	jbwm.font = XftFontOpen(jbwm.d, DefaultScreen(jbwm.d),
 		XFT_FAMILY, XftTypeString, DEF_FONT, XFT_SIZE,
 		XftTypeDouble, FONT_SIZE, NULL);
 #else//!USE_XFT
-	jbwm.font = XLoadQueryFont(jbwm.dpy, DEF_FONT);
+	jbwm.font = XLoadQueryFont(jbwm.d, DEF_FONT);
 
 	if (!jbwm.font)
-		jbwm.font = XLoadQueryFont(jbwm.dpy, FALLBACK_FONT);
+		jbwm.font = XLoadQueryFont(jbwm.d, FALLBACK_FONT);
 #endif//USE_XFT
 
 	if (!jbwm.font)
@@ -145,18 +145,18 @@ static void setup_fonts(void)
 #endif
 static void setup_event_listeners(const jbwm_window_t root)
 {
-	XChangeWindowAttributes(jbwm.dpy, root, CWEventMask,
+	XChangeWindowAttributes(jbwm.d, root, CWEventMask,
 		&(XSetWindowAttributes){.event_mask = SubstructureRedirectMask
 		| SubstructureNotifyMask | EnterWindowMask | PropertyChangeMask
 		| ColormapChangeMask});
 }
 
-static void allocate_colors(ScreenInfo * restrict s,
-	Options * restrict o)
+static void allocate_colors(ScreenInfo * restrict s, Options * restrict o)
 {
-	s->pixels.fg=pixel(s->screen, o->fg);
-	s->pixels.bg=pixel(s->screen, o->bg);
-	s->pixels.fc=pixel(s->screen, o->fc);
+	const uint8_t n = s->screen;
+	s->pixels.fg=pixel(n, o->fg);
+	s->pixels.bg=pixel(n, o->bg);
+	s->pixels.fc=pixel(n, o->fc);
 }
 
 static void setup_clients(ScreenInfo * restrict s)
@@ -164,12 +164,12 @@ static void setup_clients(ScreenInfo * restrict s)
 	unsigned int nwins;
 	Window *wins, dw;
 
-	if (!XQueryTree(jbwm.dpy, s->root, &dw, &dw, &wins, &nwins))
+	if (!XQueryTree(jbwm.d, s->root, &dw, &dw, &wins, &nwins))
 		return; // failed
 
 	while (nwins--) {
 		XWindowAttributes a;
-		XGetWindowAttributes(jbwm.dpy, wins[nwins], &a);
+		XGetWindowAttributes(jbwm.d, wins[nwins], &a);
 
 		if (!a.override_redirect && (a.map_state == IsViewable))
 			make_new_client(wins[nwins], s);
@@ -180,9 +180,9 @@ static void setup_clients(ScreenInfo * restrict s)
 
 static void setup_screen_elements(const uint8_t i)
 {
-	ScreenInfo *restrict s = &jbwm.screens[i];
+	ScreenInfo *restrict s = &jbwm.s[i];
 	s->screen = i;
-	Display * d = jbwm.dpy;
+	Display * d = jbwm.d;
 	s->root = RootWindow(d, i);
 	s->vdesk = 0;
 	s->size[JBWM_SIZE_WIDTH] = DisplayWidth(d, i);
@@ -204,12 +204,12 @@ static void setup_gc(ScreenInfo * restrict s, Options * restrict o)
 	gv.font = jbwm.font->fid;
 	vm |= GCFont;
 #endif//USE_TBAR&&!USE_XFT
-	s->gc = XCreateGC(jbwm.dpy, s->root, vm, &gv);
+	s->gc = XCreateGC(jbwm.d, s->root, vm, &gv);
 }
 
 static void setup_screen(const uint8_t i, Options * restrict o)
 {
-	ScreenInfo *s = &jbwm.screens[i];
+	ScreenInfo *s = &jbwm.s[i];
 	setup_screen_elements(i);
 	setup_gc(s, o);
 	setup_event_listeners(s->root);
@@ -223,8 +223,8 @@ static void setup_screens(Options * restrict o)
 {
 	/* Now set up each screen in turn: jbwm.num_screens is used
 	   in scanning windows (XQueryTree) */
-	uint8_t i = ScreenCount(jbwm.dpy);
-	jbwm.screens = malloc(i * sizeof(ScreenInfo));
+	uint8_t i = ScreenCount(jbwm.d);
+	jbwm.s = malloc(i * sizeof(ScreenInfo));
 
 	while (i--)
 		setup_screen(i, o);
@@ -254,14 +254,14 @@ int main(
 	Options o = {.fg=DEF_fg, .bg=DEF_bg, .fc=DEF_fc};
 	parse_argv(argc, argv, &o);
 
-	if (!(jbwm.dpy = XOpenDisplay(NULL)))
+	if (!(jbwm.d = XOpenDisplay(NULL)))
 		jbwm_error("DISPLAY");
 
 	XSetErrorHandler(handle_xerror);
 	ewmh_init();
 	/* Fonts only needed with title bars */
 	setup_fonts();
-	jbwm.cursor = XCreateFontCursor(jbwm.dpy, XC_fleur);
+	jbwm.cursor = XCreateFontCursor(jbwm.d, XC_fleur);
 	setup_screens(&o);
 	main_event_loop();
 	return 0;

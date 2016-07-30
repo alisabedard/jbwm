@@ -30,14 +30,14 @@ void shade(Client * restrict c)
 		// Unshade
 		c->size.height = c->old_size.height;
 		c->opt.shaded = false;
-		XMapWindow(jbwm.dpy, c->window);
+		XMapWindow(jbwm.d, c->window);
 		moveresize(c);
 		set_wm_state(c, NormalState);
 		ewmh_remove_state(c->window, ewmh[WM_STATE_SHADED]);
 	} else {		// Shade the client
 		c->old_size.height = c->size.height;
 		c->ignore_unmap++;
-		XUnmapWindow(jbwm.dpy, c->window);
+		XUnmapWindow(jbwm.d, c->window);
 		c->size.height = 0;
 		c->opt.shaded = true;
 		set_wm_state(c, IconicState);
@@ -49,7 +49,7 @@ void shade(Client * restrict c)
 
 static GC colorgc(ScreenInfo * restrict s, const char *restrict colorname)
 {
-	return XCreateGC(jbwm.dpy, s->root, GCForeground,
+	return XCreateGC(jbwm.d, s->root, GCForeground,
 		&(XGCValues){.foreground=pixel(s->screen, colorname)});
 }
 
@@ -65,13 +65,13 @@ static void new_titlebar(Client * restrict c)
 	if (c->opt.no_titlebar || c->opt.shaped)
 		return;
 
-	c->titlebar = XCreateSimpleWindow(jbwm.dpy, c->parent, 0, 0,
+	c->titlebar = XCreateSimpleWindow(jbwm.d, c->parent, 0, 0,
 		c->size.width, TDIM, 0, 0, c->screen->pixels.bg);
 	if (!jbwm.gc.close)
 		setup_gcs(c->screen);
 
-	XSelectInput(jbwm.dpy, c->titlebar, ExposureMask);
-	XMapRaised(jbwm.dpy, c->titlebar);
+	XSelectInput(jbwm.d, c->titlebar, ExposureMask);
+	XMapRaised(jbwm.d, c->titlebar);
 	jbwm_grab_button(c->titlebar, 0, AnyButton);
 }
 
@@ -81,13 +81,13 @@ draw_xft(Client * restrict c, const XPoint * restrict p,
 	 char * restrict name, const size_t l)
 {
 	XGlyphInfo e;
-	XftTextExtentsUtf8(jbwm.dpy, jbwm.font, (XftChar8 *) name, l, &e);
+	XftTextExtentsUtf8(jbwm.d, jbwm.font, (XftChar8 *) name, l, &e);
 	const uint8_t s = c->screen->screen;
-	Visual *v = DefaultVisual(jbwm.dpy, s);
-	const Colormap cm = DefaultColormap(jbwm.dpy, s);
-	XftDraw *xd = XftDrawCreate(jbwm.dpy, c->titlebar, v, cm);
+	Visual *v = DefaultVisual(jbwm.d, s);
+	const Colormap cm = DefaultColormap(jbwm.d, s);
+	XftDraw *xd = XftDrawCreate(jbwm.d, c->titlebar, v, cm);
 	XftColor color;
-	XftColorAllocName(jbwm.dpy, v, cm, DEF_fg, &color);
+	XftColorAllocName(jbwm.d, v, cm, DEF_fg, &color);
 	/* Prevent the text from going over the resize button.  */
 	const uint16_t max_width = c->size.width - 3 * TDIM;
 	XftDrawStringUtf8(xd, &color, jbwm.font, p->x, p->y,
@@ -95,7 +95,7 @@ draw_xft(Client * restrict c, const XPoint * restrict p,
 			  e.width > max_width
 			  && e.width > 0 ? l * max_width / e.width : l);
 	XftDrawDestroy(xd);
-	XftColorFree(jbwm.dpy, v, cm, &color);
+	XftColorFree(jbwm.d, v, cm, &color);
 }
 #endif//USE_XFT
 
@@ -110,7 +110,7 @@ static void draw_title(Client * restrict c)
 #ifdef USE_XFT
 	draw_xft(c, &p, name, l);
 #else//!USE_XFT
-	XDrawString(jbwm.dpy, c->titlebar, c->screen->gc,
+	XDrawString(jbwm.d, c->titlebar, c->screen->gc,
 		p.x, p.y, name, l);
 #endif//USE_XFT
 	XFree(name);
@@ -118,13 +118,13 @@ static void draw_title(Client * restrict c)
 
 static inline void draw(const Window t, GC gc, const uint16_t x)
 {
-	XFillRectangle(jbwm.dpy, t, gc, x, 0, TDIM, TDIM);
+	XFillRectangle(jbwm.d, t, gc, x, 0, TDIM, TDIM);
 }
 
 static void draw_titlebar(Client * restrict c)
 {
 	const Window t = c->titlebar;
-	XClearWindow(jbwm.dpy, t);
+	XClearWindow(jbwm.d, t);
 	if (!c->opt.no_close_decor)
 		draw(t, jbwm.gc.close, 0);
 	if (c->opt.tearoff) return;
@@ -139,7 +139,7 @@ static void draw_titlebar(Client * restrict c)
 static void remove_titlebar(Client * restrict c)
 {
 	c->ignore_unmap++;
-	XDestroyWindow(jbwm.dpy, c->titlebar);
+	XDestroyWindow(jbwm.d, c->titlebar);
 	c->titlebar = 0;
 }
 
@@ -160,7 +160,7 @@ void update_titlebar(Client * c)
 	}
 
 	/* Expand/Contract the titlebar width as necessary:  */
-	XMoveResizeWindow(jbwm.dpy, c->titlebar, 0, 0, c->size.width, TDIM);
+	XMoveResizeWindow(jbwm.d, c->titlebar, 0, 0, c->size.width, TDIM);
 	draw_titlebar(c);
 }
 

@@ -43,7 +43,7 @@ void handle_mwm_hints(Client * c)
 {
 	static jbwm_atom_t mwm_hints;
 	if(!mwm_hints)
-		  mwm_hints=XInternAtom(jbwm.dpy, "_MOTIF_WM_HINTS", false);
+		  mwm_hints=XInternAtom(jbwm.d, "_MOTIF_WM_HINTS", false);
 	struct { // paraphrased from MwmUtil.h
 		unsigned long flags, functions, decor;
 		long input_mode;

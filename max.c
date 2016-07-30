@@ -72,7 +72,7 @@ void unset_fullscreen(Client * restrict c)
 	c->opt.fullscreen = false; // Reflects desired status
 	unset_horz(c);
 	unset_vert(c);
-	XSetWindowBorderWidth(jbwm.dpy, c->parent, c->border);
+	XSetWindowBorderWidth(jbwm.d, c->parent, c->border);
 	ewmh_remove_state(c->window, ewmh[WM_STATE_FULLSCREEN]);
 	update_titlebar(c);
 }
@@ -89,7 +89,7 @@ void set_fullscreen(Client * restrict c)
 	c->opt.fullscreen = true; // Reflect desired status
 	set_horz(c);
 	set_vert(c);
-	XSetWindowBorderWidth(jbwm.dpy, c->parent, 0);
+	XSetWindowBorderWidth(jbwm.d, c->parent, 0);
 	ewmh_add_state(c->window, ewmh[WM_STATE_FULLSCREEN]);
 	update_titlebar(c);
 }

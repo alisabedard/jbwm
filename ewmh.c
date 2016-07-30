@@ -63,7 +63,7 @@ static char * atom_names [] = { // This list must match 1:1 with enum
 void ewmh_init(void)
 {
 	LOG("atom_names: %d\n", EWMH_ATOMS_COUNT);
-	XInternAtoms(jbwm.dpy, atom_names, EWMH_ATOMS_COUNT, false, ewmh);
+	XInternAtoms(jbwm.d, atom_names, EWMH_ATOMS_COUNT, false, ewmh);
 }
 
 static uint16_t get_client_count(void)
@@ -79,10 +79,10 @@ void ewmh_update_client_list(void)
 	size_t wl_sz = 0;
 	for (Client * i = jbwm.head; i; i = i->next, ++wl_sz)
 		wl[wl_sz] = i->window;
-	XPROP(jbwm.screens->root, ewmh[CLIENT_LIST],
+	XPROP(jbwm.s->root, ewmh[CLIENT_LIST],
 		XA_WINDOW, &wl, wl_sz);
 	// FIXME: Does not correctly report stacking order.
-	XPROP(jbwm.screens->root, ewmh[CLIENT_LIST_STACKING],
+	XPROP(jbwm.s->root, ewmh[CLIENT_LIST_STACKING],
 		XA_WINDOW, &wl, wl_sz);
 }
 static void set_root_vdesk(const jbwm_window_t r)
@@ -122,7 +122,7 @@ static void init_desktops(struct ScreenInfo * restrict s)
 
 static jbwm_window_t init_supporting(const jbwm_window_t r)
 {
-	jbwm_window_t w = XCreateSimpleWindow(jbwm.dpy, r, 0, 0, 1, 1, 0, 0, 0);
+	jbwm_window_t w = XCreateSimpleWindow(jbwm.d, r, 0, 0, 1, 1, 0, 0, 0);
 	XPROP(r, ewmh[SUPPORTING_WM_CHECK], XA_WINDOW, &w, 1);
 	XPROP(w, ewmh[SUPPORTING_WM_CHECK], XA_WINDOW, &w, 1);
 	XPROP(w, ewmh[WM_NAME], XA_STRING, "jbwm", 4);

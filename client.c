@@ -19,7 +19,7 @@
 char * get_title(const Window w)
 {
 	XTextProperty tp;
-	if (!XGetWMName(jbwm.dpy, w, &tp))
+	if (!XGetWMName(jbwm.d, w, &tp))
 		  return NULL;
 	return (char *)tp.value;
 }
@@ -53,7 +53,7 @@ Client *find_client(const Window w)
 static void unselect_current(void)
 {
 	if(!jbwm.current) return;
-	XSetWindowBorder(jbwm.dpy, jbwm.current->parent,
+	XSetWindowBorder(jbwm.d, jbwm.current->parent,
 		jbwm.current->screen->pixels.bg);
 	jbwm.current->opt.active = false;
 #ifdef EWMH
@@ -66,10 +66,10 @@ void select_client(Client * c)
 	if(!c) return;
 	c->opt.active = true;
 	unselect_current();
-	XInstallColormap(jbwm.dpy, c->cmap);
-	XSetInputFocus(jbwm.dpy, c->window,
+	XInstallColormap(jbwm.d, c->cmap);
+	XSetInputFocus(jbwm.d, c->window,
 		RevertToPointerRoot, CurrentTime);
-	XSetWindowBorder(jbwm.dpy, c->parent, c->opt.sticky
+	XSetWindowBorder(jbwm.d, c->parent, c->opt.sticky
 		? c->screen->pixels.fc : c->screen->pixels.fg);
 	jbwm.current = c;
 #ifdef EWMH
@@ -96,7 +96,7 @@ void stick(Client * c)
 static Status xmsg(const Window w, const Atom a, const long x)
 {
 	LOG("xmsg");
-	return XSendEvent(jbwm.dpy, w, false, NoEventMask, &(XEvent){
+	return XSendEvent(jbwm.d, w, false, NoEventMask, &(XEvent){
 		.xclient.type = ClientMessage, .xclient.window = w,
 		.xclient.message_type = a, .xclient.format = 32,
 		.xclient.data.l[0] = x, .xclient.data.l[1] = CurrentTime
@@ -110,7 +110,7 @@ static void setup_client_atoms(void)
 {
 	if(client_atoms[0]) return; // Already initialized
 	char *names[]={"WM_PROTOCOLS", "WM_DELETE_WINDOW", "WM_STATE"};
-	XInternAtoms(jbwm.dpy, names, CA_SZ, true, client_atoms);
+	XInternAtoms(jbwm.d, names, CA_SZ, true, client_atoms);
 }
 
 __attribute__((nonnull))
@@ -126,7 +126,7 @@ static bool has_delete_proto(const Window w)
 	bool found=false;
 	Atom *p;
 	int i;
-	if(XGetWMProtocols(jbwm.dpy, w, &p, &i)) {
+	if(XGetWMProtocols(jbwm.d, w, &p, &i)) {
 		while(i--)
 			if((found=(p[i]==client_atoms[CA_DEL_WIN])))
 				break;
@@ -144,7 +144,7 @@ void send_wm_delete(const Client * restrict c)
 			client_atoms[CA_DEL_WIN]);
 	}
 	else {
-		XKillClient(jbwm.dpy, c->window);
+		XKillClient(jbwm.d, c->window);
 	}
 }
 

@@ -15,11 +15,10 @@
 #endif//USE_XFT
 
 typedef struct {
-	Display *restrict dpy;
+	Display * d;
 	// Client tracking:
-	Client *current;
-	Client *head;
-	ScreenInfo *screens;
+	Client * current, * head;
+	ScreenInfo * s;
 #ifdef USE_TBAR
 #ifdef USE_XFT
 	XftFont *font;
@@ -27,7 +26,7 @@ typedef struct {
 	XFontStruct *font;
 #endif//USE_XFT
 #endif//USE_TBAR
-	Window last;
+	jbwm_window_t last;
 #ifdef USE_TBAR
 	struct {
 		GC close, shade, resize;
@@ -36,9 +35,7 @@ typedef struct {
 	struct {
 		uint16_t grab, mod;
 	} keymasks;
-
 	Cursor cursor:31;
-
 	bool need_cleanup:1;
 } JBWMEnvironment;
 

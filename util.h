@@ -8,7 +8,7 @@
 
 #include "typedef.h"
 
-#define XPROP(win, prop, type, data, size) XChangeProperty(jbwm.dpy, win, \
+#define XPROP(win, prop, type, data, size) XChangeProperty(jbwm.d, win, \
 		prop, type, 32, PropModeReplace, \
 		(const unsigned char *)(data), size)
 

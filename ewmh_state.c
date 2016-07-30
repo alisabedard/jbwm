@@ -42,7 +42,7 @@ static bool ewmh_get_state(const Window w, const jbwm_atom_t state)
 
 void ewmh_add_state(const Window w, jbwm_atom_t state)
 {
-	XChangeProperty(jbwm.dpy, w, ewmh[WM_STATE],
+	XChangeProperty(jbwm.d, w, ewmh[WM_STATE],
 		XA_ATOM, 32, PropModePrepend,
 		(unsigned char *)&state, 1);
 }
@@ -73,12 +73,12 @@ static void set_state(Client * restrict c,
 		c->opt.sticky=add;
 		break;
 	case WM_STATE_ABOVE:
-		if(add) XRaiseWindow(jbwm.dpy, c->parent);
-		else XLowerWindow(jbwm.dpy, c->parent);
+		if(add) XRaiseWindow(jbwm.d, c->parent);
+		else XLowerWindow(jbwm.d, c->parent);
 		break;
 	case WM_STATE_BELOW:
-		if(add) XLowerWindow(jbwm.dpy, c->parent);
-		else XRaiseWindow(jbwm.dpy, c->parent);
+		if(add) XLowerWindow(jbwm.d, c->parent);
+		else XRaiseWindow(jbwm.d, c->parent);
 		break;
 	case WM_STATE_HIDDEN:
 		LOG("HIDDEN");
@@ -144,7 +144,7 @@ static bool client_specific_message(XClientMessageEvent * restrict e,
 		client_to_vdesk(c, e->data.l[0]);
 	// If user moves window (client-side titlebars):
 	else if (t == ewmh[WM_MOVERESIZE]) {
-		XRaiseWindow(jbwm.dpy, c->parent);
+		XRaiseWindow(jbwm.d, c->parent);
 		drag(c);
 	} else if (t == ewmh[WM_STATE])
 		handle_wm_state_changes(e, c);
@@ -169,7 +169,7 @@ void ewmh_client_message(XClientMessageEvent * restrict e,
 	print_atom(e->data.l[2], __FILE__, __LINE__);
 	print_atom(e->data.l[3], __FILE__, __LINE__);
 #endif//EWMH_DEBUG
-	ScreenInfo *s = c ? c->screen : jbwm.screens;
+	ScreenInfo *s = c ? c->screen : jbwm.s;
 	if(c && client_specific_message(e, c, t))
 		  return;
 	if (t == ewmh[CURRENT_DESKTOP])

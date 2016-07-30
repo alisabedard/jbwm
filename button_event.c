@@ -39,7 +39,7 @@ void jbwm_handle_button_event(XButtonEvent * restrict e, Client * restrict c)
 		break;
 
 	case Button2:
-		XLowerWindow(jbwm.dpy, c->parent);
+		XLowerWindow(jbwm.d, c->parent);
 		break;
 
 	case Button3:

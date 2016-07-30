@@ -16,7 +16,7 @@ static bool is_shaped(Client * c)
 {
 	int s, d;
 	unsigned int u;
-	return XShapeQueryExtents(jbwm.dpy, c->window, &s, &d, &d,
+	return XShapeQueryExtents(jbwm.d, c->window, &s, &d, &d,
 		&u, &u, &d, &d, &d, &u, &u) && s;
 }
 
@@ -24,7 +24,7 @@ void set_shape(Client * c)
 {
 	if(c->opt.shaped) {
 		LOG("XShapeCombineShape: %d", (int)c->window);
-		XShapeCombineShape(jbwm.dpy, c->parent, ShapeBounding,
+		XShapeCombineShape(jbwm.d, c->parent, ShapeBounding,
 			1, 1, c->window, ShapeBounding, ShapeSet);
 	}
 }
