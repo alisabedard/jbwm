@@ -26,7 +26,7 @@ void set_horz(Client * restrict c)
 	c->old_size.x = c->size.x;
 	c->old_size.width = c->size.width;
 	c->size.x = 0;
-	c->size.width = c->screen->size.w;
+	c->size.width = c->screen->size[JBWM_SIZE_WIDTH];
 	ewmh_add_state(c->window, ewmh[WM_STATE_MAXIMIZED_HORZ]);
 	c->opt.max_horz = true;
 	// Offset if not fullscreen
@@ -54,7 +54,7 @@ void set_vert(Client * restrict c)
 	c->old_size.y = c->size.y;
 	c->old_size.height = c->size.height;
 	c->size.y = 0;
-	c->size.height = c->screen->size.h;
+	c->size.height = c->screen->size[JBWM_SIZE_HEIGHT];
 	ewmh_add_state(c->window, ewmh[WM_STATE_MAXIMIZED_VERT]);
 	c->opt.max_vert = true;
 	// Offset the titlebar if not fullscreen

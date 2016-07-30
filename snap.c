@@ -26,9 +26,9 @@ void snap_border(Client *restrict c)
 	/* snap to screen border */
 	const uint8_t b = 2 * c->border;
 	g->x=sborder(g->x, 0 - b);
-	g->x=sborder(g->x, g->width - c->screen->size.w + b);
+	g->x=sborder(g->x, g->width - c->screen->size[JBWM_SIZE_WIDTH] + b);
 	g->y=sborder(g->y, 0 - (c->opt.no_titlebar?0:TDIM));
-	g->y=sborder(g->y, g->height + b - c->screen->size.h);
+	g->y=sborder(g->y, g->height + b - c->screen->size[JBWM_SIZE_HEIGHT]);
 }
 
 __attribute__ ((const, hot, warn_unused_result, regparm(2)))

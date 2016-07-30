@@ -8,19 +8,30 @@
 
 #include <stdint.h>
 #include <X11/Xlib.h>
-#include "geometry.h"
+
+typedef uint32_t jbwm_window_t;
+typedef uint32_t jbwm_pixel_t;
+typedef uint16_t jbwm_dim_t;
+typedef int16_t jbwm_pos_t;
+
+enum {
+	JBWM_SIZE_WIDTH,
+	JBWM_SIZE_HEIGHT,
+};
 
 typedef struct ScreenInfo {
-	Window root : 32;
-#ifdef EWMH
-	Window supporting : 32;
-#endif//EWMH
 	GC gc;
-	Dim size;
+	union {
+		jbwm_window_t root, r;
+	};
+#ifdef EWMH
+	jbwm_window_t supporting;
+#endif//EWMH
 	struct {
-		uint32_t fg, bg, fc;
+		jbwm_pixel_t fg, bg, fc;
 	} pixels;
-	uint8_t screen : 4, vdesk : 4;
+	jbwm_dim_t size[2];
+	uint8_t screen, vdesk;
 } ScreenInfo;
 
 #endif /* not SCREENINFO_H */

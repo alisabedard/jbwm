@@ -108,11 +108,11 @@ void set_ewmh_allowed_actions(const Window w)
 	XPROP(w, a[0], XA_ATOM, &a, sizeof(a) / sizeof(Atom));
 }
 
-static void init_desktops(const Window r, const Dim sz, const uint8_t vdesk)
+static void init_desktops(struct ScreenInfo * restrict s)
 {
-	XPROP(r, ewmh[DESKTOP_GEOMETRY], XA_CARDINAL, &sz, 2);
-	XPROP(r, ewmh[CURRENT_DESKTOP], XA_CARDINAL, &vdesk, 1);
-	set_root_vdesk(r);
+	XPROP(s->r, ewmh[DESKTOP_GEOMETRY], XA_CARDINAL, &s->size, 2);
+	XPROP(s->r, ewmh[CURRENT_DESKTOP], XA_CARDINAL, &s->vdesk, 1);
+	set_root_vdesk(s->r);
 }
 
 static Window init_supporting(const Window r)
@@ -133,7 +133,7 @@ void setup_ewmh_for_screen(ScreenInfo * restrict s)
 	XPROP(r, ewmh[WM_NAME], XA_STRING, "jbwm", 4);
 	// Set this to the root window until we have some clients.
 	XPROP(r, ewmh[CLIENT_LIST], XA_WINDOW, &r, 1);
-	init_desktops(r, s->size, s->vdesk);
+	init_desktops(s);
 	s->supporting = init_supporting(r);
 }
 

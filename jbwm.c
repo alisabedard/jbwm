@@ -182,10 +182,11 @@ static void setup_screen_elements(const uint8_t i)
 {
 	ScreenInfo *restrict s = &jbwm.screens[i];
 	s->screen = i;
-	s->root = RootWindow(jbwm.dpy, i);
+	Display * d = jbwm.dpy;
+	s->root = RootWindow(d, i);
 	s->vdesk = 0;
-	s->size.w = DisplayWidth(jbwm.dpy, i);
-	s->size.h = DisplayHeight(jbwm.dpy, i);
+	s->size[JBWM_SIZE_WIDTH] = DisplayWidth(d, i);
+	s->size[JBWM_SIZE_HEIGHT] = DisplayHeight(d, i);
 }
 
 static void setup_gc(ScreenInfo * restrict s, Options * restrict o)
