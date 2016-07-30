@@ -143,7 +143,7 @@ static void setup_fonts(void)
 #ifdef USE_SHAPE
 #include <X11/extensions/shape.h>
 #endif
-static void setup_event_listeners(const Window root)
+static void setup_event_listeners(const jbwm_window_t root)
 {
 	XChangeWindowAttributes(jbwm.dpy, root, CWEventMask,
 		&(XSetWindowAttributes){.event_mask = SubstructureRedirectMask

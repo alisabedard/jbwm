@@ -7,6 +7,7 @@
 #define JBWM_ENVIRONMENT_H
 
 #include "client_t.h"
+#include "typedef.h"
 
 #include <stdbool.h>
 #ifdef USE_XFT
@@ -36,7 +37,7 @@ typedef struct {
 		uint16_t grab, mod;
 	} keymasks;
 
-	Cursor cursor:32;
+	Cursor cursor:31;
 
 	bool need_cleanup:1;
 } JBWMEnvironment;

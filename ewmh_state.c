@@ -12,28 +12,24 @@
 #include <X11/Xatom.h>
 
 // Remove specified atom from WM_STATE
-void ewmh_remove_state(const Window w, const Atom state)
+void ewmh_remove_state(const Window w, const jbwm_atom_t state)
 {
-	unsigned long n;
-	Atom *a = get_property(w, ewmh[WM_STATE], &n);
-
+	uint16_t n;
+	jbwm_atom_t *a = get_property(w, ewmh[WM_STATE], &n);
 	if (a) {
-		const unsigned long nitems = n;
-
-		while (n--) { // decrement here to prevent offset error
+		const uint16_t nitems = n;
+		while (n--) // decrement here to prevent offset error
 			if (a[n] == state)
 				a[n] = 0;
-		}
-
 		XPROP(w, ewmh[WM_STATE], XA_ATOM, a, nitems);
 		XFree(a);
 	}
 }
 
-static bool ewmh_get_state(const Window w, const Atom state)
+static bool ewmh_get_state(const Window w, const jbwm_atom_t state)
 {
-	unsigned long n;
-	Atom *a = get_property(w, ewmh[WM_STATE], &n);
+	uint16_t n;
+	jbwm_atom_t *a = get_property(w, ewmh[WM_STATE], &n);
 	bool found = false;
 	if (a) {
 		while (n--) // prevent offset error
@@ -44,7 +40,7 @@ static bool ewmh_get_state(const Window w, const Atom state)
 	return found;
 }
 
-void ewmh_add_state(const Window w, Atom state)
+void ewmh_add_state(const Window w, jbwm_atom_t state)
 {
 	XChangeProperty(jbwm.dpy, w, ewmh[WM_STATE],
 		XA_ATOM, 32, PropModePrepend,
@@ -103,7 +99,7 @@ static void check_state(XClientMessageEvent * e,	// event data
 			const AtomIndex t,	// state to test
 			Client *c)
 {
-	const Atom state = ewmh[t];
+	const jbwm_atom_t state = ewmh[t];
 	// 2 atoms can be set at once
 	long * l = &e->data.l[0];
 	const bool set = l[1] == (long)state || l[2] == (long)state;
@@ -121,11 +117,11 @@ static void check_state(XClientMessageEvent * e,	// event data
 		break;
 
 	case 2:{	// toggle
-			const bool add = !ewmh_get_state(e->window, state);
-			set_state(c, add, t);
-			(add ? ewmh_add_state : ewmh_remove_state)
-				(e->window, state);
-		}
+		const bool add = !ewmh_get_state(e->window, state);
+		set_state(c, add, t);
+		(add ? ewmh_add_state : ewmh_remove_state)
+			(e->window, state);
+	}
 	}
 }
 
@@ -142,7 +138,7 @@ static void handle_wm_state_changes(XClientMessageEvent * restrict e,
 }
 
 static bool client_specific_message(XClientMessageEvent * restrict e,
-	Client * restrict c, const Atom t)
+	Client * restrict c, const jbwm_atom_t t)
 {
 	if (t == ewmh[WM_DESKTOP])
 		client_to_vdesk(c, e->data.l[0]);
@@ -164,7 +160,7 @@ static bool client_specific_message(XClientMessageEvent * restrict e,
 void ewmh_client_message(XClientMessageEvent * restrict e,
 	Client * restrict c)
 {
-	const Atom t = e->message_type;
+	const jbwm_atom_t t = e->message_type;
 #ifdef EWMH_DEBUG
 	dprintf(STDERR_FILENO, "----CLIENTMESSAGE----");
 	print_atom(t, __FILE__, __LINE__);

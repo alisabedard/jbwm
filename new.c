@@ -20,9 +20,9 @@
 #include <X11/Xatom.h>
 
 #ifdef EWMH
-static uint8_t wm_desktop(const Window w, uint8_t vdesk)
+static uint8_t wm_desktop(const jbwm_window_t w, uint8_t vdesk)
 {
-	size_t n;
+	uint16_t n;
 	unsigned long *lprop = get_property(w, ewmh[WM_DESKTOP], &n);
 	if(lprop && n && lprop[0] < DESKTOPS)
 		vdesk = lprop[0];
@@ -87,7 +87,7 @@ static void reparent(Client * c) // use of restrict here is a bug
 	XMapWindow(jbwm.dpy, c->window);
 }
 
-void make_new_client(const Window w, ScreenInfo * s)
+void make_new_client(const jbwm_window_t w, ScreenInfo * s)
 {
 	LOG("make_new_client(%d,s)", (int)w);
 	Client *c = calloc(1, sizeof(Client));

@@ -41,14 +41,14 @@ static void process_flags(Client * c)
 
 void handle_mwm_hints(Client * c)
 {
-	static Atom mwm_hints;
+	static jbwm_atom_t mwm_hints;
 	if(!mwm_hints)
 		  mwm_hints=XInternAtom(jbwm.dpy, "_MOTIF_WM_HINTS", false);
 	struct { // paraphrased from MwmUtil.h
 		unsigned long flags, functions, decor;
 		long input_mode;
 		unsigned long status;
-	} *m = get_property(c->window, mwm_hints, &(long unsigned int){0});
+	} *m = get_property(c->window, mwm_hints, &(uint16_t){0});
 
 	if(!m) return;
 
