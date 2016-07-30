@@ -38,6 +38,7 @@ void jbwm_grab_button(const jbwm_window_t w, const uint32_t mask,
 }
 
 #ifdef DEBUG
+#include <stdio.h>
 void print_atom(const jbwm_atom_t a, const char * src, const uint16_t line)
 {
 	char *an = XGetAtomName(jbwm.dpy, a);
