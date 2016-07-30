@@ -23,11 +23,9 @@ __attribute__((warn_unused_result))
 void *get_property(Window w, Atom property, size_t * restrict num_items)
 {
 	unsigned char *prop;
-	if (XGetWindowProperty(jbwm.dpy, w, property, 0L, 1024LL,
+	return (XGetWindowProperty(jbwm.dpy, w, property, 0L, 1024LL,
 		false, AnyPropertyType, &property, &(int){0}, num_items,
-		&(unsigned long){0}, &prop) == Success)
-		return prop;
-	return NULL;
+		&(unsigned long){0}, &prop) == Success) ? prop : NULL;
 }
 #endif//EWMH||MWM
 
