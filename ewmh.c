@@ -1,4 +1,4 @@
-// jbwm - Minimalist Window Manager for X
+// jbwm - Minimalist jbwm_window_t Manager for X
 // Copyright 2008-2016, Jeffrey E. Bedard <jefbed@gmail.com>
 // Copyright 1999-2015, Ciaran Anscomb <jbwm@6809.org.uk>
 // See README for license and other details.
@@ -12,6 +12,7 @@
 #include "screen.h"
 #include "util.h"
 
+#include <stdlib.h>
 #include <X11/Xatom.h>
 
 Atom ewmh[EWMH_ATOMS_COUNT];
@@ -64,23 +65,26 @@ void ewmh_init(void)
 	XInternAtoms(jbwm.dpy, atom_names, EWMH_ATOMS_COUNT, false, ewmh);
 }
 
+static uint16_t get_client_count(void)
+{
+	uint16_t j = 0;
+	for (Client * i = jbwm.head; i; i = i->next, ++j);
+	return j;
+}
+
 void ewmh_update_client_list(void)
 {
-	enum { MAX_CLIENTS = 64 };
-	// Prevent data from disappearing after return.
-	static Window wl[MAX_CLIENTS];
-	register size_t count = 0;
-
-	for (Client * i = jbwm.head; i && (count < MAX_CLIENTS); i = i->next)
-		wl[count++] = i->window;
-
+	jbwm_window_t wl[get_client_count()];
+	size_t wl_sz = 0;
+	for (Client * i = jbwm.head; i; i = i->next, ++wl_sz)
+		wl[wl_sz] = i->window;
 	XPROP(jbwm.screens->root, ewmh[CLIENT_LIST],
-		XA_WINDOW, &wl, count);
+		XA_WINDOW, &wl, wl_sz);
 	// FIXME: Does not correctly report stacking order.
 	XPROP(jbwm.screens->root, ewmh[CLIENT_LIST_STACKING],
-		XA_WINDOW, &wl, count);
+		XA_WINDOW, &wl, wl_sz);
 }
-static void set_root_vdesk(const Window r)
+static void set_root_vdesk(const jbwm_window_t r)
 {
 	XPROP(r, ewmh[NUMBER_OF_DESKTOPS], XA_CARDINAL,
 		&(long){DESKTOPS}, 1);
@@ -90,7 +94,7 @@ static void set_root_vdesk(const Window r)
 }
 
 
-void set_ewmh_allowed_actions(const Window w)
+void set_ewmh_allowed_actions(const jbwm_window_t w)
 {
 	const Atom a[] = {
 		ewmh[WM_ALLOWED_ACTIONS],
@@ -115,9 +119,9 @@ static void init_desktops(struct ScreenInfo * restrict s)
 	set_root_vdesk(s->r);
 }
 
-static Window init_supporting(const Window r)
+static jbwm_window_t init_supporting(const jbwm_window_t r)
 {
-	Window w = XCreateSimpleWindow(jbwm.dpy, r, 0, 0, 1, 1, 0, 0, 0);
+	jbwm_window_t w = XCreateSimpleWindow(jbwm.dpy, r, 0, 0, 1, 1, 0, 0, 0);
 	XPROP(r, ewmh[SUPPORTING_WM_CHECK], XA_WINDOW, &w, 1);
 	XPROP(w, ewmh[SUPPORTING_WM_CHECK], XA_WINDOW, &w, 1);
 	XPROP(w, ewmh[WM_NAME], XA_STRING, "jbwm", 4);
@@ -128,7 +132,7 @@ static Window init_supporting(const Window r)
 __attribute__((nonnull(1)))
 void setup_ewmh_for_screen(ScreenInfo * restrict s)
 {
-	const Window r = s->root;
+	const jbwm_window_t r = s->root;
 	XPROP(r, ewmh[SUPPORTED], XA_ATOM, ewmh, EWMH_ATOMS_COUNT);
 	XPROP(r, ewmh[WM_NAME], XA_STRING, "jbwm", 4);
 	// Set this to the root window until we have some clients.

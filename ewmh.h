@@ -11,7 +11,7 @@
 #include "client_t.h"
 
 void ewmh_update_client_list(void);
-void set_ewmh_allowed_actions(const Window w);
+void set_ewmh_allowed_actions(const jbwm_window_t w);
 void setup_ewmh_for_screen(ScreenInfo * restrict s)
 	__attribute__((nonnull));
 void ewmh_init(void);
