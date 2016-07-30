@@ -29,10 +29,10 @@
 // Main application data structure.
 JBWMEnvironment jbwm;
 
-typedef struct {
+struct Options {
 	// Color names:
 	char *fg, *bg, *fc;
-} Options;
+};
 
 #ifdef USE_ARGV
 
@@ -44,7 +44,7 @@ static uint16_t parse_modifiers(char * restrict arg)
 	size_t s = 0; // strlen
 	while(arg[++s])
 		  ;
-	if(s>3) { // switch based on the 4th character
+	if (s > 3) { // switch based on the 4th character
 		switch(arg[3]) {
 		case 'f': // shift
 			return ShiftMask;
@@ -67,7 +67,7 @@ static uint16_t parse_modifiers(char * restrict arg)
 	return Mod1Mask;
 }
 
-static void parse_argv(uint8_t argc, char **argv, Options * restrict o)
+static void parse_argv(uint8_t argc, char **argv, struct Options * restrict o)
 {
 	LOG("parse_argv(%d,%s...)", argc, argv[0]);
 	const char *optstring = "1:2:b:d:f:hs:V";
@@ -151,7 +151,7 @@ static void setup_event_listeners(const jbwm_window_t root)
 		| ColormapChangeMask});
 }
 
-static void allocate_colors(ScreenInfo * restrict s, Options * restrict o)
+static void allocate_colors(ScreenInfo * restrict s, struct Options * restrict o)
 {
 	const uint8_t n = s->screen;
 	s->pixels.fg=pixel(n, o->fg);
@@ -159,23 +159,23 @@ static void allocate_colors(ScreenInfo * restrict s, Options * restrict o)
 	s->pixels.fc=pixel(n, o->fc);
 }
 
+static bool check_redirect(const jbwm_window_t w)
+{
+	XWindowAttributes a;
+	XGetWindowAttributes(jbwm.d, w, &a);
+	return (!a.override_redirect && (a.map_state == IsViewable));
+}
+
 static void setup_clients(ScreenInfo * restrict s)
 {
-	unsigned int nwins;
-	Window *wins, dw;
-
-	if (!XQueryTree(jbwm.d, s->root, &dw, &dw, &wins, &nwins))
+	jbwm_window_t * w, d;
+	unsigned int n;
+	if (!XQueryTree(jbwm.d, s->root, &d, &d, &w, &n))
 		return; // failed
-
-	while (nwins--) {
-		XWindowAttributes a;
-		XGetWindowAttributes(jbwm.d, wins[nwins], &a);
-
-		if (!a.override_redirect && (a.map_state == IsViewable))
-			make_new_client(wins[nwins], s);
-	}
-
-	XFree(wins);
+	while (n--)
+		if (check_redirect(w[n]))
+			make_new_client(w[n], s);
+	XFree(w);
 }
 
 static void setup_screen_elements(const uint8_t i)
@@ -189,7 +189,7 @@ static void setup_screen_elements(const uint8_t i)
 	s->size[JBWM_SIZE_HEIGHT] = DisplayHeight(d, i);
 }
 
-static void setup_gc(ScreenInfo * restrict s, Options * restrict o)
+static void setup_gc(ScreenInfo * restrict s, struct Options * restrict o)
 {
 	allocate_colors(s, o);
 	unsigned long vm = GCFunction | GCSubwindowMode
@@ -207,7 +207,7 @@ static void setup_gc(ScreenInfo * restrict s, Options * restrict o)
 	s->gc = XCreateGC(jbwm.d, s->root, vm, &gv);
 }
 
-static void setup_screen(const uint8_t i, Options * restrict o)
+static void setup_screen(const uint8_t i, struct Options * restrict o)
 {
 	ScreenInfo *s = &jbwm.s[i];
 	setup_screen_elements(i);
@@ -219,7 +219,7 @@ static void setup_screen(const uint8_t i, Options * restrict o)
 	setup_ewmh_for_screen(s);
 }
 
-static void setup_screens(Options * restrict o)
+static void setup_screens(struct Options * restrict o)
 {
 	/* Now set up each screen in turn: jbwm.num_screens is used
 	   in scanning windows (XQueryTree) */
@@ -251,7 +251,7 @@ int main(
 {
 	jbwm.keymasks.grab = GRAB_MASK;
 	jbwm.keymasks.mod = MOD_MASK;
-	Options o = {.fg=DEF_fg, .bg=DEF_bg, .fc=DEF_fc};
+	struct Options o = {.fg=DEF_fg, .bg=DEF_bg, .fc=DEF_fc};
 	parse_argv(argc, argv, &o);
 
 	if (!(jbwm.d = XOpenDisplay(NULL)))
