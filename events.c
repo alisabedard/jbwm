@@ -74,38 +74,23 @@ static void cleanup(void)
 	} while(i && (c = i));
 }
 
-static void handle_wm_hints(Client * c)
-{
-	LOG("handle_wm_hints");
-	XWMHints *h = XGetWMHints(jbwm.d, c->window);
-	if (!h)
-		return;
-	if (h->flags & XUrgencyHint) {
-		switch_vdesk(c->screen, c->vdesk);
-		XRaiseWindow(jbwm.d, c->parent);
-	}
-	XFree(h);
-}
-
 static void handle_property_change(XPropertyEvent * restrict e,
 	Client * restrict c)
 {
-	LOG("handle_property_change");
+#ifdef EVENT_DEBUG
+	print_atom(e->atom, __FILE__, __LINE__);
+#endif//EVENT_DEBUG
 	if(e->state != PropertyNewValue)
 		  return;
-	print_atom(e->atom, __FILE__, __LINE__);
-	switch (e->atom) {
-#ifdef USE_TBAR
-	case XA_WM_NAME:
+	if (e->atom == XA_WM_NAME)
 		update_titlebar(c);
-		return;
-#endif//USE_TBAR
-	case XA_WM_HINTS:
-		handle_wm_hints(c);
-		return;
-	default:
-		moveresize(c);
-		return;
+	else {
+		print_atom(e->atom, __FILE__, __LINE__);
+		static jbwm_atom_t ws;
+		if (!ws)
+			ws = XInternAtom(jbwm.d, "WM_STATE", false);
+		if (e->atom == ws)
+			moveresize(c);
 	}
 }
 
@@ -183,10 +168,10 @@ void main_event_loop(void)
 		ewmh_client_message(&ev.xclient, c);
 		break;
 #endif//EWMH
-#ifdef DEBUG
+#ifdef EVENT_DEBUG
 	default:
 		LOG("Unhandled event (%d)", ev.type);
-#endif//DEBUG
+#endif//EVENT_DEBUG
 	}
 	if (jbwm.need_cleanup) {
 		cleanup();
