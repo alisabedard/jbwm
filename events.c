@@ -73,7 +73,7 @@ static void cleanup(void)
 		free(c);
 	} while(i && (c = i));
 }
-
+#include <stdio.h>
 static void handle_property_change(XPropertyEvent * restrict e,
 	Client * restrict c)
 {
@@ -85,9 +85,9 @@ static void handle_property_change(XPropertyEvent * restrict e,
 	if (e->atom == XA_WM_NAME)
 		update_titlebar(c);
 	else {
-		print_atom(e->atom, __FILE__, __LINE__);
-		if (e->atom == set_wm_state(NULL, -1))
+		if (e->atom == get_wm_state())
 			moveresize(c);
+		print_atom(e->atom, __FILE__, __LINE__);
 	}
 }
 

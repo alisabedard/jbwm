@@ -34,10 +34,7 @@ void client_to_vdesk(Client * restrict c, const uint8_t d)
 	switch_vdesk(c->screen, p);
 }
 
-/*
- * used all over the place.  return the client that has specified window as
- * either window or parent
- */
+// Return the client that has specified window as either window or parent
 Client *find_client(const jbwm_window_t w)
 {
 	Client *c=jbwm.head;
@@ -103,24 +100,27 @@ static Status xmsg(const jbwm_window_t w, const Atom a, const long x)
 	});
 }
 
-enum { CA_PROTOS, CA_DEL_WIN, CA_WM_STATE, CA_SZ };
-static Atom client_atoms[CA_SZ];
-
-static void setup_client_atoms(void)
+static jbwm_atom_t get_wm_protocols(void)
 {
-	if(client_atoms[0]) return; // Already initialized
-	char *names[]={"WM_PROTOCOLS", "WM_DELETE_WINDOW", "WM_STATE"};
-	XInternAtoms(jbwm.d, names, CA_SZ, true, client_atoms);
+	static jbwm_atom_t a;
+	return a?a:(a = XInternAtom(jbwm.d, "WM_PROTOCOLS", false));
 }
 
-jbwm_atom_t set_wm_state(Client * restrict c, const int8_t state)
+static jbwm_atom_t get_wm_delete_window(void)
 {
-	LOG("set_wm_state(%d, %d)", (int)c->window, state);
-	setup_client_atoms();
-	if (state == -1)
-		return client_atoms[CA_WM_STATE];
-	XPROP(c->window, client_atoms[CA_WM_STATE], XA_CARDINAL, &state, 1);
-	return 0;
+	static jbwm_atom_t a;
+	return a?a:(a = XInternAtom(jbwm.d, "WM_DELETE_WINDOW", false));
+}
+
+jbwm_atom_t get_wm_state(void)
+{
+	static jbwm_atom_t a;
+	return a?a:(a = XInternAtom(jbwm.d, "WM_STATE", false));
+}
+
+void set_wm_state(Client * restrict c, const int8_t state)
+{
+	XPROP(c->window, get_wm_state(), XA_CARDINAL, &state, 1);
 }
 
 static bool has_delete_proto(const jbwm_window_t w)
@@ -130,9 +130,8 @@ static bool has_delete_proto(const jbwm_window_t w)
 	int i;
 	if(XGetWMProtocols(jbwm.d, w, &p, &i)) {
 		while(i--)
-			if((found=(p[i]==client_atoms[CA_DEL_WIN])))
+			if((found=(p[i] == get_wm_delete_window())))
 				break;
-		// Should be freed here, otherwise p has no alloc.
 		XFree(p);
 	}
 	return found;
@@ -140,13 +139,9 @@ static bool has_delete_proto(const jbwm_window_t w)
 
 void send_wm_delete(const Client * restrict c)
 {
-	setup_client_atoms();
-	if(has_delete_proto(c->window)) {
-		xmsg(c->window, client_atoms[CA_PROTOS],
-			client_atoms[CA_DEL_WIN]);
-	}
-	else {
+	if(has_delete_proto(c->window))
+		xmsg(c->window, get_wm_protocols(), get_wm_delete_window());
+	else
 		XKillClient(jbwm.d, c->window);
-	}
 }
 

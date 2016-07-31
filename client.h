@@ -20,8 +20,11 @@ void select_client(Client * c);
 
 void send_wm_delete(const Client * restrict c) __attribute__((nonnull));
 
-// state -1 returns WM_STATE atom
-jbwm_atom_t set_wm_state(Client * c, const int8_t state);
+// Set WM_STATE property
+void set_wm_state(Client * c, const int8_t state);
+
+// Return WM_STATE atom
+jbwm_atom_t get_wm_state(void);
 
 void stick(Client * c) __attribute__((nonnull,cold));
 

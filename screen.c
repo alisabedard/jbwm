@@ -23,6 +23,8 @@ enum {MouseMask=(ButtonPressMask|ButtonReleaseMask|PointerMotionMask)};
 __attribute__ ((hot,nonnull))
 static void draw_outline(Client * restrict c)
 {
+	if (!c->border)
+		return;
 	const uint8_t offset = c->opt.no_titlebar ? 0 : TDIM;
 	XDrawRectangle(jbwm.d, c->screen->root, c->screen->gc,
 		c->size.x, c->size.y - offset,
@@ -44,8 +46,50 @@ static void grab_pointer(const jbwm_window_t w)
 		GrabModeAsync, None, jbwm.cursor, CurrentTime);
 }
 
+static jbwm_point_t get_mouse_position(jbwm_window_t w)
+{
+	jbwm_point_t p;
+	int d; // dummy
+	XQueryPointer(jbwm.d, w, (Window*)&w, (Window*)&w,
+		(int*)&p.x, (int*)&p.y, &d, &d, (unsigned int *)&d);
+	return p;
+}
+
+static void dr(Client * restrict c, const bool r)
+{
+	XRaiseWindow(jbwm.d, c->parent);
+	if (r && (c->opt.no_resize || c->opt.shaded))
+		return;
+	grab_pointer(c->screen->root);
+	const jbwm_point_t p = get_mouse_position(c->screen->root);
+	const jbwm_point_t op = {c->size.x, c->size.y};
+	XEvent e;
+	if (r)
+		XWarpPointer(jbwm.d, None, c->window, 0, 0, 0, 0,
+			c->size.width, c->size.height);
+	do {
+		XMaskEvent(jbwm.d, MouseMask, &e);
+		draw_outline(c);
+		if (r) {
+			c->size.width=abs(c->size.x - e.xmotion.x);
+			c->size.height=abs(c->size.y - e.xmotion.y);
+		} else {
+			c->size.x = op.x - p.x + e.xmotion.x;
+			c->size.y = op.y - p.y + e.xmotion.y;
+			snap_client(c);
+		}
+		(c->border ? draw_outline : moveresize)(c);
+	} while(e.type == MotionNotify);
+	draw_outline(c);
+	XUngrabPointer(jbwm.d, CurrentTime);
+	moveresize(c);
+	if (!r && !c->opt.tearoff)
+		configure((&c->size), c->window);
+}
+
 void resize(Client * restrict c)
 {
+#if 0
 	XRaiseWindow(jbwm.d, c->parent);
 	LOG("resize");
 	if (c->opt.no_resize || c->opt.shaded)
@@ -66,21 +110,14 @@ resize_loop:
 	}
 	XUngrabPointer(jbwm.d, CurrentTime);
 	moveresize(c);
+#endif
+	dr(c, true);
 }
-
-static jbwm_point_t get_mouse_position(jbwm_window_t w)
-{
-	jbwm_point_t p;
-	int d; // dummy
-	XQueryPointer(jbwm.d, w, (Window*)&w, (Window*)&w,
-		(int*)&p.x, (int*)&p.y, &d, &d, (unsigned int *)&d);
-	return p;
-}
-
 void drag(Client * restrict c)
 {
+#if 0
 	LOG("drag");
-	XRaiseWindow(jbwm.d, c->parent);
+	XRaiseWindow(jbwm.d,* c->parent);
 	grab_pointer(c->screen->root);
 	const jbwm_point_t op = { c->size.x, c->size.y};
 	jbwm_point_t p = get_mouse_position(c->screen->root);
@@ -88,7 +125,8 @@ void drag(Client * restrict c)
 	do {
 		XMaskEvent(jbwm.d, MouseMask, &ev);
 		if(ev.type == MotionNotify) {
-			if(c->border) draw_outline(c); // clear
+			if(c->border)
+				draw_outline(c); // clear
 			c->size.x = op.x - p.x + ev.xmotion.x;
 			c->size.y = op.y - p.y + ev.xmotion.y;
 			snap_client(c);
@@ -101,6 +139,8 @@ void drag(Client * restrict c)
 	moveresize(c);
 	if(!c->opt.tearoff)
 		configure(&(c->size), c->window);
+#endif
+	dr(c, false);
 }
 
 void moveresize(Client * restrict c)
