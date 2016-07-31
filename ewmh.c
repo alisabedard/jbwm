@@ -13,7 +13,6 @@
 #include "util.h"
 
 #include <stdlib.h>
-#include <unistd.h>
 #include <X11/Xatom.h>
 
 Atom ewmh[EWMH_ATOMS_COUNT];

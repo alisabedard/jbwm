@@ -8,7 +8,7 @@
 
 #include "ScreenInfo.h"
 
-void make_new_client(const jbwm_window_t w, ScreenInfo * restrict s)
+void make_new_client(const Window w, ScreenInfo * restrict s)
 	__attribute__((nonnull(2)));
 
 #endif//!JBWM_NEW_H

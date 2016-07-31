@@ -6,8 +6,9 @@
 #ifndef SCREENINFO_H
 #define SCREENINFO_H
 
-#include "typedef.h"
+#include <stdint.h>
 #include <X11/Xlib.h>
+#include "typedef.h"
 
 enum {
 	JBWM_SIZE_WIDTH,

@@ -7,6 +7,8 @@
 
 #include "jbwmenv.h"
 
+#include <unistd.h>
+
 __attribute__((nonnull(2)))
 unsigned long pixel(const uint8_t screen, const char * restrict name)
 {
@@ -18,19 +20,20 @@ unsigned long pixel(const uint8_t screen, const char * restrict name)
 
 #if defined(EWMH) || defined(MWM)
 __attribute__((warn_unused_result))
-void *get_property(jbwm_window_t w, jbwm_atom_t property,
-	uint16_t * restrict num_items)
+void *get_property(Window w, Atom property, uint16_t * num_items)
 {
-	unsigned char *prop;
-	return (XGetWindowProperty(jbwm.d, w, property, 0L, 1024LL,
-		false, AnyPropertyType, &property, &(int){0},
-		(long unsigned int *)num_items,
-		&(unsigned long){0}, &prop) == Success) ? prop : NULL;
+	unsigned char * prop;
+	long unsigned int n, b;
+	int d;
+	XGetWindowProperty(jbwm.d, w, property, 0, 1024, false,
+		AnyPropertyType, &property, &d, &n, &b, &prop);
+	*num_items = n;
+	return prop;
 }
 #endif//EWMH||MWM
 
-void jbwm_grab_button(const jbwm_window_t w, const uint32_t mask,
-	const uint32_t btn)
+void jbwm_grab_button(const Window w, const unsigned int mask,
+		 const unsigned int btn)
 {
 	XGrabButton(jbwm.d, btn, mask, w, false,
 		    ButtonPressMask | ButtonReleaseMask, GrabModeAsync,
@@ -39,7 +42,7 @@ void jbwm_grab_button(const jbwm_window_t w, const uint32_t mask,
 
 #ifdef DEBUG
 #include <stdio.h>
-void print_atom(const jbwm_atom_t a, const char * src, const uint16_t line)
+void print_atom(const Atom a, const char * src, const uint16_t line)
 {
 	char *an = XGetAtomName(jbwm.d, a);
 	fprintf(stderr, "\t%s:%d %s(%lu)\n", src, line, an, a);

@@ -15,11 +15,11 @@ typedef struct Client Client;
 struct Client {
 	XRectangle old_size;
 	XSizeHints size;
-	jbwm_window_t window, parent;
+	Window window, parent;
 #ifdef USE_TBAR
-	jbwm_window_t titlebar;
+	Window titlebar;
 #endif//USE_TBAR
-	jbwm_cmap_t cmap;
+	Colormap cmap;
 	ScreenInfo *screen;
 	Client *next;
 	int8_t ignore_unmap;

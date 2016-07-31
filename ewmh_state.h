@@ -5,9 +5,9 @@
 
 #include "client_t.h"
 
-void ewmh_remove_state(const Window w, const jbwm_atom_t state);
+void ewmh_remove_state(const Window w, const Atom state);
 
-void ewmh_add_state(const Window w, jbwm_atom_t state);
+void ewmh_add_state(const Window w, Atom state);
 
 void ewmh_client_message(XClientMessageEvent * restrict e,
 	Client * restrict c) __attribute__((nonnull(1)));

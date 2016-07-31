@@ -41,7 +41,7 @@ static void process_flags(Client * c)
 
 void handle_mwm_hints(Client * c)
 {
-	static jbwm_atom_t mwm_hints;
+	static Atom mwm_hints;
 	if(!mwm_hints)
 		  mwm_hints=XInternAtom(jbwm.d, "_MOTIF_WM_HINTS", false);
 	struct { // paraphrased from MwmUtil.h
