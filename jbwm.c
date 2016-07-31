@@ -228,7 +228,7 @@ static int handle_xerror(Display * restrict dpy __attribute__ ((unused)),
 	    && (e->request_code == X_ChangeWindowAttributes)) {
 		jbwm_error("ROOT");
 	}
-
+	LOG("xerror: %d, %d\n", e->error_code, e->request_code);
 	return 0; // Ignore everything else.
 }
 
@@ -243,10 +243,8 @@ int main(
 	jbwm.keymasks.mod = MOD_MASK;
 	struct Options o = {.fg=DEF_fg, .bg=DEF_bg, .fc=DEF_fc};
 	parse_argv(argc, argv, &o);
-
 	if (!(jbwm.d = XOpenDisplay(NULL)))
 		jbwm_error("DISPLAY");
-
 	XSetErrorHandler(handle_xerror);
 	ewmh_init();
 	/* Fonts only needed with title bars */

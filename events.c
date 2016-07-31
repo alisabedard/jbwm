@@ -21,16 +21,11 @@
 #include <stdlib.h>
 #include <X11/Xatom.h>
 
-__attribute__((pure)) // Return does not change between calls
-static ScreenInfo *find_screen(const Window root)
+__attribute__((pure))
+static ScreenInfo * get_screen(const int8_t i, const jbwm_window_t root)
 {
-	uint8_t i = ScreenCount(jbwm.d);
-
-	while (i--)
-		if (jbwm.s[i].root == root)
-			return &jbwm.s[i];
-
-	return NULL;
+	return jbwm.s[i].root == root ? &jbwm.s[i]
+		: get_screen(i - 1, root);
 }
 
 // Relink c's linked list to exclude c
@@ -83,13 +78,13 @@ static void handle_wm_hints(Client * c)
 {
 	LOG("handle_wm_hints");
 	XWMHints *h = XGetWMHints(jbwm.d, c->window);
-	if(h) {
-		if (h->flags & XUrgencyHint) {
-			switch_vdesk(c->screen, c->vdesk);
-			XRaiseWindow(jbwm.d, c->parent);
-		}
-		XFree(h);
+	if (!h)
+		return;
+	if (h->flags & XUrgencyHint) {
+		switch_vdesk(c->screen, c->vdesk);
+		XRaiseWindow(jbwm.d, c->parent);
 	}
+	XFree(h);
 }
 
 static void handle_property_change(XPropertyEvent * restrict e,
@@ -167,8 +162,8 @@ void main_event_loop(void)
 		if(c || ev.xmaprequest.window == jbwm.last)
 			break;
 		jbwm.last = ev.xmaprequest.window;
-		make_new_client(ev.xmaprequest.window,
-			find_screen(ev.xmaprequest.parent));
+		make_new_client(ev.xmaprequest.window, get_screen(
+			ScreenCount(jbwm.d), ev.xmaprequest.parent));
 		break;
 	case ConfigureRequest:
 		handle_configure_request(&ev.xconfigurerequest);

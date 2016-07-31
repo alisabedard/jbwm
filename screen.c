@@ -38,7 +38,7 @@ static void configure(XSizeHints * restrict g, const Window w)
 		.height = g->height, .type = ConfigureNotify, .event = w });
 }
 
-static inline void grab_pointer(const Window w)
+static void grab_pointer(const Window w)
 {
 	XGrabPointer(jbwm.d, w, false, MouseMask, GrabModeAsync,
 		GrabModeAsync, None, jbwm.cursor, CurrentTime);
@@ -115,23 +115,21 @@ void moveresize(Client * restrict c)
 		c->size.width, c->size.height);
 	if(offset) { update_titlebar(c); } // Avoid shaped and fullscreen
 	set_shape(c);
-	//configure(&(c->size), c->window);
 }
 
-static void hide(Client * restrict c)
+static void hide(Client * restrict c, const bool h)
 {
-	LOG("hide");
-	XUnmapWindow(jbwm.d, c->parent);
-	set_wm_state(c, IconicState);
-	ewmh_add_state(c->window, ewmh[WM_STATE_HIDDEN]);
+	(h ? XUnmapWindow : XMapWindow)(jbwm.d, c->parent);
+	set_wm_state(c, h ? IconicState : NormalState);
+#ifdef EWMH
+	(h ? ewmh_add_state : ewmh_remove_state)(c->window,
+		ewmh[WM_STATE_HIDDEN]);
+#endif//EWMH
 }
 
 void unhide(Client * restrict c)
 {
-	LOG("unhide");
-	XMapWindow(jbwm.d, c->parent);
-	set_wm_state(c, NormalState);
-	ewmh_remove_state(c->window, ewmh[WM_STATE_HIDDEN]);
+	hide(c, false);
 }
 
 uint8_t switch_vdesk(ScreenInfo * s, uint8_t v)
@@ -143,18 +141,16 @@ uint8_t switch_vdesk(ScreenInfo * s, uint8_t v)
 
 	for (Client * c = jbwm.head; c; c = c->next) {
 		if (c->opt.sticky) {
-			unhide(c);
+			hide(c, false);
 			continue;
 		}
 		if (c->screen != s) continue;
-		if (c->vdesk == s->vdesk) hide(c);
-		else if (c->vdesk == v) unhide(c);
+		if (c->vdesk == s->vdesk) hide(c, true);
+		else if (c->vdesk == v) hide(c, false);
 	}
-
 	s->vdesk = v;
 #ifdef EWMH
-	XPROP(s->root, ewmh[CURRENT_DESKTOP],
-		XA_CARDINAL, &v, 1);
+	XPROP(s->root, ewmh[CURRENT_DESKTOP], XA_CARDINAL, &v, 1);
 #endif//EWMH
 	return s->vdesk;
 }
