@@ -149,7 +149,7 @@ static bool client_specific_message(XClientMessageEvent * restrict e,
 	// If user moves window (client-side titlebars):
 	else if (t == ewmh[WM_MOVERESIZE]) {
 		XRaiseWindow(jbwm.d, c->parent);
-		drag(c);
+		jbwm_drag(c, false);
 	} else if (t == ewmh[WM_STATE])
 		handle_wm_state_changes(e, c);
 	else if (t == ewmh[ACTIVE_WINDOW])

@@ -10,10 +10,13 @@
 
 enum {DESKTOPS=10};
 
-void drag(Client * restrict c) __attribute__((nonnull));
+void jbwm_drag(Client * restrict c, const bool resize)
+	__attribute__((nonnull));
+
 void moveresize(Client * restrict c) __attribute__((nonnull));
-void resize(Client * restrict c) __attribute__((nonnull));
+
 uint8_t switch_vdesk(ScreenInfo * s, uint8_t v) __attribute__((nonnull));
+
 void unhide(Client * restrict c) __attribute__((nonnull));
 
 #endif /* JBWM_SCREEN_H */

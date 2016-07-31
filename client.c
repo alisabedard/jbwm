@@ -52,7 +52,6 @@ static void unselect_current(void)
 	if(!jbwm.current) return;
 	XSetWindowBorder(jbwm.d, jbwm.current->parent,
 		jbwm.current->screen->pixels.bg);
-	jbwm.current->opt.active = false;
 #ifdef EWMH
 	ewmh_remove_state(jbwm.current->window, ewmh[WM_STATE_FOCUSED]);
 #endif//EWMH
@@ -61,7 +60,6 @@ static void unselect_current(void)
 void select_client(Client * c)
 {
 	if(!c) return;
-	c->opt.active = true;
 	unselect_current();
 	XInstallColormap(jbwm.d, c->cmap);
 	XSetInputFocus(jbwm.d, c->window,
@@ -79,13 +77,12 @@ void select_client(Client * c)
 void stick(Client * c)
 {
 	LOG("stick");
-	c->vdesk = c->screen->vdesk;
 	c->opt.sticky ^= true; // toggle
 	select_client(c);
 	update_titlebar(c);
 #ifdef EWMH
-	c->opt.sticky?ewmh_add_state(c->window, ewmh[WM_STATE_STICKY])
-		:ewmh_remove_state(c->window, ewmh[WM_STATE_STICKY]);
+	(c->opt.sticky?ewmh_add_state:ewmh_remove_state)(c->window,
+		ewmh[WM_STATE_STICKY]);
 #endif//EWMH
 }
 
@@ -139,9 +136,7 @@ static bool has_delete_proto(const jbwm_window_t w)
 
 void send_wm_delete(const Client * restrict c)
 {
-	if(has_delete_proto(c->window))
-		xmsg(c->window, get_wm_protocols(), get_wm_delete_window());
-	else
-		XKillClient(jbwm.d, c->window);
+	has_delete_proto(c->window)?xmsg(c->window, get_wm_protocols(),
+		get_wm_delete_window()): XKillClient(jbwm.d, c->window);
 }
 

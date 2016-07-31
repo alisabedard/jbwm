@@ -85,7 +85,7 @@ static void handle_client_key_event(const bool mod,
 		(c->opt.max_vert ? unset_vert : set_vert)(c);
 		break;
 	case KEY_STICK: stick(c); break;
-	case KEY_MOVE: drag(c); break;
+	case KEY_MOVE: jbwm_drag(c, false); break;
 	case KEY_SHADE: shade(c); break;
 	}
 }

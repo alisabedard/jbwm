@@ -20,9 +20,9 @@ static void titlebar_event(Client * restrict c, const uint16_t x)
 		   the parent window to stick around as a ghost window. */
 		if (c->opt.shaded) shade(c);
 		send_wm_delete(c);
-	} else if (!c->opt.no_resize && (x > w - TDIM)) resize(c);
+	} else if (!c->opt.no_resize && (x > w - TDIM)) jbwm_drag(c, true);
 	else if (!c->opt.no_min && (x > w - (TDIM<<1))) shade(c);
-	else drag(c);
+	else jbwm_drag(c, false);
 }
 #endif//USE_TBAR
 
@@ -35,7 +35,7 @@ void jbwm_handle_button_event(XButtonEvent * restrict e, Client * restrict c)
 			titlebar_event(c, e->x);
 		else
 #endif//USE_TBAR
-			drag(c);
+			jbwm_drag(c, false);
 		break;
 
 	case Button2:
@@ -48,7 +48,7 @@ void jbwm_handle_button_event(XButtonEvent * restrict e, Client * restrict c)
 		   users especially, where it is difficult
 		   to register a middle button press, even
 		   with X Emulate3Buttons enabled.  */
-		c->opt.shaded?drag(c):resize(c);
+		jbwm_drag(c, !c->opt.shaded);
 		break;
 	}
 }
