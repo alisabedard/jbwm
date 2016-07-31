@@ -101,11 +101,10 @@ static void handle_configure_request(XConfigureRequestEvent * e)
 		.sibling = e->above, .stack_mode = e->detail});
 }
 
-void main_event_loop(void)
+static void iteration(void)
 {
 	XEvent ev;
 	Client * c;
- head:
 	XNextEvent(jbwm.d, &ev);
 	c=find_client(ev.xany.window);
 	switch (ev.type) {
@@ -174,6 +173,10 @@ void main_event_loop(void)
 		cleanup();
 		jbwm.last=0; // Fix ignoring every other new window
 	}
+}
 
-	goto head;
+void main_event_loop(void)
+{
+	for(;;)
+		iteration();
 }
