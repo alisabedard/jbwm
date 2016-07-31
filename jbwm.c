@@ -168,8 +168,9 @@ static bool check_redirect(const jbwm_window_t w)
 
 static void setup_clients(ScreenInfo * restrict s)
 {
-	jbwm_window_t * w, d;
+	Window * w, d; // don't use jbwm_window_t here
 	unsigned int n;
+	// XQueryTree depends on 64-bit types
 	if (!XQueryTree(jbwm.d, s->root, &d, &d, &w, &n))
 		return; // failed
 	while (n--)
@@ -219,17 +220,6 @@ static void setup_screen(const uint8_t i, struct Options * restrict o)
 	setup_ewmh_for_screen(s);
 }
 
-static void setup_screens(struct Options * restrict o)
-{
-	/* Now set up each screen in turn: jbwm.num_screens is used
-	   in scanning windows (XQueryTree) */
-	uint8_t i = ScreenCount(jbwm.d);
-	jbwm.s = malloc(i * sizeof(ScreenInfo));
-
-	while (i--)
-		setup_screen(i, o);
-}
-
 __attribute__((pure))
 static int handle_xerror(Display * restrict dpy __attribute__ ((unused)),
 	XErrorEvent * restrict e)
@@ -262,7 +252,11 @@ int main(
 	/* Fonts only needed with title bars */
 	setup_fonts();
 	jbwm.cursor = XCreateFontCursor(jbwm.d, XC_fleur);
-	setup_screens(&o);
+	uint8_t i = ScreenCount(jbwm.d);
+	ScreenInfo s[i]; // remains in scope till exit.
+	jbwm.s = s;
+	while (i--)
+		setup_screen(i, &o);
 	main_event_loop();
 	return 0;
 }
