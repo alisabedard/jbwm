@@ -16,7 +16,7 @@
 #include <X11/Xatom.h>
 
 // Free result with XFree if not NULL
-char * get_title(const Window w)
+char * get_title(const jbwm_window_t w)
 {
 	XTextProperty tp;
 	if (!XGetWMName(jbwm.d, w, &tp))
@@ -38,7 +38,7 @@ void client_to_vdesk(Client * restrict c, const uint8_t d)
  * used all over the place.  return the client that has specified window as
  * either window or parent
  */
-Client *find_client(const Window w)
+Client *find_client(const jbwm_window_t w)
 {
 	Client *c=jbwm.head;
 	while(c && c->parent != w && c->window !=w
@@ -93,7 +93,7 @@ void stick(Client * c)
 }
 
 // Returns 0 on failure.
-static Status xmsg(const Window w, const Atom a, const long x)
+static Status xmsg(const jbwm_window_t w, const Atom a, const long x)
 {
 	LOG("xmsg");
 	return XSendEvent(jbwm.d, w, false, NoEventMask, &(XEvent){
@@ -113,15 +113,17 @@ static void setup_client_atoms(void)
 	XInternAtoms(jbwm.d, names, CA_SZ, true, client_atoms);
 }
 
-__attribute__((nonnull))
-void set_wm_state(Client * restrict c, const int state)
+jbwm_atom_t set_wm_state(Client * restrict c, const int8_t state)
 {
 	LOG("set_wm_state(%d, %d)", (int)c->window, state);
 	setup_client_atoms();
+	if (state == -1)
+		return client_atoms[CA_WM_STATE];
 	XPROP(c->window, client_atoms[CA_WM_STATE], XA_CARDINAL, &state, 1);
+	return 0;
 }
 
-static bool has_delete_proto(const Window w)
+static bool has_delete_proto(const jbwm_window_t w)
 {
 	bool found=false;
 	Atom *p;

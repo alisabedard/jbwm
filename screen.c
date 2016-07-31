@@ -31,14 +31,14 @@ static void draw_outline(Client * restrict c)
 }
 
 __attribute__((nonnull))
-static void configure(XSizeHints * restrict g, const Window w)
+static void configure(XSizeHints * restrict g, const jbwm_window_t w)
 {
 	XSendEvent(jbwm.d, w, true, StructureNotifyMask, (XEvent *)
 		&(XConfigureEvent){.x = g->x, .y = g->y, .width = g->width,
 		.height = g->height, .type = ConfigureNotify, .event = w });
 }
 
-static void grab_pointer(const Window w)
+static void grab_pointer(const jbwm_window_t w)
 {
 	XGrabPointer(jbwm.d, w, false, MouseMask, GrabModeAsync,
 		GrabModeAsync, None, jbwm.cursor, CurrentTime);
@@ -68,12 +68,13 @@ resize_loop:
 	moveresize(c);
 }
 
-static XPoint get_mouse_position(Window w)
+static jbwm_point_t get_mouse_position(jbwm_window_t w)
 {
-	int x, y;
-	XQueryPointer(jbwm.d, w, &w, &w, &x, &y,
-		&(int){0}, &(int){0}, &(unsigned int){0});
-	return (XPoint){x, y};
+	jbwm_point_t p;
+	int d; // dummy
+	XQueryPointer(jbwm.d, w, (Window*)&w, (Window*)&w,
+		(int*)&p.x, (int*)&p.y, &d, &d, (unsigned int *)&d);
+	return p;
 }
 
 void drag(Client * restrict c)
@@ -81,21 +82,21 @@ void drag(Client * restrict c)
 	LOG("drag");
 	XRaiseWindow(jbwm.d, c->parent);
 	grab_pointer(c->screen->root);
-	const XPoint op = { c->size.x, c->size.y};
-	XPoint p = get_mouse_position(c->screen->root);
+	const jbwm_point_t op = { c->size.x, c->size.y};
+	jbwm_point_t p = get_mouse_position(c->screen->root);
 	XEvent ev;
-drag_loop:
-	XMaskEvent(jbwm.d, MouseMask, &ev);
-	if(ev.type == MotionNotify) {
-		if(c->border) draw_outline(c); // clear
-		c->size.x = op.x - p.x + ev.xmotion.x;
-		c->size.y = op.y - p.y + ev.xmotion.y;
-		snap_client(c);
-		if(c->border) draw_outline(c); // draw
-		else moveresize(c);
-		goto drag_loop;
-	}
-	if(c->border) draw_outline(c); // clear
+	do {
+		XMaskEvent(jbwm.d, MouseMask, &ev);
+		if(ev.type == MotionNotify) {
+			if(c->border) draw_outline(c); // clear
+			c->size.x = op.x - p.x + ev.xmotion.x;
+			c->size.y = op.y - p.y + ev.xmotion.y;
+			snap_client(c);
+			(c->border ? draw_outline : moveresize)(c);
+		}
+	} while(ev.type == MotionNotify);
+	if(c->border)
+		draw_outline(c); // clear
 	XUngrabPointer(jbwm.d, CurrentTime);
 	moveresize(c);
 	if(!c->opt.tearoff)

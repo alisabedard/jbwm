@@ -12,46 +12,46 @@
 
 typedef struct Client Client;
 
+struct JBWMClientOptions {
+	bool sticky : 1;
+	bool active : 1;
+	bool remove : 1;
+	bool fullscreen : 1;
+	bool shaded : 1;
+	bool shaped : 1;
+	bool is_fullscreen : 1;
+	bool no_titlebar : 1;
+	bool no_min : 1;
+	bool no_resize : 1;
+	bool no_max : 1;
+	bool no_move : 1;
+	bool no_border : 1;
+	bool no_close : 1;
+	bool no_resize_decor : 1;
+	bool no_close_decor : 1;
+	bool no_min_decor : 1;
+	bool max_horz : 1;
+	bool max_vert : 1;
+	bool tearoff : 1;
+};
+
 struct Client {
-	XRectangle old_size;
-	XSizeHints size;
-	Window window, parent;
-#ifdef USE_TBAR
-	Window titlebar;
-#endif//USE_TBAR
-	Colormap cmap;
-	ScreenInfo *screen;
 	Client *next;
-	int8_t ignore_unmap;
-	uint8_t vdesk : 4;
-	uint8_t border : 1;
+	ScreenInfo *screen;
+	XSizeHints size;
+	jbwm_rect_t old_size;
+	jbwm_window_t window, parent;
+#ifdef USE_TBAR
+	jbwm_window_t titlebar;
+#endif//USE_TBAR
+	jbwm_cmap_t cmap;
 #ifdef USE_TBAR
 	uint16_t exposed_width;
 #endif//USE_TBAR
-	struct {
-		bool sticky : 1;
-		bool active : 1;
-		bool remove : 1;
-		bool fullscreen : 1;
-		bool shaded : 1;
-		bool shaped : 1;
-		bool is_fullscreen : 1;
-		bool no_titlebar : 1;
-		bool no_min : 1;
-		bool no_resize : 1;
-		bool no_max : 1;
-		bool no_move : 1;
-		bool no_border : 1;
-		bool no_close : 1;
-		bool no_resize_decor : 1;
-		bool no_close_decor : 1;
-		bool no_min_decor : 1;
-		//bool no_max_decor : 1;
-		bool max_horz : 1;
-		bool max_vert : 1;
-		//bool modal : 1;
-		bool tearoff : 1;
-	} opt;
+	int8_t ignore_unmap:3;
+	uint8_t vdesk:4;
+	uint8_t border:1;
+	struct JBWMClientOptions opt;
 };
 
 #endif /* JBWM_CLIENT_STRUCT_H */

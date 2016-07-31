@@ -11,7 +11,7 @@ CFLAGS+=-Wsuggest-attribute=pure
 CFLAGS+=-Wsuggest-attribute=const
 CFLAGS+=-Wsuggest-attribute=noreturn
 CFLAGS+=-Wsuggest-attribute=format
-CFLAGS+=-Wlarger-than=512 -Wframe-larger-than=512 -Wstack-usage=512
+#CFLAGS+=-Wlarger-than=512 -Wframe-larger-than=512 -Wstack-usage=512
 CFLAGS+=-Wcast-qual -Wcast-align -Wjump-misses-init
 CFLAGS+=-Wlogical-op -Wmissing-prototypes
 #CFLAGS+=-Wpadded

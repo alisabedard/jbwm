@@ -86,10 +86,7 @@ static void handle_property_change(XPropertyEvent * restrict e,
 		update_titlebar(c);
 	else {
 		print_atom(e->atom, __FILE__, __LINE__);
-		static jbwm_atom_t ws;
-		if (!ws)
-			ws = XInternAtom(jbwm.d, "WM_STATE", false);
-		if (e->atom == ws)
+		if (e->atom == set_wm_state(NULL, -1))
 			moveresize(c);
 	}
 }

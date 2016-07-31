@@ -10,12 +10,19 @@
 
 void client_to_vdesk(Client * restrict c, const uint8_t d)
 	__attribute((nonnull));
-Client *find_client(Window w) __attribute__((hot,pure));
+
+Client *find_client(jbwm_window_t w) __attribute__((hot,pure));
+
 // Free result with XFree if not NULL
-char * get_title(const Window w) __attribute__((pure));
+char * get_title(const jbwm_window_t w) __attribute__((pure));
+
 void select_client(Client * c);
+
 void send_wm_delete(const Client * restrict c) __attribute__((nonnull));
-void set_wm_state(Client * c, const int state) __attribute__((nonnull));
+
+// state -1 returns WM_STATE atom
+jbwm_atom_t set_wm_state(Client * c, const int8_t state);
+
 void stick(Client * c) __attribute__((nonnull,cold));
 
 #endif /* JBWM_CLIENT_H */

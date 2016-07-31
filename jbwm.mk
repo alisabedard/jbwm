@@ -99,7 +99,8 @@ small:
 	make clean
 	make -f Makefile.small
 	make strip
-	ls -l jbwm
+	ls -l jbwm >> small.log
+	tail small.log
 
 clang:
 	make clean

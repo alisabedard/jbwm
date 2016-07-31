@@ -20,7 +20,7 @@
 #include <X11/Xatom.h>
 
 #ifdef EWMH
-static uint8_t wm_desktop(const Window w, uint8_t vdesk)
+static uint8_t wm_desktop(const jbwm_window_t w, uint8_t vdesk)
 {
 	uint16_t n;
 	unsigned long *lprop = get_property(w, ewmh[WM_DESKTOP], &n);
@@ -44,7 +44,7 @@ static void init_properties(Client * c)
 	c->vdesk = wm_desktop(c->window, c->vdesk);
 	// Required by wm-spec 1.4:
 	XPROP(c->window, ewmh[FRAME_EXTENTS], XA_CARDINAL,
-		(&(Atom[]){1, 1, 1+TDIM, 1}), 4);
+		(&(jbwm_atom_t[]){1, 1, 1+TDIM, 1}), 4);
 #endif//EWMH
 }
 
@@ -87,7 +87,7 @@ static void reparent(Client * c) // use of restrict here is a bug
 	XMapWindow(jbwm.d, c->window);
 }
 
-void make_new_client(const Window w, ScreenInfo * s)
+void make_new_client(const jbwm_window_t w, ScreenInfo * s)
 {
 	LOG("make_new_client(%d,s)", (int)w);
 	Client *c = calloc(1, sizeof(Client));
