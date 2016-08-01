@@ -48,11 +48,10 @@ static void grab_pointer(const jbwm_window_t w)
 
 static jbwm_point_t get_mouse_position(jbwm_window_t w)
 {
-	jbwm_point_t p;
-	int d; // dummy
-	XQueryPointer(jbwm.d, w, (Window*)&w, (Window*)&w,
-		(int*)&p.x, (int*)&p.y, &d, &d, (unsigned int *)&d);
-	return p;
+	int x, y;
+	XQueryPointer(jbwm.d, w, &(Window){0}, &(Window){0},
+		&x, &y, &(int){0}, &(int){0}, &(unsigned int){0});
+	return (jbwm_point_t){x, y};
 }
 
 void jbwm_drag(Client * restrict c, const bool resize)
@@ -67,8 +66,10 @@ void jbwm_drag(Client * restrict c, const bool resize)
 	if (resize)
 		XWarpPointer(jbwm.d, None, c->window, 0, 0, 0, 0,
 			c->size.width, c->size.height);
-	do {
+	for(;;) {
 		XMaskEvent(jbwm.d, MouseMask, &e);
+		if (e.type != MotionNotify)
+			break;
 		draw_outline(c);
 		if (resize) {
 			c->size.width=abs(c->size.x - e.xmotion.x);
@@ -79,7 +80,7 @@ void jbwm_drag(Client * restrict c, const bool resize)
 			snap_client(c);
 		}
 		(c->border ? draw_outline : moveresize)(c);
-	} while(e.type == MotionNotify);
+	}
 	draw_outline(c);
 	XUngrabPointer(jbwm.d, CurrentTime);
 	moveresize(c);
