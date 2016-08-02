@@ -17,6 +17,7 @@ void unset_horz(Client * restrict c)
 	c->size.x = c->old_size.x;
 	c->size.width = c->old_size.width;
 	ewmh_remove_state(c->window, ewmh[WM_STATE_MAXIMIZED_HORZ]);
+	moveresize(c);
 }
 
 void set_horz(Client * restrict c)
@@ -33,6 +34,7 @@ void set_horz(Client * restrict c)
 	if (!c->opt.fullscreen) {
 		c->size.width -= c->border<<1;
 	}
+	moveresize(c);
 }
 
 void unset_vert(Client * restrict c)
@@ -45,6 +47,7 @@ void unset_vert(Client * restrict c)
 		ewmh_remove_state(c->window,
 			ewmh[WM_STATE_MAXIMIZED_VERT]);
 	}
+	moveresize(c);
 }
 
 void set_vert(Client * restrict c)
@@ -61,8 +64,8 @@ void set_vert(Client * restrict c)
 	if (!c->opt.fullscreen) {
 		c->size.y += TDIM+c->border;
 		c->size.height -= TDIM+(c->border<<2);
-		moveresize(c);
 	}
+	moveresize(c);
 }
 
 void unset_fullscreen(Client * restrict c)
