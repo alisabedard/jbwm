@@ -105,6 +105,7 @@ xcb_atom_t jb_get_atom(xcb_connection_t * x, const char * name)
 bool jb_next_event_timed(xcb_connection_t * x,
 	xcb_generic_event_t ** e, const uint32_t delay)
 {
+	jb_check_x(x);
 	if ((*e = xcb_poll_for_event(x)))
 		return true;
 	int fd = xcb_get_file_descriptor(x);
