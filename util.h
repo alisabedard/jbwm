@@ -31,4 +31,7 @@ fd_t jb_open(const char * path, const int flags);
 // If val is false, print msg, return val
 bool jb_check(const bool val, const char * msg);
 
+// If val is false, print msg, exit
+void jb_assert(const bool val, const char * msg);
+
 #endif//!JB_UTIL_H

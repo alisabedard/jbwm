@@ -33,8 +33,19 @@ fd_t jb_open(const char * path, const int flags)
 
 bool jb_check(const bool val, const char * msg)
 {
-	if (!val)
-		perror(msg ? msg : "Error");
+	if (!val) {
+		if (errno)
+			perror(msg ? msg : "Error");
+		else
+			fprintf(stderr, "%s\n", msg ? msg
+				: "Check failed");
+	}
 	return !val;
+}
+
+void jb_assert(const bool val, const char * msg)
+{
+	if (jb_check(val, msg))
+		exit(1);
 }
 
