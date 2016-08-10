@@ -14,7 +14,7 @@
 void jb_close(const fd_t fd)
 {
 	if (close(fd) != -1)
-		return;
+		return; // success
 	const uint8_t sz = 32;
 	char buf[sz];
 	snprintf(buf, sz, "Could not close fd %d", fd);
@@ -24,23 +24,26 @@ void jb_close(const fd_t fd)
 fd_t jb_open(const char * path, const int flags)
 {
 	fd_t r = open(path, flags);
+	if (r != -1)
+		return r; // success
 	const uint8_t sz = 64;
 	char buf[sz];
 	snprintf(buf, sz, "Could not open %s", path);
-	jb_check(r != -1, buf);
-	return r;
+	perror(buf);
+	return -1;
+}
+
+bool jb_check_errno(const bool val, const char * msg)
+{
+	if (!val)
+		perror(msg);
+	return !val;
 }
 
 bool jb_check(const bool val, const char * msg)
 {
-	if (!val) {
-		if (errno)
-			perror(msg ? msg : "Error");
-		else
-			fprintf(stderr, "%s\n", msg ? msg
-				: "Warning:  Value check failed");
-	}
-	errno = 0; // prevent stale errno values from persisting.
+	if (!val)
+		fprintf(stderr, "%s\n", msg);
 	return !val;
 }
 

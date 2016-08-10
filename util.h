@@ -28,7 +28,10 @@ void jb_close(const fd_t fd);
 // Open path with flags options, check result
 fd_t jb_open(const char * path, const int flags);
 
-// If val is false, print msg, return val
+// If val is false, perror msg, return !val
+bool jb_check_errno(const bool val, const char * msg);
+
+// If val is false, print msg, return !val
 bool jb_check(const bool val, const char * msg);
 
 // If val is false, print msg, exit
