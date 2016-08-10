@@ -4,6 +4,7 @@
 #include "log.h"
 #include "util.h"
 
+#include <errno.h>
 #include <string.h>
 #include <sys/select.h>
 #include <unistd.h>
@@ -12,7 +13,10 @@ __attribute__((noreturn,nonnull(1)))
 static void xerr(xcb_connection_t * x, const char * msg)
 {
         xcb_disconnect(x);
-	perror(msg);
+	if (errno)
+		perror(msg);
+	else
+		fprintf(stderr, "%s\n", msg);
 	exit(1);
 }
 
