@@ -33,21 +33,20 @@ fd_t jb_open(const char * path, const int flags)
 	return -1;
 }
 
-bool jb_check_errno(const bool val, const char * msg)
+bool jb_check(const bool val, char * msg)
 {
-	if (!val)
-		perror(msg);
+	if (!val) {
+		char * e = msg ? msg : "Error";
+		if (errno)
+			perror(e);
+		else
+			fprintf(stderr, "%s\n", e);
+	}
+	errno = 0; // reset
 	return !val;
 }
 
-bool jb_check(const bool val, const char * msg)
-{
-	if (!val)
-		fprintf(stderr, "%s\n", msg);
-	return !val;
-}
-
-void jb_assert(const bool val, const char * msg)
+void jb_assert(const bool val, char * msg)
 {
 	if (jb_check(val, msg))
 		exit(1);
