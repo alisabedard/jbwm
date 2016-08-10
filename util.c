@@ -38,8 +38,9 @@ bool jb_check(const bool val, const char * msg)
 			perror(msg ? msg : "Error");
 		else
 			fprintf(stderr, "%s\n", msg ? msg
-				: "Check failed");
+				: "Warning:  Value check failed");
 	}
+	errno = 0; // prevent stale errno values from persisting.
 	return !val;
 }
 
