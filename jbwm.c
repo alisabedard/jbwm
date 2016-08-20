@@ -187,7 +187,7 @@ static void setup_screen_elements(const uint8_t i)
 	s->root = RootWindow(d, i);
 	s->vdesk = 0;
 	s->size.w = DisplayWidth(d, i);
-	s->size.h = DisplayWidth(d, i);
+	s->size.h = DisplayHeight(d, i);
 }
 
 static void setup_gc(struct JBWMScreen * restrict s, struct Options * restrict o)
