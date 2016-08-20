@@ -6,9 +6,8 @@
 #include "new.h"
 
 #include "config.h"
-#include "client_t.h"
 #include "ewmh.h"
-#include "jbwmenv.h"
+#include "JBWMEnv.h"
 #include "log.h"
 #include "mwm.h"
 #include "screen.h"
@@ -36,7 +35,7 @@ static uint8_t wm_desktop(const jbwm_window_t w, uint8_t vdesk)
 #endif//EWMH
 
 __attribute__((nonnull))
-static void init_properties(Client * c)
+static void init_properties(struct JBWMClient * c)
 {
 	handle_mwm_hints(c);
 	c->vdesk = c->screen->vdesk;
@@ -49,7 +48,7 @@ static void init_properties(Client * c)
 }
 
 __attribute__((nonnull))
-static void init_geometry(Client * c)
+static void init_geometry(struct JBWMClient * c)
 {
 	XWindowAttributes attr;
 	XGetWindowAttributes(jbwm.d, c->window, &attr);
@@ -61,14 +60,14 @@ static void init_geometry(Client * c)
 		? attr.height : c->size.min_height;
 	const bool pos = (attr.map_state == IsViewable)
 	    || (c->size.flags & USPosition);
-	c->size.x=pos ? attr.x : (c->screen->size[0]>>1)-(c->size.width>>1);
-	c->size.y=pos ? attr.y : (c->screen->size[1]>>1)-(c->size.height>>1);
+	c->size.x=pos ? attr.x : (c->screen->size.w >> 1) - (c->size.width >> 1);
+	c->size.y=pos ? attr.y : (c->screen->size.h >> 1) - (c->size.height >> 1);
 
 	// Test if the reparent that is to come would trigger an unmap event.
 	c->ignore_unmap=attr.map_state==IsViewable;
 }
 
-static void reparent(Client * c) // use of restrict here is a bug
+static void reparent(struct JBWMClient * c) // use of restrict here is a bug
 {
 	LOG("reparent()");
 	setup_shaped(c);
@@ -87,10 +86,10 @@ static void reparent(Client * c) // use of restrict here is a bug
 	XMapWindow(jbwm.d, c->window);
 }
 
-void make_new_client(const jbwm_window_t w, ScreenInfo * s)
+void make_new_client(const jbwm_window_t w, struct JBWMScreen * s)
 {
 	LOG("make_new_client(%d,s)", (int)w);
-	Client *c = calloc(1, sizeof(Client));
+	struct JBWMClient *c = calloc(1, sizeof(struct JBWMClient));
 	XGrabServer(jbwm.d);
 	c->next = jbwm.head;
 	jbwm.head = c;

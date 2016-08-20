@@ -5,7 +5,7 @@
 
 #include "mwm.h"
 
-#include "jbwmenv.h"
+#include "JBWMEnv.h"
 #include "log.h"
 #include "util.h"
 
@@ -30,7 +30,7 @@ enum {
 // status:
 enum { MWM_TEAROFF_WINDOW = 1 };
 
-static void process_flags(Client * c)
+static void process_flags(struct JBWMClient * c)
 {
 	if (c->opt.tearoff) {
 		c->opt.no_border = c->opt.no_resize = c->opt.no_min
@@ -39,7 +39,7 @@ static void process_flags(Client * c)
 	c->border=!c->opt.no_border;
 }
 
-void handle_mwm_hints(Client * c)
+void handle_mwm_hints(struct JBWMClient * c)
 {
 	static Atom mwm_hints;
 	if(!mwm_hints)

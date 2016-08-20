@@ -3,7 +3,7 @@
 // Copyright 1999-2015, Ciaran Anscomb <jbwm@6809.org.uk>
 // See README for license and other details.
 
-#include "jbwmenv.h"
+#include "JBWMEnv.h"
 
 #include "config.h"
 #include "events.h"
@@ -27,7 +27,7 @@
 #include <X11/Xproto.h>
 
 // Main application data structure.
-JBWMEnvironment jbwm;
+struct JBWMEnv jbwm;
 
 struct Options {
 	// Color names:
@@ -142,7 +142,7 @@ static void setup_fonts(void)
 
 #ifdef USE_SHAPE
 #include <X11/extensions/shape.h>
-#endif
+#endif//USE_SHAPE
 static void setup_event_listeners(const jbwm_window_t root)
 {
 	XChangeWindowAttributes(jbwm.d, root, CWEventMask,
@@ -151,7 +151,7 @@ static void setup_event_listeners(const jbwm_window_t root)
 		| ColormapChangeMask});
 }
 
-static void allocate_colors(ScreenInfo * restrict s, struct Options * restrict o)
+static void allocate_colors(struct JBWMScreen * restrict s, struct Options * restrict o)
 {
 	const uint8_t n = s->screen;
 	s->pixels.fg=pixel(n, o->fg);
@@ -166,7 +166,7 @@ static bool check_redirect(const jbwm_window_t w)
 	return (!a.override_redirect && (a.map_state == IsViewable));
 }
 
-static void setup_clients(ScreenInfo * restrict s)
+static void setup_clients(struct JBWMScreen * restrict s)
 {
 	Window * w, d; // don't use jbwm_window_t here
 	unsigned int n;
@@ -181,16 +181,16 @@ static void setup_clients(ScreenInfo * restrict s)
 
 static void setup_screen_elements(const uint8_t i)
 {
-	ScreenInfo *restrict s = &jbwm.s[i];
+	struct JBWMScreen *restrict s = &jbwm.s[i];
 	s->screen = i;
 	Display * d = jbwm.d;
 	s->root = RootWindow(d, i);
 	s->vdesk = 0;
-	s->size[JBWM_SIZE_WIDTH] = DisplayWidth(d, i);
-	s->size[JBWM_SIZE_HEIGHT] = DisplayHeight(d, i);
+	s->size.w = DisplayWidth(d, i);
+	s->size.h = DisplayWidth(d, i);
 }
 
-static void setup_gc(ScreenInfo * restrict s, struct Options * restrict o)
+static void setup_gc(struct JBWMScreen * restrict s, struct Options * restrict o)
 {
 	allocate_colors(s, o);
 	unsigned long vm = GCFunction | GCSubwindowMode
@@ -210,7 +210,7 @@ static void setup_gc(ScreenInfo * restrict s, struct Options * restrict o)
 
 static void setup_screen(const uint8_t i, struct Options * restrict o)
 {
-	ScreenInfo *s = &jbwm.s[i];
+	struct JBWMScreen *s = &jbwm.s[i];
 	setup_screen_elements(i);
 	setup_gc(s, o);
 	setup_event_listeners(s->root);
@@ -251,7 +251,7 @@ int main(
 	setup_fonts();
 	jbwm.cursor = XCreateFontCursor(jbwm.d, XC_fleur);
 	uint8_t i = ScreenCount(jbwm.d);
-	ScreenInfo s[i]; // remains in scope till exit.
+	struct JBWMScreen s[i]; // remains in scope till exit.
 	jbwm.s = s;
 	while (i--)
 		setup_screen(i, &o);

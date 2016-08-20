@@ -5,7 +5,7 @@
 
 #include "util.h"
 
-#include "jbwmenv.h"
+#include "JBWMEnv.h"
 
 #include <unistd.h>
 

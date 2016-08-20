@@ -8,14 +8,14 @@
 
 #ifdef MWM
 
-#include "client_t.h"
+#include "JBWMClient.h"
 
-void handle_mwm_hints(Client * c);
+void handle_mwm_hints(struct JBWMClient * c);
 
-#else
+#else//!MWM
 
 #define handle_mwm_hints(c)
 
-#endif
+#endif//MWM
 
 #endif//!JBWM_MWM_H

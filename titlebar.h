@@ -7,10 +7,10 @@
 
 #ifdef USE_TBAR
 
-#include "jbwmenv.h"
+#include "JBWMEnv.h"
 
-void shade(Client * restrict c) __attribute__((nonnull));
-void update_titlebar(Client * c) __attribute__((nonnull));
+void shade(struct JBWMClient * restrict c) __attribute__((nonnull));
+void update_titlebar(struct JBWMClient * c) __attribute__((nonnull));
 
 /* Ensure that the title text fits within the titlebar.  */
 #define TDIM (jbwm.font->ascent+jbwm.font->descent)

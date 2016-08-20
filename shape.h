@@ -8,10 +8,13 @@
 
 #ifdef USE_SHAPE
 
-#include "client_t.h"
+#include "JBWMClient.h"
 
-void setup_shaped(Client * c) __attribute__((nonnull));
-void set_shape(Client * c) __attribute__((nonnull));
+void setup_shaped(struct JBWMClient * c)
+	__attribute__((nonnull));
+
+void set_shape(struct JBWMClient * c)
+	__attribute__((nonnull));
 
 #else//!USE_SHAPE
 

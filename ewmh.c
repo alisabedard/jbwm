@@ -5,8 +5,7 @@
 
 #include "ewmh.h"
 
-#include "client.h"
-#include "jbwmenv.h"
+#include "JBWMEnv.h"
 #include "log.h"
 #include "max.h"
 #include "screen.h"
@@ -69,7 +68,7 @@ static uint16_t get_client_count(void)
 {
 	uint16_t j = 0;
 	// Check against UINT16_MAX to avoid wrap-around
-	for (Client * i = jbwm.head; j < UINT16_MAX && i; i = i->next, ++j);
+	for (struct JBWMClient * i = jbwm.head; j < UINT16_MAX && i; i = i->next, ++j);
 	return j;
 }
 
@@ -77,7 +76,7 @@ void ewmh_update_client_list(void)
 {
 	jbwm_window_t wl[get_client_count()];
 	size_t wl_sz = 0;
-	for (Client * i = jbwm.head; i; i = i->next, ++wl_sz)
+	for (struct JBWMClient * i = jbwm.head; i; i = i->next, ++wl_sz)
 		wl[wl_sz] = i->window;
 	XPROP(jbwm.s->root, ewmh[CLIENT_LIST],
 		XA_WINDOW, &wl, wl_sz);
@@ -113,7 +112,7 @@ void set_ewmh_allowed_actions(const jbwm_window_t w)
 	XPROP(w, a[0], XA_ATOM, &a, sizeof(a) / sizeof(Atom));
 }
 
-static void init_desktops(struct ScreenInfo * restrict s)
+static void init_desktops(struct JBWMScreen * restrict s)
 {
 	XPROP(s->r, ewmh[DESKTOP_GEOMETRY], XA_CARDINAL, &s->size, 2);
 	XPROP(s->r, ewmh[CURRENT_DESKTOP], XA_CARDINAL, &s->vdesk, 1);
@@ -131,7 +130,7 @@ static jbwm_window_t init_supporting(const jbwm_window_t r)
 }
 
 __attribute__((nonnull(1)))
-void setup_ewmh_for_screen(ScreenInfo * restrict s)
+void setup_ewmh_for_screen(struct JBWMScreen * restrict s)
 {
 	const jbwm_window_t r = s->root;
 	XPROP(r, ewmh[SUPPORTED], XA_ATOM, ewmh, EWMH_ATOMS_COUNT);

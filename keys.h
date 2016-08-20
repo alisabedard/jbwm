@@ -6,7 +6,7 @@
 #ifndef __KEYS_H
 #define __KEYS_H
 
-#include "ScreenInfo.h"
+#include "JBWMScreen.h"
 #include <X11/keysym.h>
 
 void jbwm_handle_key_event(XKeyEvent * restrict e)
@@ -43,7 +43,7 @@ enum { KEY_NEXT=XK_Tab, KEY_NEW=XK_Return, KEY_QUIT=XK_Escape,
 #define JBWM_ALT_KEYS_TO_GRAB KEY_KILL, JBWM_DIRECTION_KEYS,\
 	JBWM_VWM_KEYS, 0
 
-void grab_keys_for_screen(ScreenInfo * restrict s)
+void grab_keys_for_screen(struct JBWMScreen * restrict s)
 	__attribute__((nonnull));
 
 #endif /* __KEYS_H */

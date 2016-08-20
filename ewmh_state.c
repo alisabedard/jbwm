@@ -3,7 +3,7 @@
 
 #include "client.h"
 #include "ewmh.h"
-#include "jbwmenv.h"
+#include "JBWMEnv.h"
 #include "log.h"
 #include "max.h"
 #include "screen.h"
@@ -64,7 +64,7 @@ void ewmh_add_state(const Window w, Atom state)
   data.l[3] = source indication
   other data.l[] elements = 0 */
 
-static void set_state(Client * restrict c,
+static void set_state(struct JBWMClient * restrict c,
 	const bool add, const AtomIndex t)
 {
 	if (!c)
@@ -101,7 +101,7 @@ static void set_state(Client * restrict c,
 __attribute__((nonnull(1,3)))
 static void check_state(XClientMessageEvent * e,	// event data
 			const AtomIndex t,	// state to test
-			Client *c)
+			struct JBWMClient *c)
 {
 	const Atom state = ewmh[t];
 	// 2 atoms can be set at once
@@ -131,7 +131,7 @@ static void check_state(XClientMessageEvent * e,	// event data
 
 __attribute__((nonnull(1,2)))
 static void handle_wm_state_changes(XClientMessageEvent * restrict e,
-	Client * restrict c)
+	struct JBWMClient * restrict c)
 {
 	check_state(e, WM_STATE_ABOVE, c);
 	check_state(e, WM_STATE_BELOW, c);
@@ -142,7 +142,7 @@ static void handle_wm_state_changes(XClientMessageEvent * restrict e,
 }
 
 static bool client_specific_message(XClientMessageEvent * restrict e,
-	Client * restrict c, const Atom t)
+	struct JBWMClient * restrict c, const Atom t)
 {
 	if (t == ewmh[WM_DESKTOP])
 		client_to_vdesk(c, e->data.l[0]);
@@ -162,7 +162,7 @@ static bool client_specific_message(XClientMessageEvent * restrict e,
 }
 
 void ewmh_client_message(XClientMessageEvent * restrict e,
-	Client * restrict c)
+	struct JBWMClient * restrict c)
 {
 	const Atom t = e->message_type;
 #ifdef EWMH_DEBUG
@@ -173,7 +173,7 @@ void ewmh_client_message(XClientMessageEvent * restrict e,
 	print_atom(e->data.l[2], __FILE__, __LINE__);
 	print_atom(e->data.l[3], __FILE__, __LINE__);
 #endif//EWMH_DEBUG
-	ScreenInfo *s = c ? c->screen : jbwm.s;
+	struct JBWMScreen *s = c ? c->screen : jbwm.s;
 	if(c && client_specific_message(e, c, t))
 		  return;
 	if (t == ewmh[CURRENT_DESKTOP])

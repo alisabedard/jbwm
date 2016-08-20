@@ -17,7 +17,7 @@
 #include <X11/Xft/Xft.h>
 #endif//USE_XFT
 
-void shade(Client * restrict c)
+void shade(struct JBWMClient * restrict c)
 {
 	LOG("shade");
 
@@ -47,20 +47,20 @@ void shade(Client * restrict c)
 	update_titlebar(c);
 }
 
-static GC colorgc(ScreenInfo * restrict s, const char *restrict colorname)
+static GC colorgc(struct JBWMScreen * restrict s, const char *restrict colorname)
 {
 	return XCreateGC(jbwm.d, s->root, GCForeground,
 		&(XGCValues){.foreground=pixel(s->screen, colorname)});
 }
 
-static void setup_gcs(ScreenInfo * restrict s)
+static void setup_gcs(struct JBWMScreen * restrict s)
 {
 	jbwm.gc.close = colorgc(s, TITLEBAR_CLOSE_BG);
 	jbwm.gc.shade = colorgc(s, TITLEBAR_SHADE_BG);
 	jbwm.gc.resize = colorgc(s, TITLEBAR_RESIZE_BG);
 }
 
-static void new_titlebar(Client * restrict c)
+static void new_titlebar(struct JBWMClient * restrict c)
 {
 	if (c->opt.no_titlebar || c->opt.shaped)
 		return;
@@ -77,7 +77,7 @@ static void new_titlebar(Client * restrict c)
 
 #ifdef USE_XFT
 static void
-draw_xft(Client * restrict c, const XPoint * restrict p,
+draw_xft(struct JBWMClient * restrict c, const XPoint * restrict p,
 	 char * restrict name, const size_t l)
 {
 	XGlyphInfo e;
@@ -99,7 +99,7 @@ draw_xft(Client * restrict c, const XPoint * restrict p,
 }
 #endif//USE_XFT
 
-static void draw_title(Client * restrict c)
+static void draw_title(struct JBWMClient * restrict c)
 {
 	char * name = get_title(c->window);
 	if(!name) return; // No title could be loaded, abort
@@ -121,7 +121,7 @@ static inline void draw(const Window t, GC gc, const uint16_t x)
 	XFillRectangle(jbwm.d, t, gc, x, 0, TDIM, TDIM);
 }
 
-static void draw_titlebar(Client * restrict c)
+static void draw_titlebar(struct JBWMClient * restrict c)
 {
 	const Window t = c->titlebar;
 	XClearWindow(jbwm.d, t);
@@ -136,14 +136,14 @@ static void draw_titlebar(Client * restrict c)
 	draw_title(c);
 }
 
-static void remove_titlebar(Client * restrict c)
+static void remove_titlebar(struct JBWMClient * restrict c)
 {
 	c->ignore_unmap++;
 	XDestroyWindow(jbwm.d, c->titlebar);
 	c->titlebar = 0;
 }
 
-void update_titlebar(Client * c)
+void update_titlebar(struct JBWMClient * c)
 {
 	if (c->opt.no_titlebar || c->opt.shaped)
 		  return;

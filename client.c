@@ -7,7 +7,7 @@
 
 #include "ewmh.h"
 #include "ewmh_state.h"
-#include "jbwmenv.h"
+#include "JBWMEnv.h"
 #include "log.h"
 #include "screen.h"
 #include "titlebar.h"
@@ -24,7 +24,7 @@ char * get_title(const jbwm_window_t w)
 	return (char *)tp.value;
 }
 
-void client_to_vdesk(Client * restrict c, const uint8_t d)
+void client_to_vdesk(struct JBWMClient * restrict c, const uint8_t d)
 {
 	LOG("client_to_vdesk");
 	const uint8_t p = c->vdesk;
@@ -35,9 +35,9 @@ void client_to_vdesk(Client * restrict c, const uint8_t d)
 }
 
 // Return the client that has specified window as either window or parent
-Client *find_client(const jbwm_window_t w)
+struct JBWMClient *find_client(const jbwm_window_t w)
 {
-	Client *c=jbwm.head;
+	struct JBWMClient *c=jbwm.head;
 	while(c && c->parent != w && c->window !=w
 #ifdef USE_TBAR
 		&& c->titlebar != w
@@ -57,7 +57,7 @@ static void unselect_current(void)
 #endif//EWMH
 }
 
-void select_client(Client * c)
+void select_client(struct JBWMClient * c)
 {
 	if(!c) return;
 	unselect_current();
@@ -74,7 +74,7 @@ void select_client(Client * c)
 #endif//EWMH
 }
 
-void stick(Client * c)
+void stick(struct JBWMClient * c)
 {
 	LOG("stick");
 	c->opt.sticky ^= true; // toggle
@@ -115,7 +115,7 @@ jbwm_atom_t get_wm_state(void)
 	return a?a:(a = XInternAtom(jbwm.d, "WM_STATE", false));
 }
 
-void set_wm_state(Client * restrict c, const int8_t state)
+void set_wm_state(struct JBWMClient * restrict c, const int8_t state)
 {
 	XPROP(c->window, get_wm_state(), XA_CARDINAL, &state, 1);
 }
@@ -134,7 +134,7 @@ static bool has_delete_proto(const jbwm_window_t w)
 	return found;
 }
 
-void send_wm_delete(const Client * restrict c)
+void send_wm_delete(const struct JBWMClient * restrict c)
 {
 	has_delete_proto(c->window)?xmsg(c->window, get_wm_protocols(),
 		get_wm_delete_window()): XKillClient(jbwm.d, c->window);

@@ -8,10 +8,13 @@
 
 #ifdef USE_SNAP
 
-#include "client_t.h"
+#include "JBWMClient.h"
 
-void snap_border(Client * restrict c) __attribute__((nonnull));
-void snap_client(Client * c) __attribute__((nonnull));
+void snap_border(struct JBWMClient * restrict c)
+	__attribute__((nonnull));
+
+void snap_client(struct JBWMClient * c)
+	__attribute__((nonnull));
 
 #else//!USE_SNAP
 

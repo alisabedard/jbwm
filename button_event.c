@@ -6,13 +6,13 @@
 #include "button_event.h"
 
 #include "client.h"
-#include "jbwmenv.h"
+#include "JBWMEnv.h"
 #include "screen.h"
 #include "titlebar.h"
 
 #ifdef USE_TBAR
 __attribute__((nonnull))
-static void titlebar_event(Client * restrict c, const uint16_t x)
+static void titlebar_event(struct JBWMClient * restrict c, const uint16_t x)
 {
 	const uint16_t w = c->size.width;
 	if (!c->opt.no_close && (x < TDIM)) {
@@ -26,7 +26,7 @@ static void titlebar_event(Client * restrict c, const uint16_t x)
 }
 #endif//USE_TBAR
 
-void jbwm_handle_button_event(XButtonEvent * restrict e, Client * restrict c)
+void jbwm_handle_button_event(XButtonEvent * restrict e, struct JBWMClient * restrict c)
 {
 	switch (e->button) {
 	case Button1:

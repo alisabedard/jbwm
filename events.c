@@ -9,7 +9,7 @@
 #include "client.h"
 #include "ewmh.h"
 #include "ewmh_state.h"
-#include "jbwmenv.h"
+#include "JBWMEnv.h"
 #include "keys.h"
 #include "log.h"
 #include "mwm.h"
@@ -22,14 +22,15 @@
 #include <X11/Xatom.h>
 
 __attribute__((pure))
-static ScreenInfo * get_screen(const int8_t i, const jbwm_window_t root)
+static struct JBWMScreen * get_screen(const int8_t i,
+	const jbwm_window_t root)
 {
 	return jbwm.s[i].root == root ? &jbwm.s[i]
 		: get_screen(i - 1, root);
 }
 
 // Relink c's linked list to exclude c
-static void relink_window_list(Client * c)
+static void relink_window_list(struct JBWMClient * c)
 {
 	LOG("relink_window_list");
 	if (jbwm.current == c) // Remove selection target
@@ -38,7 +39,7 @@ static void relink_window_list(Client * c)
 		jbwm.head = c->next;
 		return;
 	}
-	for (Client * p = jbwm.head; p && p->next; p = p->next) {
+	for (struct JBWMClient * p = jbwm.head; p && p->next; p = p->next) {
 		if (p->next == c) { // Close the link
 			p->next = c->next;
 			return;
@@ -50,8 +51,8 @@ static void cleanup(void)
 {
 	LOG("cleanup");
 	jbwm.need_cleanup = false;
-	Client * c = jbwm.head;
-	Client * i;
+	struct JBWMClient * c = jbwm.head;
+	struct JBWMClient * i;
 	do {
 		i = c->next;
 		if (!c->opt.remove)
@@ -75,7 +76,7 @@ static void cleanup(void)
 }
 #include <stdio.h>
 static void handle_property_change(XPropertyEvent * restrict e,
-	Client * restrict c)
+	struct JBWMClient * restrict c)
 {
 #ifdef EVENT_DEBUG
 	print_atom(e->atom, __FILE__, __LINE__);
@@ -104,7 +105,7 @@ static void handle_configure_request(XConfigureRequestEvent * e)
 static void iteration(void)
 {
 	XEvent ev;
-	Client * c;
+	struct JBWMClient * c;
 	XNextEvent(jbwm.d, &ev);
 	c=find_client(ev.xany.window);
 	switch (ev.type) {

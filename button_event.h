@@ -6,9 +6,9 @@
 #ifndef JBWM_BTN_EVT_H
 #define JBWM_BTN_EVT_H
 
-#include "client_t.h"
+#include "JBWMClient.h"
 
 void jbwm_handle_button_event(XButtonEvent * restrict e,
-	Client * restrict c) __attribute__((nonnull(1)));
+	struct JBWMClient * restrict c) __attribute__((nonnull(1)));
 
 #endif /* JBWM_BTN_EVT_H */

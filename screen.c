@@ -8,7 +8,7 @@
 #include "client.h"
 #include "ewmh.h"
 #include "ewmh_state.h"
-#include "jbwmenv.h"
+#include "JBWMEnv.h"
 #include "log.h"
 #include "shape.h"
 #include "snap.h"
@@ -21,7 +21,7 @@
 enum {MouseMask=(ButtonPressMask|ButtonReleaseMask|PointerMotionMask)};
 
 __attribute__ ((hot,nonnull))
-static void draw_outline(Client * restrict c)
+static void draw_outline(struct JBWMClient * restrict c)
 {
 	if (!c->border)
 		return;
@@ -54,7 +54,7 @@ static jbwm_point_t get_mouse_position(jbwm_window_t w)
 	return (jbwm_point_t){x, y};
 }
 
-void jbwm_drag(Client * restrict c, const bool resize)
+void jbwm_drag(struct JBWMClient * restrict c, const bool resize)
 {
 	XRaiseWindow(jbwm.d, c->parent);
 	if (resize && (c->opt.no_resize || c->opt.shaded))
@@ -88,7 +88,7 @@ void jbwm_drag(Client * restrict c, const bool resize)
 		configure((&c->size), c->window);
 }
 
-void moveresize(Client * restrict c)
+void moveresize(struct JBWMClient * restrict c)
 {
 	LOG("moveresize");
 	const uint8_t offset = c->opt.no_titlebar || c->opt.fullscreen
@@ -103,7 +103,7 @@ void moveresize(Client * restrict c)
 	set_shape(c);
 }
 
-static void hide(Client * restrict c, const bool h)
+static void hide(struct JBWMClient * restrict c, const bool h)
 {
 	(h ? XUnmapWindow : XMapWindow)(jbwm.d, c->parent);
 	set_wm_state(c, h ? IconicState : NormalState);
@@ -113,19 +113,19 @@ static void hide(Client * restrict c, const bool h)
 #endif//EWMH
 }
 
-void unhide(Client * restrict c)
+void unhide(struct JBWMClient * restrict c)
 {
 	hide(c, false);
 }
 
-uint8_t switch_vdesk(ScreenInfo * s, uint8_t v)
+uint8_t switch_vdesk(struct JBWMScreen * s, uint8_t v)
 {
 	LOG("switch_vdesk");
 
 	if (v == s->vdesk || v > DESKTOPS)
 		return s->vdesk;
 
-	for (Client * c = jbwm.head; c; c = c->next) {
+	for (struct JBWMClient * c = jbwm.head; c; c = c->next) {
 		if (c->opt.sticky) {
 			hide(c, false);
 			continue;

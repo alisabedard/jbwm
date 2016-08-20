@@ -6,18 +6,17 @@
 #ifndef JBWM_ENVIRONMENT_H
 #define JBWM_ENVIRONMENT_H
 
-#include "client_t.h"
+#include "JBWMClient.h"
 
-#include <stdbool.h>
 #ifdef USE_XFT
 #include <X11/Xft/Xft.h>
 #endif//USE_XFT
 
-typedef struct {
+struct JBWMEnv {
 	Display * d;
 	// Client tracking:
-	Client * current, * head;
-	ScreenInfo * s;
+	struct JBWMClient * current, * head;
+	struct JBWMScreen * s;
 #ifdef USE_TBAR
 #ifdef USE_XFT
 	XftFont *font;
@@ -36,8 +35,8 @@ typedef struct {
 	} keymasks;
 	Cursor cursor;
 	bool need_cleanup:1;
-} JBWMEnvironment;
+};
 
-extern JBWMEnvironment jbwm;
+extern struct JBWMEnv jbwm;
 
 #endif /* not JBWM_ENVIRONMENT_H */

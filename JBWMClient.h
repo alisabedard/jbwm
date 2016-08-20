@@ -6,11 +6,9 @@
 #ifndef JBWM_CLIENT_STRUCT_H
 #define JBWM_CLIENT_STRUCT_H
 
+#include "JBWMScreen.h"
 #include <stdbool.h>
 #include <X11/Xutil.h>
-#include "ScreenInfo.h"
-
-typedef struct Client Client;
 
 struct JBWMClientOptions {
 	bool fullscreen : 1;
@@ -33,9 +31,9 @@ struct JBWMClientOptions {
 	bool tearoff : 1;
 };
 
-struct Client {
-	Client *next;
-	ScreenInfo *screen;
+struct JBWMClient {
+	struct JBWMClient *next;
+	struct JBWMScreen *screen;
 	XSizeHints size;
 	jbwm_rect_t old_size;
 	jbwm_window_t window, parent;

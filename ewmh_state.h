@@ -3,14 +3,15 @@
 
 #ifdef EWMH
 
-#include "client_t.h"
+#include "JBWMClient.h"
 
 void ewmh_remove_state(const Window w, const Atom state);
 
 void ewmh_add_state(const Window w, Atom state);
 
 void ewmh_client_message(XClientMessageEvent * restrict e,
-	Client * restrict c) __attribute__((nonnull(1)));
+	struct JBWMClient * restrict c)
+	__attribute__((nonnull(1)));
 
 #else//!EWMH
 

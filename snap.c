@@ -6,7 +6,7 @@
 #include "snap.h"
 
 #include "config.h"
-#include "jbwmenv.h"
+#include "JBWMEnv.h"
 #include "log.h"
 #include "titlebar.h"
 
@@ -20,15 +20,16 @@ static int16_t sborder(const int16_t xy, const int16_t edge)
 	return xy;
 }
 
-void snap_border(Client *restrict c)
+void snap_border(struct JBWMClient *restrict c)
 {
 	XSizeHints *restrict g = &(c->size);
 	/* snap to screen border */
 	const uint8_t b = 2 * c->border;
 	g->x=sborder(g->x, 0 - b);
-	g->x=sborder(g->x, g->width - c->screen->size[JBWM_SIZE_WIDTH] + b);
+	const struct JBWMSize s = c->screen->size;
+	g->x=sborder(g->x, g->width - s.width + b);
 	g->y=sborder(g->y, 0 - (c->opt.no_titlebar?0:TDIM));
-	g->y=sborder(g->y, g->height + b - c->screen->size[JBWM_SIZE_HEIGHT]);
+	g->y=sborder(g->y, g->height + b - s.height);
 }
 
 __attribute__ ((const, hot, warn_unused_result, regparm(2)))
@@ -51,14 +52,14 @@ snap_dim(const int16_t cxy, const uint16_t cwh, const int16_t cixy,
 	return d;
 }
 
-void snap_client(Client * c)
+void snap_client(struct JBWMClient * c)
 {
 	snap_border(c);
 	// Snap to other windows:
 	XSizeHints *restrict g = &(c->size);
 	XPoint d = { JBWM_SNAP, JBWM_SNAP };
 
-	for (Client * ci = jbwm.head; ci; ci = ci->next) {
+	for (struct JBWMClient * ci = jbwm.head; ci; ci = ci->next) {
 		// This test qualifies 'restrict'
 		if ((ci == c) || (ci->screen != c->screen)
 		    || (ci->vdesk != c->vdesk))

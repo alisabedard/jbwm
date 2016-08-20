@@ -10,12 +10,20 @@
 #include <X11/Xlib.h>
 #include "typedef.h"
 
-enum {
-	JBWM_SIZE_WIDTH,
-	JBWM_SIZE_HEIGHT,
+struct JBWMSize {
+	union {
+		jbwm_dim_t width, w;
+	};
+	union {
+		jbwm_dim_t height, h;
+	};
 };
 
-typedef struct ScreenInfo {
+struct JBWMPixels {
+	jbwm_pixel_t fg, bg, fc;
+};
+
+struct JBWMScreen {
 	GC gc;
 	union {
 		jbwm_window_t root, r;
@@ -23,11 +31,9 @@ typedef struct ScreenInfo {
 #ifdef EWMH
 	jbwm_window_t supporting;
 #endif//EWMH
-	struct {
-		jbwm_pixel_t fg, bg, fc;
-	} pixels;
-	jbwm_dim_t size[2];
+	struct JBWMPixels pixels;
+	struct JBWMSize size;
 	uint8_t screen, vdesk;
-} ScreenInfo;
+};
 
 #endif /* not SCREENINFO_H */
