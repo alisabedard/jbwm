@@ -21,12 +21,14 @@ struct JBSize16 {
 struct JBSize8 {
 	union {
 		uint8_t width, w;
+		uint8_t cols, c;
 		int8_t ascent, a;
 		int8_t top, t;
 		int8_t max;
 	};
 	union {
 		uint8_t height, h;
+		uint8_t rows, r;
 		int8_t descent, d;
 		int8_t bottom, bot, b;
 		int8_t min;
