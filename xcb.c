@@ -3,6 +3,8 @@
 
 #include "log.h"
 #include "util.h"
+// Include this just to check syntax
+#include "struct.h"
 
 #include <errno.h>
 #include <string.h>

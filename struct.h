@@ -1,4 +1,4 @@
-// Copyright 2016, Jeffrey E. Bedard <jefbed@gmail.com> 
+// Copyright 2016, Jeffrey E. Bedard
 
 #ifndef JB_STRUCT_H
 #define JB_STRUCT_H
@@ -7,10 +7,12 @@
 
 struct JBSize {
 	union {
-		uint16_t width, w, top, t;
+		uint16_t width, w, columns, cols, col, c;
+		int16_t top, t;
 	};
 	union {
-		uint16_t height, h, bottom, b;
+		uint16_t height, h, rows, r;
+		int16_t bottom, bot, b;
 	};
 };
 
