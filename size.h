@@ -4,6 +4,7 @@
 #define JB_STRUCT_H
 
 #include <stdint.h>
+#include <xcb/xcb.h>
 
 struct JBSize {
 	union {
@@ -28,6 +29,7 @@ struct JBPoint {
 };
 
 union JBDim {
+	struct xcb_point_t xcb_point;
 	struct JBPoint p;
 	struct JBSize s;
 };
