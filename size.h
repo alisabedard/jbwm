@@ -35,4 +35,19 @@ struct JBSize8 {
 	};
 };
 
+struct JBPoint {
+	union {
+		int16_t x, column, col, c, top, t;
+	};
+	union {
+		int16_t y, row, r, bot, b;
+	};
+};
+
+union JBDim {
+	struct JBPoint p;
+	struct JBSize16 s16, s;
+	struct JBSize8 s8;
+};
+
 #endif//!JB_STRUCT_H
