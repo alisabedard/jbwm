@@ -4,34 +4,16 @@
 #define JB_STRUCT_H
 
 #include <stdint.h>
-#include <xcb/xcb.h>
 
-struct JBSize {
+struct JBDim {
 	union {
 		uint16_t width, w, columns, cols, col, c;
-		int16_t top, t;
-		int16_t max;
+		int16_t x, top, t, max;
 	};
 	union {
 		uint16_t height, h, rows, r;
-		int16_t bottom, bot, b;
-		int16_t min;
+		int16_t y, bottom, bot, b, min;
 	};
-};
-
-struct JBPoint {
-	union {
-		int16_t x, column, col, c, top, t;
-	};
-	union {
-		int16_t y, row, r, bot, b;
-	};
-};
-
-union JBDim {
-	struct xcb_point_t xcb_point;
-	struct JBPoint p;
-	struct JBSize s;
 };
 
 #endif//!JB_STRUCT_H
