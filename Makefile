@@ -34,5 +34,5 @@ install:
 	install -d /usr/lib
 	install -d /usr/include/jb
 	install libjb.a /usr/lib
-	install jb.h /usr/include
+	install *.h /usr/include/jb
 
