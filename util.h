@@ -12,7 +12,7 @@
 
 #undef SWAP
 #define SWAP(type, a, b) {\
-	type x; x = a; a = b; b = x;\
+	type tmp; tmp = (a); a = (b); b = tmp;\
 }
 
 #undef likely
