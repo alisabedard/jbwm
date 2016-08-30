@@ -11,6 +11,15 @@
 #include <sys/types.h>
 #include <unistd.h>
 
+void jb_swap(void * a, void * b)
+{
+	int *c = (int*)a;
+	int *d = (int*)b;
+	int e = *c;
+	*c = *d;
+	*d = e;
+}
+
 void jb_close(const fd_t fd)
 {
 	if (close(fd) != -1)

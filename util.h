@@ -22,6 +22,9 @@
 
 typedef int fd_t;
 
+// Swap contents of a and b.
+void jb_swap(void * a, void * b);
+
 // Close the FD, print an error message if unsuccessful
 void jb_close(const fd_t fd);
 
