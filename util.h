@@ -10,7 +10,7 @@
 #undef MIN
 #define MIN(a,b) ((a) < (b) ? (a) : (b))
 
-#define JB_LIMIT(var, max, min) {var = MAX(MIN(var, max) min);}
+#define JB_LIMIT(var, max, min) {var = MAX(MIN(var, max), min);}
 
 #undef likely
 #define likely(x)       __builtin_expect((x), true)
