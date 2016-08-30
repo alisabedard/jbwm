@@ -10,11 +10,6 @@
 #undef MIN
 #define MIN(a,b) ((a) < (b) ? (a) : (b))
 
-#undef SWAP
-#define SWAP(type, a, b) {\
-	type tmp; tmp = (a); a = (b); b = tmp;\
-}
-
 #undef likely
 #define likely(x)       __builtin_expect((x), true)
 #undef unlikely
