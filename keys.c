@@ -17,6 +17,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <sys/wait.h>
 
 __attribute__((nonnull))
 static void point(struct JBWMClient * restrict c, const int16_t x, const int16_t y)

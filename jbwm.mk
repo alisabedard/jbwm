@@ -17,6 +17,10 @@ SRCS+=$(EXTRASRCS)
 INCLUDES+=$(EXTRAINCLUDES)
 LIBS+=$(EXTRALIBS)
 
+# Fix build on FreeBSD
+INCLUDES+=-I/usr/local/include
+LDPATH+=-L/usr/local/lib
+
 # Fix build on NetBSD and older systems:
 # Uncomment X11R6 paths for older installations.
 #INCLUDES+=-I/usr/X11R6/include
