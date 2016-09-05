@@ -97,4 +97,3 @@ void set_fullscreen(struct JBWMClient * restrict c)
 	update_titlebar(c);
 }
 
-

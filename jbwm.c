@@ -107,7 +107,7 @@ static void parse_argv(uint8_t argc, char **argv, struct Options * restrict o)
 #endif//USE_ARGV
 
 __attribute__((noreturn))
-static void jbwm_error(const char * msg
+static void jbwm_error(const char * restrict msg
 #ifndef STDIO
 	__attribute__((unused))
 #endif//!STDIO
@@ -140,9 +140,6 @@ static void setup_fonts(void)
 #define setup_fonts()
 #endif//USE_TBAR
 
-#ifdef USE_SHAPE
-#include <X11/extensions/shape.h>
-#endif//USE_SHAPE
 static void setup_event_listeners(const jbwm_window_t root)
 {
 	XChangeWindowAttributes(jbwm.d, root, CWEventMask,
@@ -151,7 +148,8 @@ static void setup_event_listeners(const jbwm_window_t root)
 		| ColormapChangeMask});
 }
 
-static void allocate_colors(struct JBWMScreen * restrict s, struct Options * restrict o)
+static void allocate_colors(struct JBWMScreen * restrict s,
+	struct Options * restrict o)
 {
 	const uint8_t n = s->screen;
 	s->pixels.fg=pixel(n, o->fg);
