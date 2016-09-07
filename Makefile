@@ -36,3 +36,8 @@ install:
 	install libjb.a /usr/lib
 	install *.h /usr/include/jb
 
+check: libjb.a
+	cc test.c libjb.a
+	echo "The following will abort (intentionally)"
+	./a.out
+

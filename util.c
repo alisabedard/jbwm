@@ -7,6 +7,7 @@
 #include <errno.h>
 #include <fcntl.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <unistd.h>
@@ -59,5 +60,13 @@ void jb_assert(const bool val, char * msg)
 {
 	if (jb_check(val, msg))
 		exit(1);
+}
+
+bool jb_abort_if_false(bool val, char * msg)
+{
+	val = jb_check(val, msg);
+	if (val)
+		abort();
+	return val;
 }
 

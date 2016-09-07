@@ -28,21 +28,21 @@ void jb_close(const fd_t fd);
 // Open path with flags options, check result
 fd_t jb_open(const char * path, const int flags);
 
+// If val is false, print msg and abort
+bool jb_abort_if_false(bool val, char * msg);
+
 #ifndef DEBUG
 
 // If val is false, print msg, using perror if errno set, return !val
 bool jb_check(const bool val, char * msg);
 
-// If val is false, print msg, exit
+// If val is false, print msg and exit
 void jb_assert(const bool val, char * msg);
 
 #else//DEBUG
-#include <stdlib.h>
-#include <stdio.h>
-#include <errno.h>
-#define __jb_assert(val, msg) {errno=0;if(!(val)){perror(msg);abort();}}
-#define jb_check(val, msg) __jb_assert(val, msg)
-#define jb_assert(val, msg) __jb_assert(val, msg)
+// Abort if check fails to aid in debugging, producing a backtrace/core
+#define jb_check jb_abort_if_false
+#define jb_assert jb_abort_if_false
 #endif//DEBUG
 
 #endif//!JB_UTIL_H
