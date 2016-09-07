@@ -40,9 +40,10 @@ void jb_assert(const bool val, char * msg);
 #include <stdlib.h>
 #include <stdio.h>
 #include <errno.h>
-#define __jb_assert(val) {errno=0; if(!(val)) {perror(msg); abort();}}
-#define jb_check(val, msg) __jb_assert(val)
-#define jb_assert(val, msg) __jb_assert(val)
+#define __jb_assert(val, msg) \
+	{errno=0; if(!(val)) {perror(msg); abort();}}
+#define jb_check(val, msg) __jb_assert(val, msg)
+#define jb_assert(val, msg) __jb_assert(val, msg)
 #endif//DEBUG
 
 #endif//!JB_UTIL_H
