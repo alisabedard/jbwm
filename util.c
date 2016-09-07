@@ -1,5 +1,8 @@
 // Copyright 2016, Jeffrey E. Bedard
 
+// Prevent behavior changes when DEBUG defined from affecting this file.
+#undef DEBUG
+
 #include "util.h"
 
 #include "log.h"
