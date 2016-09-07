@@ -41,8 +41,8 @@ void jb_assert(const bool val, char * msg);
 
 #else//DEBUG
 // Abort if check fails to aid in debugging, producing a backtrace/core
-#define jb_check jb_abort_if_false
-#define jb_assert jb_abort_if_false
+#define jb_check(val, msg) jb_abort_if_false(val, msg)
+#define jb_assert(val, msg) jb_abort_if_false(val, msg)
 #endif//DEBUG
 
 #endif//!JB_UTIL_H
