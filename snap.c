@@ -12,7 +12,7 @@
 
 #include <stdlib.h>
 
-__attribute__ ((const, hot, warn_unused_result, regparm(2)))
+__attribute__ ((const, hot, warn_unused_result))
 static int16_t sborder(const int16_t xy, const int16_t edge)
 {
 	if(abs(xy+edge) < JBWM_SNAP)
@@ -32,7 +32,7 @@ void snap_border(struct JBWMClient *restrict c)
 	g->y=sborder(g->y, g->height + b - s.height);
 }
 
-__attribute__ ((const, hot, warn_unused_result, regparm(2)))
+__attribute__ ((const, hot, warn_unused_result))
 static inline int16_t absmin(const int16_t a, const int16_t b)
 {
 	return abs(a) < abs(b) ? a : b;
