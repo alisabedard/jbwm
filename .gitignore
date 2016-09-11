@@ -1,1 +1,7 @@
-*.o
+/*.o
+/tags
+/jbwm
+/*.dbg
+/.*.swp
+/*.log
+
