@@ -183,11 +183,16 @@ void jbwm_handle_key_event(XKeyEvent * e)
 
 	switch (key) {
 	case KEY_NEW: {
+#ifdef STDIO
 		const int r = system(TERMINAL_CMD);
 		if (!WIFEXITED(r) || WEXITSTATUS(r)) {
 			fputs("Could not execute terminal command\n",
 				stderr);
 		}
+#else//!STDIO
+		if (system(TERMINAL_CMD))
+			exit(1);
+#endif//STDIO
 		break;
 	}
 	case KEY_QUIT:
