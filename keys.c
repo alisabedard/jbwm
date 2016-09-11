@@ -60,7 +60,9 @@ static void handle_client_key_event(const bool mod,
 	case KEY_RIGHT:
 		keymv(c, &(c->size.x), &(c->size.width), mod, 1);
 		break;
-	case KEY_KILL: send_wm_delete(c); break;
+	case KEY_KILL:
+		send_wm_delete(c);
+		break;
 	case KEY_LOWER:
 	case KEY_ALTLOWER: XLowerWindow(jbwm.d, c->parent); break;
 	case KEY_RAISE: XRaiseWindow(jbwm.d, c->parent); break;
@@ -85,9 +87,15 @@ static void handle_client_key_event(const bool mod,
 	case KEY_MAX_V:
 		(c->opt.max_vert ? unset_vert : set_vert)(c);
 		break;
-	case KEY_STICK: stick(c); break;
-	case KEY_MOVE: jbwm_drag(c, false); break;
-	case KEY_SHADE: shade(c); break;
+	case KEY_STICK:
+		stick(c);
+		break;
+	case KEY_MOVE:
+		jbwm_drag(c, false);
+		break;
+	case KEY_SHADE:
+		shade(c);
+		break;
 	}
 }
 
