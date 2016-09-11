@@ -19,27 +19,73 @@
 #include <stdlib.h>
 #include <sys/wait.h>
 
-__attribute__((nonnull))
+__attribute__((nonnull(1)))
 static void point(struct JBWMClient * restrict c, const int16_t x, const int16_t y)
 {
 	XRaiseWindow(jbwm.d, c->parent);
 	XWarpPointer(jbwm.d, None, c->window, 0, 0, 0, 0, x, y);
 }
 
-__attribute__((nonnull))
-static void keymv(struct JBWMClient * restrict c, int * restrict xy,
-	int * restrict wh, const bool mod, const int8_t sign)
+__attribute__((nonnull(1)))
+static void commit_key_move(struct JBWMClient * restrict c)
+{
+	snap_border(c);
+	moveresize(c);
+	point(c, 1, 1);
+}
+
+struct KeyMoveFlags {
+	bool horz:1, pos:1, mod:1;
+};
+
+__attribute__((nonnull(1)))
+static void key_move(struct JBWMClient * restrict c,
+	const struct KeyMoveFlags f)
+{
+	const int8_t d = f.pos ? JBWM_RESIZE_INCREMENT
+		: -JBWM_RESIZE_INCREMENT;
+	XSizeHints * restrict s = &c->size;
+	int * wh = f.horz ? &s->width : &s->height;
+	int * xy = f.horz ? &s->x : &s->y;
+	*(f.mod && (*wh > JBWM_RESIZE_INCREMENT<<1)
+		&& !c->opt.shaped && !c->opt.no_resize ? wh : xy) += d;
+	commit_key_move(c);
+}
+
+__attribute__((nonnull(1)))
+static void handle_key_move(struct JBWMClient * restrict c,
+	const KeySym k, const bool mod)
 {
 	/* These operations invalid when fullscreen.  */
 	if (c->opt.fullscreen)
 		return;
-	const int8_t d = sign * JBWM_RESIZE_INCREMENT;
+	struct KeyMoveFlags f = {.mod = mod, .pos = true};
+	switch (k) {
+	case KEY_LEFT:
+		f.pos = false;
+	case KEY_RIGHT:
+		f.horz = true;
+		break;
+	case KEY_UP:
+		f.pos = false;
+	}
+	key_move(c, f);
+}
 
-	*(mod && (*wh > JBWM_RESIZE_INCREMENT<<1)
-		&& !c->opt.shaped && !c->opt.no_resize ? wh : xy) += d;
-	snap_border(c);
-	moveresize(c);
-	point(c, 1, 1);
+static void toggle_maximize(struct JBWMClient * restrict c)
+{
+	const struct JBWMClientOptions o = c->opt;
+	// Honor !MWM_FUNC_MAXIMIZE
+	// Maximizing shaped windows is buggy, so return.
+	if (o.shaped || o.no_max)
+		return;
+	if (o.max_horz && o.max_vert) {
+		unset_horz(c);
+		unset_vert(c);
+	} else {
+		set_horz(c);
+		set_vert(c);
+	}
 }
 
 __attribute__((nonnull))
@@ -49,37 +95,28 @@ static void handle_client_key_event(const bool mod,
 	LOG("handle_client_key_event: %d", (int)key);
 	switch (key) {
 	case KEY_LEFT:
-		keymv(c, &(c->size.x), &(c->size.width), mod, -1);
-		break;
-	case KEY_DOWN:
-		keymv(c, &(c->size.y), &(c->size.height), mod, 1);
-		break;
-	case KEY_UP:
-		keymv(c, &(c->size.y), &(c->size.height), mod, -1);
-		break;
 	case KEY_RIGHT:
-		keymv(c, &(c->size.x), &(c->size.width), mod, 1);
+	case KEY_UP:
+	case KEY_DOWN:
+		handle_key_move(c, key, mod);
 		break;
 	case KEY_KILL:
 		send_wm_delete(c);
 		break;
 	case KEY_LOWER:
-	case KEY_ALTLOWER: XLowerWindow(jbwm.d, c->parent); break;
-	case KEY_RAISE: XRaiseWindow(jbwm.d, c->parent); break;
+	case KEY_ALTLOWER:
+		XLowerWindow(jbwm.d, c->parent);
+		break;
+	case KEY_RAISE:
+		XRaiseWindow(jbwm.d, c->parent);
+		break;
 	case KEY_FS:
 		if (!c->opt.no_max)
 			(c->opt.fullscreen ? unset_fullscreen
 			 : set_fullscreen)(c);
 		break;
-	case KEY_MAX: {
-		// Honor !MWM_FUNC_MAXIMIZE
-		// Maximizing shaped windows is buggy, so return.
-		if(c->opt.shaped || c->opt.no_max)
-			break;
-		const bool max = c->opt.max_horz && c->opt.max_vert;
-		(max ? unset_horz : set_horz)(c);
-		(max ? unset_vert : set_vert)(c);
-	}
+	case KEY_MAX:
+		toggle_maximize(c);
 		break;
 	case KEY_MAX_H:
 		(c->opt.max_horz ? unset_horz : set_horz)(c);
