@@ -68,7 +68,6 @@ strip:
 		-R .eh_frame \
 		-R .eh_frame_hdr \
 		-R .got \
-		-R .rela.dyn \
 		$(PROG)
 
 INSTALL=install -c
@@ -102,6 +101,7 @@ debug:
 small:
 	make clean
 	make -f Makefile.small
+	cp jbwm jbwm.small.dbg
 	make strip
 	ls -l jbwm >> small.log
 	tail small.log
