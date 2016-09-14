@@ -1,7 +1,7 @@
 // Copyright 2016, Jeffrey E. Bedard
 
-#ifndef JB_STRUCT_H
-#define JB_STRUCT_H
+#ifndef JB_SIZE_H
+#define JB_SIZE_H
 
 #include <stdint.h>
 
@@ -16,4 +16,4 @@ struct JBDim {
 	};
 };
 
-#endif//!JB_STRUCT_H
+#endif//!JB_SIZE_H
