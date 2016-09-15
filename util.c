@@ -7,11 +7,13 @@
 
 #include "JBWMEnv.h"
 
+#include <string.h>
 #include <unistd.h>
 
-__attribute__((nonnull(2)))
 unsigned long pixel(const uint8_t screen, const char * restrict name)
 {
+	if (!name) // sanitize input to avoid segfault
+		return 0;
 	XColor c;
 	XAllocNamedColor(jbwm.d, DefaultColormap(jbwm.d, screen),
 		name, &c, &(XColor){});

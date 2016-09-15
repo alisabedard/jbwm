@@ -240,6 +240,9 @@ static void jbwm_set_defaults(void)
 	setenv(JBWM_ENV_BG, JBWM_DEF_BG, 0);
 	setenv(JBWM_ENV_TERM, JBWM_DEF_TERM, 0);
 #ifdef USE_TBAR
+	setenv(JBWM_ENV_CLOSE, JBWM_DEF_CLOSE, 0);
+	setenv(JBWM_ENV_RESIZE, JBWM_DEF_RESIZE, 0);
+	setenv(JBWM_ENV_SHADE, JBWM_DEF_SHADE, 0);
 	setenv(JBWM_ENV_FONT, JBWM_DEF_FONT, 0);
 #endif//USE_TBAR
 }

@@ -13,6 +13,8 @@
 #include "screen.h"
 #include "util.h"
 
+#include <stdlib.h>
+
 #ifdef USE_XFT
 #include <X11/Xft/Xft.h>
 #endif//USE_XFT
@@ -55,9 +57,9 @@ static GC colorgc(struct JBWMScreen * restrict s, const char *restrict colorname
 
 static void setup_gcs(struct JBWMScreen * restrict s)
 {
-	jbwm.gc.close = colorgc(s, JBWM_DEF_CLOSE);
-	jbwm.gc.shade = colorgc(s, JBWM_DEF_SHADE);
-	jbwm.gc.resize = colorgc(s, JBWM_DEF_RESIZE);
+	jbwm.gc.close = colorgc(s, getenv(JBWM_ENV_CLOSE));
+	jbwm.gc.shade = colorgc(s, getenv(JBWM_ENV_SHADE));
+	jbwm.gc.resize = colorgc(s, getenv(JBWM_ENV_RESIZE));
 }
 
 static void new_titlebar(struct JBWMClient * restrict c)
