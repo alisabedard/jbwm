@@ -102,7 +102,7 @@ static void parse_argv(uint8_t argc, char **argv)
 			exit(0);
 		default: { // usage
 			size_t l = 0;
-			while (*argv+++l);
+			while (argv[0][++l]);
 			print(l, *argv);
 			print(4, " -[ ");
 			print(sizeof(optstring), optstring);
@@ -136,13 +136,9 @@ static void setup_fonts(void)
 		XftTypeDouble, JBWM_FONT_SIZE, NULL);
 #else//!USE_XFT
 	jbwm.font = XLoadQueryFont(jbwm.d, font);
-
-	if (!jbwm.font)
-		jbwm.font = XLoadQueryFont(jbwm.d, JBWM_FALLBACK_FONT);
 #endif//USE_XFT
-
 	if (!jbwm.font)
-		jbwm_error("Cannot load any font");
+		jbwm_error(JBWM_ENV_FONT);
 }
 #else//!USE_TBAR
 #define setup_fonts()
