@@ -6,21 +6,14 @@
 #ifndef JBWM_CONFIG_H
 #define JBWM_CONFIG_H
 
-#ifndef TERMINAL_CMD
-#ifndef DEBIAN
-#define TERMINAL_CMD "xterm&"
-#else /* DEBIAN */
-#define TERMINAL_CMD "x-terminal-emulator&"
-#endif /* !DEBIAN */
-#endif /* !TERMINAL_CMD */
+#define JBWM_DEF_TERM "xterm"
 
 /* Default fonts */
 #ifdef USE_XFT
 #define JBWM_DEF_FONT "Sans"
 #define JBWM_FONT_SIZE 10.0
 #else /* ! USE_XFT */
-#define JBWM_DEF_FONT "-*-lucida-*-r-*-*-14-*-*-*-*-*-iso10646-*"
-#define JBWM_FALLBACK_FONT "fixed"
+#define JBWM_DEF_FONT "variable"
 #endif /* USE_XFT */
 
 /* Default colors */
@@ -37,6 +30,7 @@
 #define JBWM_ENV_FC "JBWM_FC"
 #define JBWM_ENV_BG "JBWM_BG"
 #define JBWM_ENV_FONT "JBWM_FONT"
+#define JBWM_ENV_TERM "JBWM_TERM"
 
 enum {
 	GRAB_MASK = Mod4Mask,

@@ -235,11 +235,12 @@ static int handle_xerror(Display * restrict dpy __attribute__ ((unused)),
 
 static void jbwm_set_defaults(void)
 {
-	setenv("JBWM_FG", JBWM_DEF_FG, 0);
-	setenv("JBWM_FC", JBWM_DEF_FC, 0);
-	setenv("JBWM_BG", JBWM_DEF_BG, 0);
+	setenv(JBWM_ENV_FG, JBWM_DEF_FG, 0);
+	setenv(JBWM_ENV_FC, JBWM_DEF_FC, 0);
+	setenv(JBWM_ENV_BG, JBWM_DEF_BG, 0);
+	setenv(JBWM_ENV_TERM, JBWM_DEF_TERM, 0);
 #ifdef USE_TBAR
-	setenv("JBWM_FONT", JBWM_DEF_FONT, 0);
+	setenv(JBWM_ENV_FONT, JBWM_DEF_FONT, 0);
 #endif//USE_TBAR
 }
 

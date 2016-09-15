@@ -18,6 +18,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <sys/wait.h>
+#include <unistd.h>
 
 __attribute__((nonnull(1)))
 static void point(struct JBWMClient * restrict c, const int16_t x, const int16_t y)
@@ -183,16 +184,11 @@ void jbwm_handle_key_event(XKeyEvent * e)
 
 	switch (key) {
 	case KEY_NEW: {
-#ifdef STDIO
-		const int r = system(TERMINAL_CMD);
-		if (!WIFEXITED(r) || WEXITSTATUS(r)) {
-			fputs("Could not execute terminal command\n",
-				stderr);
+		if (fork() == 0) {
+			const char * restrict t
+				= getenv(JBWM_ENV_TERM);
+			execlp(t, t);
 		}
-#else//!STDIO
-		if (system(TERMINAL_CMD))
-			exit(1);
-#endif//STDIO
 		break;
 	}
 	case KEY_QUIT:
