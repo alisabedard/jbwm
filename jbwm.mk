@@ -3,7 +3,7 @@
 # Copyright 1999-2015, Ciaran Anscomb <jbwm@6809.org.uk>
 # See README for license and other details.
 
-version = 1.48
+version = 1.49
 
 PROG=jbwm
 distname = $(PROG)-$(version)
@@ -47,7 +47,7 @@ SRCS += button_event.c keys.c util.c max.c
 OBJS = $(SRCS:.c=.o)
 
 $(PROG): $(OBJS) 
-	$(CC) $(CFLAGS) $(OBJS) -o $@ $(LDFLAGS)
+	$(CC) $(LDFLAGS) $(OBJS) -o $@
 	strip $(PROG) -o $(PROG).tmp
 	ls -l $(PROG).tmp >> sz.log
 	rm -f $(PROG).tmp
@@ -56,18 +56,21 @@ $(PROG): $(OBJS)
 all: $(PROG)
 
 strip: 
+	# Leave .plt.got
 	strip -s \
-		-R .comment \
+		-R .jcr \
+		-R .eh_frame \
+		-R .got \
 		-R .note \
 		-R .gnu.version \
 		-R .note.gnu.build-id \
 		-R .note.ABI-tag \
-		-R .gnu.hash \
-		-R .jcr \
-		-R .plt.got \
-		-R .eh_frame \
 		-R .eh_frame_hdr \
-		-R .got \
+		-R .comment \
+		-R .gnu.hash \
+		-R .shstrtab \
+		-R .fini_array \
+		-R .fini \
 		$(PROG)
 
 INSTALL=install -c
