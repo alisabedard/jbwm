@@ -16,20 +16,27 @@
 
 /* Default fonts */
 #ifdef USE_XFT
-#define DEF_FONT "Sans"
-#define FONT_SIZE 10.0
+#define JBWM_DEF_FONT "Sans"
+#define JBWM_FONT_SIZE 10.0
 #else /* ! USE_XFT */
-#define DEF_FONT "-*-lucida-*-r-*-*-14-*-*-*-*-*-iso10646-*"
-#define FALLBACK_FONT "fixed"
+#define JBWM_DEF_FONT "-*-lucida-*-r-*-*-14-*-*-*-*-*-iso10646-*"
+#define JBWM_FALLBACK_FONT "fixed"
 #endif /* USE_XFT */
 
 /* Default colors */
-#define DEF_fg                  "white"
-#define DEF_fc			"green"
-#define DEF_bg			"grey15"
-#define TITLEBAR_CLOSE_BG       "#977"
-#define TITLEBAR_SHADE_BG       "#797"
-#define TITLEBAR_RESIZE_BG      "#779"
+#define JBWM_DEF_FG "white"
+#define JBWM_DEF_FC "green"
+#define JBWM_DEF_BG "grey15"
+#define JBWM_DEF_CLOSE "#977"
+#define JBWM_DEF_SHADE "#797"
+#define JBWM_DEF_RESIZE "#779"
+
+// Environment
+#define JBWM_ENV_DISPLAY "DISPLAY"
+#define JBWM_ENV_FG "JBWM_FG"
+#define JBWM_ENV_FC "JBWM_FC"
+#define JBWM_ENV_BG "JBWM_BG"
+#define JBWM_ENV_FONT "JBWM_FONT"
 
 enum {
 	GRAB_MASK = Mod4Mask,

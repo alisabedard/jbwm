@@ -55,9 +55,9 @@ static GC colorgc(struct JBWMScreen * restrict s, const char *restrict colorname
 
 static void setup_gcs(struct JBWMScreen * restrict s)
 {
-	jbwm.gc.close = colorgc(s, TITLEBAR_CLOSE_BG);
-	jbwm.gc.shade = colorgc(s, TITLEBAR_SHADE_BG);
-	jbwm.gc.resize = colorgc(s, TITLEBAR_RESIZE_BG);
+	jbwm.gc.close = colorgc(s, JBWM_DEF_CLOSE);
+	jbwm.gc.shade = colorgc(s, JBWM_DEF_SHADE);
+	jbwm.gc.resize = colorgc(s, JBWM_DEF_RESIZE);
 }
 
 static void new_titlebar(struct JBWMClient * restrict c)
@@ -87,7 +87,7 @@ draw_xft(struct JBWMClient * restrict c, const XPoint * restrict p,
 	const Colormap cm = DefaultColormap(jbwm.d, s);
 	XftDraw *xd = XftDrawCreate(jbwm.d, c->titlebar, v, cm);
 	XftColor color;
-	XftColorAllocName(jbwm.d, v, cm, DEF_fg, &color);
+	XftColorAllocName(jbwm.d, v, cm, getenv(JBWM_ENV_FG), &color);
 	/* Prevent the text from going over the resize button.  */
 	const uint16_t max_width = c->size.width - 3 * TDIM;
 	XftDrawStringUtf8(xd, &color, jbwm.font, p->x, p->y,

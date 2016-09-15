@@ -29,10 +29,11 @@
 // Main application data structure.
 struct JBWMEnv jbwm;
 
-struct Options {
-	// Color names:
-	char *fg, *bg, *fc;
-};
+static void print(const size_t sz, const char * buf)
+{
+	if (write(1, buf, sz) == -1)
+		abort();
+}
 
 #ifdef USE_ARGV
 
@@ -67,11 +68,10 @@ static uint16_t parse_modifiers(char * restrict arg)
 	return Mod1Mask;
 }
 
-static void parse_argv(uint8_t argc, char **argv, struct Options * restrict o)
+static void parse_argv(uint8_t argc, char **argv)
 {
 	LOG("parse_argv(%d,%s...)", argc, argv[0]);
-	const char *optstring = "1:2:b:d:f:hs:V";
-
+	static const char optstring[] = "1:2:b:d:F:f:hs:V";
 	int8_t opt;
 	while((opt=getopt(argc, argv, optstring)) != -1) {
 		switch (opt) {
@@ -82,55 +82,63 @@ static void parse_argv(uint8_t argc, char **argv, struct Options * restrict o)
 			jbwm.keymasks.mod = parse_modifiers(optarg);
 			break;
 		case 'b':
-			o->bg = optarg;
+			setenv(JBWM_ENV_BG, optarg, 1);
 			break;
 		case 'd':
-			setenv("DISPLAY", optarg, 1);
+			setenv(JBWM_ENV_DISPLAY, optarg, 1);
+			break;
+		case 'F':
+			setenv(JBWM_ENV_FONT, optarg, 1);
 			break;
 		case 'f':
-			o->fg = optarg;
+			setenv(JBWM_ENV_FG, optarg, 1);
 			break;
 		case 's':
-			o->fc = optarg;
+			setenv(JBWM_ENV_FC, optarg, 1);
 			break;
 		case 'V':
-			puts(VERSION);
+			print(sizeof(VERSION), VERSION);
+			print(1, "\n");
 			exit(0);
-		default: // usage
-			printf("%s -[ %s ]\n", argv[0], optstring);
+		default: { // usage
+			size_t l = 0;
+			while (*argv+++l);
+			print(l, *argv);
+			print(4, " -[ ");
+			print(sizeof(optstring), optstring);
+			print(2, "]\n");
 			exit(1);
+		}
 		}
 	}
 }
 #else//!USE_ARGV
-#define parse_argv(a, b, o)
+#define parse_argv(a, b)
 #endif//USE_ARGV
 
 __attribute__((noreturn))
-static void jbwm_error(const char * restrict msg
-#ifndef STDIO
-	__attribute__((unused))
-#endif//!STDIO
-	)
+static void jbwm_error(const char * restrict msg)
 {
-#ifdef STDIO
-	perror(msg);
-#endif//STDIO
+	size_t count = 0;
+	while (msg[++count]);
+	print(count, msg);
+	print(1, "\n");
 	exit(1);
 }
 
 #ifdef USE_TBAR
 static void setup_fonts(void)
 {
+	char * font = getenv(JBWM_ENV_FONT);
 #ifdef USE_XFT
 	jbwm.font = XftFontOpen(jbwm.d, DefaultScreen(jbwm.d),
-		XFT_FAMILY, XftTypeString, DEF_FONT, XFT_SIZE,
-		XftTypeDouble, FONT_SIZE, NULL);
+		XFT_FAMILY, XftTypeString, font, XFT_SIZE,
+		XftTypeDouble, JBWM_FONT_SIZE, NULL);
 #else//!USE_XFT
-	jbwm.font = XLoadQueryFont(jbwm.d, DEF_FONT);
+	jbwm.font = XLoadQueryFont(jbwm.d, font);
 
 	if (!jbwm.font)
-		jbwm.font = XLoadQueryFont(jbwm.d, FALLBACK_FONT);
+		jbwm.font = XLoadQueryFont(jbwm.d, JBWM_FALLBACK_FONT);
 #endif//USE_XFT
 
 	if (!jbwm.font)
@@ -148,13 +156,12 @@ static void setup_event_listeners(const jbwm_window_t root)
 		| ColormapChangeMask});
 }
 
-static void allocate_colors(struct JBWMScreen * restrict s,
-	struct Options * restrict o)
+static void allocate_colors(struct JBWMScreen * restrict s)
 {
 	const uint8_t n = s->screen;
-	s->pixels.fg=pixel(n, o->fg);
-	s->pixels.bg=pixel(n, o->bg);
-	s->pixels.fc=pixel(n, o->fc);
+	s->pixels.fg=pixel(n, getenv(JBWM_ENV_FG));
+	s->pixels.bg=pixel(n, getenv(JBWM_ENV_BG));
+	s->pixels.fc=pixel(n, getenv(JBWM_ENV_FC));
 }
 
 static bool check_redirect(const jbwm_window_t w)
@@ -188,9 +195,9 @@ static void setup_screen_elements(const uint8_t i)
 	s->size.h = DisplayHeight(d, i);
 }
 
-static void setup_gc(struct JBWMScreen * restrict s, struct Options * restrict o)
+static void setup_gc(struct JBWMScreen * restrict s)
 {
-	allocate_colors(s, o);
+	allocate_colors(s);
 	unsigned long vm = GCFunction | GCSubwindowMode
 		| GCLineWidth | GCForeground | GCBackground;
 	XGCValues gv = {.foreground = s->pixels.fg,
@@ -206,11 +213,11 @@ static void setup_gc(struct JBWMScreen * restrict s, struct Options * restrict o
 	s->gc = XCreateGC(jbwm.d, s->root, vm, &gv);
 }
 
-static void setup_screen(const uint8_t i, struct Options * restrict o)
+static void setup_screen(const uint8_t i)
 {
 	struct JBWMScreen *s = &jbwm.s[i];
 	setup_screen_elements(i);
-	setup_gc(s, o);
+	setup_gc(s);
 	setup_event_listeners(s->root);
 	grab_keys_for_screen(s);
 	/* scan all the windows on this screen */
@@ -230,6 +237,16 @@ static int handle_xerror(Display * restrict dpy __attribute__ ((unused)),
 	return 0; // Ignore everything else.
 }
 
+static void jbwm_set_defaults(void)
+{
+	setenv("JBWM_FG", JBWM_DEF_FG, 0);
+	setenv("JBWM_FC", JBWM_DEF_FC, 0);
+	setenv("JBWM_BG", JBWM_DEF_BG, 0);
+#ifdef USE_TBAR
+	setenv("JBWM_FONT", JBWM_DEF_FONT, 0);
+#endif//USE_TBAR
+}
+
 int main(
 #ifdef USE_ARGV
 		int argc, char **argv)
@@ -237,12 +254,12 @@ int main(
 		void)
 #endif//USE_ARGV
 {
+	jbwm_set_defaults();
 	jbwm.keymasks.grab = GRAB_MASK;
 	jbwm.keymasks.mod = MOD_MASK;
-	struct Options o = {.fg=DEF_fg, .bg=DEF_bg, .fc=DEF_fc};
-	parse_argv(argc, argv, &o);
+	parse_argv(argc, argv);
 	if (!(jbwm.d = XOpenDisplay(NULL)))
-		jbwm_error("DISPLAY");
+		jbwm_error(JBWM_ENV_DISPLAY);
 	XSetErrorHandler(handle_xerror);
 	ewmh_init();
 	/* Fonts only needed with title bars */
@@ -252,7 +269,7 @@ int main(
 	struct JBWMScreen s[i]; // remains in scope till exit.
 	jbwm.s = s;
 	while (i--)
-		setup_screen(i, &o);
+		setup_screen(i);
 	main_event_loop();
 	return 0;
 }
