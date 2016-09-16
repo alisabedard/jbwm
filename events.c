@@ -107,7 +107,7 @@ static void iteration(void)
 	XEvent ev;
 	struct JBWMClient * c;
 	XNextEvent(jbwm.d, &ev);
-	c=find_client(ev.xany.window);
+	c = find_client(ev.xany.window);
 	switch (ev.type) {
 	case KeyPress:
 		jbwm_handle_key_event(&ev.xkey);

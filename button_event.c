@@ -7,32 +7,25 @@
 
 #include "client.h"
 #include "JBWMEnv.h"
+#include "log.h"
 #include "screen.h"
 #include "titlebar.h"
 
-#ifdef USE_TBAR
-__attribute__((nonnull))
-static void titlebar_event(struct JBWMClient * restrict c, const uint16_t x)
+void jbwm_handle_button_event(XButtonEvent * restrict e,
+	struct JBWMClient * restrict c)
 {
-	const uint16_t w = c->size.width;
-	if (!c->opt.no_close && (x < TDIM)) {
-		/* This fixes a bug where deleting a shaded window will cause
-		   the parent window to stick around as a ghost window. */
-		if (c->opt.shaded) shade(c);
-		send_wm_delete(c);
-	} else if (!c->opt.no_resize && (x > w - TDIM)) jbwm_drag(c, true);
-	else if (!c->opt.no_min && (x > w - (TDIM<<1))) shade(c);
-	else jbwm_drag(c, false);
-}
-#endif//USE_TBAR
-
-void jbwm_handle_button_event(XButtonEvent * restrict e, struct JBWMClient * restrict c)
-{
+	LOG("jbwm_handle_button_event");
 	switch (e->button) {
 	case Button1:
 #ifdef USE_TBAR
-		if(e->window==c->titlebar)
-			titlebar_event(c, e->x);
+		LOG("e->window: %d, c->titlebar: %d, e->subwindow: %d",
+			(int)e->window, (int)c->titlebar, (int)e->subwindow);
+		if (e->subwindow == c->button.close)
+			send_wm_delete(c);
+		else if (e->subwindow == c->button.resize)
+			jbwm_drag(c, !c->opt.no_resize);
+		else if (e->subwindow == c->button.shade && !c->opt.no_min)
+			shade(c);
 		else
 #endif//USE_TBAR
 			jbwm_drag(c, false);

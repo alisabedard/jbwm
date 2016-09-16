@@ -158,6 +158,11 @@ static void allocate_colors(struct JBWMScreen * restrict s)
 	s->pixels.fg=pixel(n, getenv(JBWM_ENV_FG));
 	s->pixels.bg=pixel(n, getenv(JBWM_ENV_BG));
 	s->pixels.fc=pixel(n, getenv(JBWM_ENV_FC));
+#ifdef USE_TBAR
+	s->pixels.close = pixel(n, getenv(JBWM_ENV_CLOSE));
+	s->pixels.resize = pixel(n, getenv(JBWM_ENV_RESIZE));
+	s->pixels.shade = pixel(n, getenv(JBWM_ENV_SHADE));
+#endif//USE_TBAR
 }
 
 static bool check_redirect(const jbwm_window_t w)

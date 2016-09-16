@@ -9,7 +9,6 @@
 #include "config.h"
 #include "ewmh.h"
 #include "ewmh_state.h"
-#include "log.h"
 #include "screen.h"
 #include "util.h"
 
@@ -21,10 +20,9 @@
 
 void shade(struct JBWMClient * restrict c)
 {
-	LOG("shade");
-
 	// Honor !MWM_FUNC_MINIMIZE
-	if (c->opt.no_min || c->opt.fullscreen) return;
+	if (c->opt.no_min || c->opt.fullscreen)
+		return;
 
 	/* This implements window shading, a substitute
 	   for iconification.  */
@@ -49,32 +47,31 @@ void shade(struct JBWMClient * restrict c)
 	update_titlebar(c);
 }
 
-static GC colorgc(struct JBWMScreen * restrict s, const char *restrict colorname)
+static void move_buttons(struct JBWMClient * restrict c)
 {
-	return XCreateGC(jbwm.d, s->root, GCForeground,
-		&(XGCValues){.foreground=pixel(s->screen, colorname)});
-}
-
-static void setup_gcs(struct JBWMScreen * restrict s)
-{
-	jbwm.gc.close = colorgc(s, getenv(JBWM_ENV_CLOSE));
-	jbwm.gc.shade = colorgc(s, getenv(JBWM_ENV_SHADE));
-	jbwm.gc.resize = colorgc(s, getenv(JBWM_ENV_RESIZE));
+	uint16_t x = c->size.width - TDIM;
+	XMoveWindow(jbwm.d, c->button.resize, x, 0);
+	x -= TDIM;
+	XMoveWindow(jbwm.d, c->button.shade, x, 0);
 }
 
 static void new_titlebar(struct JBWMClient * restrict c)
 {
-	if (c->opt.no_titlebar || c->opt.shaped)
-		return;
-
-	c->titlebar = XCreateSimpleWindow(jbwm.d, c->parent, 0, 0,
-		c->size.width, TDIM, 0, 0, c->screen->pixels.bg);
-	if (!jbwm.gc.close)
-		setup_gcs(c->screen);
-
-	XSelectInput(jbwm.d, c->titlebar, ExposureMask);
-	XMapRaised(jbwm.d, c->titlebar);
-	jbwm_grab_button(c->titlebar, 0, AnyButton);
+	const struct JBWMPixels * p = &c->screen->pixels;
+	const jbwm_window_t t = c->titlebar = XCreateSimpleWindow(jbwm.d,
+		c->parent, 0, 0, c->size.width, TDIM, 0, 0,
+		p->bg);
+	XSelectInput(jbwm.d, t, ExposureMask);
+	c->button.close = XCreateSimpleWindow(jbwm.d, t, 0, 0, TDIM, TDIM,
+		0, 0, p->close);
+	c->button.resize = XCreateSimpleWindow(jbwm.d, t, 0, 0, TDIM, TDIM,
+		0, 0, p->resize);
+	c->button.shade = XCreateSimpleWindow(jbwm.d, t, 0, 0, TDIM, TDIM,
+		0, 0, p->shade);
+	move_buttons(c);
+	XMapRaised(jbwm.d, t);
+	XMapSubwindows(jbwm.d, t);
+	jbwm_grab_button(t, 0, AnyButton);
 }
 
 #ifdef USE_XFT
@@ -118,26 +115,6 @@ static void draw_title(struct JBWMClient * restrict c)
 	XFree(name);
 }
 
-static inline void draw(const Window t, GC gc, const uint16_t x)
-{
-	XFillRectangle(jbwm.d, t, gc, x, 0, TDIM, TDIM);
-}
-
-static void draw_titlebar(struct JBWMClient * restrict c)
-{
-	const Window t = c->titlebar;
-	XClearWindow(jbwm.d, t);
-	if (!c->opt.no_close_decor)
-		draw(t, jbwm.gc.close, 0);
-	if (c->opt.tearoff) return;
-	const uint16_t w = c->size.width-TDIM;
-	if (!c->opt.no_resize_decor && !c->opt.shaded)
-		draw(t, jbwm.gc.resize, w);
-	if (!c->opt.no_min_decor)
-		draw(t, jbwm.gc.shade, w-TDIM);
-	draw_title(c);
-}
-
 static void remove_titlebar(struct JBWMClient * restrict c)
 {
 	c->ignore_unmap++;
@@ -155,14 +132,13 @@ void update_titlebar(struct JBWMClient * c)
 		return;
 	}
 
-	if (!c->titlebar) {
+	if (!c->titlebar)
 		new_titlebar(c);
-		/* Return here to prevent BadWindow/BadDrawable errors */
-		return;
-	}
 
 	/* Expand/Contract the titlebar width as necessary:  */
 	XMoveResizeWindow(jbwm.d, c->titlebar, 0, 0, c->size.width, TDIM);
-	draw_titlebar(c);
+	move_buttons(c);
+	XClearWindow(jbwm.d, c->titlebar);
+	draw_title(c);
 }
 

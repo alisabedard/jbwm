@@ -39,6 +39,9 @@ struct JBWMClient {
 	jbwm_window_t window, parent;
 #ifdef USE_TBAR
 	jbwm_window_t titlebar;
+	struct {
+		jbwm_window_t close, resize, shade;
+	} button;
 #endif//USE_TBAR
 	jbwm_cmap_t cmap;
 #ifdef USE_TBAR

@@ -19,17 +19,12 @@ struct JBWMEnv {
 	struct JBWMScreen * s;
 #ifdef USE_TBAR
 #ifdef USE_XFT
-	XftFont *font;
+	XftFont * font;
 #else//! USE_XFT
-	XFontStruct *font;
+	XFontStruct * font;
 #endif//USE_XFT
 #endif//USE_TBAR
 	jbwm_window_t last;
-#ifdef USE_TBAR
-	struct {
-		GC close, shade, resize;
-	} gc;
-#endif//USE_TBAR
 	struct {
 		uint16_t grab, mod;
 	} keymasks;

@@ -21,6 +21,9 @@ struct JBWMSize {
 
 struct JBWMPixels {
 	jbwm_pixel_t fg, bg, fc;
+#ifdef USE_TBAR
+	jbwm_pixel_t close, resize, shade;
+#endif//USE_TBAR
 };
 
 struct JBWMScreen {
