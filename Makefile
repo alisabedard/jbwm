@@ -1,7 +1,6 @@
 version=0.2
 
 CFLAGS+=-Wall -Wextra
-CFLAGS+=-std=c11
 CFLAGS+=-D_XOPEN_SOURCE=700
 CFLAGS+=-DJB_VERSION=${version}
 
