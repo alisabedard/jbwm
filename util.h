@@ -12,6 +12,8 @@
 
 #define JB_LIMIT(var, max, min) {var = MAX(MIN(var, max), min);}
 
+#define JB_SWAP(type, a, b) {type c = a; a = b; b = c;}
+
 #undef likely
 #define likely(x)       __builtin_expect((x), true)
 #undef unlikely
