@@ -185,9 +185,8 @@ void jbwm_handle_key_event(XKeyEvent * e)
 	switch (key) {
 	case KEY_NEW: {
 		if (fork() == 0) {
-			const char * restrict t
-				= getenv(JBWM_ENV_TERM);
-			execlp(t, t);
+			char * t = getenv(JBWM_ENV_TERM);
+			execlp(t, t, (char*)NULL);
 		}
 		break;
 	}
