@@ -17,12 +17,12 @@
 #endif /* USE_XFT */
 
 /* Default colors */
-#define JBWM_DEF_FG "white"
-#define JBWM_DEF_FC "#88a"
-#define JBWM_DEF_BG "grey10"
-#define JBWM_DEF_CLOSE "#744"
-#define JBWM_DEF_SHADE "#464"
-#define JBWM_DEF_RESIZE "#446"
+#define JBWM_DEF_FG "#ddd"
+#define JBWM_DEF_FC "#8f8"
+#define JBWM_DEF_BG "#111"
+#define JBWM_DEF_CLOSE "#877"
+#define JBWM_DEF_SHADE "#787"
+#define JBWM_DEF_RESIZE "#778"
 
 // Environment
 #define JBWM_ENV_DISPLAY "DISPLAY"
