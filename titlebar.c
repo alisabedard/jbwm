@@ -66,7 +66,7 @@ static Window get_button(const Window p, const jbwm_pixel_t bg)
 	return get_win(p, TDIM, TDIM, bg);
 }
 
-static void new_titlebar(struct JBWMClient * restrict c)
+static jbwm_window_t new_titlebar(struct JBWMClient * restrict c)
 {
 	const struct JBWMPixels * p = &c->screen->pixels;
 	const jbwm_window_t t = c->tb.win = get_win(c->parent,
@@ -79,6 +79,7 @@ static void new_titlebar(struct JBWMClient * restrict c)
 	XMapRaised(jbwm.d, t);
 	XMapSubwindows(jbwm.d, t);
 	jbwm_grab_button(t, 0, AnyButton);
+	return t;
 }
 
 #ifdef USE_XFT
@@ -133,19 +134,19 @@ void update_titlebar(struct JBWMClient * c)
 {
 	if (c->opt.no_titlebar || c->opt.shaped)
 		  return;
-
-	if (c->opt.fullscreen && c->tb.win) {
+	jbwm_window_t w = c->tb.win;
+	if (c->opt.fullscreen && w) {
 		remove_titlebar(c);
 		return;
 	}
 
-	if (!c->tb.win)
-		new_titlebar(c);
+	if (!w)
+		w = new_titlebar(c);
 
 	/* Expand/Contract the titlebar width as necessary:  */
-	XMoveResizeWindow(jbwm.d, c->tb.win, 0, 0, c->size.width, TDIM);
+	XResizeWindow(jbwm.d, w, c->size.width, TDIM);
 	move_buttons(c);
-	XClearWindow(jbwm.d, c->tb.win);
+	XClearWindow(jbwm.d, w);
 	draw_title(c);
 }
 
