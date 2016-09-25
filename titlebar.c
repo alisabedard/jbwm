@@ -50,24 +50,31 @@ void shade(struct JBWMClient * restrict c)
 static void move_buttons(struct JBWMClient * restrict c)
 {
 	uint16_t x = c->size.width - TDIM;
-	XMoveWindow(jbwm.d, c->button.resize, x, 0);
+	XMoveWindow(jbwm.d, c->tb.resize, x, 0);
 	x -= TDIM;
-	XMoveWindow(jbwm.d, c->button.shade, x, 0);
+	XMoveWindow(jbwm.d, c->tb.shade, x, 0);
+}
+
+static Window get_win(const Window p, const uint16_t w, const uint16_t h,
+	const jbwm_pixel_t bg)
+{
+	return XCreateSimpleWindow(jbwm.d, p, 0, 0, w, h, 0, 0, bg);
+}
+
+static Window get_button(const Window p, const jbwm_pixel_t bg)
+{
+	return get_win(p, TDIM, TDIM, bg);
 }
 
 static void new_titlebar(struct JBWMClient * restrict c)
 {
 	const struct JBWMPixels * p = &c->screen->pixels;
-	const jbwm_window_t t = c->titlebar = XCreateSimpleWindow(jbwm.d,
-		c->parent, 0, 0, c->size.width, TDIM, 0, 0,
-		p->bg);
+	const jbwm_window_t t = c->tb.win = get_win(c->parent,
+		c->size.width, TDIM, p->bg);
 	XSelectInput(jbwm.d, t, ExposureMask);
-	c->button.close = XCreateSimpleWindow(jbwm.d, t, 0, 0, TDIM, TDIM,
-		0, 0, p->close);
-	c->button.resize = XCreateSimpleWindow(jbwm.d, t, 0, 0, TDIM, TDIM,
-		0, 0, p->resize);
-	c->button.shade = XCreateSimpleWindow(jbwm.d, t, 0, 0, TDIM, TDIM,
-		0, 0, p->shade);
+	c->tb.close = get_button(t, p->close);
+	c->tb.resize = get_button(t, p->resize);
+	c->tb.shade = get_button(t, p->shade);
 	move_buttons(c);
 	XMapRaised(jbwm.d, t);
 	XMapSubwindows(jbwm.d, t);
@@ -84,7 +91,7 @@ draw_xft(struct JBWMClient * restrict c, const XPoint * restrict p,
 	const uint8_t s = c->screen->screen;
 	Visual *v = DefaultVisual(jbwm.d, s);
 	const Colormap cm = DefaultColormap(jbwm.d, s);
-	XftDraw *xd = XftDrawCreate(jbwm.d, c->titlebar, v, cm);
+	XftDraw *xd = XftDrawCreate(jbwm.d, c->tb.win, v, cm);
 	XftColor color;
 	XftColorAllocName(jbwm.d, v, cm, getenv(JBWM_ENV_FG), &color);
 	/* Prevent the text from going over the resize button.  */
@@ -109,7 +116,7 @@ static void draw_title(struct JBWMClient * restrict c)
 #ifdef USE_XFT
 	draw_xft(c, &p, name, l);
 #else//!USE_XFT
-	XDrawString(jbwm.d, c->titlebar, c->screen->gc,
+	XDrawString(jbwm.d, c->tb.win, c->screen->gc,
 		p.x, p.y, name, l);
 #endif//USE_XFT
 	XFree(name);
@@ -118,8 +125,8 @@ static void draw_title(struct JBWMClient * restrict c)
 static void remove_titlebar(struct JBWMClient * restrict c)
 {
 	c->ignore_unmap++;
-	XDestroyWindow(jbwm.d, c->titlebar);
-	c->titlebar = 0;
+	XDestroyWindow(jbwm.d, c->tb.win);
+	c->tb.win = 0;
 }
 
 void update_titlebar(struct JBWMClient * c)
@@ -127,18 +134,18 @@ void update_titlebar(struct JBWMClient * c)
 	if (c->opt.no_titlebar || c->opt.shaped)
 		  return;
 
-	if (c->opt.fullscreen && c->titlebar) {
+	if (c->opt.fullscreen && c->tb.win) {
 		remove_titlebar(c);
 		return;
 	}
 
-	if (!c->titlebar)
+	if (!c->tb.win)
 		new_titlebar(c);
 
 	/* Expand/Contract the titlebar width as necessary:  */
-	XMoveResizeWindow(jbwm.d, c->titlebar, 0, 0, c->size.width, TDIM);
+	XMoveResizeWindow(jbwm.d, c->tb.win, 0, 0, c->size.width, TDIM);
 	move_buttons(c);
-	XClearWindow(jbwm.d, c->titlebar);
+	XClearWindow(jbwm.d, c->tb.win);
 	draw_title(c);
 }
 

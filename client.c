@@ -40,7 +40,7 @@ struct JBWMClient *find_client(const jbwm_window_t w)
 	struct JBWMClient *c=jbwm.head;
 	while(c && c->parent != w && c->window !=w
 #ifdef USE_TBAR
-		&& c->titlebar != w
+		&& c->tb.win != w
 #endif//USE_TBAR
 	     ) c=c->next;
 

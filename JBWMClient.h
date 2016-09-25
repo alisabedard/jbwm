@@ -31,6 +31,12 @@ struct JBWMClientOptions {
 	bool tearoff : 1;
 };
 
+#ifdef USE_TBAR
+struct JBWMClientTitlebar {
+	jbwm_window_t win, close, resize, shade;
+};
+#endif//USE_TBAR
+
 struct JBWMClient {
 	struct JBWMClient *next;
 	struct JBWMScreen *screen;
@@ -38,10 +44,7 @@ struct JBWMClient {
 	jbwm_rect_t old_size;
 	jbwm_window_t window, parent;
 #ifdef USE_TBAR
-	jbwm_window_t titlebar;
-	struct {
-		jbwm_window_t close, resize, shade;
-	} button;
+	struct JBWMClientTitlebar tb;
 #endif//USE_TBAR
 	jbwm_cmap_t cmap;
 #ifdef USE_TBAR
