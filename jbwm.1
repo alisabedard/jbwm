@@ -1,22 +1,18 @@
-.TH jbwm 1 "November 29, 2016" "" ""
+.TH jbwm 1 "14 SEP 2016"
 
 .SH NAME
-jbwm \- Minimalist Window Manager
+jbwm \- minimalistic window manager for X
 
 .SH SYNOPSIS
 .B jbwm
-.LP
-If you have enabled ARGV support in the Makefile:
-.LP
-.B jbwm [ \-{f,b,s}
-.I color
-.B ] [ \-d
-.I display
-.B ] [ \-1
-.I keymask for primary modifier (Default: Windows/Meta key)
-.B ] [ \-2
-.I keymask for secondary modifier (Default: Shift key)
-.B ] [ \-V ]
+[\fB-1\fR \fIMODS\fR]
+[\fB-2\fR \fIMODS\fR]
+[\fB-b\fR \fIBG\fR]
+[\fB-d\fR \fIDISPLAY\fR]
+[\fB-F\fR \fIFONT\fR]
+[\fB-f\fR \fIFG\fR]
+[\fB-s\fR \fIFC\fR]
+[\fB-V\fR]
 
 .SH DESCRIPTION
 .B jbwm
@@ -24,90 +20,111 @@ is a minimalist window manager forked from evilwm, adding basic titlebar
 support, simpler key bindings, and various code cleanups and size
 reductions.  evilwm is based on aewm, extended to feature
 many keyboard controls, and otherwise altered to be more friendly.
-.PP
-In
-.BR jbwm ,
-the focus follows the mouse pointer, and focus is not lost if
+
+.SH OPTIONS
+Available if \fBUSE_ARGV\fR specified in build.
+.IP "\fB-1 \fIMOD"
+Set first modifier key.  \fBMOD\fR may be control, alt, mod1, mod2, mod3,
+mod4, or mod5.
+.IP "\fB-2 \fIMOD"
+Set second modifier key.  \fBMOD\fR is as above.
+.IP "\fB-b \fIBG"
+Set background color.
+.IP "\fB-d \fIDISPLAY"
+Set DISPLAY.
+.IP "\fB-F \fIFONT"
+Set font.
+.IP "\fB-f \fIFG"
+Set foreground color.
+.IP "\fB-s \fIFC"
+Set sticky window color.
+.IP "\fB-V"
+Print version then exit.
+.IP "\fB-*"
+For all other options, display usage then exit.
+
+.SH NOTES
+In jbwm, the focus follows the mouse pointer, and focus is not lost if
 you stray onto the root window. 
 .PP
 You can use the mouse to manipulate windows either by click/dragging
-the 1 pixel border, or by holding down Windows/Meta and doing so anywhere 
+the 1 pixel border, or by holding down \fBMod1\fR and doing so anywhere 
 in the client window. The controls are:
-.IP "Button 1"
+.IP "\fBButton 1"
 Move or raise window.
-.IP "Button 2"
+.IP "\fBButton 2"
 Lower window.
-.IP "Button 3"
+.IP "\fBButton 3"
 Resize window.
 .PP
-Most keyboard controls are used by holding down Windows/Meta, then
+Most keyboard controls are used by holding down \fBMod1\fR, then
 pressing a key. Available functions are:
-.IP Escape
+.IP \fBEscape
 Exit jbwm.
-.IP Return
+.IP \fBReturn
 Spawn new terminal.
-.IP q
+.IP \fBq
 Delete current window.
-.IP "Down Arrow"
+.IP "\fBDown Arrow"
 Lower current window.
-.IP "Up Arrow"
+.IP "\fBUp Arrow"
 Lower current window.
-.IP "H, J, K, L"
-Move window left, down, up or right.  Holding Shift resizes the
+.IP "\fBH, J, K, L"
+Move window left, down, up or right.  Holding \fBShift\fR resizes the
 window instead.
-.IP a
+.IP \fBa
 Toggle fullscreen.  
-.IP Space
+.IP \fBSpace
 Toggle maximization.
-.IP z
+.IP \fBz
 Toggle vertical maximization.  
-.IP x
+.IP \fBx
 Toggle horizontal maximization.  
-.IP s
+.IP \fBs
 Toggle window shade.
 .PP
 If compiled with virtual desktop support, these functions are also available: 
-.IP Period
+.IP \fB.
 Toggle window stickiness.
-.IP "1--0"
+.IP "\fB1--0"
 Switch virtual desktop.
-.IP Left
+.IP \fBLeft
 Previous virtual desktop.
-.IP Right
+.IP \fBRight
 Next virtual desktop.
 .PP
-In addition to the above, Windows/Meta+Tab can be used 
+In addition to the above, \fBMod1+Tab\fR can be used 
 to cycle through windows on screen.
 
-.SH OPTIONS
-Command line arguments are accepted if jbwm was compiled with ARGV enabled
-in its Makefile.  
-Valid modifier values for the 
-.B \-1 
-and 
-.B \-2 
-options are 
-control, alt, mod1, mod2, mod3, mod4, mod5.
-.B \-b \-f \-s
-Set the background, foreground and sticky colors, respectively.  
-.B \-V
-displays the jbwm version number.  
-
 .SH ENVIRONMENT
-.IP DISPLAY
+.IP \fBDISPLAY
 DISPLAY should be set, otherwise default of :0 will be used.  
+.IP \fBJBWM_FC
+Set sticky window border color.
+.IP \fBJBWM_FG
+Set foreground color.
+.IP \fBJBWM_BG
+Set background color.
+.IP \fBJBWM_CLOSE
+Set close button color.
+.IP \fBJBWM_SHADE
+Set shade button color.
+.IP \fBJBWM_RESIZE
+Set resize button color.
+.IP \fBJBWM_FONT
+Set font.
+.IP \fBJBWM_TERM
+Set terminal emulator program.
 
 .SH BUGS
 EWMH support is a work in progress.  
 
 .SH AUTHOR
-Jeffrey Bedard <jefbed@gmail.com>
-.br
-evilwm was written by Ciaran Anscomb <evilwm@6809.org.uk>.
-.br
-aewm was written by Decklin Foster <fosterd@hartwick.edu>.
-.br
-9wm was written by David Hogan <dhog@cs.su.oz.au>.
+Jeffrey Bedard <\fIjefbed@gmail.com\fR>
+Ciaran Anscomb <\fIevilwm@6809.org.uk\fR> wrote evilwm.
+Decklin Foster <\fIfosterd@hartwick.edu\fR> wrote aewm.
+David Hogan <\fIdhog@cs.su.oz.au\fR> wrote 9wm.
+
 .SH "SEE ALSO"
 .BR xinit (1),
 .BR X (7)
