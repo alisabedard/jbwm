@@ -3,13 +3,7 @@
 # Copyright 1999-2015, Ciaran Anscomb <jbwm@6809.org.uk>
 # See README for license and other details.
 
-CFLAGS=-Os
-CFLAGS+=-march=native
-CFLAGS+=-fomit-frame-pointer -pipe -flto
-CFLAGS+=-W -Wall -Wextra
-
-# Uncomment to disable assertions
-#DEFINES += -DNDEBUG
+CFLAGS+=-Wall -Wextra
 
 # Titlebar Xft support:
 include xft.mk
