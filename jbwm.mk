@@ -70,8 +70,6 @@ strip:
 		-R .comment \
 		-R .gnu.hash \
 		-R .shstrtab \
-		-R .fini_array \
-		-R .fini \
 		$(PROG)
 
 INSTALL=install -c
