@@ -14,9 +14,9 @@ unsigned long pixel(const uint8_t screen, const char * restrict name)
 {
 	if (!name) // sanitize input to avoid segfault
 		return 0;
-	XColor c;
+	XColor c, d;
 	XAllocNamedColor(jbwm.d, DefaultColormap(jbwm.d, screen),
-		name, &c, &(XColor){});
+		name, &c, &d);
 	return c.pixel;
 }
 

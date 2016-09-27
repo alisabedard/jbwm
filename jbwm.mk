@@ -25,6 +25,7 @@ LDPATH+=-L/usr/local/lib
 # Uncomment X11R6 paths for older installations.
 #INCLUDES+=-I/usr/X11R6/include
 INCLUDES+=-I/usr/X11R7/include
+CFLAGS+=-Wno-missing-field-initializers
 
 # NetBSD now requires RPATH set
 #
