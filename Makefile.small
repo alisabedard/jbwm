@@ -1,6 +1,6 @@
 CFLAGS=-Os
 # Compile for current machine
-CFLAGS+=-march=native
+#CFLAGS+=-march=native
 # Tuning
 CFLAGS+=-fomit-frame-pointer -pipe -flto
 CFLAGS+=-W -Wall -Wextra
