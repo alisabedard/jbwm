@@ -1,4 +1,3 @@
-DEFINES += -DUSE_SHAPE
-EXTRASRCS += shape.c
-EXTRALIBS += -lXext
-
+CFLAGS+=-DUSE_SHAPE
+LDFLAGS+=-lXext
+OBJS+=shape.o

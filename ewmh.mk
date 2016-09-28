@@ -1,3 +1,2 @@
-DEFINES += -DEWMH
-EXTRASRCS += ewmh.c ewmh_state.c
-
+CFLAGS+=-DEWMH
+OBJS+=ewmh.o ewmh_state.o

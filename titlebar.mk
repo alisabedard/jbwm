@@ -1,3 +1,2 @@
-DEFINES += -DUSE_TBAR
-EXTRASRCS += titlebar.c
-
+CFLAGS+=-DUSE_TBAR
+OBJS+=titlebar.o

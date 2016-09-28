@@ -9,7 +9,7 @@ CFLAGS+=-fomit-frame-pointer -pipe -flto
 CFLAGS+=-W -Wall -Wextra
 
 # Uncomment to disable assertions
-DEFINES += -DNDEBUG
+CFLAGS+=-DNDEBUG
 
 # Titlebar Xft support:
 #include xft.mk

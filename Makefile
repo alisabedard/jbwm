@@ -20,7 +20,7 @@ include shape.mk
 
 # Uncomment to enable parsing command line arguments.
 #  Saves ~2030 bytes
-DEFINES += -DUSE_ARGV 
+CFLAGS+=-DUSE_ARGV
 
 # Uncomment to enable titlebars
 include titlebar.mk
@@ -29,7 +29,7 @@ include titlebar.mk
 include snap.mk
 
 # Uncomment to enable STDIO
-DEFINES += -DSTDIO
+CFLAGS+=-DSTDIO
 
 # Uncomment to enable EWMH ~8k
 include ewmh.mk

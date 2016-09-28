@@ -3,50 +3,46 @@
 # Copyright 1999-2015, Ciaran Anscomb <jbwm@6809.org.uk>
 # See README for license and other details.
 
-version = 1.49
+version=1.49
 
 PROG=jbwm
-distname = $(PROG)-$(version)
+distname=$(PROG)-$(version)
 
 # Edit/override this line if you don't want jbwm to install under /usr.
 PREFIX=/usr
 # Note that $(DESTDIR) is used by the Debian build process.
-prefix = $(DESTDIR)$(PREFIX)
+dest=$(DESTDIR)$(PREFIX)
 
-SRCS+=$(EXTRASRCS)
-INCLUDES+=$(EXTRAINCLUDES)
-LIBS+=$(EXTRALIBS)
+# FreeBSD:
+CFLAGS+=-I/usr/local/include
+LDFLAGS+=-L/usr/local/lib
 
-# Fix build on FreeBSD
-INCLUDES+=-I/usr/local/include
-LDPATH+=-L/usr/local/lib
+# OpenBSD:
+CFLAGS+=-I/usr/X11R6/include
+CFLAGS+=-I/usr/X11R6/include/freetype2
+LDFLAGS+=-L/usr/X11R6/lib
 
-# Fix build on NetBSD and older systems:
-# Uncomment X11R6 paths for older installations.
-#INCLUDES+=-I/usr/X11R6/include
-INCLUDES+=-I/usr/X11R7/include
-INCLUDES+=-I/usr/X11R7/include/freetype2
+# NetBSD:
+CFLAGS+=-I/usr/X11R7/include
+CFLAGS+=-I/usr/X11R7/include/freetype2
 CFLAGS+=-Wno-missing-field-initializers
+#LDFLAGS+=-Wl,-R/usr/X11R6/lib
+LDFLAGS+=-L/usr/X11R7/lib
+LDFLAGS+=-Wl,-R/usr/X11R7/lib
 
-# NetBSD now requires RPATH set
-#
-#LDPATH+=-L/usr/X11R6/lib -Wl,-R/usr/X11R6/lib
-LDPATH+=-L/usr/X11R7/lib -Wl,-R/usr/X11R7/lib
-LIBS += -lX11 
+LDFLAGS+=-lX11 
 
 # Uncomment to enable X11 miscellaneous debugging (events)
-#DEFINES += -DXDEBUG
+#CFLAGS+=-DXDEBUG
 
-DEFINES += -DVERSION=\"$(version)\" $(DEBIAN)
-CFLAGS  += $(INCLUDES) $(DEFINES) 
-CFLAGS += -D_XOPEN_SOURCE=700 -std=c11
-LDFLAGS += $(LDPATH) $(LIBS)
+CFLAGS+=-DVERSION=\"$(version)\" $(DEBIAN)
+CFLAGS+=-D_XOPEN_SOURCE=700 -std=c11
+
 # Uncomment for static linking of binary:
-#LDFLAGS += -static 
+#LDFLAGS+=-static 
 
-SRCS += client.c events.c jbwm.c new.c screen.c 
-SRCS += button_event.c keys.c util.c max.c
-OBJS = $(SRCS:.c=.o)
+OBJS+=client.o events.o jbwm.o new.o screen.o 
+OBJS+=button_event.o keys.o util.o max.o
 
 $(PROG): $(OBJS) 
 	$(CC) $(LDFLAGS) $(OBJS) -o $@
@@ -77,9 +73,9 @@ INSTALL=install -c
 INSTALL_PROG=$(INSTALL) 
 INSTALL_DIR=install -d
 install: 
-	$(INSTALL_DIR) $(prefix)/bin $(prefix)/share/man/man1
-	$(INSTALL_PROG) $(PROG) $(prefix)/bin
-	$(INSTALL) $(PROG).1 $(prefix)/share/man/man1
+	$(INSTALL_DIR) $(dest)/bin $(dest)/share/man/man1
+	$(INSTALL_PROG) $(PROG) $(dest)/bin
+	$(INSTALL) $(PROG).1 $(dest)/share/man/man1
 
 clean:
 	rm -f $(PROG) *.o

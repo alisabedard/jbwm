@@ -5,10 +5,7 @@ CFLAGS=-Os
 CFLAGS+=-fomit-frame-pointer -pipe -flto
 CFLAGS+=-W -Wall -Wextra
 
-# Uncomment to disable everything for minimal configuration 
-DEFINES=-DNDEBUG
-EXTRASRCS=
-EXTRALIBS=
-EXTRAINCLUDES=
+# disable everything for minimal configuration 
+CFLAGS=-DNDEBUG
 
 include jbwm.mk

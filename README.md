@@ -24,6 +24,11 @@ Edit configuration options in Makefile and config.h, then build:
 	$ make
 	# make install
 ```
+On OpenBSD (bundled gcc is too old):
+```sh
+	$ make CC=clang
+	# make install
+```
 
 ## ACKNOWLEDGEMENTS
 

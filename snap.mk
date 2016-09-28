@@ -1,3 +1,3 @@
 # Window snaping support
-DEFINES += -DUSE_SNAP
-EXTRASRCS += snap.c
+CFLAGS+=-DUSE_SNAP
+OBJS+=snap.o
