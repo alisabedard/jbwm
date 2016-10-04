@@ -11,7 +11,7 @@ struct JBDim {
 		int16_t x, top, t, max;
 	};
 	union {
-		uint16_t height, h, row, rows, r;
+		uint16_t height, h, row, rows, r, index;
 		int16_t y, bottom, bot, b, min;
 	};
 };
