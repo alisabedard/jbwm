@@ -18,7 +18,7 @@
 #include <stdlib.h>
 #include <X11/Xatom.h>
 
-enum {MouseMask=(ButtonPressMask|ButtonReleaseMask|PointerMotionMask)};
+enum {JBWMMouseMask=(ButtonPressMask|ButtonReleaseMask|PointerMotionMask)};
 
 __attribute__ ((hot,nonnull))
 static void draw_outline(struct JBWMClient * restrict c)
@@ -42,7 +42,7 @@ static void configure(XSizeHints * restrict g, const jbwm_window_t w)
 
 static void grab_pointer(const jbwm_window_t w)
 {
-	XGrabPointer(jbwm.d, w, false, MouseMask, GrabModeAsync,
+	XGrabPointer(jbwm.d, w, false, JBWMMouseMask, GrabModeAsync,
 		GrabModeAsync, None, jbwm.cursor, CurrentTime);
 }
 
@@ -88,7 +88,7 @@ void jbwm_drag(struct JBWMClient * restrict c, const bool resize)
 	if (resize)
 		warp_corner(c);
 	for(;;) {
-		XMaskEvent(jbwm.d, MouseMask, &e);
+		XMaskEvent(jbwm.d, JBWMMouseMask, &e);
 		if (e.type != MotionNotify)
 			break;
 		draw_outline(c);
