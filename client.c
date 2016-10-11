@@ -34,17 +34,21 @@ void jbwm_set_client_vdesk(struct JBWMClient * restrict c, const uint8_t d)
 	jbwm_set_vdesk(c->screen, p);
 }
 
-// Return the client that has specified window as either window or parent
-struct JBWMClient *jbwm_get_client(const jbwm_window_t w)
+static struct JBWMClient * search(struct JBWMClient * c,
+	const jbwm_window_t w)
 {
-	struct JBWMClient *c=jbwm.head;
-	while(c && c->parent != w && c->window !=w
 #ifdef USE_TBAR
-		&& c->tb.win != w
+	return (!c || c->parent == w || c->window == w || c->tb.win == w)
+#else//!USE_TBAR
+	return (!c || c->parent == w || c->window == w)
 #endif//USE_TBAR
-	     ) c=c->next;
+		? c : search(c->next, w);
+}
 
-	return c;
+// Return the client that has specified window as either window or parent
+struct JBWMClient * jbwm_get_client(const jbwm_window_t w)
+{
+	return search(jbwm.head, w);
 }
 
 static void unselect_current(void)
