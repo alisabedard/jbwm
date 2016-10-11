@@ -73,21 +73,19 @@ static void set_state(struct JBWMClient * restrict c,
 		c->opt.sticky=add;
 		break;
 	case WM_STATE_ABOVE:
-		if(add) XRaiseWindow(jbwm.d, c->parent);
-		else XLowerWindow(jbwm.d, c->parent);
+		(add ? XRaiseWindow : XLowerWindow)(jbwm.d, c->parent);
 		break;
 	case WM_STATE_BELOW:
-		if(add) XLowerWindow(jbwm.d, c->parent);
-		else XRaiseWindow(jbwm.d, c->parent);
+		(add ? XLowerWindow : XRaiseWindow)(jbwm.d, c->parent);
 		break;
 	case WM_STATE_HIDDEN:
 		LOG("HIDDEN");
 		break;
 	case WM_STATE_MAXIMIZED_VERT:
-		add?set_vert(c):unset_vert(c);
+		(add ? set_vert : unset_vert)(c);
 		break;
 	case WM_STATE_MAXIMIZED_HORZ:
-		add?set_horz(c):unset_horz(c);
+		(add ? set_horz : unset_horz)(c);
 		break;
 	default:
 		break;
