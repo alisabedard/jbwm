@@ -61,15 +61,20 @@ static void unselect_current(void)
 #endif//EWMH
 }
 
-void jbwm_select_client(struct JBWMClient * c)
+static void set_border(struct JBWMClient * restrict c)
 {
-	if(!c) return;
-	unselect_current();
-	XInstallColormap(jbwm.d, c->cmap);
-	XSetInputFocus(jbwm.d, c->window,
-		RevertToPointerRoot, CurrentTime);
 	XSetWindowBorder(jbwm.d, c->parent, c->opt.sticky
 		? c->screen->pixels.fc : c->screen->pixels.fg);
+}
+
+void jbwm_select_client(struct JBWMClient * c)
+{
+	if(!c)
+		return;
+	unselect_current();
+	XInstallColormap(jbwm.d, c->cmap);
+	XSetInputFocus(jbwm.d, c->window, RevertToPointerRoot, CurrentTime);
+	set_border(c);
 	jbwm.current = c;
 #ifdef EWMH
 	jbwm_set_property(c->screen->root, ewmh[ACTIVE_WINDOW],
@@ -104,19 +109,19 @@ static Status xmsg(const jbwm_window_t w, const Atom a, const long x)
 static jbwm_atom_t get_wm_protocols(void)
 {
 	static jbwm_atom_t a;
-	return a?a:(a = XInternAtom(jbwm.d, "WM_PROTOCOLS", false));
+	return a ? a : (a = XInternAtom(jbwm.d, "WM_PROTOCOLS", false));
 }
 
 static jbwm_atom_t get_wm_delete_window(void)
 {
 	static jbwm_atom_t a;
-	return a?a:(a = XInternAtom(jbwm.d, "WM_DELETE_WINDOW", false));
+	return a ? a : (a = XInternAtom(jbwm.d, "WM_DELETE_WINDOW", false));
 }
 
 jbwm_atom_t jbwm_get_wm_state(void)
 {
 	static jbwm_atom_t a;
-	return a?a:(a = XInternAtom(jbwm.d, "WM_STATE", false));
+	return a ? a : (a = XInternAtom(jbwm.d, "WM_STATE", false));
 }
 
 void jbwm_set_wm_state(struct JBWMClient * restrict c, const int8_t state)
