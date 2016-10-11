@@ -70,20 +70,23 @@ static void init_geometry(struct JBWMClient * c)
 	c->ignore_unmap = attr.map_state == IsViewable;
 }
 
+static Window get_parent(struct JBWMClient * restrict c)
+{
+	return XCreateWindow(jbwm.d, c->screen->root, c->size.x, c->size.y,
+		c->size.width, c->size.height, c->border, CopyFromParent,
+		CopyFromParent, CopyFromParent, CWOverrideRedirect
+		| CWEventMask, &(XSetWindowAttributes){
+		.override_redirect=true, .event_mask
+		= SubstructureRedirectMask | SubstructureNotifyMask
+		| ButtonPressMask | EnterWindowMask});
+
+}
+
 static void reparent(struct JBWMClient * c) // use of restrict here is a bug
 {
 	LOG("reparent()");
 	setup_shaped(c);
-	c->parent = XCreateWindow(jbwm.d, c->screen->root,
-		c->size.x, c->size.y,
-		c->size.width, c->size.height, c->border,
-		CopyFromParent, CopyFromParent, CopyFromParent,
-		CWOverrideRedirect | CWEventMask, &(XSetWindowAttributes){
-			.override_redirect=true,
-			.event_mask = SubstructureRedirectMask
-				| SubstructureNotifyMask
-				| ButtonPressMask
-				| EnterWindowMask});
+	c->parent = get_parent(c);
 	XAddToSaveSet(jbwm.d, c->window);
 	XReparentWindow(jbwm.d, c->window, c->parent, 0, 0);
 	XMapWindow(jbwm.d, c->window);
