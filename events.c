@@ -87,7 +87,7 @@ static void handle_property_change(XPropertyEvent * restrict e,
 		jbwm_update_titlebar(c);
 	else {
 		if (e->atom == jbwm_get_wm_state())
-			moveresize(c);
+			jbwm_move_resize(c);
 		print_atom(e->atom, __FILE__, __LINE__);
 	}
 }

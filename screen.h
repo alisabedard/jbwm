@@ -8,18 +8,18 @@
 
 #include "JBWMClient.h"
 
-enum {DESKTOPS=10};
+enum {JBWM_MAX_DESKTOPS=10};
 
 void jbwm_drag(struct JBWMClient * restrict c, const bool resize)
 	__attribute__((nonnull));
 
-void moveresize(struct JBWMClient * restrict c)
+void jbwm_move_resize(struct JBWMClient * restrict c)
 	__attribute__((nonnull));
 
-uint8_t switch_vdesk(struct JBWMScreen * s, uint8_t v)
+uint8_t jbwm_set_vdesk(struct JBWMScreen * s, uint8_t v)
 	__attribute__((nonnull));
 
-void unhide(struct JBWMClient * restrict c)
+void jbwm_restore_client(struct JBWMClient * restrict c)
 	__attribute__((nonnull));
 
 #endif /* JBWM_SCREEN_H */

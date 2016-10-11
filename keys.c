@@ -31,7 +31,7 @@ __attribute__((nonnull(1)))
 static void commit_key_move(struct JBWMClient * restrict c)
 {
 	snap_border(c);
-	moveresize(c);
+	jbwm_move_resize(c);
 	point(c, 1, 1);
 }
 
@@ -158,7 +158,7 @@ static void next(void)
 	struct JBWMClient * c = get_next_on_vdesk();
 	if (!c)
 		return;
-	unhide(c);
+	jbwm_restore_client(c);
 	jbwm_select_client(c);
 	point(c, 0, 0);
 	point(c, c->size.width, c->size.height);
@@ -167,7 +167,7 @@ static void next(void)
 static void cond_client_to_desk(struct JBWMClient * c, struct JBWMScreen * s,
 	const uint8_t d, const bool mod)
 {
-	mod && c ? jbwm_set_client_vdesk(c, d) : switch_vdesk(s, d);
+	mod && c ? jbwm_set_client_vdesk(c, d) : jbwm_set_vdesk(s, d);
 }
 
 static void start_terminal(void)

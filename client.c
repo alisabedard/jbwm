@@ -29,9 +29,9 @@ void jbwm_set_client_vdesk(struct JBWMClient * restrict c, const uint8_t d)
 	LOG("jbwm_set_client_vdesk");
 	const uint8_t p = c->vdesk;
 	c->vdesk = d;
-	// use switch_vdesk to validate d:
-	c->vdesk = switch_vdesk(c->screen, d);
-	switch_vdesk(c->screen, p);
+	// use jbwm_set_vdesk to validate d:
+	c->vdesk = jbwm_set_vdesk(c->screen, d);
+	jbwm_set_vdesk(c->screen, p);
 }
 
 // Return the client that has specified window as either window or parent

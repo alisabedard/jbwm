@@ -98,7 +98,7 @@ static void drag_event_loop(struct JBWMClient * restrict c, const bool resize)
 		draw_outline(c);
 		do_changes(c, resize, start, original,
 			e.xmotion.x, e.xmotion.y);
-		(c->border ? draw_outline : moveresize)(c);
+		(c->border ? draw_outline : jbwm_move_resize)(c);
 	}
 }
 
@@ -113,14 +113,14 @@ void jbwm_drag(struct JBWMClient * restrict c, const bool resize)
 	drag_event_loop(c, resize);
 	draw_outline(c);
 	XUngrabPointer(jbwm.d, CurrentTime);
-	moveresize(c);
+	jbwm_move_resize(c);
 	if (!resize && !c->opt.tearoff)
 		configure((&c->size), c->window);
 }
 
-void moveresize(struct JBWMClient * restrict c)
+void jbwm_move_resize(struct JBWMClient * restrict c)
 {
-	LOG("moveresize");
+	LOG("jbwm_move_resize");
 	const uint8_t offset = c->opt.no_titlebar || c->opt.fullscreen
 		? 0 : TDIM;
 	XMoveResizeWindow(jbwm.d, c->parent,
@@ -142,28 +142,28 @@ static void hide(struct JBWMClient * restrict c)
 	ewmh_add_state(c->window, ewmh[WM_STATE_HIDDEN]);
 }
 
-void unhide(struct JBWMClient * restrict c)
+void jbwm_restore_client(struct JBWMClient * restrict c)
 {
 	XMapWindow(jbwm.d, c->parent);
 	jbwm_set_wm_state(c, NormalState);
 	ewmh_remove_state(c->window, ewmh[WM_STATE_HIDDEN]);
 }
 
-uint8_t switch_vdesk(struct JBWMScreen * s, uint8_t v)
+uint8_t jbwm_set_vdesk(struct JBWMScreen * s, uint8_t v)
 {
-	LOG("switch_vdesk");
+	LOG("jbwm_set_vdesk");
 
-	if (v == s->vdesk || v > DESKTOPS)
+	if (v == s->vdesk || v > JBWM_MAX_DESKTOPS)
 		return s->vdesk;
 
 	for (struct JBWMClient * c = jbwm.head; c; c = c->next) {
 		if (c->opt.sticky) {
-			unhide(c);
+			jbwm_restore_client(c);
 			continue;
 		}
 		if (c->screen != s) continue;
 		if (c->vdesk == s->vdesk) hide(c);
-		else if (c->vdesk == v) unhide(c);
+		else if (c->vdesk == v) jbwm_restore_client(c);
 	}
 	s->vdesk = v;
 #ifdef EWMH

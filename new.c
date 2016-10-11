@@ -24,7 +24,7 @@ static uint8_t wm_desktop(const jbwm_window_t w, uint8_t vdesk)
 	uint16_t n;
 	unsigned long *lprop = get_property(w, ewmh[WM_DESKTOP], &n);
 	if (lprop) {
-		if (n && lprop[0] < DESKTOPS) // is valid
+		if (n && lprop[0] < JBWM_MAX_DESKTOPS) // is valid
 			vdesk = lprop[0]; // Set vdesk to property value
 		else // Set to a valid desktop number:
 			XPROP(w, ewmh[WM_DESKTOP], XA_CARDINAL, &vdesk, 1);
@@ -122,5 +122,5 @@ void make_new_client(const jbwm_window_t w, struct JBWMScreen * s)
 	init_properties(c);
 	init_geometry(c);
 	reparent(c);
-	unhide(c);
+	jbwm_restore_client(c);
 }

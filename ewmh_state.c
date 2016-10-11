@@ -177,7 +177,7 @@ void ewmh_client_message(XClientMessageEvent * restrict e,
 	if(c && client_specific_message(e, c, t))
 		  return;
 	if (t == ewmh[CURRENT_DESKTOP])
-		  switch_vdesk(s, e->data.l[0]);
+		  jbwm_set_vdesk(s, e->data.l[0]);
 	// If something else moves the window:
 	else if (t == ewmh[MOVERESIZE_WINDOW]) {
 		const uint8_t src = (e->data.l[0] >> 12) & 3;

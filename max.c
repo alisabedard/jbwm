@@ -17,7 +17,7 @@ void unset_horz(struct JBWMClient * restrict c)
 	c->size.x = c->old_size.x;
 	c->size.width = c->old_size.width;
 	ewmh_remove_state(c->window, ewmh[WM_STATE_MAXIMIZED_HORZ]);
-	moveresize(c);
+	jbwm_move_resize(c);
 }
 
 void set_horz(struct JBWMClient * restrict c)
@@ -33,7 +33,7 @@ void set_horz(struct JBWMClient * restrict c)
 	// Offset if not fullscreen
 	if (!c->opt.fullscreen)
 		c->size.width -= c->border<<1;
-	moveresize(c);
+	jbwm_move_resize(c);
 }
 
 void unset_vert(struct JBWMClient * restrict c)
@@ -46,7 +46,7 @@ void unset_vert(struct JBWMClient * restrict c)
 		ewmh_remove_state(c->window,
 			ewmh[WM_STATE_MAXIMIZED_VERT]);
 	}
-	moveresize(c);
+	jbwm_move_resize(c);
 }
 
 void set_vert(struct JBWMClient * restrict c)
@@ -64,7 +64,7 @@ void set_vert(struct JBWMClient * restrict c)
 		c->size.y += TDIM+c->border;
 		c->size.height -= TDIM+(c->border<<2);
 	}
-	moveresize(c);
+	jbwm_move_resize(c);
 }
 
 void unset_fullscreen(struct JBWMClient * restrict c)

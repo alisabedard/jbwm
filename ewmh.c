@@ -19,7 +19,7 @@ Atom ewmh[EWMH_ATOMS_COUNT];
 static char * atom_names [] = { // This list must match 1:1 with enum
 	"_NET_SUPPORTED",
 	"_NET_CURRENT_DESKTOP",
-	"_NET_NUMBER_OF_DESKTOPS",
+	"_NET_NUMBER_OF_JBWM_MAX_DESKTOPS",
 	"_NET_DESKTOP_VIEWPORT",
 	"_NET_DESKTOP_GEOMETRY",
 	"_NET_SUPPORTING_WM_CHECK",
@@ -86,8 +86,8 @@ void ewmh_update_client_list(void)
 }
 static void set_root_vdesk(const jbwm_window_t r)
 {
-	XPROP(r, ewmh[NUMBER_OF_DESKTOPS], XA_CARDINAL,
-		&(long){DESKTOPS}, 1);
+	XPROP(r, ewmh[NUMBER_OF_JBWM_MAX_DESKTOPS], XA_CARDINAL,
+		&(long){JBWM_MAX_DESKTOPS}, 1);
 	XPROP(r, ewmh[DESKTOP_VIEWPORT], XA_CARDINAL,
 		(&(long[]){0, 0}), 2);
 	XPROP(r, ewmh[VIRTUAL_ROOTS], XA_WINDOW, &r, 1);
