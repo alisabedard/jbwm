@@ -7,12 +7,11 @@
 
 #include "button_event.h"
 #include "client.h"
-#include "ewmh.h"
 #include "ewmh_state.h"
+#include "ewmh.h"
 #include "JBWMEnv.h"
 #include "keys.h"
 #include "log.h"
-#include "mwm.h"
 #include "new.h"
 #include "screen.h"
 #include "titlebar.h"
