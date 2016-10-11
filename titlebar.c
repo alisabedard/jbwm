@@ -31,7 +31,7 @@ void jbwm_toggle_shade(struct JBWMClient * restrict c)
 		c->opt.shaded = false;
 		XMapWindow(jbwm.d, c->window);
 		moveresize(c);
-		set_wm_state(c, NormalState);
+		jbwm_set_wm_state(c, NormalState);
 		ewmh_remove_state(c->window, ewmh[WM_STATE_SHADED]);
 	} else {		// Shade the client
 		c->old_size.height = c->size.height;
@@ -39,9 +39,9 @@ void jbwm_toggle_shade(struct JBWMClient * restrict c)
 		XUnmapWindow(jbwm.d, c->window);
 		c->size.height = 0;
 		c->opt.shaded = true;
-		set_wm_state(c, IconicState);
+		jbwm_set_wm_state(c, IconicState);
 		ewmh_add_state(c->window, ewmh[WM_STATE_SHADED]);
-		select_client(c);
+		jbwm_select_client(c);
 	}
 	jbwm_update_titlebar(c);
 }
@@ -113,7 +113,7 @@ draw_xft(struct JBWMClient * restrict c, const XPoint * restrict p,
 
 static void draw_title(struct JBWMClient * restrict c)
 {
-	char * name = get_title(c->window);
+	char * name = jbwm_get_title(c->window);
 	if(!name) return; // No title could be loaded, abort
 	const XPoint p = { TDIM + 4, jbwm.font->ascent };
 	size_t l = 0; // strlen

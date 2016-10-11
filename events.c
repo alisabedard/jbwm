@@ -86,7 +86,7 @@ static void handle_property_change(XPropertyEvent * restrict e,
 	if (e->atom == XA_WM_NAME)
 		jbwm_update_titlebar(c);
 	else {
-		if (e->atom == get_wm_state())
+		if (e->atom == jbwm_get_wm_state())
 			moveresize(c);
 		print_atom(e->atom, __FILE__, __LINE__);
 	}
@@ -107,7 +107,7 @@ static void iteration(void)
 	XEvent ev;
 	struct JBWMClient * c;
 	XNextEvent(jbwm.d, &ev);
-	c = find_client(ev.xany.window);
+	c = jbwm_get_client(ev.xany.window);
 	switch (ev.type) {
 	case KeyPress:
 		jbwm_handle_key_event(&ev.xkey);
@@ -117,7 +117,7 @@ static void iteration(void)
 		break;
 	case EnterNotify:
 		if(c && (ev.xcrossing.window == c->parent))
-			  select_client(c);
+			  jbwm_select_client(c);
 		break;
 #ifdef USE_TBAR
 	case Expose:

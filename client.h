@@ -8,26 +8,26 @@
 
 #include "JBWMClient.h"
 
-void client_to_vdesk(struct JBWMClient * restrict c, const uint8_t d)
+void jbwm_set_client_vdesk(struct JBWMClient * restrict c, const uint8_t d)
 	__attribute((nonnull));
 
-struct JBWMClient *find_client(jbwm_window_t w)
+struct JBWMClient *jbwm_get_client(jbwm_window_t w)
 	__attribute__((hot,pure));
 
 // Free result with XFree if not NULL
-char * get_title(const jbwm_window_t w)
+char * jbwm_get_title(const jbwm_window_t w)
 	__attribute__((pure));
 
-void select_client(struct JBWMClient * c);
+void jbwm_select_client(struct JBWMClient * c);
 
-void send_wm_delete(const struct JBWMClient * restrict c)
+void jbwm_send_wm_delete(const struct JBWMClient * restrict c)
 	__attribute__((nonnull));
 
 // Set WM_STATE property
-void set_wm_state(struct JBWMClient * c, const int8_t state);
+void jbwm_set_wm_state(struct JBWMClient * c, const int8_t state);
 
 // Return WM_STATE atom
-jbwm_atom_t get_wm_state(void);
+jbwm_atom_t jbwm_get_wm_state(void);
 
 void jbwm_toggle_sticky(struct JBWMClient * c)
 	__attribute__((nonnull,cold));

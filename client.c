@@ -16,7 +16,7 @@
 #include <X11/Xatom.h>
 
 // Free result with XFree if not NULL
-char * get_title(const jbwm_window_t w)
+char * jbwm_get_title(const jbwm_window_t w)
 {
 	XTextProperty tp;
 	if (!XGetWMName(jbwm.d, w, &tp))
@@ -24,9 +24,9 @@ char * get_title(const jbwm_window_t w)
 	return (char *)tp.value;
 }
 
-void client_to_vdesk(struct JBWMClient * restrict c, const uint8_t d)
+void jbwm_set_client_vdesk(struct JBWMClient * restrict c, const uint8_t d)
 {
-	LOG("client_to_vdesk");
+	LOG("jbwm_set_client_vdesk");
 	const uint8_t p = c->vdesk;
 	c->vdesk = d;
 	// use switch_vdesk to validate d:
@@ -35,7 +35,7 @@ void client_to_vdesk(struct JBWMClient * restrict c, const uint8_t d)
 }
 
 // Return the client that has specified window as either window or parent
-struct JBWMClient *find_client(const jbwm_window_t w)
+struct JBWMClient *jbwm_get_client(const jbwm_window_t w)
 {
 	struct JBWMClient *c=jbwm.head;
 	while(c && c->parent != w && c->window !=w
@@ -57,7 +57,7 @@ static void unselect_current(void)
 #endif//EWMH
 }
 
-void select_client(struct JBWMClient * c)
+void jbwm_select_client(struct JBWMClient * c)
 {
 	if(!c) return;
 	unselect_current();
@@ -78,7 +78,7 @@ void jbwm_toggle_sticky(struct JBWMClient * c)
 {
 	LOG("stick");
 	c->opt.sticky ^= true; // toggle
-	select_client(c);
+	jbwm_select_client(c);
 	jbwm_update_titlebar(c);
 #ifdef EWMH
 	(c->opt.sticky?ewmh_add_state:ewmh_remove_state)(c->window,
@@ -109,15 +109,15 @@ static jbwm_atom_t get_wm_delete_window(void)
 	return a?a:(a = XInternAtom(jbwm.d, "WM_DELETE_WINDOW", false));
 }
 
-jbwm_atom_t get_wm_state(void)
+jbwm_atom_t jbwm_get_wm_state(void)
 {
 	static jbwm_atom_t a;
 	return a?a:(a = XInternAtom(jbwm.d, "WM_STATE", false));
 }
 
-void set_wm_state(struct JBWMClient * restrict c, const int8_t state)
+void jbwm_set_wm_state(struct JBWMClient * restrict c, const int8_t state)
 {
-	XPROP(c->window, get_wm_state(), XA_CARDINAL, &state, 1);
+	XPROP(c->window, jbwm_get_wm_state(), XA_CARDINAL, &state, 1);
 }
 
 static bool has_delete_proto(const jbwm_window_t w)
@@ -134,7 +134,7 @@ static bool has_delete_proto(const jbwm_window_t w)
 	return found;
 }
 
-void send_wm_delete(const struct JBWMClient * restrict c)
+void jbwm_send_wm_delete(const struct JBWMClient * restrict c)
 {
 	has_delete_proto(c->window)?xmsg(c->window, get_wm_protocols(),
 		get_wm_delete_window()): XKillClient(jbwm.d, c->window);

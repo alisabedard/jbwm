@@ -138,14 +138,14 @@ void moveresize(struct JBWMClient * restrict c)
 static void hide(struct JBWMClient * restrict c)
 {
 	XUnmapWindow(jbwm.d, c->parent);
-	set_wm_state(c, IconicState);
+	jbwm_set_wm_state(c, IconicState);
 	ewmh_add_state(c->window, ewmh[WM_STATE_HIDDEN]);
 }
 
 void unhide(struct JBWMClient * restrict c)
 {
 	XMapWindow(jbwm.d, c->parent);
-	set_wm_state(c, NormalState);
+	jbwm_set_wm_state(c, NormalState);
 	ewmh_remove_state(c->window, ewmh[WM_STATE_HIDDEN]);
 }
 

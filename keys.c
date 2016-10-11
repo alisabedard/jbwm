@@ -102,7 +102,7 @@ static void handle_client_key_event(const bool mod,
 		handle_key_move(c, key, mod);
 		break;
 	case KEY_KILL:
-		send_wm_delete(c);
+		jbwm_send_wm_delete(c);
 		break;
 	case KEY_LOWER:
 	case KEY_ALTLOWER:
@@ -159,7 +159,7 @@ static void next(void)
 	if (!c)
 		return;
 	unhide(c);
-	select_client(c);
+	jbwm_select_client(c);
 	point(c, 0, 0);
 	point(c, c->size.width, c->size.height);
 }
@@ -167,7 +167,7 @@ static void next(void)
 static void cond_client_to_desk(struct JBWMClient * c, struct JBWMScreen * s,
 	const uint8_t d, const bool mod)
 {
-	mod && c ? client_to_vdesk(c, d) : switch_vdesk(s, d);
+	mod && c ? jbwm_set_client_vdesk(c, d) : switch_vdesk(s, d);
 }
 
 static void start_terminal(void)

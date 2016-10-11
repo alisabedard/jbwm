@@ -145,7 +145,7 @@ static bool client_specific_message(XClientMessageEvent * restrict e,
 	struct JBWMClient * restrict c, const Atom t)
 {
 	if (t == ewmh[WM_DESKTOP])
-		client_to_vdesk(c, e->data.l[0]);
+		jbwm_set_client_vdesk(c, e->data.l[0]);
 	// If user moves window (client-side titlebars):
 	else if (t == ewmh[WM_MOVERESIZE]) {
 		XRaiseWindow(jbwm.d, c->parent);
@@ -153,9 +153,9 @@ static bool client_specific_message(XClientMessageEvent * restrict e,
 	} else if (t == ewmh[WM_STATE])
 		handle_wm_state_changes(e, c);
 	else if (t == ewmh[ACTIVE_WINDOW])
-		select_client(c);
+		jbwm_select_client(c);
 	else if (t == ewmh[CLOSE_WINDOW])
-		send_wm_delete(c);
+		jbwm_send_wm_delete(c);
 	else
 		  return false;
 	return true;
