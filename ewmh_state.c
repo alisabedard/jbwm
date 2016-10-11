@@ -15,7 +15,7 @@
 void ewmh_remove_state(const Window w, const Atom state)
 {
 	uint16_t n;
-	Atom *a = get_property(w, ewmh[WM_STATE], &n);
+	Atom *a = jbwm_get_property(w, ewmh[WM_STATE], &n);
 
 	if (a) {
 		const unsigned long nitems = n;
@@ -33,7 +33,7 @@ void ewmh_remove_state(const Window w, const Atom state)
 static bool ewmh_get_state(const Window w, const Atom state)
 {
 	uint16_t n;
-	Atom *a = get_property(w, ewmh[WM_STATE], &n);
+	Atom *a = jbwm_get_property(w, ewmh[WM_STATE], &n);
 	bool found = false;
 	if (a) {
 		while (n--) // prevent offset error

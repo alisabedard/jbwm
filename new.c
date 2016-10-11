@@ -22,7 +22,7 @@
 static uint8_t wm_desktop(const jbwm_window_t w, uint8_t vdesk)
 {
 	uint16_t n;
-	unsigned long *lprop = get_property(w, ewmh[WM_DESKTOP], &n);
+	unsigned long *lprop = jbwm_get_property(w, ewmh[WM_DESKTOP], &n);
 	if (lprop) {
 		if (n && lprop[0] < JBWM_MAX_DESKTOPS) // is valid
 			vdesk = lprop[0]; // Set vdesk to property value

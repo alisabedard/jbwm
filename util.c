@@ -30,7 +30,7 @@ unsigned long jbwm_get_pixel(const uint8_t screen, const char * restrict name)
 
 #if defined(EWMH) || defined(MWM)
 __attribute__((warn_unused_result))
-void *get_property(Window w, Atom property, uint16_t * num_items)
+void *jbwm_get_property(Window w, Atom property, uint16_t * num_items)
 {
 	unsigned char * prop;
 	long unsigned int n, b;

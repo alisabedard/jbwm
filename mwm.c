@@ -46,7 +46,7 @@ void handle_mwm_hints(struct JBWMClient * c)
 		  mwm_hints=XInternAtom(jbwm.d, "_MOTIF_WM_HINTS", false);
 	struct { // paraphrased from MwmUtil.h
 		uint32_t flags, functions, decor, input_mode, status;
-	} *m = get_property(c->window, mwm_hints, &(uint16_t){0});
+	} *m = jbwm_get_property(c->window, mwm_hints, &(uint16_t){0});
 
 	if(!m) return;
 
