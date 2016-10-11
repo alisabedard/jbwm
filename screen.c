@@ -103,19 +103,20 @@ void moveresize(struct JBWMClient * restrict c)
 	set_shape(c);
 }
 
-static void hide(struct JBWMClient * restrict c, const bool h)
+static void hide(struct JBWMClient * restrict c)
 {
-	(h ? XUnmapWindow : XMapWindow)(jbwm.d, c->parent);
-	set_wm_state(c, h ? IconicState : NormalState);
+	XUnmapWindow(jbwm.d, c->parent);
 #ifdef EWMH
-	(h ? ewmh_add_state : ewmh_remove_state)(c->window,
-		ewmh[WM_STATE_HIDDEN]);
+	ewmh_add_state(c->window, ewmh[WM_STATE_HIDDEN]);
 #endif//EWMH
 }
 
 void unhide(struct JBWMClient * restrict c)
 {
-	hide(c, false);
+	XMapWindow(jbwm.d, c->parent);
+#ifdef EWMH
+	ewmh_remove_state(c->window, ewmh[WM_STATE_HIDDEN]);
+#endif//EWMH
 }
 
 uint8_t switch_vdesk(struct JBWMScreen * s, uint8_t v)
@@ -127,12 +128,12 @@ uint8_t switch_vdesk(struct JBWMScreen * s, uint8_t v)
 
 	for (struct JBWMClient * c = jbwm.head; c; c = c->next) {
 		if (c->opt.sticky) {
-			hide(c, false);
+			unhide(c);
 			continue;
 		}
 		if (c->screen != s) continue;
-		if (c->vdesk == s->vdesk) hide(c, true);
-		else if (c->vdesk == v) hide(c, false);
+		if (c->vdesk == s->vdesk) hide(c);
+		else if (c->vdesk == v) unhide(c);
 	}
 	s->vdesk = v;
 #ifdef EWMH

@@ -61,13 +61,13 @@ static void init_geometry(struct JBWMClient * c)
 		? attr.height : c->size.min_height;
 	const bool pos = (attr.map_state == IsViewable)
 	    || (c->size.flags & USPosition);
-	c->size.x=pos ? attr.x : (c->screen->size.w >> 1)
+	c->size.x = pos ? attr.x : (c->screen->size.w >> 1)
 		- (c->size.width >> 1);
-	c->size.y=pos ? attr.y : (c->screen->size.h >> 1)
+	c->size.y = pos ? attr.y : (c->screen->size.h >> 1)
 		- (c->size.height >> 1);
 
 	// Test if the reparent that is to come would trigger an unmap event.
-	c->ignore_unmap=attr.map_state==IsViewable;
+	c->ignore_unmap = attr.map_state == IsViewable;
 }
 
 static void reparent(struct JBWMClient * c) // use of restrict here is a bug
