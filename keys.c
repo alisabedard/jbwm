@@ -89,7 +89,7 @@ static void toggle_maximize(struct JBWMClient * restrict c)
 	}
 }
 
-__attribute__((nonnull))
+__attribute__((nonnull(2)))
 static void handle_client_key_event(const bool mod,
 	struct JBWMClient * restrict c, const KeySym key)
 {
@@ -132,7 +132,7 @@ static void handle_client_key_event(const bool mod,
 		jbwm_drag(c, false);
 		break;
 	case KEY_SHADE:
-		shade(c);
+		jbwm_toggle_shade(c);
 		break;
 	}
 }

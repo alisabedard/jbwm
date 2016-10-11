@@ -25,7 +25,7 @@ void jbwm_handle_button_event(XButtonEvent * restrict e,
 		else if (e->subwindow == c->tb.resize)
 			jbwm_drag(c, !c->opt.no_resize);
 		else if (e->subwindow == c->tb.shade && !c->opt.no_min)
-			shade(c);
+			jbwm_toggle_shade(c);
 		else
 #endif//USE_TBAR
 			jbwm_drag(c, false);

@@ -77,7 +77,7 @@ void unset_fullscreen(struct JBWMClient * restrict c)
 	unset_vert(c);
 	XSetWindowBorderWidth(jbwm.d, c->parent, c->border);
 	ewmh_remove_state(c->window, ewmh[WM_STATE_FULLSCREEN]);
-	update_titlebar(c);
+	jbwm_update_titlebar(c);
 }
 
 void set_fullscreen(struct JBWMClient * restrict c)
@@ -94,6 +94,6 @@ void set_fullscreen(struct JBWMClient * restrict c)
 	set_vert(c);
 	XSetWindowBorderWidth(jbwm.d, c->parent, 0);
 	ewmh_add_state(c->window, ewmh[WM_STATE_FULLSCREEN]);
-	update_titlebar(c);
+	jbwm_update_titlebar(c);
 }
 

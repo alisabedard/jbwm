@@ -79,7 +79,7 @@ void stick(struct JBWMClient * c)
 	LOG("stick");
 	c->opt.sticky ^= true; // toggle
 	select_client(c);
-	update_titlebar(c);
+	jbwm_update_titlebar(c);
 #ifdef EWMH
 	(c->opt.sticky?ewmh_add_state:ewmh_remove_state)(c->window,
 		ewmh[WM_STATE_STICKY]);

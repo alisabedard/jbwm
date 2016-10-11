@@ -17,7 +17,7 @@
 #include <X11/Xft/Xft.h>
 #endif//USE_XFT
 
-void shade(struct JBWMClient * restrict c)
+void jbwm_toggle_shade(struct JBWMClient * restrict c)
 {
 	// Honor !MWM_FUNC_MINIMIZE
 	if (c->opt.no_min || c->opt.fullscreen)
@@ -43,7 +43,7 @@ void shade(struct JBWMClient * restrict c)
 		ewmh_add_state(c->window, ewmh[WM_STATE_SHADED]);
 		select_client(c);
 	}
-	update_titlebar(c);
+	jbwm_update_titlebar(c);
 }
 
 static void move_buttons(struct JBWMClient * restrict c)
@@ -141,7 +141,7 @@ static void remove_titlebar(struct JBWMClient * restrict c)
 #endif//EWMH
 }
 
-void update_titlebar(struct JBWMClient * c)
+void jbwm_update_titlebar(struct JBWMClient * c)
 {
 	if (c->opt.no_titlebar || c->opt.shaped)
 		  return;

@@ -129,7 +129,9 @@ void moveresize(struct JBWMClient * restrict c)
 	XMoveResizeWindow(jbwm.d, c->window,
 		0, offset,
 		c->size.width, c->size.height);
-	if(offset) { update_titlebar(c); } // Avoid shaped and fullscreen
+	if(offset) { // Leave braces in case titlebar support was disabled.
+		jbwm_update_titlebar(c);
+	} // Skip shaped and fullscreen clients.
 	set_shape(c);
 }
 
