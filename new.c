@@ -114,9 +114,9 @@ static void do_grabs(const jbwm_window_t w)
 	set_ewmh_allowed_actions(w);
 }
 
-void make_new_client(const jbwm_window_t w, struct JBWMScreen * s)
+void jbwm_new_client(const jbwm_window_t w, struct JBWMScreen * s)
 {
-	LOG("make_new_client(%d,s)", (int)w);
+	LOG("jbwm_new_client(%d,s)", (int)w);
 	struct JBWMClient * c = jbwm.head = get_JBWMClient(w, s);
 	do_grabs(w);
 	init_properties(c);

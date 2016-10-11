@@ -8,7 +8,7 @@
 
 #include "JBWMScreen.h"
 
-void make_new_client(const jbwm_window_t w, struct JBWMScreen * restrict s)
+void jbwm_new_client(const jbwm_window_t w, struct JBWMScreen * restrict s)
 	__attribute__((nonnull(2)));
 
 #endif//!JBWM_NEW_H

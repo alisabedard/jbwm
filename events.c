@@ -144,7 +144,7 @@ static void iteration(void)
 		if(c || ev.xmaprequest.window == jbwm.last)
 			break;
 		jbwm.last = ev.xmaprequest.window;
-		make_new_client(ev.xmaprequest.window, get_screen(
+		jbwm_new_client(ev.xmaprequest.window, get_screen(
 			ScreenCount(jbwm.d), ev.xmaprequest.parent));
 		break;
 	case ConfigureRequest:

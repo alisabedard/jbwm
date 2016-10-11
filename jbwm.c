@@ -181,7 +181,7 @@ static void setup_clients(struct JBWMScreen * restrict s)
 		return; // failed
 	while (n--)
 		if (check_redirect(w[n]))
-			make_new_client(w[n], s);
+			jbwm_new_client(w[n], s);
 	XFree(w);
 }
 
