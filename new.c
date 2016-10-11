@@ -43,8 +43,9 @@ static void init_properties(struct JBWMClient * c)
 #ifdef EWMH
 	c->vdesk = wm_desktop(c->window, c->vdesk);
 	// Required by wm-spec 1.4:
+	const uint8_t b = c->border;
 	XPROP(c->window, ewmh[FRAME_EXTENTS], XA_CARDINAL,
-		(&(jbwm_atom_t[]){1, 1, 1+TDIM, 1}), 4);
+		(&(jbwm_atom_t[]){b, b, b, b}), 4);
 #endif//EWMH
 }
 

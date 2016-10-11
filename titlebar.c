@@ -13,6 +13,7 @@
 #include "util.h"
 
 #include <stdlib.h>
+#include <X11/Xatom.h>
 
 #ifdef USE_XFT
 #include <X11/Xft/Xft.h>
@@ -79,6 +80,12 @@ static jbwm_window_t new_titlebar(struct JBWMClient * restrict c)
 	XMapRaised(jbwm.d, t);
 	XMapSubwindows(jbwm.d, t);
 	jbwm_grab_button(t, 0, AnyButton);
+#ifdef EWMH
+	// Required by wm-spec 1.4:
+	const uint8_t b = c->border;
+	XPROP(c->window, ewmh[FRAME_EXTENTS], XA_CARDINAL,
+		(&(jbwm_atom_t[]){b, b, b + TDIM, b}), 4);
+#endif//EWMH
 	return t;
 }
 
@@ -128,6 +135,12 @@ static void remove_titlebar(struct JBWMClient * restrict c)
 	c->ignore_unmap++;
 	XDestroyWindow(jbwm.d, c->tb.win);
 	c->tb.win = 0;
+#ifdef EWMH
+	// Required by wm-spec 1.4:
+	const uint8_t b = c->border;
+	XPROP(c->window, ewmh[FRAME_EXTENTS], XA_CARDINAL,
+		(&(jbwm_atom_t[]){b, b, b, b}), 4);
+#endif//EWMH
 }
 
 void update_titlebar(struct JBWMClient * c)
