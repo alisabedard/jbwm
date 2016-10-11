@@ -74,7 +74,7 @@ static void cleanup(void)
 		free(c);
 	} while(i && (c = i));
 }
-#include <stdio.h>
+
 static void handle_property_change(XPropertyEvent * restrict e,
 	struct JBWMClient * restrict c)
 {
