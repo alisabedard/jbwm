@@ -47,6 +47,22 @@ static void relink_window_list(struct JBWMClient * c)
 	}
 }
 
+static void free_client(struct JBWMClient * restrict c)
+{
+	const jbwm_window_t w = c->window;
+#ifdef EWMH
+	// Per ICCCM + EWMH:
+	XDeleteProperty(jbwm.d, w, ewmh[WM_STATE]);
+	XDeleteProperty(jbwm.d, w, ewmh[WM_DESKTOP]);
+#endif//EWMH
+	XReparentWindow(jbwm.d, w, c->screen->root, c->size.x, c->size.y);
+	XRemoveFromSaveSet(jbwm.d, w);
+	if(c->parent)
+		XDestroyWindow(jbwm.d, c->parent);
+	relink_window_list(c);
+	free(c);
+}
+
 static void cleanup(void)
 {
 	LOG("cleanup");
@@ -57,21 +73,7 @@ static void cleanup(void)
 		i = c->next;
 		if (!c->opt.remove)
 			  continue;
-		// Per ICCM + EWMH:
-#ifdef EWMH
-		XDeleteProperty(jbwm.d, c->window,
-			ewmh[WM_STATE]);
-		XDeleteProperty(jbwm.d, c->window,
-			ewmh[WM_DESKTOP]);
-#endif//EWMH
-		XReparentWindow(jbwm.d, c->window,
-			c->screen->root,
-			c->size.x, c->size.y);
-		XRemoveFromSaveSet(jbwm.d, c->window);
-		if(c->parent)
-			  XDestroyWindow(jbwm.d, c->parent);
-		relink_window_list(c);
-		free(c);
+		free_client(c);
 	} while(i && (c = i));
 }
 
