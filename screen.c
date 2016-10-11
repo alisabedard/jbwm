@@ -18,9 +18,7 @@
 #include <stdlib.h>
 #include <X11/Xatom.h>
 
-enum JBWMEventMasks {
-	JBWMMouseMask = ButtonPressMask | ButtonReleaseMask | PointerMotionMask
-};
+enum {JBWMMouseMask=(ButtonPressMask|ButtonReleaseMask|PointerMotionMask)};
 
 __attribute__ ((hot,nonnull))
 static void draw_outline(struct JBWMClient * restrict c)
@@ -50,9 +48,9 @@ static void grab_pointer(const jbwm_window_t w)
 
 static jbwm_point_t get_mouse_position(jbwm_window_t w)
 {
-	int x, y, d;
-	XQueryPointer(jbwm.d, w, (Window *)&d, (Window *)&d,
-		&x, &y, &d, &d, (unsigned int *)&d);
+	int x, y;
+	XQueryPointer(jbwm.d, w, &(Window){0}, &(Window){0},
+		&x, &y, &(int){0}, &(int){0}, &(unsigned int){0});
 	return (jbwm_point_t){x, y};
 }
 
