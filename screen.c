@@ -60,6 +60,22 @@ static void warp_corner(struct JBWMClient * restrict c)
 		c->size.width, c->size.height);
 }
 
+static void set_size(struct JBWMClient * restrict c,
+	const int16_t x, const int16_t y)
+{
+	c->size.width=abs(c->size.x - x);
+	c->size.height=abs(c->size.y - y);
+}
+
+static void set_position(struct JBWMClient * restrict c,
+	jbwm_point_t old, jbwm_point_t start,
+	const int16_t x, const int16_t y)
+{
+	c->size.x = old.x - start.x + x;
+	c->size.y = old.y - start.y + y;
+	snap_client(c);
+}
+
 void jbwm_drag(struct JBWMClient * restrict c, const bool resize)
 {
 	XRaiseWindow(jbwm.d, c->parent);
@@ -76,14 +92,10 @@ void jbwm_drag(struct JBWMClient * restrict c, const bool resize)
 		if (e.type != MotionNotify)
 			break;
 		draw_outline(c);
-		if (resize) {
-			c->size.width=abs(c->size.x - e.xmotion.x);
-			c->size.height=abs(c->size.y - e.xmotion.y);
-		} else {
-			c->size.x = op.x - p.x + e.xmotion.x;
-			c->size.y = op.y - p.y + e.xmotion.y;
-			snap_client(c);
-		}
+		if (resize)
+			set_size(c, e.xmotion.x, e.xmotion.y);
+		else // drag
+			set_position(c, op, p, e.xmotion.x, e.xmotion.y);
 		(c->border ? draw_outline : moveresize)(c);
 	}
 	draw_outline(c);

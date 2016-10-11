@@ -41,7 +41,7 @@ struct JBWMClient {
 	struct JBWMClient *next;
 	struct JBWMScreen *screen;
 	XSizeHints size;
-	jbwm_rect_t old_size;
+	jbwm_rectangle_t old_size;
 	jbwm_window_t window, parent;
 #ifdef USE_TBAR
 	struct JBWMClientTitlebar tb;
