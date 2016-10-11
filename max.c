@@ -31,9 +31,8 @@ void set_horz(struct JBWMClient * restrict c)
 	ewmh_add_state(c->window, ewmh[WM_STATE_MAXIMIZED_HORZ]);
 	c->opt.max_horz = true;
 	// Offset if not fullscreen
-	if (!c->opt.fullscreen) {
+	if (!c->opt.fullscreen)
 		c->size.width -= c->border<<1;
-	}
 	moveresize(c);
 }
 
@@ -87,8 +86,10 @@ void set_fullscreen(struct JBWMClient * restrict c)
 		  return;
 	/* The following checks remove conflicts between fullscreen
 	   mode and setd modes.  */
-	if(c->opt.max_horz) unset_horz(c);
-	if(c->opt.max_vert) unset_vert(c);
+	if(c->opt.max_horz)
+		unset_horz(c);
+	if(c->opt.max_vert)
+		unset_vert(c);
 	c->opt.fullscreen = true; // Reflect desired status
 	set_horz(c);
 	set_vert(c);
