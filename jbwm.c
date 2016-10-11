@@ -13,18 +13,14 @@
 #include "new.h"
 #include "util.h"
 
+#include <stdlib.h>
+#include <unistd.h>
+#include <X11/cursorfont.h>
+#include <X11/Xproto.h>
+
 #ifdef STDIO
 #include <stdio.h>
 #endif//STDIO
-
-#include <stdlib.h>
-
-#ifdef USE_ARGV
-#include <unistd.h>
-#endif//USE_ARGV
-
-#include <X11/cursorfont.h>
-#include <X11/Xproto.h>
 
 // Main application data structure.
 struct JBWMEnv jbwm;
@@ -155,13 +151,13 @@ static void setup_event_listeners(const jbwm_window_t root)
 static void allocate_colors(struct JBWMScreen * restrict s)
 {
 	const uint8_t n = s->screen;
-	s->pixels.fg=pixel(n, getenv(JBWM_ENV_FG));
-	s->pixels.bg=pixel(n, getenv(JBWM_ENV_BG));
-	s->pixels.fc=pixel(n, getenv(JBWM_ENV_FC));
+	s->pixels.fg=jbwm_get_pixel(n, getenv(JBWM_ENV_FG));
+	s->pixels.bg=jbwm_get_pixel(n, getenv(JBWM_ENV_BG));
+	s->pixels.fc=jbwm_get_pixel(n, getenv(JBWM_ENV_FC));
 #ifdef USE_TBAR
-	s->pixels.close = pixel(n, getenv(JBWM_ENV_CLOSE));
-	s->pixels.resize = pixel(n, getenv(JBWM_ENV_RESIZE));
-	s->pixels.shade = pixel(n, getenv(JBWM_ENV_SHADE));
+	s->pixels.close = jbwm_get_pixel(n, getenv(JBWM_ENV_CLOSE));
+	s->pixels.resize = jbwm_get_pixel(n, getenv(JBWM_ENV_RESIZE));
+	s->pixels.shade = jbwm_get_pixel(n, getenv(JBWM_ENV_SHADE));
 #endif//USE_TBAR
 }
 

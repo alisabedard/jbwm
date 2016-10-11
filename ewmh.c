@@ -12,6 +12,7 @@
 #include "util.h"
 
 #include <stdlib.h>
+#include <unistd.h>
 #include <X11/Xatom.h>
 
 Atom ewmh[EWMH_ATOMS_COUNT];
@@ -78,25 +79,26 @@ void ewmh_update_client_list(void)
 	size_t wl_sz = 0;
 	for (struct JBWMClient * i = jbwm.head; i; i = i->next, ++wl_sz)
 		wl[wl_sz] = i->window;
-	XPROP(jbwm.s->root, ewmh[CLIENT_LIST],
+	jbwm_set_property(jbwm.s->root, ewmh[CLIENT_LIST],
 		XA_WINDOW, &wl, wl_sz);
 	// FIXME: Does not correctly report stacking order.
-	XPROP(jbwm.s->root, ewmh[CLIENT_LIST_STACKING],
+	jbwm_set_property(jbwm.s->root, ewmh[CLIENT_LIST_STACKING],
 		XA_WINDOW, &wl, wl_sz);
 }
-static void set_root_vdesk(const jbwm_window_t r)
+
+static void set_root_vdesk(jbwm_window_t r)
 {
-	XPROP(r, ewmh[NUMBER_OF_JBWM_MAX_DESKTOPS], XA_CARDINAL,
+	jbwm_set_property(r, ewmh[NUMBER_OF_JBWM_MAX_DESKTOPS], XA_CARDINAL,
 		&(long){JBWM_MAX_DESKTOPS}, 1);
-	XPROP(r, ewmh[DESKTOP_VIEWPORT], XA_CARDINAL,
+	jbwm_set_property(r, ewmh[DESKTOP_VIEWPORT], XA_CARDINAL,
 		(&(long[]){0, 0}), 2);
-	XPROP(r, ewmh[VIRTUAL_ROOTS], XA_WINDOW, &r, 1);
+	jbwm_set_property(r, ewmh[VIRTUAL_ROOTS], XA_WINDOW, &r, 1);
 }
 
 
 void set_ewmh_allowed_actions(const jbwm_window_t w)
 {
-	const Atom a[] = {
+	Atom a[] = {
 		ewmh[WM_ALLOWED_ACTIONS],
 		ewmh[WM_ACTION_MOVE],
 		ewmh[WM_ACTION_RESIZE],
@@ -109,34 +111,34 @@ void set_ewmh_allowed_actions(const jbwm_window_t w)
 		ewmh[WM_ACTION_MAXIMIZE_HORZ],
 		ewmh[WM_ACTION_MAXIMIZE_VERT]
 	};
-	XPROP(w, a[0], XA_ATOM, &a, sizeof(a) / sizeof(Atom));
+	jbwm_set_property(w, a[0], XA_ATOM, &a, sizeof(a) / sizeof(Atom));
 }
 
 static void init_desktops(struct JBWMScreen * restrict s)
 {
-	XPROP(s->r, ewmh[DESKTOP_GEOMETRY], XA_CARDINAL, &s->size, 2);
-	XPROP(s->r, ewmh[CURRENT_DESKTOP], XA_CARDINAL, &s->vdesk, 1);
+	jbwm_set_property(s->r, ewmh[DESKTOP_GEOMETRY], XA_CARDINAL, &s->size, 2);
+	jbwm_set_property(s->r, ewmh[CURRENT_DESKTOP], XA_CARDINAL, &s->vdesk, 1);
 	set_root_vdesk(s->r);
 }
 
 static jbwm_window_t init_supporting(const jbwm_window_t r)
 {
 	jbwm_window_t w = XCreateSimpleWindow(jbwm.d, r, 0, 0, 1, 1, 0, 0, 0);
-	XPROP(r, ewmh[SUPPORTING_WM_CHECK], XA_WINDOW, &w, 1);
-	XPROP(w, ewmh[SUPPORTING_WM_CHECK], XA_WINDOW, &w, 1);
-	XPROP(w, ewmh[WM_NAME], XA_STRING, "jbwm", 4);
-	XPROP(w, ewmh[WM_PID], XA_CARDINAL, &(pid_t){getpid()}, 1);
+	jbwm_set_property(r, ewmh[SUPPORTING_WM_CHECK], XA_WINDOW, &w, 1);
+	jbwm_set_property(w, ewmh[SUPPORTING_WM_CHECK], XA_WINDOW, &w, 1);
+	jbwm_set_property(w, ewmh[WM_NAME], XA_STRING, "jbwm", 4);
+	jbwm_set_property(w, ewmh[WM_PID], XA_CARDINAL, &(pid_t){getpid()}, 1);
 	return w;
 }
 
 __attribute__((nonnull(1)))
 void setup_ewmh_for_screen(struct JBWMScreen * restrict s)
 {
-	const jbwm_window_t r = s->root;
-	XPROP(r, ewmh[SUPPORTED], XA_ATOM, ewmh, EWMH_ATOMS_COUNT);
-	XPROP(r, ewmh[WM_NAME], XA_STRING, "jbwm", 4);
+	jbwm_window_t r = s->root;
+	jbwm_set_property(r, ewmh[SUPPORTED], XA_ATOM, ewmh, EWMH_ATOMS_COUNT);
+	jbwm_set_property(r, ewmh[WM_NAME], XA_STRING, "jbwm", 4);
 	// Set this to the root window until we have some clients.
-	XPROP(r, ewmh[CLIENT_LIST], XA_WINDOW, &r, 1);
+	jbwm_set_property(r, ewmh[CLIENT_LIST], XA_WINDOW, &r, 1);
 	init_desktops(s);
 	s->supporting = init_supporting(r);
 }

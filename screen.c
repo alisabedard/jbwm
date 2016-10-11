@@ -167,7 +167,7 @@ uint8_t jbwm_set_vdesk(struct JBWMScreen * s, uint8_t v)
 	}
 	s->vdesk = v;
 #ifdef EWMH
-	XPROP(s->root, ewmh[CURRENT_DESKTOP], XA_CARDINAL, &v, 1);
+	jbwm_set_property(s->root, ewmh[CURRENT_DESKTOP], XA_CARDINAL, &v, 1);
 #endif//EWMH
 	return s->vdesk;
 }

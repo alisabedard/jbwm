@@ -10,7 +10,15 @@
 #include <string.h>
 #include <unistd.h>
 
-unsigned long pixel(const uint8_t screen, const char * restrict name)
+void jbwm_set_property(const jbwm_window_t win,
+	const jbwm_atom_t property, const jbwm_atom_t type,
+	void * restrict data, int16_t size)
+{
+	XChangeProperty(jbwm.d, win, property, type, 32, PropModeReplace,
+		data, size);
+}
+
+unsigned long jbwm_get_pixel(const uint8_t screen, const char * restrict name)
 {
 	if (!name) // sanitize input to avoid segfault
 		return 0;
@@ -44,7 +52,7 @@ void jbwm_grab_button(const Window w, const unsigned int mask,
 
 #ifdef DEBUG
 #include <stdio.h>
-void print_atom(const Atom a, const char * src, const uint16_t line)
+void jbwm_print_atom(const Atom a, const char * src, const uint16_t line)
 {
 	char *an = XGetAtomName(jbwm.d, a);
 	fprintf(stderr, "\t%s:%d %s(%lu)\n", src, line, an, a);

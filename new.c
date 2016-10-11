@@ -27,7 +27,7 @@ static uint8_t wm_desktop(const jbwm_window_t w, uint8_t vdesk)
 		if (n && lprop[0] < JBWM_MAX_DESKTOPS) // is valid
 			vdesk = lprop[0]; // Set vdesk to property value
 		else // Set to a valid desktop number:
-			XPROP(w, ewmh[WM_DESKTOP], XA_CARDINAL, &vdesk, 1);
+			jbwm_set_property(w, ewmh[WM_DESKTOP], XA_CARDINAL, &vdesk, 1);
 		XFree(lprop);
 	}
 	LOG("wm_desktop(): vdesk is %d\n", vdesk);
@@ -44,7 +44,7 @@ static void init_properties(struct JBWMClient * c)
 	c->vdesk = wm_desktop(c->window, c->vdesk);
 	// Required by wm-spec 1.4:
 	const uint8_t b = c->border;
-	XPROP(c->window, ewmh[FRAME_EXTENTS], XA_CARDINAL,
+	jbwm_set_property(c->window, ewmh[FRAME_EXTENTS], XA_CARDINAL,
 		(&(jbwm_atom_t[]){b, b, b, b}), 4);
 #endif//EWMH
 }

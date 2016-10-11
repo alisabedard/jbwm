@@ -81,7 +81,7 @@ static jbwm_window_t new_titlebar(struct JBWMClient * restrict c)
 #ifdef EWMH
 	// Required by wm-spec 1.4:
 	const uint8_t b = c->border;
-	XPROP(c->window, ewmh[FRAME_EXTENTS], XA_CARDINAL,
+	jbwm_set_property(c->window, ewmh[FRAME_EXTENTS], XA_CARDINAL,
 		(&(jbwm_atom_t[]){b, b, b + TDIM, b}), 4);
 #endif//EWMH
 	return t;
@@ -136,7 +136,7 @@ static void remove_titlebar(struct JBWMClient * restrict c)
 #ifdef EWMH
 	// Required by wm-spec 1.4:
 	const uint8_t b = c->border;
-	XPROP(c->window, ewmh[FRAME_EXTENTS], XA_CARDINAL,
+	jbwm_set_property(c->window, ewmh[FRAME_EXTENTS], XA_CARDINAL,
 		(&(jbwm_atom_t[]){b, b, b, b}), 4);
 #endif//EWMH
 }

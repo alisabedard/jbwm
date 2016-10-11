@@ -68,7 +68,7 @@ void jbwm_select_client(struct JBWMClient * c)
 		? c->screen->pixels.fc : c->screen->pixels.fg);
 	jbwm.current = c;
 #ifdef EWMH
-	XPROP(c->screen->root, ewmh[ACTIVE_WINDOW],
+	jbwm_set_property(c->screen->root, ewmh[ACTIVE_WINDOW],
 		XA_WINDOW, &(c->parent), 1);
 	ewmh_add_state(c->window, ewmh[WM_STATE_FOCUSED]);
 #endif//EWMH
@@ -117,7 +117,8 @@ jbwm_atom_t jbwm_get_wm_state(void)
 
 void jbwm_set_wm_state(struct JBWMClient * restrict c, const int8_t state)
 {
-	XPROP(c->window, jbwm_get_wm_state(), XA_CARDINAL, &state, 1);
+	jbwm_set_property(c->window, jbwm_get_wm_state(),
+		XA_CARDINAL, &(uint32_t){state}, 1);
 }
 
 static bool has_delete_proto(const jbwm_window_t w)

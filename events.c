@@ -79,7 +79,7 @@ static void handle_property_change(XPropertyEvent * restrict e,
 	struct JBWMClient * restrict c)
 {
 #ifdef EVENT_DEBUG
-	print_atom(e->atom, __FILE__, __LINE__);
+	jbwm_print_atom(e->atom, __FILE__, __LINE__);
 #endif//EVENT_DEBUG
 	if(e->state != PropertyNewValue)
 		  return;
@@ -88,7 +88,7 @@ static void handle_property_change(XPropertyEvent * restrict e,
 	else {
 		if (e->atom == jbwm_get_wm_state())
 			jbwm_move_resize(c);
-		print_atom(e->atom, __FILE__, __LINE__);
+		jbwm_print_atom(e->atom, __FILE__, __LINE__);
 	}
 }
 
