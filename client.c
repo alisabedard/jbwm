@@ -90,7 +90,7 @@ void jbwm_toggle_sticky(struct JBWMClient * c)
 	jbwm_select_client(c);
 	jbwm_update_titlebar(c);
 #ifdef EWMH
-	(c->opt.sticky?ewmh_add_state:ewmh_remove_state)(c->window,
+	(c->opt.sticky ? ewmh_add_state : ewmh_remove_state)(c->window,
 		ewmh[WM_STATE_STICKY]);
 #endif//EWMH
 }
@@ -106,22 +106,27 @@ static Status xmsg(const jbwm_window_t w, const Atom a, const long x)
 	});
 }
 
+static jbwm_atom_t get_atom(jbwm_atom_t * a, const char * name)
+{
+	return *a ? *a : (*a = XInternAtom(jbwm.d, name, false));
+}
+
 static jbwm_atom_t get_wm_protocols(void)
 {
 	static jbwm_atom_t a;
-	return a ? a : (a = XInternAtom(jbwm.d, "WM_PROTOCOLS", false));
+	return get_atom(&a, "WM_PROTOCOLS");
 }
 
 static jbwm_atom_t get_wm_delete_window(void)
 {
 	static jbwm_atom_t a;
-	return a ? a : (a = XInternAtom(jbwm.d, "WM_DELETE_WINDOW", false));
+	return get_atom(&a, "WM_DELETE_WINDOW");
 }
 
 jbwm_atom_t jbwm_get_wm_state(void)
 {
 	static jbwm_atom_t a;
-	return a ? a : (a = XInternAtom(jbwm.d, "WM_STATE", false));
+	return get_atom(&a, "WM_STATE");
 }
 
 void jbwm_set_wm_state(struct JBWMClient * restrict c, const int8_t state)
