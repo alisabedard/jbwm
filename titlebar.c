@@ -4,18 +4,16 @@
 // See README for license and other details.
 
 #include "titlebar.h"
-
 #include "client.h"
-#include "config.h"
 #include "ewmh.h"
 #include "ewmh_state.h"
 #include "screen.h"
 #include "util.h"
 
-#include <stdlib.h>
 #include <X11/Xatom.h>
 
 #ifdef USE_XFT
+#include "config.h"
 #include <X11/Xft/Xft.h>
 #endif//USE_XFT
 
