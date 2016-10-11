@@ -126,7 +126,7 @@ static void handle_client_key_event(const bool mod,
 		(c->opt.max_vert ? unset_vert : set_vert)(c);
 		break;
 	case KEY_STICK:
-		stick(c);
+		jbwm_toggle_sticky(c);
 		break;
 	case KEY_MOVE:
 		jbwm_drag(c, false);

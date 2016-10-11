@@ -74,7 +74,7 @@ void select_client(struct JBWMClient * c)
 #endif//EWMH
 }
 
-void stick(struct JBWMClient * c)
+void jbwm_toggle_sticky(struct JBWMClient * c)
 {
 	LOG("stick");
 	c->opt.sticky ^= true; // toggle
