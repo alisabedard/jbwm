@@ -92,6 +92,7 @@ static void reparent(struct JBWMClient * c) // use of restrict here is a bug
 	XMapWindow(jbwm.d, c->window);
 }
 
+// Allocate the client structure with some defaults set
 static struct JBWMClient * get_JBWMClient(const jbwm_window_t w,
 	struct JBWMScreen * s)
 {
@@ -101,18 +102,22 @@ static struct JBWMClient * get_JBWMClient(const jbwm_window_t w,
 	return c;
 }
 
+// Grab input and setup EWMH for client window
+static void do_grabs(const jbwm_window_t w)
+{
+	XSelectInput(jbwm.d, w, EnterWindowMask
+		| PropertyChangeMask | ColormapChangeMask);
+	jbwm_grab_button(w, jbwm.keymasks.grab, AnyButton);
+	set_ewmh_allowed_actions(w);
+}
+
 void make_new_client(const jbwm_window_t w, struct JBWMScreen * s)
 {
 	LOG("make_new_client(%d,s)", (int)w);
-	XGrabServer(jbwm.d);
 	struct JBWMClient * c = jbwm.head = get_JBWMClient(w, s);
+	do_grabs(w);
 	init_properties(c);
 	init_geometry(c);
-	XSelectInput(jbwm.d, c->window, EnterWindowMask
-		| PropertyChangeMask | ColormapChangeMask);
 	reparent(c);
 	unhide(c);
-	jbwm_grab_button(w, jbwm.keymasks.grab, AnyButton);
-	set_ewmh_allowed_actions(w);
-	XUngrabServer(jbwm.d);
 }
