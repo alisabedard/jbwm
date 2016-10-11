@@ -70,6 +70,7 @@ static void init_geometry(struct JBWMClient * c)
 	c->ignore_unmap = attr.map_state == IsViewable;
 }
 
+__attribute__((nonnull))
 static Window get_parent(struct JBWMClient * restrict c)
 {
 	return XCreateWindow(jbwm.d, c->screen->root, c->size.x, c->size.y,
@@ -82,14 +83,15 @@ static Window get_parent(struct JBWMClient * restrict c)
 
 }
 
+__attribute__((nonnull))
 static void reparent(struct JBWMClient * c) // use of restrict here is a bug
 {
 	LOG("reparent()");
 	setup_shaped(c);
-	c->parent = get_parent(c);
-	XAddToSaveSet(jbwm.d, c->window);
-	XReparentWindow(jbwm.d, c->window, c->parent, 0, 0);
-	XMapWindow(jbwm.d, c->window);
+	const jbwm_window_t p = c->parent = get_parent(c), w = c->window;
+	XAddToSaveSet(jbwm.d, w);
+	XReparentWindow(jbwm.d, w, p, 0, 0);
+	XMapWindow(jbwm.d, w);
 }
 
 // Allocate the client structure with some defaults set
