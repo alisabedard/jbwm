@@ -131,17 +131,15 @@ void moveresize(struct JBWMClient * restrict c)
 static void hide(struct JBWMClient * restrict c)
 {
 	XUnmapWindow(jbwm.d, c->parent);
-#ifdef EWMH
+	set_wm_state(c, IconicState);
 	ewmh_add_state(c->window, ewmh[WM_STATE_HIDDEN]);
-#endif//EWMH
 }
 
 void unhide(struct JBWMClient * restrict c)
 {
 	XMapWindow(jbwm.d, c->parent);
-#ifdef EWMH
+	set_wm_state(c, NormalState);
 	ewmh_remove_state(c->window, ewmh[WM_STATE_HIDDEN]);
-#endif//EWMH
 }
 
 uint8_t switch_vdesk(struct JBWMScreen * s, uint8_t v)
