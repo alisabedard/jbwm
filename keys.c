@@ -170,6 +170,14 @@ static void cond_client_to_desk(struct JBWMClient * c, struct JBWMScreen * s,
 	mod && c ? client_to_vdesk(c, d) : switch_vdesk(s, d);
 }
 
+static void start_terminal(void)
+{
+	if (fork() == 0) {
+		char * t = getenv(JBWM_ENV_TERM);
+		execlp(t, t, (char*)NULL);
+	}
+}
+
 void jbwm_handle_key_event(XKeyEvent * e)
 {
 	LOG("jbwm_handle_key_event");
@@ -183,13 +191,9 @@ void jbwm_handle_key_event(XKeyEvent * e)
 	} opt = {s->vdesk, e->state & jbwm.keymasks.mod, 0};
 
 	switch (key) {
-	case KEY_NEW: {
-		if (fork() == 0) {
-			char * t = getenv(JBWM_ENV_TERM);
-			execlp(t, t, (char*)NULL);
-		}
+	case KEY_NEW:
+		start_terminal();
 		break;
-	}
 	case KEY_QUIT:
 		exit(0);
 	case KEY_NEXT:
