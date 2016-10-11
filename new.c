@@ -92,16 +92,20 @@ static void reparent(struct JBWMClient * c) // use of restrict here is a bug
 	XMapWindow(jbwm.d, c->window);
 }
 
+static struct JBWMClient * get_JBWMClient(const jbwm_window_t w,
+	struct JBWMScreen * s)
+{
+	struct JBWMClient * c = malloc(sizeof(struct JBWMClient));
+	*c = (struct JBWMClient) {.screen = s, .window = w, .border = 1,
+		.next = jbwm.head};
+	return c;
+}
+
 void make_new_client(const jbwm_window_t w, struct JBWMScreen * s)
 {
 	LOG("make_new_client(%d,s)", (int)w);
-	struct JBWMClient *c = calloc(1, sizeof(struct JBWMClient));
 	XGrabServer(jbwm.d);
-	c->next = jbwm.head;
-	jbwm.head = c;
-	c->screen = s;
-	c->window = w;
-	c->border = 1;
+	struct JBWMClient * c = jbwm.head = get_JBWMClient(w, s);
 	init_properties(c);
 	init_geometry(c);
 	XSelectInput(jbwm.d, c->window, EnterWindowMask
