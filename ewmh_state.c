@@ -155,6 +155,19 @@ static bool client_specific_message(XClientMessageEvent * restrict e,
 	return true;
 }
 
+static void handle_moveresize(XClientMessageEvent * restrict e)
+{
+	const uint8_t src = (e->data.l[0] >> 12) & 3;
+	if (src != 2)
+		return;
+	const int vm = (e->data.l[0] >> 8) & 0x0f;
+	XConfigureWindow(e->display, e->window,
+		vm, &(XWindowChanges){
+		.x = e->data.l[1], .y = e->data.l[2],
+		.width = e->data.l[3],
+		.height = e->data.l[4]});
+}
+
 void ewmh_client_message(XClientMessageEvent * restrict e,
 	struct JBWMClient * restrict c)
 {
@@ -173,17 +186,8 @@ void ewmh_client_message(XClientMessageEvent * restrict e,
 	if (t == ewmh[CURRENT_DESKTOP])
 		  jbwm_set_vdesk(s, e->data.l[0]);
 	// If something else moves the window:
-	else if (t == ewmh[MOVERESIZE_WINDOW]) {
-		const uint8_t src = (e->data.l[0] >> 12) & 3;
-		if (src != 2)
-			  return;
-		const int vm = (e->data.l[0] >> 8) & 0x0f;
-		XConfigureWindow(e->display, e->window,
-			vm, &(XWindowChanges){
-			.x = e->data.l[1], .y = e->data.l[2],
-			.width = e->data.l[3],
-			.height = e->data.l[4]});
-	}
+	else if (t == ewmh[MOVERESIZE_WINDOW])
+		handle_moveresize(e);
 }
 
 
