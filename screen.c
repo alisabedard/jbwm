@@ -54,6 +54,12 @@ static jbwm_point_t get_mouse_position(jbwm_window_t w)
 	return (jbwm_point_t){x, y};
 }
 
+static void warp_corner(struct JBWMClient * restrict c)
+{
+	XWarpPointer(jbwm.d, None, c->window, 0, 0, 0, 0,
+		c->size.width, c->size.height);
+}
+
 void jbwm_drag(struct JBWMClient * restrict c, const bool resize)
 {
 	XRaiseWindow(jbwm.d, c->parent);
@@ -64,8 +70,7 @@ void jbwm_drag(struct JBWMClient * restrict c, const bool resize)
 	const jbwm_point_t op = {c->size.x, c->size.y};
 	XEvent e;
 	if (resize)
-		XWarpPointer(jbwm.d, None, c->window, 0, 0, 0, 0,
-			c->size.width, c->size.height);
+		warp_corner(c);
 	for(;;) {
 		XMaskEvent(jbwm.d, MouseMask, &e);
 		if (e.type != MotionNotify)
