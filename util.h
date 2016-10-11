@@ -17,7 +17,7 @@ unsigned long jbwm_get_pixel(const uint8_t screen, const char * restrict name);
 #if defined(EWMH) || defined(MWM)
 
 // Free the result with XFree
-void *jbwm_get_property(Window w, Atom property, uint16_t * num_items);
+void * jbwm_get_property(Window w, Atom property, uint16_t * num_items);
 
 #endif//EWMH||MWM
 
