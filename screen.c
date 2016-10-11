@@ -76,21 +76,28 @@ static void set_position(struct JBWMClient * restrict c,
 	snap_client(c);
 }
 
-static void drag_event_loop(struct JBWMClient * restrict c,
-	const bool resize, const jbwm_point_t original,
-	const jbwm_point_t start)
+static void do_changes(struct JBWMClient * restrict c, const bool resize,
+	const jbwm_point_t start, const jbwm_point_t original,
+	const int16_t x, const int16_t y)
 {
+	if (resize)
+		set_size(c, x, y);
+	else // drag
+		set_position(c, original, start, x, y);
+}
+
+static void drag_event_loop(struct JBWMClient * restrict c, const bool resize)
+{
+	const jbwm_point_t start = get_mouse_position(c->screen->root);
+	const jbwm_point_t original = {c->size.x, c->size.y};
 	for (;;) {
 		XEvent e;
 		XMaskEvent(jbwm.d, JBWMMouseMask, &e);
 		if (e.type != MotionNotify)
 			return;
 		draw_outline(c);
-		if (resize)
-			set_size(c, e.xmotion.x, e.xmotion.y);
-		else // drag
-			set_position(c, original, start,
-				e.xmotion.x, e.xmotion.y);
+		do_changes(c, resize, start, original,
+			e.xmotion.x, e.xmotion.y);
 		(c->border ? draw_outline : moveresize)(c);
 	}
 }
@@ -101,11 +108,9 @@ void jbwm_drag(struct JBWMClient * restrict c, const bool resize)
 	if (resize && (c->opt.no_resize || c->opt.shaded))
 		return;
 	grab_pointer(c->screen->root);
-	const jbwm_point_t start = get_mouse_position(c->screen->root);
-	const jbwm_point_t original = {c->size.x, c->size.y};
 	if (resize)
 		warp_corner(c);
-	drag_event_loop(c, resize, original, start);
+	drag_event_loop(c, resize);
 	draw_outline(c);
 	XUngrabPointer(jbwm.d, CurrentTime);
 	moveresize(c);
