@@ -52,6 +52,7 @@ static void move_buttons(struct JBWMClient * restrict c)
 	XMoveWindow(jbwm.d, c->tb.resize, x, 0);
 	x -= TDIM;
 	XMoveWindow(jbwm.d, c->tb.shade, x, 0);
+	XMoveWindow(jbwm.d, c->tb.stick, x, TDIM >> 1);
 }
 
 static Window get_win(const Window p, const uint16_t w, const uint16_t h,
@@ -74,6 +75,7 @@ static jbwm_window_t new_titlebar(struct JBWMClient * restrict c)
 	c->tb.close = get_button(t, p->close);
 	c->tb.resize = get_button(t, p->resize);
 	c->tb.shade = get_button(t, p->shade);
+	c->tb.stick = get_button(t, p->stick);
 	move_buttons(c);
 	XMapRaised(jbwm.d, t);
 	XMapSubwindows(jbwm.d, t);

@@ -158,6 +158,7 @@ static void allocate_colors(struct JBWMScreen * restrict s)
 	s->pixels.close = jbwm_get_pixel(n, getenv(JBWM_ENV_CLOSE));
 	s->pixels.resize = jbwm_get_pixel(n, getenv(JBWM_ENV_RESIZE));
 	s->pixels.shade = jbwm_get_pixel(n, getenv(JBWM_ENV_SHADE));
+	s->pixels.stick = jbwm_get_pixel(n, getenv(JBWM_ENV_STICK));
 #endif//USE_TBAR
 }
 
@@ -244,6 +245,7 @@ static void jbwm_set_defaults(void)
 	setenv(JBWM_ENV_CLOSE, JBWM_DEF_CLOSE, 0);
 	setenv(JBWM_ENV_RESIZE, JBWM_DEF_RESIZE, 0);
 	setenv(JBWM_ENV_SHADE, JBWM_DEF_SHADE, 0);
+	setenv(JBWM_ENV_STICK, JBWM_DEF_STICK, 0);
 	setenv(JBWM_ENV_FONT, JBWM_DEF_FONT, 0);
 #endif//USE_TBAR
 }

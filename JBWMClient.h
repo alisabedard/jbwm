@@ -33,7 +33,7 @@ struct JBWMClientOptions {
 
 #ifdef USE_TBAR
 struct JBWMClientTitlebar {
-	jbwm_window_t win, close, resize, shade;
+	jbwm_window_t win, close, resize, shade, stick;
 };
 #endif//USE_TBAR
 

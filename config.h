@@ -20,9 +20,10 @@
 #define JBWM_DEF_FG "#ddd"
 #define JBWM_DEF_FC "#8f8"
 #define JBWM_DEF_BG "#111"
-#define JBWM_DEF_CLOSE "#877"
-#define JBWM_DEF_SHADE "#787"
-#define JBWM_DEF_RESIZE "#778"
+#define JBWM_DEF_CLOSE "#867"
+#define JBWM_DEF_SHADE "#6a7"
+#define JBWM_DEF_STICK "#555"
+#define JBWM_DEF_RESIZE "#66a"
 
 // Environment
 #define JBWM_ENV_DISPLAY "DISPLAY"
@@ -31,6 +32,7 @@
 #define JBWM_ENV_BG "JBWM_BG"
 #define JBWM_ENV_CLOSE "JBWM_CLOSE"
 #define JBWM_ENV_SHADE "JBWM_SHADE"
+#define JBWM_ENV_STICK "JBWM_STICK"
 #define JBWM_ENV_RESIZE "JBWM_RESIZE"
 #define JBWM_ENV_FONT "JBWM_FONT"
 #define JBWM_ENV_TERM "JBWM_TERM"
