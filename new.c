@@ -23,12 +23,13 @@ static uint8_t wm_desktop(const jbwm_window_t w, uint8_t vdesk)
 {
 	uint16_t n;
 	unsigned long *lprop = get_property(w, ewmh[WM_DESKTOP], &n);
-	if(lprop && n && lprop[0] < DESKTOPS)
-		vdesk = lprop[0];
-	else
-		  XPROP(w, ewmh[WM_DESKTOP], XA_CARDINAL, &vdesk, 1);
-	if(lprop)
-		  XFree(lprop);
+	if (lprop) {
+		if (n && lprop[0] < DESKTOPS) // is valid
+			vdesk = lprop[0]; // Set vdesk to property value
+		else // Set to a valid desktop number:
+			XPROP(w, ewmh[WM_DESKTOP], XA_CARDINAL, &vdesk, 1);
+		XFree(lprop);
+	}
 	LOG("wm_desktop(): vdesk is %d\n", vdesk);
 	return vdesk;
 }
