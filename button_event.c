@@ -11,32 +11,38 @@
 #include "screen.h"
 #include "titlebar.h"
 
+#ifdef USE_TBAR
+static void handle_titlebar_button(XButtonEvent * restrict e,
+	struct JBWMClient * restrict c)
+{
+	LOG("e->window: %d, c->titlebar: %d, e->subwindow: %d",
+		(int)e->window, (int)c->tb.win, (int)e->subwindow);
+	if (e->subwindow == c->tb.close)
+		jbwm_send_wm_delete(c);
+	else if (e->subwindow == c->tb.resize)
+		jbwm_drag(c, !c->opt.no_resize);
+	else if (e->subwindow == c->tb.shade && !c->opt.no_min)
+		jbwm_toggle_shade(c);
+	else if (e->subwindow == c->tb.stick)
+		jbwm_toggle_sticky(c);
+	else
+		jbwm_drag(c, false);
+}
+#else//!USE_TBAR
+#define handle_titlebar_button(e, c) jbwm_drag(c, false)
+#endif//USE_TBAR
+
 void jbwm_handle_button_event(XButtonEvent * restrict e,
 	struct JBWMClient * restrict c)
 {
 	LOG("jbwm_handle_button_event");
 	switch (e->button) {
 	case Button1:
-#ifdef USE_TBAR
-		LOG("e->window: %d, c->titlebar: %d, e->subwindow: %d",
-			(int)e->window, (int)c->tb.win, (int)e->subwindow);
-		if (e->subwindow == c->tb.close)
-			jbwm_send_wm_delete(c);
-		else if (e->subwindow == c->tb.resize)
-			jbwm_drag(c, !c->opt.no_resize);
-		else if (e->subwindow == c->tb.shade && !c->opt.no_min)
-			jbwm_toggle_shade(c);
-		else if (e->subwindow == c->tb.stick)
-			jbwm_toggle_sticky(c);
-		else
-#endif//USE_TBAR
-			jbwm_drag(c, false);
+		handle_titlebar_button(e, c);
 		break;
-
 	case Button2:
 		XLowerWindow(jbwm.d, c->parent);
 		break;
-
 	case Button3:
 		/* Resize operations more useful here,
 		   rather than for third button, for laptop
