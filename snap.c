@@ -64,12 +64,12 @@ static XPoint search(struct JBWMClient * c)
 		const uint8_t b = c->border;
 		if ((gi->y - c->size.height - c->size.y <= d.x)
 		    && (c->size.y - gi->height - gi->y <= d.x))
-			d.x = snap_dim(c->size.x, c->size.width, gi->x, gi->width, b,
-				       d.x);
+			d.x = snap_dim(c->size.x, c->size.width,
+				gi->x, gi->width, b, d.x);
 		if ((gi->x - c->size.width - c->size.x <= d.y)
 		    && (c->size.x - gi->width - gi->x <= d.y))
-			d.y = snap_dim(c->size.y, c->size.height, gi->y, gi->height, b,
-				       d.y);
+			d.y = snap_dim(c->size.y, c->size.height,
+				gi->y, gi->height, b, d.y);
 	}
 	return d;
 }
