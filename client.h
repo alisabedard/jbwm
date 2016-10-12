@@ -20,7 +20,7 @@ char * jbwm_get_title(const jbwm_window_t w)
 
 void jbwm_select_client(struct JBWMClient * c);
 
-void jbwm_send_wm_delete(const struct JBWMClient * restrict c)
+void jbwm_send_wm_delete(struct JBWMClient * restrict c)
 	__attribute__((nonnull));
 
 // Set WM_STATE property

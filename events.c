@@ -46,7 +46,7 @@ static void relink_window_list(struct JBWMClient * c)
 	}
 }
 
-static void free_client(struct JBWMClient * restrict c)
+void jbwm_free_client(struct JBWMClient * restrict c)
 {
 	const jbwm_window_t w = c->window;
 #ifdef EWMH
@@ -60,6 +60,8 @@ static void free_client(struct JBWMClient * restrict c)
 		XDestroyWindow(jbwm.d, c->parent);
 	relink_window_list(c);
 	free(c);
+	jbwm.last = 0; /* allow this client's window id to be reused
+			  for another client.  */
 }
 
 static void cleanup(void)
@@ -72,7 +74,7 @@ static void cleanup(void)
 		i = c->next;
 		if (!c->opt.remove)
 			  continue;
-		free_client(c);
+		jbwm_free_client(c);
 	} while(i && (c = i));
 }
 

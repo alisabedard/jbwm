@@ -5,6 +5,7 @@
 
 #include "JBWMEnv.h"
 
+#include "client.h"
 #include "config.h"
 #include "events.h"
 #include "ewmh.h"
@@ -230,6 +231,11 @@ static int handle_xerror(Display * restrict dpy __attribute__ ((unused)),
 	if ((e->error_code == BadAccess)
 	    && (e->request_code == X_ChangeWindowAttributes)) {
 		jbwm_error("ROOT");
+	}
+	if (e->error_code == BadWindow) { // cleanup zombie windows
+		struct JBWMClient * c = jbwm_get_client(e->resourceid);
+		if (c) // match found
+			jbwm_free_client(c);
 	}
 	LOG("xerror: %d, %d\n", e->error_code, e->request_code);
 	return 0; // Ignore everything else.
