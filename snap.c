@@ -52,38 +52,35 @@ snap_dim(const int16_t cxy, const uint16_t cwh, const int16_t cixy,
 	return d;
 }
 
-void snap_client(struct JBWMClient * c)
+static XPoint search(struct JBWMClient * c)
 {
-	snap_border(c);
-	// Snap to other windows:
-	XSizeHints *restrict g = &(c->size);
 	XPoint d = { JBWM_SNAP, JBWM_SNAP };
-
 	for (struct JBWMClient * ci = jbwm.head; ci; ci = ci->next) {
 		// This test qualifies 'restrict'
 		if ((ci == c) || (ci->screen != c->screen)
 		    || (ci->vdesk != c->vdesk))
 			continue;
-
 		XSizeHints *restrict gi = &(ci->size);
 		const uint8_t b = c->border;
-
-		if ((gi->y - g->height - g->y <= d.x)
-		    && (g->y - gi->height - gi->y <= d.x)) {
-			d.x = snap_dim(g->x, g->width, gi->x, gi->width, b,
+		if ((gi->y - c->size.height - c->size.y <= d.x)
+		    && (c->size.y - gi->height - gi->y <= d.x))
+			d.x = snap_dim(c->size.x, c->size.width, gi->x, gi->width, b,
 				       d.x);
-		}
-
-		if ((gi->x - g->width - g->x <= d.y)
-		    && (g->x - gi->width - gi->x <= d.y)) {
-			d.y = snap_dim(g->y, g->height, gi->y, gi->height, b,
+		if ((gi->x - c->size.width - c->size.x <= d.y)
+		    && (c->size.x - gi->width - gi->x <= d.y))
+			d.y = snap_dim(c->size.y, c->size.height, gi->y, gi->height, b,
 				       d.y);
-		}
 	}
+	return d;
+}
 
+void snap_client(struct JBWMClient * c)
+{
+	snap_border(c);
+	// Snap to other windows:
+	const XPoint d = search(c);
 	if (abs(d.x) < JBWM_SNAP)
-		g->x += d.x;
-
+		c->size.x += d.x;
 	if (abs(d.y) < JBWM_SNAP)
-		g->y += d.y;
+		c->size.y += d.y;
 }
