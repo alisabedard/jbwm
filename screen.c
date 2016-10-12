@@ -152,18 +152,13 @@ void jbwm_restore_client(struct JBWMClient * restrict c)
 static void check_visibility(struct JBWMScreen * s,
 	struct JBWMClient * restrict c, const uint8_t v)
 {
-	if (c->opt.sticky) {
-		c->vdesk = v; // allow moving windows by sticking
-		jbwm_restore_client(c);
-		return;
-	}
 	if (c->screen != s)
 		return;
-	if (c->vdesk == s->vdesk)
-		hide(c);
-	else if (c->vdesk == v)
+	if (c->vdesk == v || c->opt.sticky) {
+		c->vdesk = v; // allow moving windows by sticking
 		jbwm_restore_client(c);
-
+	} else
+		hide(c);
 }
 
 uint8_t jbwm_set_vdesk(struct JBWMScreen * s, uint8_t v)
