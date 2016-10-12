@@ -149,6 +149,23 @@ void jbwm_restore_client(struct JBWMClient * restrict c)
 	ewmh_remove_state(c->window, ewmh[WM_STATE_HIDDEN]);
 }
 
+static void check_visibility(struct JBWMScreen * s,
+	struct JBWMClient * restrict c, const uint8_t v)
+{
+	if (c->opt.sticky) {
+		c->vdesk = v; // allow moving windows by sticking
+		jbwm_restore_client(c);
+		return;
+	}
+	if (c->screen != s)
+		return;
+	if (c->vdesk == s->vdesk)
+		hide(c);
+	else if (c->vdesk == v)
+		jbwm_restore_client(c);
+
+}
+
 uint8_t jbwm_set_vdesk(struct JBWMScreen * s, uint8_t v)
 {
 	LOG("jbwm_set_vdesk");
@@ -156,16 +173,8 @@ uint8_t jbwm_set_vdesk(struct JBWMScreen * s, uint8_t v)
 	if (v == s->vdesk || v > JBWM_MAX_DESKTOPS)
 		return s->vdesk;
 
-	for (struct JBWMClient * c = jbwm.head; c; c = c->next) {
-		if (c->opt.sticky) {
-			c->vdesk = v; // allow moving windows by sticking
-			jbwm_restore_client(c);
-			continue;
-		}
-		if (c->screen != s) continue;
-		if (c->vdesk == s->vdesk) hide(c);
-		else if (c->vdesk == v) jbwm_restore_client(c);
-	}
+	for (struct JBWMClient * c = jbwm.head; c; c = c->next)
+		check_visibility(s, c, v);
 	s->vdesk = v;
 #ifdef EWMH
 	jbwm_set_property(s->root, ewmh[CURRENT_DESKTOP], XA_CARDINAL, &v, 1);
