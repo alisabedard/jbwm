@@ -9,8 +9,6 @@
 #include "log.h"
 #include "util.h"
 
-#include <X11/Xatom.h>
-
 // These are MWM-specific hints
 enum MwmFlags {
 // flags:
