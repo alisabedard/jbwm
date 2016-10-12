@@ -24,11 +24,10 @@ enum {
 	MWM_DECOR_ALL = (1L << 0), MWM_DECOR_BORDER = (1L << 1),
 	MWM_DECOR_RESIZEH = (1L << 2), MWM_DECOR_TITLE = (1L << 3),
 	MWM_DECOR_MENU = (1L << 4), MWM_DECOR_MINIMIZE = (1L << 5),
-	MWM_DECOR_MAXIMIZE = (1L << 6)
-};
-
+	MWM_DECOR_MAXIMIZE = (1L << 6),
 // status:
-enum { MWM_TEAROFF_WINDOW = 1 };
+	MWM_TEAROFF_WINDOW = 1
+};
 
 static void process_flags(struct JBWMClient * c)
 {
@@ -43,57 +42,31 @@ struct JBWMMWM { // paraphrased from MwmUtil.h
 	uint32_t flags, functions, decor, input_mode, status;
 };
 
-static bool do_status(struct JBWMClient * restrict c,
-	struct JBWMMWM * restrict m)
+static void do_functions(struct JBWMClientOptions * restrict o,
+	const uint32_t f)
 {
-	if (m->flags & MWM_HINTS_STATUS) {
-		LOG("MWM_HINTS_STATUS");
-		c->opt.tearoff = m->status & MWM_TEAROFF_WINDOW;
-		return true;
-	}
-	return false;
+		o->no_resize=!(f & MWM_FUNC_RESIZE);
+		o->no_close=!(f & MWM_FUNC_CLOSE);
+		o->no_min=!(f & MWM_FUNC_MINIMIZE);
+		o->no_max=!(f & MWM_FUNC_MAXIMIZE);
+		o->no_move=!(f & MWM_FUNC_MOVE);
+		LOG("MWM_HINTS_FUNCTIONS\topts: %d, %d, %d, %d, %d",
+			o->no_resize, o->no_close, o->no_min, o->no_max,
+			o->no_move);
 }
 
-static void do_functions(struct JBWMClient * restrict c,
-	struct JBWMMWM * restrict m)
+static void do_decorations(struct JBWMClientOptions * restrict o,
+	const uint32_t f)
 {
-	if (m->flags & MWM_HINTS_FUNCTIONS
-		&& !(m->functions&MWM_FUNC_ALL)) {
-		LOG("MWM_HINTS_FUNCTIONS");
-		c->opt.no_resize=!(m->functions&MWM_FUNC_RESIZE);
-		c->opt.no_close=!(m->functions&MWM_FUNC_CLOSE);
-		c->opt.no_min=!(m->functions&MWM_FUNC_MINIMIZE);
-		c->opt.no_max=!(m->functions&MWM_FUNC_MAXIMIZE);
-		c->opt.no_move=!(m->functions&MWM_FUNC_MOVE);
-		LOG("\topts: %d, %d, %d, %d, %d",
-			c->opt.no_resize,
-			c->opt.no_close,
-			c->opt.no_min,
-			c->opt.no_max,
-			c->opt.no_move);
-	}
-
-}
-
-static void do_decorations(struct JBWMClient * restrict c,
-	struct JBWMMWM * restrict m)
-{
-	if (m->flags & MWM_HINTS_DECORATIONS
-		&& !(m->decor&MWM_DECOR_ALL)) {
-		LOG("MWM_HINTS_DECORATIONS");
-		c->opt.no_border=!(m->decor&MWM_DECOR_BORDER);
-		c->opt.no_resize_decor=!(m->decor&MWM_DECOR_RESIZEH);
-		c->opt.no_titlebar=!(m->decor&MWM_DECOR_TITLE);
-		c->opt.no_close_decor=!(m->decor&MWM_DECOR_MENU);
-		c->opt.no_min_decor=!(m->decor&MWM_DECOR_MINIMIZE);
-		//c->opt.no_max_decor=!(m->decor&MWM_DECOR_MAXIMIZE);
-		LOG("\topts: %d, %d, %d, %d",
-			c->opt.no_resize_decor,
-			c->opt.no_titlebar,
-			c->opt.no_close_decor,
-			c->opt.no_min_decor);
-	}
-
+		o->no_border=!(f & MWM_DECOR_BORDER);
+		o->no_resize_decor=!(f & MWM_DECOR_RESIZEH);
+		o->no_titlebar=!(f & MWM_DECOR_TITLE);
+		o->no_close_decor=!(f & MWM_DECOR_MENU);
+		o->no_min_decor=!(f & MWM_DECOR_MINIMIZE);
+		//o->no_max_decor=!(f & MWM_DECOR_MAXIMIZE);
+		LOG("MWM_HINTS_DECORATIONS\topts: %d, %d, %d, %d",
+			o->no_resize_decor, o->no_titlebar, o->no_close_decor,
+			o->no_min_decor);
 }
 
 static Atom get_mwm_hints_atom(void)
@@ -109,12 +82,13 @@ void handle_mwm_hints(struct JBWMClient * c)
 		mwm_hints, &(uint16_t){0});
 	if(!m)
 		return;
-	if (do_status(c, m))
-		goto mwm_end;
-	do_functions(c, m);
-	do_decorations(c, m);
-
-
+	if ((c->opt.tearoff = m->flags & MWM_HINTS_STATUS && m->status &
+		MWM_TEAROFF_WINDOW))
+		goto mwm_end; // skip the following if tear-off window
+	if (m->flags & MWM_HINTS_FUNCTIONS && !(m->functions & MWM_FUNC_ALL))
+		do_functions(&c->opt, m->functions);
+	if (m->flags & MWM_HINTS_DECORATIONS && !(m->decor & MWM_DECOR_ALL))
+		do_decorations(&c->opt, m->decor);
 mwm_end:
 	XFree(m);
 	process_flags(c);
