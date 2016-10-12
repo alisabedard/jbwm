@@ -141,9 +141,8 @@ static bool has_delete_proto(const jbwm_window_t w)
 	Atom *p;
 	int i;
 	if(XGetWMProtocols(jbwm.d, w, &p, &i)) {
-		while(i--)
-			if((found=(p[i] == get_wm_delete_window())))
-				break;
+		while(i-- && !found)
+			found = p[i] == get_wm_delete_window();
 		XFree(p);
 	}
 	return found;
