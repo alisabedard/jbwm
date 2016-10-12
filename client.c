@@ -148,8 +148,14 @@ static bool has_delete_proto(const jbwm_window_t w)
 	return found;
 }
 
-void jbwm_send_wm_delete(const struct JBWMClient * restrict c)
+void jbwm_send_wm_delete(struct JBWMClient * restrict c)
 {
+	if (c->opt.remove) { // this allows a second click to force a kill
+		XKillClient(jbwm.d, c->window);
+		return;
+	}
+	c->opt.remove = true;
+	--c->ignore_unmap;
 	has_delete_proto(c->window)?xmsg(c->window, get_wm_protocols(),
 		get_wm_delete_window()): XKillClient(jbwm.d, c->window);
 }
