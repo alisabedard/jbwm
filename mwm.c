@@ -39,23 +39,24 @@ static void process_flags(struct JBWMClient * c)
 	c->border=!c->opt.no_border;
 }
 
-void handle_mwm_hints(struct JBWMClient * c)
+struct JBWMMWM { // paraphrased from MwmUtil.h
+	uint32_t flags, functions, decor, input_mode, status;
+};
+
+static bool do_status(struct JBWMClient * restrict c,
+	struct JBWMMWM * restrict m)
 {
-	static Atom mwm_hints;
-	if(!mwm_hints)
-		  mwm_hints=XInternAtom(jbwm.d, "_MOTIF_WM_HINTS", false);
-	struct { // paraphrased from MwmUtil.h
-		uint32_t flags, functions, decor, input_mode, status;
-	} *m = jbwm_get_property(c->window, mwm_hints, &(uint16_t){0});
-
-	if(!m) return;
-
 	if (m->flags & MWM_HINTS_STATUS) {
 		LOG("MWM_HINTS_STATUS");
 		c->opt.tearoff = m->status & MWM_TEAROFF_WINDOW;
-		goto mwm_end;
+		return true;
 	}
+	return false;
+}
 
+static void do_functions(struct JBWMClient * restrict c,
+	struct JBWMMWM * restrict m)
+{
 	if (m->flags & MWM_HINTS_FUNCTIONS
 		&& !(m->functions&MWM_FUNC_ALL)) {
 		LOG("MWM_HINTS_FUNCTIONS");
@@ -72,6 +73,11 @@ void handle_mwm_hints(struct JBWMClient * c)
 			c->opt.no_move);
 	}
 
+}
+
+static void do_decorations(struct JBWMClient * restrict c,
+	struct JBWMMWM * restrict m)
+{
 	if (m->flags & MWM_HINTS_DECORATIONS
 		&& !(m->decor&MWM_DECOR_ALL)) {
 		LOG("MWM_HINTS_DECORATIONS");
@@ -87,6 +93,28 @@ void handle_mwm_hints(struct JBWMClient * c)
 			c->opt.no_close_decor,
 			c->opt.no_min_decor);
 	}
+
+}
+
+static Atom get_mwm_hints_atom(void)
+{
+	static Atom a;
+	return a ? a : (a = XInternAtom(jbwm.d, "_MOTIF_WM_HINTS", false));
+}
+
+void handle_mwm_hints(struct JBWMClient * c)
+{
+	const Atom mwm_hints = get_mwm_hints_atom();
+	struct JBWMMWM * m = jbwm_get_property(c->window,
+		mwm_hints, &(uint16_t){0});
+	if(!m)
+		return;
+	if (do_status(c, m))
+		goto mwm_end;
+	do_functions(c, m);
+	do_decorations(c, m);
+
+
 mwm_end:
 	XFree(m);
 	process_flags(c);
