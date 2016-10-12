@@ -12,21 +12,38 @@
 #include <X11/Xatom.h>
 
 // These are MWM-specific hints
-enum {
+enum MwmFlags {
 // flags:
 	MWM_HINTS_FUNCTIONS = (1L << 0), MWM_HINTS_DECORATIONS = (1L << 1),
-	MWM_HINTS_INPUT_MODE = (1L << 2), MWM_HINTS_STATUS = (1L << 3),
+	MWM_HINTS_INPUT_MODE = (1L << 2), MWM_HINTS_STATUS = (1L << 3)
+};
+
+enum MwmFunctions {
 // functions:
 	MWM_FUNC_ALL = (1L << 0), MWM_FUNC_RESIZE = (1L << 1),
 	MWM_FUNC_MOVE = (1L << 2), MWM_FUNC_MINIMIZE = (1L << 3),
 	MWM_FUNC_MAXIMIZE = (1L << 4), MWM_FUNC_CLOSE = (1L << 5),
+};
+
+enum MwmDecor {
 // decor:
 	MWM_DECOR_ALL = (1L << 0), MWM_DECOR_BORDER = (1L << 1),
 	MWM_DECOR_RESIZEH = (1L << 2), MWM_DECOR_TITLE = (1L << 3),
 	MWM_DECOR_MENU = (1L << 4), MWM_DECOR_MINIMIZE = (1L << 5),
 	MWM_DECOR_MAXIMIZE = (1L << 6),
+};
+
+enum MwmStatus {
 // status:
 	MWM_TEAROFF_WINDOW = 1
+};
+
+struct JBWMMwm { // paraphrased from MwmUtil.h
+	enum MwmFlags flags;
+	enum MwmFunctions functions;
+	enum MwmDecor decor;
+	uint32_t input_mode;
+	enum MwmStatus status;
 };
 
 static void process_flags(struct JBWMClient * c)
@@ -38,12 +55,8 @@ static void process_flags(struct JBWMClient * c)
 	c->border=!c->opt.no_border;
 }
 
-struct JBWMMWM { // paraphrased from MwmUtil.h
-	uint32_t flags, functions, decor, input_mode, status;
-};
-
 static void do_functions(struct JBWMClientOptions * restrict o,
-	const uint32_t f)
+	const enum MwmFunctions f)
 {
 		o->no_resize=!(f & MWM_FUNC_RESIZE);
 		o->no_close=!(f & MWM_FUNC_CLOSE);
@@ -56,7 +69,7 @@ static void do_functions(struct JBWMClientOptions * restrict o,
 }
 
 static void do_decorations(struct JBWMClientOptions * restrict o,
-	const uint32_t f)
+	const enum MwmDecor f)
 {
 		o->no_border=!(f & MWM_DECOR_BORDER);
 		o->no_resize_decor=!(f & MWM_DECOR_RESIZEH);
@@ -78,7 +91,7 @@ static Atom get_mwm_hints_atom(void)
 void handle_mwm_hints(struct JBWMClient * c)
 {
 	const Atom mwm_hints = get_mwm_hints_atom();
-	struct JBWMMWM * m = jbwm_get_property(c->window,
+	struct JBWMMwm * m = jbwm_get_property(c->window,
 		mwm_hints, &(uint16_t){0});
 	if(!m)
 		return;
