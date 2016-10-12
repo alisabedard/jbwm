@@ -39,11 +39,7 @@ enum MwmStatus {
 };
 
 struct JBWMMwm { // paraphrased from MwmUtil.h
-	enum MwmFlags flags;
-	enum MwmFunctions functions;
-	enum MwmDecor decor;
-	uint32_t input_mode;
-	enum MwmStatus status;
+	uint32_t flags, functions, decor, input_mode, status;
 };
 
 static void process_flags(struct JBWMClient * c)
