@@ -158,6 +158,7 @@ uint8_t jbwm_set_vdesk(struct JBWMScreen * s, uint8_t v)
 
 	for (struct JBWMClient * c = jbwm.head; c; c = c->next) {
 		if (c->opt.sticky) {
+			c->vdesk = v; // allow moving windows by sticking
 			jbwm_restore_client(c);
 			continue;
 		}
