@@ -36,9 +36,13 @@ void jbwm_handle_button_event(XButtonEvent * restrict e,
 	struct JBWMClient * restrict c)
 {
 	LOG("jbwm_handle_button_event");
+	const bool fs = c->opt.fullscreen;
 	switch (e->button) {
 	case Button1:
-		handle_titlebar_button(e, c);
+		if (fs)
+			XRaiseWindow(jbwm.d, c->parent);
+		else
+			handle_titlebar_button(e, c);
 		break;
 	case Button2:
 		XLowerWindow(jbwm.d, c->parent);
@@ -49,7 +53,10 @@ void jbwm_handle_button_event(XButtonEvent * restrict e,
 		   users especially, where it is difficult
 		   to register a middle button press, even
 		   with X Emulate3Buttons enabled.  */
-		jbwm_drag(c, !c->opt.shaded);
+		if (fs)
+			XLowerWindow(jbwm.d, c->parent);
+		else
+			jbwm_drag(c, !c->opt.shaded);
 		break;
 	}
 }
