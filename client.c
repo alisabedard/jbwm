@@ -155,7 +155,6 @@ void jbwm_send_wm_delete(struct JBWMClient * restrict c)
 		return;
 	}
 	c->opt.remove = true;
-	--c->ignore_unmap;
 	has_delete_proto(c->window)?xmsg(c->window, get_wm_protocols(),
 		get_wm_delete_window()): XKillClient(jbwm.d, c->window);
 }
