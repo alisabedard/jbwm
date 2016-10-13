@@ -29,15 +29,12 @@ void jbwm_toggle_shade(struct JBWMClient * restrict c)
 		// Unshade
 		c->size.height = c->old_size.height;
 		c->opt.shaded = false;
-		XMapWindow(jbwm.d, c->window);
 		jbwm_move_resize(c);
 		jbwm_set_wm_state(c, NormalState);
 		ewmh_remove_state(c->window, ewmh[WM_STATE_SHADED]);
 	} else {		// Shade the client
 		c->old_size.height = c->size.height;
-		c->ignore_unmap++;
-		XUnmapWindow(jbwm.d, c->window);
-		c->size.height = 0;
+		c->size.height = -1;
 		c->opt.shaded = true;
 		jbwm_set_wm_state(c, IconicState);
 		ewmh_add_state(c->window, ewmh[WM_STATE_SHADED]);

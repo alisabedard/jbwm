@@ -154,9 +154,10 @@ static void check_visibility(struct JBWMScreen * s,
 {
 	if (c->screen != s)
 		return;
-	if (c->vdesk == v || c->opt.sticky)
+	if (c->vdesk == v || c->opt.sticky) {
+		c->vdesk = v; // allow moving windows by sticking
 		jbwm_restore_client(c);
-	else
+	} else
 		hide(c);
 }
 
