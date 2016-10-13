@@ -81,11 +81,11 @@ static void toggle_maximize(struct JBWMClient * restrict c)
 	if (o.shaped || o.no_max)
 		return;
 	if (o.max_horz && o.max_vert) {
-		unset_horz(c);
-		unset_vert(c);
+		jbwm_set_not_horz(c);
+		jbwm_set_not_vert(c);
 	} else {
-		set_horz(c);
-		set_vert(c);
+		jbwm_set_horz(c);
+		jbwm_set_vert(c);
 	}
 }
 
@@ -113,17 +113,17 @@ static void handle_client_key_event(const bool mod,
 		break;
 	case KEY_FS:
 		if (!c->opt.no_max)
-			(c->opt.fullscreen ? unset_fullscreen
-			 : set_fullscreen)(c);
+			(c->opt.fullscreen ? jbwm_set_not_fullscreen
+			 : jbwm_set_fullscreen)(c);
 		break;
 	case KEY_MAX:
 		toggle_maximize(c);
 		break;
 	case KEY_MAX_H:
-		(c->opt.max_horz ? unset_horz : set_horz)(c);
+		(c->opt.max_horz ? jbwm_set_not_horz : jbwm_set_horz)(c);
 		break;
 	case KEY_MAX_V:
-		(c->opt.max_vert ? unset_vert : set_vert)(c);
+		(c->opt.max_vert ? jbwm_set_not_vert : jbwm_set_vert)(c);
 		break;
 	case KEY_STICK:
 		jbwm_toggle_sticky(c);

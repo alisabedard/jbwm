@@ -9,9 +9,9 @@
 #include "screen.h"
 #include "titlebar.h"
 
-void unset_horz(struct JBWMClient * restrict c)
+void jbwm_set_not_horz(struct JBWMClient * restrict c)
 {
-	LOG("unset_horz");
+	LOG("jbwm_set_not_horz");
 	if (!c->opt.max_horz) return;
 	c->opt.max_horz = false;
 	c->size.x = c->old_size.x;
@@ -20,9 +20,9 @@ void unset_horz(struct JBWMClient * restrict c)
 	jbwm_move_resize(c);
 }
 
-void set_horz(struct JBWMClient * restrict c)
+void jbwm_set_horz(struct JBWMClient * restrict c)
 {
-	LOG("set_horz");
+	LOG("jbwm_set_horz");
 	if (c->opt.max_horz) return;
 	c->old_size.x = c->size.x;
 	c->old_size.width = c->size.width;
@@ -36,9 +36,9 @@ void set_horz(struct JBWMClient * restrict c)
 	jbwm_move_resize(c);
 }
 
-void unset_vert(struct JBWMClient * restrict c)
+void jbwm_set_not_vert(struct JBWMClient * restrict c)
 {
-	LOG("unset_vert");
+	LOG("jbwm_set_not_vert");
 	if (c->opt.max_vert && !c->opt.shaded) {
 		c->opt.max_vert = false;
 		c->size.y = c->old_size.y;
@@ -49,9 +49,9 @@ void unset_vert(struct JBWMClient * restrict c)
 	jbwm_move_resize(c);
 }
 
-void set_vert(struct JBWMClient * restrict c)
+void jbwm_set_vert(struct JBWMClient * restrict c)
 {
-	LOG("set_vert");
+	LOG("jbwm_set_vert");
 	if (c->opt.max_vert || c->opt.shaded) return;
 	c->old_size.y = c->size.y;
 	c->old_size.height = c->size.height;
@@ -67,32 +67,32 @@ void set_vert(struct JBWMClient * restrict c)
 	jbwm_move_resize(c);
 }
 
-void unset_fullscreen(struct JBWMClient * restrict c)
+void jbwm_set_not_fullscreen(struct JBWMClient * restrict c)
 {
-	LOG("unset_fullscreen");
+	LOG("jbwm_set_not_fullscreen");
 	if(!c->opt.fullscreen) return;
 	c->opt.fullscreen = false; // Reflects desired status
-	unset_horz(c);
-	unset_vert(c);
+	jbwm_set_not_horz(c);
+	jbwm_set_not_vert(c);
 	XSetWindowBorderWidth(jbwm.d, c->parent, c->border);
 	ewmh_remove_state(c->window, ewmh[WM_STATE_FULLSCREEN]);
 	jbwm_update_titlebar(c);
 }
 
-void set_fullscreen(struct JBWMClient * restrict c)
+void jbwm_set_fullscreen(struct JBWMClient * restrict c)
 {
-	LOG("set_fullscreen");
+	LOG("jbwm_set_fullscreen");
 	if(c->opt.fullscreen || c->opt.shaded)
 		  return;
 	/* The following checks remove conflicts between fullscreen
 	   mode and setd modes.  */
 	if(c->opt.max_horz)
-		unset_horz(c);
+		jbwm_set_not_horz(c);
 	if(c->opt.max_vert)
-		unset_vert(c);
+		jbwm_set_not_vert(c);
 	c->opt.fullscreen = true; // Reflect desired status
-	set_horz(c);
-	set_vert(c);
+	jbwm_set_horz(c);
+	jbwm_set_vert(c);
 	XSetWindowBorderWidth(jbwm.d, c->parent, 0);
 	ewmh_add_state(c->window, ewmh[WM_STATE_FULLSCREEN]);
 	jbwm_update_titlebar(c);

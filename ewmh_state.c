@@ -67,7 +67,7 @@ static void set_state(struct JBWMClient * restrict c,
 		return;
 	switch(t) {
 	case WM_STATE_FULLSCREEN:
-		add?set_fullscreen(c):unset_fullscreen(c);
+		add?jbwm_set_fullscreen(c):jbwm_set_not_fullscreen(c);
 		break;
 	case WM_STATE_STICKY:
 		c->opt.sticky=add;
@@ -82,10 +82,10 @@ static void set_state(struct JBWMClient * restrict c,
 		LOG("HIDDEN");
 		break;
 	case WM_STATE_MAXIMIZED_VERT:
-		(add ? set_vert : unset_vert)(c);
+		(add ? jbwm_set_vert : jbwm_set_not_vert)(c);
 		break;
 	case WM_STATE_MAXIMIZED_HORZ:
-		(add ? set_horz : unset_horz)(c);
+		(add ? jbwm_set_horz : jbwm_set_not_horz)(c);
 		break;
 	default:
 		break;
