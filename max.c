@@ -82,7 +82,7 @@ void jbwm_set_not_fullscreen(struct JBWMClient * restrict c)
 void jbwm_set_fullscreen(struct JBWMClient * restrict c)
 {
 	LOG("jbwm_set_fullscreen");
-	if(c->opt.fullscreen || c->opt.shaded)
+	if(c->opt.fullscreen || c->opt.shaded || c->opt.no_max)
 		  return;
 	/* The following checks remove conflicts between fullscreen
 	   mode and setd modes.  */

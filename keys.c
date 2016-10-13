@@ -78,7 +78,7 @@ static void toggle_maximize(struct JBWMClient * restrict c)
 	const struct JBWMClientOptions o = c->opt;
 	// Honor !MWM_FUNC_MAXIMIZE
 	// Maximizing shaped windows is buggy, so return.
-	if (o.shaped || o.no_max)
+	if (o.shaped || o.no_max || o.fullscreen)
 		return;
 	if (o.max_horz && o.max_vert) {
 		jbwm_set_not_horz(c);
@@ -94,6 +94,13 @@ static void handle_client_key_event(const bool mod,
 	struct JBWMClient * restrict c, const KeySym key)
 {
 	LOG("handle_client_key_event: %d", (int)key);
+	if (c->opt.fullscreen) {
+		// only allow exiting from fullscreen
+		if (key == KEY_FS) {
+			jbwm_set_not_fullscreen(c);
+		}
+		return; // prevent other operations while fullscreen
+	}
 	switch (key) {
 	case KEY_LEFT:
 	case KEY_RIGHT:
@@ -112,9 +119,7 @@ static void handle_client_key_event(const bool mod,
 		XRaiseWindow(jbwm.d, c->parent);
 		break;
 	case KEY_FS:
-		if (!c->opt.no_max)
-			(c->opt.fullscreen ? jbwm_set_not_fullscreen
-			 : jbwm_set_fullscreen)(c);
+		jbwm_set_fullscreen(c);
 		break;
 	case KEY_MAX:
 		toggle_maximize(c);
