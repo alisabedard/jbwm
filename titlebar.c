@@ -142,8 +142,8 @@ static void remove_titlebar(struct JBWMClient * restrict c)
 
 void jbwm_update_titlebar(struct JBWMClient * c)
 {
-	if (c->opt.no_titlebar || c->opt.shaped)
-		  return;
+	if (c->opt.shaped)
+		return;
 	jbwm_window_t w = c->tb.win;
 	if (c->opt.fullscreen && w) {
 		remove_titlebar(c);
@@ -158,5 +158,7 @@ void jbwm_update_titlebar(struct JBWMClient * c)
 	move_buttons(c);
 	XClearWindow(jbwm.d, w);
 	draw_title(c);
+	if (c->opt.no_titlebar)
+		remove_titlebar(c);
 }
 

@@ -11,6 +11,7 @@
 #include "mwm.h"
 #include "screen.h"
 #include "shape.h"
+#include "titlebar.h"
 #include "util.h"
 
 #include <stdlib.h>
@@ -25,12 +26,29 @@ static uint8_t wm_desktop(const jbwm_window_t w, uint8_t vdesk)
 		if (n && lprop[0] < JBWM_MAX_DESKTOPS) // is valid
 			vdesk = lprop[0]; // Set vdesk to property value
 		else // Set to a valid desktop number:
-			jbwm_set_property(w, ewmh[WM_DESKTOP], XA_CARDINAL, &vdesk, 1);
+			jbwm_set_property(w, ewmh[WM_DESKTOP],
+				XA_CARDINAL, &vdesk, 1);
 		XFree(lprop);
 	}
 	LOG("wm_desktop(): vdesk is %d\n", vdesk);
 	return vdesk;
 }
+#else//!EWMH
+#define wm_desktop(w, vdesk) vdesk
+#endif//EWMH
+
+#ifdef EWMH
+__attribute__((nonnull))
+static void set_frame_extents(struct JBWMClient * c)
+{
+	// Required by wm-spec 1.4:
+	const uint8_t b = c->border;
+	jbwm_set_property(c->window, ewmh[FRAME_EXTENTS], XA_CARDINAL,
+		(&(jbwm_atom_t[]){b, b, b + (c->opt.no_titlebar ? 0 : TDIM),
+		 b}), 4);
+}
+#else//!EWMH
+#define set_frame_extents(c)
 #endif//EWMH
 
 __attribute__((nonnull))
@@ -38,13 +56,7 @@ static void init_properties(struct JBWMClient * c)
 {
 	handle_mwm_hints(c);
 	c->vdesk = c->screen->vdesk;
-#ifdef EWMH
 	c->vdesk = wm_desktop(c->window, c->vdesk);
-	// Required by wm-spec 1.4:
-	const uint8_t b = c->border;
-	jbwm_set_property(c->window, ewmh[FRAME_EXTENTS], XA_CARDINAL,
-		(&(jbwm_atom_t[]){b, b, b, b}), 4);
-#endif//EWMH
 }
 
 __attribute__((nonnull))
@@ -66,7 +78,7 @@ static void init_geometry(struct JBWMClient * c)
 		- (c->size.height >> 1);
 
 	// Test if the reparent that is to come would trigger an unmap event.
-	c->ignore_unmap = attr.map_state == IsViewable;
+	c->ignore_unmap += attr.map_state == IsViewable ? 1 : 0;
 }
 
 __attribute__((nonnull))
@@ -120,5 +132,7 @@ void jbwm_new_client(const jbwm_window_t w, struct JBWMScreen * s)
 	init_properties(c);
 	init_geometry(c);
 	reparent(c);
+	set_frame_extents(c);
 	jbwm_restore_client(c);
+	jbwm_update_titlebar(c);
 }
