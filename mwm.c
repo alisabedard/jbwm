@@ -67,7 +67,8 @@ static void do_decorations(struct JBWMClientOptions * restrict o,
 {
 		o->no_border=!(f & MWM_DECOR_BORDER);
 		o->no_resize_decor=!(f & MWM_DECOR_RESIZEH);
-		o->no_titlebar=!(f & MWM_DECOR_TITLE);
+		// This causes problems with QT5 dialogs:
+		// o->no_titlebar=!(f & MWM_DECOR_TITLE);
 		o->no_close_decor=!(f & MWM_DECOR_MENU);
 		o->no_min_decor=!(f & MWM_DECOR_MINIMIZE);
 		//o->no_max_decor=!(f & MWM_DECOR_MAXIMIZE);
