@@ -43,17 +43,11 @@ struct JBWMMwm { // paraphrased from MwmUtil.h
 static void process_flags(struct JBWMClient * c)
 {
 	struct JBWMClientOptions * o = &c->opt;
-//	if (o->no_titlebar && o->no_close_decor)
-//		o->no_titlebar = false;
 	if (o->tearoff) {
 		o->no_border = o->no_resize = o->no_min = o->no_max
 			= o->no_titlebar = true;
 	}
 	c->border = o->no_border ? 0 : 1;
-#if 0
-	if (o->no_titlebar)
-		c->ignore_unmap ++;
-#endif
 }
 
 static void do_functions(struct JBWMClientOptions * restrict o,
@@ -81,22 +75,6 @@ static void do_decorations(struct JBWMClientOptions * restrict o,
 		o->no_min_decor = true;
 	if (!(f & MWM_DECOR_TITLE))
 		o->no_titlebar = true;
-#if 0
-		o->no_resize_decor = true;
-		o->no_resize_decor=!(f & MWM_DECOR_RESIZEH);
-		o->no_close_decor=!(f & MWM_DECOR_MENU);
-		o->no_min_decor=!(f & MWM_DECOR_MINIMIZE);
-		// This causes problems with QT5 dialogs:
-		o->no_titlebar=!(f & MWM_DECOR_TITLE);
-		o->no_close_decor=!(f & MWM_DECOR_MENU);
-		o->no_min_decor=!(f & MWM_DECOR_MINIMIZE);
-		o->no_titlebar=!(f & MWM_DECOR_TITLE);
-		if ((f & MWM_DECOR_MENU) && (f & MWM_DECOR_TITLE))
-			o->tearoff = true;
-		LOG("MWM_HINTS_DECORATIONS\topts: %d, %d, %d, %d",
-			o->no_resize_decor, o->no_titlebar, o->no_close_decor,
-			o->no_min_decor);
-#endif
 }
 
 static Atom get_mwm_hints_atom(void)
