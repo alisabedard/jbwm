@@ -3,7 +3,7 @@
 # Copyright 1999-2015, Ciaran Anscomb <jbwm@6809.org.uk>
 # See README for license and other details.
 
-version=1.49
+version=1.50
 
 PROG=jbwm
 distname=$(PROG)-$(version)
@@ -95,7 +95,7 @@ indent:
 
 debug:
 	make clean
-	make -f Makefile.debug
+	make -f Makefile.debug -j 4
 
 small:
 	make clean
