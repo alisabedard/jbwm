@@ -21,7 +21,8 @@
 #include <unistd.h>
 
 __attribute__((nonnull(1)))
-static void point(struct JBWMClient * restrict c, const int16_t x, const int16_t y)
+static void point(struct JBWMClient * restrict c, const int16_t x,
+	const int16_t y)
 {
 	XRaiseWindow(jbwm.d, c->parent);
 	XWarpPointer(jbwm.d, None, c->window, 0, 0, 0, 0, x, y);

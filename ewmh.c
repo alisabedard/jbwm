@@ -69,7 +69,8 @@ static uint16_t get_client_count(void)
 {
 	uint16_t j = 0;
 	// Check against UINT16_MAX to avoid wrap-around
-	for (struct JBWMClient * i = jbwm.head; j < UINT16_MAX && i; i = i->next, ++j);
+	for (struct JBWMClient * i = jbwm.head; j < UINT16_MAX && i;
+		i = i->next, ++j);
 	return j;
 }
 
