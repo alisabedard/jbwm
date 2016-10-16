@@ -29,4 +29,7 @@ xcb_atom_t jb_get_atom(xcb_connection_t * x, const char * name);
 bool jb_next_event_timed(xcb_connection_t * x,
 	xcb_generic_event_t ** e, const uint32_t delay);
 
+bool jb_xcb_cookie_has_error(xcb_connection_t * x,
+	const xcb_void_cookie_t c);
+
 #endif//!JB_XCB_H

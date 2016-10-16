@@ -11,6 +11,15 @@
 #include <sys/select.h>
 #include <unistd.h>
 
+bool jb_xcb_cookie_has_error(xcb_connection_t * x, const xcb_void_cookie_t c)
+{
+	xcb_generic_error_t * e = xcb_request_check(x, c);
+	if (!e)
+		return false;
+	free(e);
+	return true;
+}
+
 static void xerr(xcb_connection_t * x, const char * msg)
 {
         xcb_disconnect(x);
