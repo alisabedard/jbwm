@@ -1,6 +1,5 @@
 #include "file.h"
 #include "util.h"
-
 int main(int argc __attribute__((unused)),
 char ** argv __attribute__((unused)))
 {
@@ -14,4 +13,3 @@ char ** argv __attribute__((unused)))
 	jb_check(false, "false");
 	return 0;
 }
-

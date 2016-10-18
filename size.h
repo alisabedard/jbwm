@@ -1,10 +1,7 @@
 // Copyright 2016, Jeffrey E. Bedard
-
 #ifndef JB_JBDIM_H
 #define JB_JBDIM_H
-
 #include <stdint.h>
-
 struct JBDim {
 	union {
 		uint16_t width, w, columns, cols, col, c;
@@ -15,5 +12,4 @@ struct JBDim {
 		int16_t y, bottom, bot, b, min, index;
 	};
 };
-
 #endif//!JB_JBDIM_H

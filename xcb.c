@@ -1,16 +1,13 @@
 // Copyright 2016, Jeffrey E. Bedard
 #include "xcb.h"
-
 #include "log.h"
 #include "util.h"
 // Include this just to check syntax
 #include "size.h"
-
 #include <errno.h>
 #include <string.h>
 #include <sys/select.h>
 #include <unistd.h>
-
 bool jb_xcb_cookie_has_error(xcb_connection_t * x, const xcb_void_cookie_t c)
 {
 	xcb_generic_error_t * e = xcb_request_check(x, c);
@@ -19,7 +16,6 @@ bool jb_xcb_cookie_has_error(xcb_connection_t * x, const xcb_void_cookie_t c)
 	free(e);
 	return true;
 }
-
 static void xerr(xcb_connection_t * x, const char * msg)
 {
         xcb_disconnect(x);
@@ -29,7 +25,6 @@ static void xerr(xcb_connection_t * x, const char * msg)
 		fprintf(stderr, "%s\n", msg);
 	exit(1);
 }
-
 void jb_check_x(xcb_connection_t * x)
 {
        switch(xcb_connection_has_error(x)) {
@@ -48,21 +43,17 @@ void jb_check_x(xcb_connection_t * x)
         case XCB_CONN_CLOSED_INVALID_SCREEN:
                 xerr(x, "Invalid screen");
         }
-
 }
-
 xcb_connection_t * jb_get_xcb_connection(const char * display, int * screen)
 {
         xcb_connection_t * x = xcb_connect(display, screen);
 	jb_check_x(x);
 	return x;
 }
-
 xcb_screen_t * jb_get_xcb_screen(xcb_connection_t * x)
 {
         return xcb_setup_roots_iterator(xcb_get_setup(x)).data;
 }
-
 pixel_t jb_get_pixel(xcb_connection_t * x, const xcb_colormap_t cmap,
 	const char * color)
 {
@@ -76,7 +67,6 @@ pixel_t jb_get_pixel(xcb_connection_t * x, const xcb_colormap_t cmap,
 	free(r);
 	return p;
 }
-
 pixel_t jb_get_rgb_pixel(xcb_connection_t * x, const xcb_colormap_t cm,
 	const int16_t r, const int16_t g, const int16_t b)
 {
@@ -88,19 +78,16 @@ pixel_t jb_get_rgb_pixel(xcb_connection_t * x, const xcb_colormap_t cm,
 	free(rpl);
 	return p;
 }
-
 pixel_t jb_set_fg(xcb_connection_t * x, const xcb_gc_t gc, const pixel_t p)
 {
 	xcb_change_gc(x, gc, XCB_GC_FOREGROUND, &(uint32_t){p});
 	return p;
 }
-
 pixel_t jb_set_bg(xcb_connection_t * x, const xcb_gc_t gc, const pixel_t p)
 {
 	xcb_change_gc(x, gc, XCB_GC_BACKGROUND, &(uint32_t){p});
 	return p;
 }
-
 xcb_atom_t jb_get_atom(xcb_connection_t * x, const char * name)
 {
 	xcb_intern_atom_reply_t * r = xcb_intern_atom_reply(x,
@@ -109,7 +96,6 @@ xcb_atom_t jb_get_atom(xcb_connection_t * x, const char * name)
 	free(r);
 	return a;
 }
-
 bool jb_next_event_timed(xcb_connection_t * x,
 	xcb_generic_event_t ** e, const uint32_t delay)
 {
@@ -127,4 +113,3 @@ bool jb_next_event_timed(xcb_connection_t * x,
 	*e = xcb_poll_for_event(x);
 	return true;
 }
-
