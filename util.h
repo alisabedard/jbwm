@@ -32,18 +32,10 @@ fd_t jb_open(const char * path, const int flags);
 // If val is false, print msg and abort
 bool jb_abort_if_false(bool val, char * msg);
 
-#ifndef DEBUG
-
 // If val is false, print msg, using perror if errno set, return !val
 bool jb_check(const bool val, char * msg);
 
 // If val is false, print msg and exit
 void jb_assert(const bool val, char * msg);
-
-#else//DEBUG
-// Abort if check fails to aid in debugging, producing a backtrace/core
-#define jb_check(val, msg) jb_abort_if_false(val, msg)
-#define jb_assert(val, msg) jb_abort_if_false(val, msg)
-#endif//DEBUG
 
 #endif//!JB_UTIL_H
