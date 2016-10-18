@@ -4,22 +4,12 @@
 
 #include <stdbool.h>
 
-#ifndef MAX
-#define MAX(a,b) ((a) > (b) ? (a) : (b))
-#endif//!MAX
-
-#ifndef MIN
-#define MIN(a,b) ((a) < (b) ? (a) : (b))
-#endif//!MIN
-
+#define JB_MAX(a,b) ((a) > (b) ? (a) : (b))
+#define JB_MIN(a,b) ((a) < (b) ? (a) : (b))
 #define JB_LIMIT(var, max, min) {var = MAX(MIN(var, max), min);}
-
 #define JB_SWAP(type, a, b) {type c = a; a = b; b = c;}
-
-#undef likely
-#define likely(x)       __builtin_expect((x), true)
-#undef unlikely
-#define unlikely(x)     __builtin_expect((x), false)
+#define JB_LIKELY(x)       __builtin_expect((x), true)
+#define JB_UNLIKELY(x)     __builtin_expect((x), false)
 
 typedef int fd_t;
 
