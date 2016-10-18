@@ -2,9 +2,7 @@
 // Copyright 2008-2016, Jeffrey E. Bedard <jefbed@gmail.com>
 // Copyright 1999-2015, Ciaran Anscomb <jbwm@6809.org.uk>
 // See README for license and other details.
-
 #include "keys.h"
-
 #include "client.h"
 #include "config.h"
 #include "JBWMEnv.h"
@@ -14,12 +12,10 @@
 #include "snap.h"
 #include "titlebar.h"
 #include "util.h"
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <sys/wait.h>
 #include <unistd.h>
-
 __attribute__((nonnull(1)))
 static void point(struct JBWMClient * restrict c, const int16_t x,
 	const int16_t y)
@@ -27,7 +23,6 @@ static void point(struct JBWMClient * restrict c, const int16_t x,
 	XRaiseWindow(jbwm.d, c->parent);
 	XWarpPointer(jbwm.d, None, c->window, 0, 0, 0, 0, x, y);
 }
-
 __attribute__((nonnull(1)))
 static void commit_key_move(struct JBWMClient * restrict c)
 {
@@ -35,11 +30,9 @@ static void commit_key_move(struct JBWMClient * restrict c)
 	jbwm_move_resize(c);
 	point(c, 1, 1);
 }
-
 struct KeyMoveFlags {
 	bool horz:1, pos:1, mod:1;
 };
-
 __attribute__((nonnull(1)))
 static void key_move(struct JBWMClient * restrict c,
 	const struct KeyMoveFlags f)
@@ -53,7 +46,6 @@ static void key_move(struct JBWMClient * restrict c,
 		&& !c->opt.shaped && !c->opt.no_resize ? wh : xy) += d;
 	commit_key_move(c);
 }
-
 __attribute__((nonnull(1)))
 static void handle_key_move(struct JBWMClient * restrict c,
 	const KeySym k, const bool mod)
@@ -73,7 +65,6 @@ static void handle_key_move(struct JBWMClient * restrict c,
 	}
 	key_move(c, f);
 }
-
 static void toggle_maximize(struct JBWMClient * restrict c)
 {
 	const struct JBWMClientOptions o = c->opt;
@@ -89,7 +80,6 @@ static void toggle_maximize(struct JBWMClient * restrict c)
 		jbwm_set_vert(c);
 	}
 }
-
 __attribute__((nonnull(2)))
 static void handle_client_key_event(const bool mod,
 	struct JBWMClient * restrict c, const KeySym key)
@@ -142,7 +132,6 @@ static void handle_client_key_event(const bool mod,
 		break;
 	}
 }
-
 static struct JBWMClient * get_next_on_vdesk(void)
 {
 	struct JBWMClient *c = jbwm.current;
@@ -158,7 +147,6 @@ static struct JBWMClient * get_next_on_vdesk(void)
 	} while (c->vdesk != c->screen->vdesk);
 	return c;
 }
-
 static void next(void)
 {
 	struct JBWMClient * c = get_next_on_vdesk();
@@ -169,13 +157,11 @@ static void next(void)
 	point(c, 0, 0);
 	point(c, c->size.width, c->size.height);
 }
-
 static void cond_client_to_desk(struct JBWMClient * c, struct JBWMScreen * s,
 	const uint8_t d, const bool mod)
 {
 	mod && c ? jbwm_set_client_vdesk(c, d) : jbwm_set_vdesk(s, d);
 }
-
 static void start_terminal(void)
 {
 	if (fork() == 0) {
@@ -183,7 +169,6 @@ static void start_terminal(void)
 		execlp(t, t, (char*)NULL);
 	}
 }
-
 void jbwm_handle_key_event(XKeyEvent * e)
 {
 	LOG("jbwm_handle_key_event");
@@ -195,7 +180,6 @@ void jbwm_handle_key_event(XKeyEvent * e)
 		bool mod:1;
 		bool zero:1;
 	} opt = {s->vdesk, e->state & jbwm.keymasks.mod, 0};
-
 	switch (key) {
 	case KEY_NEW:
 		start_terminal();
@@ -223,7 +207,6 @@ void jbwm_handle_key_event(XKeyEvent * e)
 			handle_client_key_event(opt.mod, c, key);
 	}
 }
-
 __attribute__((nonnull(1,2)))
 static void grab(struct JBWMScreen * restrict s, KeySym * restrict ks,
 	const uint32_t mask)
@@ -233,10 +216,8 @@ static void grab(struct JBWMScreen * restrict s, KeySym * restrict ks,
 			 jbwm.keymasks.grab | mask, s->root, true,
 			 GrabModeAsync, GrabModeAsync);
 }
-
 void grab_keys_for_screen(struct JBWMScreen * restrict s)
 {
 	grab(s, (KeySym[]){JBWM_KEYS_TO_GRAB}, 0);
 	grab(s, (KeySym[]){JBWM_ALT_KEYS_TO_GRAB}, jbwm.keymasks.mod);
 }
-

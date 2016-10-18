@@ -1,18 +1,14 @@
 // Copyright 2016, Jeffrey E. Bedard
-
 #include "max.h"
-
 #include "ewmh.h"
 #include "ewmh_state.h"
 #include "JBWMEnv.h"
 #include "log.h"
 #include "screen.h"
 #include "titlebar.h"
-
 /* In this file, the static companion functions perform the requested option
    directly, while the global functions call the corresponding static
    function and perform sanity checks and adjustments.  */
-
 static void set_not_horz(struct JBWMClient * restrict c)
 {
 	c->opt.max_horz = false;
@@ -20,7 +16,6 @@ static void set_not_horz(struct JBWMClient * restrict c)
 	c->size.width = c->old_size.width;
 	ewmh_remove_state(c->window, ewmh[WM_STATE_MAXIMIZED_HORZ]);
 }
-
 void jbwm_set_not_horz(struct JBWMClient * restrict c)
 {
 	LOG("jbwm_set_not_horz");
@@ -28,7 +23,6 @@ void jbwm_set_not_horz(struct JBWMClient * restrict c)
 		set_not_horz(c);
 	jbwm_move_resize(c);
 }
-
 static void set_horz(struct JBWMClient * restrict c)
 {
 	c->opt.max_horz = true;
@@ -37,7 +31,6 @@ static void set_horz(struct JBWMClient * restrict c)
 	c->size.x = 0;
 	c->size.width = c->screen->size.w;
 }
-
 void jbwm_set_horz(struct JBWMClient * restrict c)
 {
 	LOG("jbwm_set_horz");
@@ -47,7 +40,6 @@ void jbwm_set_horz(struct JBWMClient * restrict c)
 	c->size.width -= c->border << 1;
 	jbwm_move_resize(c);
 }
-
 static void set_not_vert(struct JBWMClient * restrict c)
 {
 	c->opt.max_vert = false;
@@ -56,7 +48,6 @@ static void set_not_vert(struct JBWMClient * restrict c)
 	ewmh_remove_state(c->window,
 		ewmh[WM_STATE_MAXIMIZED_VERT]);
 }
-
 void jbwm_set_not_vert(struct JBWMClient * restrict c)
 {
 	LOG("jbwm_set_not_vert");
@@ -64,7 +55,6 @@ void jbwm_set_not_vert(struct JBWMClient * restrict c)
 		set_not_vert(c);
 	jbwm_move_resize(c);
 }
-
 static void set_vert(struct JBWMClient * restrict c)
 {
 	c->opt.max_vert = true;
@@ -74,7 +64,6 @@ static void set_vert(struct JBWMClient * restrict c)
 	c->size.height = c->screen->size.h;
 	ewmh_add_state(c->window, ewmh[WM_STATE_MAXIMIZED_VERT]);
 }
-
 void jbwm_set_vert(struct JBWMClient * restrict c)
 {
 	LOG("jbwm_set_vert");
@@ -89,7 +78,6 @@ void jbwm_set_vert(struct JBWMClient * restrict c)
 	}
 	jbwm_move_resize(c);
 }
-
 static void set_not_fullscreen(struct JBWMClient * restrict c)
 {
 	c->opt.fullscreen = false;
@@ -99,7 +87,6 @@ static void set_not_fullscreen(struct JBWMClient * restrict c)
 	ewmh_remove_state(c->window, ewmh[WM_STATE_FULLSCREEN]);
 	jbwm_update_titlebar(c);
 }
-
 void jbwm_set_not_fullscreen(struct JBWMClient * restrict c)
 {
 	LOG("jbwm_set_not_fullscreen");
@@ -107,7 +94,6 @@ void jbwm_set_not_fullscreen(struct JBWMClient * restrict c)
 		set_not_fullscreen(c);
 	jbwm_move_resize(c);
 }
-
 static void set_fullscreen(struct JBWMClient * restrict c)
 {
 	c->opt.fullscreen = true;
@@ -125,7 +111,6 @@ static void set_fullscreen(struct JBWMClient * restrict c)
 	ewmh_add_state(c->window, ewmh[WM_STATE_FULLSCREEN]);
 	jbwm_update_titlebar(c);
 }
-
 void jbwm_set_fullscreen(struct JBWMClient * restrict c)
 {
 	LOG("jbwm_set_fullscreen");
@@ -134,4 +119,3 @@ void jbwm_set_fullscreen(struct JBWMClient * restrict c)
 	set_fullscreen(c);
 	jbwm_move_resize(c);
 }
-

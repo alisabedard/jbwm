@@ -2,13 +2,9 @@
 # Copyright 2008-2016, Jeffrey E. Bedard <jefbed@gmail.com> 
 # Copyright 1999-2015, Ciaran Anscomb <jbwm@6809.org.uk>
 # See README for license and other details.
-
 CFLAGS+=-Wall -Wextra
-
 # Titlebar Xft support:
 include xft.mk
-
 # Uncomment to enable titlebars
 include titlebar.mk
-
 include jbwm.mk

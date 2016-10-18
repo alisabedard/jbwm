@@ -1,4 +1,3 @@
 # Copyright 2016, Jeffrey E. Bedard
 CC=clang
 include Makefile
-

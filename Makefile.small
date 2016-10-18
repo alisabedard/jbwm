@@ -4,8 +4,6 @@ CFLAGS=-Os
 # Tuning
 CFLAGS+=-fomit-frame-pointer -pipe -flto
 CFLAGS+=-W -Wall -Wextra
-
 # disable everything for minimal configuration 
 CFLAGS=-DNDEBUG
-
 include jbwm.mk

@@ -2,14 +2,11 @@
 // Copyright 2008-2016, Jeffrey E. Bedard <jefbed@gmail.com>
 // Copyright 1999-2015, Ciaran Anscomb <jbwm@6809.org.uk>
 // See README for license and other details.
-
 #ifndef JBWM_CLIENT_STRUCT_H
 #define JBWM_CLIENT_STRUCT_H
-
 #include "JBWMScreen.h"
 #include <stdbool.h>
 #include <X11/Xutil.h>
-
 struct JBWMClientOptions {
 	bool fullscreen : 1;
 	bool max_horz : 1;
@@ -30,13 +27,11 @@ struct JBWMClientOptions {
 	bool sticky : 1;
 	bool tearoff : 1;
 };
-
 #ifdef USE_TBAR
 struct JBWMClientTitlebar {
 	jbwm_window_t win, close, resize, shade, stick;
 };
 #endif//USE_TBAR
-
 struct JBWMClient {
 	struct JBWMClient *next;
 	struct JBWMScreen *screen;
@@ -55,5 +50,4 @@ struct JBWMClient {
 	uint8_t border:1;
 	struct JBWMClientOptions opt;
 };
-
 #endif /* JBWM_CLIENT_STRUCT_H */

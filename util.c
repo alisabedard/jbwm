@@ -2,14 +2,10 @@
 // Copyright 2008-2016, Jeffrey E. Bedard <jefbed@gmail.com>
 // Copyright 1999-2015, Ciaran Anscomb <jbwm@6809.org.uk>
 // See README for license and other details.
-
 #include "util.h"
-
 #include "JBWMEnv.h"
-
 #include <string.h>
 #include <unistd.h>
-
 void jbwm_set_property(const jbwm_window_t win,
 	const jbwm_atom_t property, const jbwm_atom_t type,
 	void * restrict data, int16_t size)
@@ -17,7 +13,6 @@ void jbwm_set_property(const jbwm_window_t win,
 	XChangeProperty(jbwm.d, win, property, type, 32, PropModeReplace,
 		data, size);
 }
-
 unsigned long jbwm_get_pixel(const uint8_t screen, const char * restrict name)
 {
 	if (!name) // sanitize input to avoid segfault
@@ -27,7 +22,6 @@ unsigned long jbwm_get_pixel(const uint8_t screen, const char * restrict name)
 		name, &c, &d);
 	return c.pixel;
 }
-
 #if defined(EWMH) || defined(MWM)
 __attribute__((warn_unused_result))
 void *jbwm_get_property(Window w, Atom property, uint16_t * num_items)
@@ -41,7 +35,6 @@ void *jbwm_get_property(Window w, Atom property, uint16_t * num_items)
 	return prop;
 }
 #endif//EWMH||MWM
-
 void jbwm_grab_button(const Window w, const unsigned int mask,
 		 const unsigned int btn)
 {
@@ -49,7 +42,6 @@ void jbwm_grab_button(const Window w, const unsigned int mask,
 		    ButtonPressMask | ButtonReleaseMask, GrabModeAsync,
 		    GrabModeSync, None, None);
 }
-
 #ifdef DEBUG
 #include <stdio.h>
 void jbwm_print_atom(const Atom a, const char * src, const uint16_t line)
@@ -59,5 +51,3 @@ void jbwm_print_atom(const Atom a, const char * src, const uint16_t line)
 	XFree(an);
 }
 #endif//DEBUG
-
-

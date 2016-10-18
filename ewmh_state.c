@@ -1,6 +1,5 @@
 // Copyright 2016, Jeffrey E. Bedard <jefbed@gmail.com>
 #include "ewmh_state.h"
-
 #include "client.h"
 #include "ewmh.h"
 #include "JBWMEnv.h"
@@ -8,9 +7,7 @@
 #include "max.h"
 #include "screen.h"
 #include "util.h"
-
 #include <X11/Xatom.h>
-
 // Remove specified atom from WM_STATE
 void ewmh_remove_state(const Window w, const Atom state)
 {
@@ -25,7 +22,6 @@ void ewmh_remove_state(const Window w, const Atom state)
 	jbwm_set_property(w, ewmh[WM_STATE], XA_ATOM, a, nitems);
 	XFree(a);
 }
-
 static bool ewmh_get_state(const Window w, const Atom state)
 {
 	uint16_t n;
@@ -39,14 +35,12 @@ static bool ewmh_get_state(const Window w, const Atom state)
 	}
 	return found;
 }
-
 void ewmh_add_state(const Window w, Atom state)
 {
 	XChangeProperty(jbwm.d, w, ewmh[WM_STATE],
 		XA_ATOM, 32, PropModePrepend,
 		(unsigned char *)&state, 1);
 }
-
 /*      Reference, per wm-spec:
   window  = the respective client window
   message_type = _NET_WM_STATE
@@ -59,7 +53,6 @@ void ewmh_add_state(const Window w, Atom state)
   data.l[2] = second property to alter
   data.l[3] = source indication
   other data.l[] elements = 0 */
-
 static void set_state(struct JBWMClient * restrict c,
 	const bool add, const AtomIndex t)
 {
@@ -91,7 +84,6 @@ static void set_state(struct JBWMClient * restrict c,
 		break;
 	}
 }
-
 __attribute__((nonnull(1,3)))
 static void check_state(XClientMessageEvent * e,	// event data
 			const AtomIndex t,	// state to test
@@ -108,12 +100,10 @@ static void check_state(XClientMessageEvent * e,	// event data
 		set_state(c, false, t);
 		ewmh_remove_state(e->window, state);
 		break;
-
 	case 1:	// add
 		set_state(c, true, t);
 		ewmh_add_state(e->window, state);
 		break;
-
 	case 2:{	// toggle
 			const bool add = !ewmh_get_state(e->window, state);
 			set_state(c, add, t);
@@ -122,7 +112,6 @@ static void check_state(XClientMessageEvent * e,	// event data
 		}
 	}
 }
-
 __attribute__((nonnull(1,2)))
 static void handle_wm_state_changes(XClientMessageEvent * restrict e,
 	struct JBWMClient * restrict c)
@@ -134,7 +123,6 @@ static void handle_wm_state_changes(XClientMessageEvent * restrict e,
 	check_state(e, WM_STATE_MAXIMIZED_VERT, c);
 	check_state(e, WM_STATE_STICKY, c);
 }
-
 static bool client_specific_message(XClientMessageEvent * restrict e,
 	struct JBWMClient * restrict c, const Atom t)
 {
@@ -154,7 +142,6 @@ static bool client_specific_message(XClientMessageEvent * restrict e,
 		  return false;
 	return true;
 }
-
 static void handle_moveresize(XClientMessageEvent * restrict e)
 {
 	const uint8_t src = (e->data.l[0] >> 12) & 3;
@@ -167,7 +154,6 @@ static void handle_moveresize(XClientMessageEvent * restrict e)
 		.width = e->data.l[3],
 		.height = e->data.l[4]});
 }
-
 void ewmh_client_message(XClientMessageEvent * restrict e,
 	struct JBWMClient * restrict c)
 {
@@ -189,5 +175,3 @@ void ewmh_client_message(XClientMessageEvent * restrict e,
 	else if (t == ewmh[MOVERESIZE_WINDOW])
 		handle_moveresize(e);
 }
-
-

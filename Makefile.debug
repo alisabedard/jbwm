@@ -18,16 +18,12 @@ CFLAGS+=-Wlogical-op -Wmissing-prototypes
 CFLAGS+=-Wredundant-decls -Wpointer-sign
 CFLAGS+=-fstrict-aliasing -Wstrict-aliasing=2
 CFLAGS+=-Wformat=2
-
 CFLAGS+=-DUSE_ARGV
 CFLAGS+=-DSTDIO
-
 include ewmh.mk
 include mwm.mk
 include shape.mk
 include snap.mk
 include titlebar.mk
 include xft.mk
-
-
 include jbwm.mk

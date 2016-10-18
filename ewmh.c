@@ -2,21 +2,16 @@
 // Copyright 2008-2016, Jeffrey E. Bedard <jefbed@gmail.com>
 // Copyright 1999-2015, Ciaran Anscomb <jbwm@6809.org.uk>
 // See README for license and other details.
-
 #include "ewmh.h"
-
 #include "JBWMEnv.h"
 #include "log.h"
 #include "max.h"
 #include "screen.h"
 #include "util.h"
-
 #include <stdlib.h>
 #include <unistd.h>
 #include <X11/Xatom.h>
-
 Atom ewmh[EWMH_ATOMS_COUNT];
-
 static char * atom_names [] = { // This list must match 1:1 with enum
 	"_NET_SUPPORTED",
 	"_NET_CURRENT_DESKTOP",
@@ -58,13 +53,11 @@ static char * atom_names [] = { // This list must match 1:1 with enum
 	"_NET_WM_STATE_BELOW",
 	"_NET_WM_STATE_FOCUSED",
 };
-
 void ewmh_init(void)
 {
 	LOG("atom_names: %d\n", EWMH_ATOMS_COUNT);
 	XInternAtoms(jbwm.d, atom_names, EWMH_ATOMS_COUNT, false, ewmh);
 }
-
 static uint16_t get_client_count(void)
 {
 	uint16_t j = 0;
@@ -73,7 +66,6 @@ static uint16_t get_client_count(void)
 		i = i->next, ++j);
 	return j;
 }
-
 void ewmh_update_client_list(void)
 {
 	jbwm_window_t wl[get_client_count()];
@@ -86,7 +78,6 @@ void ewmh_update_client_list(void)
 	jbwm_set_property(jbwm.s->root, ewmh[CLIENT_LIST_STACKING],
 		XA_WINDOW, &wl, wl_sz);
 }
-
 static void set_root_vdesk(jbwm_window_t r)
 {
 	jbwm_set_property(r, ewmh[NUMBER_OF_JBWM_MAX_DESKTOPS], XA_CARDINAL,
@@ -95,8 +86,6 @@ static void set_root_vdesk(jbwm_window_t r)
 		(&(long[]){0, 0}), 2);
 	jbwm_set_property(r, ewmh[VIRTUAL_ROOTS], XA_WINDOW, &r, 1);
 }
-
-
 void set_ewmh_allowed_actions(const jbwm_window_t w)
 {
 	Atom a[] = {
@@ -114,14 +103,12 @@ void set_ewmh_allowed_actions(const jbwm_window_t w)
 	};
 	jbwm_set_property(w, a[0], XA_ATOM, &a, sizeof(a) / sizeof(Atom));
 }
-
 static void init_desktops(struct JBWMScreen * restrict s)
 {
 	jbwm_set_property(s->r, ewmh[DESKTOP_GEOMETRY], XA_CARDINAL, &s->size, 2);
 	jbwm_set_property(s->r, ewmh[CURRENT_DESKTOP], XA_CARDINAL, &s->vdesk, 1);
 	set_root_vdesk(s->r);
 }
-
 static jbwm_window_t init_supporting(const jbwm_window_t r)
 {
 	jbwm_window_t w = XCreateSimpleWindow(jbwm.d, r, 0, 0, 1, 1, 0, 0, 0);
@@ -131,7 +118,6 @@ static jbwm_window_t init_supporting(const jbwm_window_t r)
 	jbwm_set_property(w, ewmh[WM_PID], XA_CARDINAL, &(pid_t){getpid()}, 1);
 	return w;
 }
-
 __attribute__((nonnull(1)))
 void setup_ewmh_for_screen(struct JBWMScreen * restrict s)
 {
@@ -143,4 +129,3 @@ void setup_ewmh_for_screen(struct JBWMScreen * restrict s)
 	init_desktops(s);
 	s->supporting = init_supporting(r);
 }
-

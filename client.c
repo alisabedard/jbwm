@@ -2,9 +2,7 @@
 // Copyright 2008-2016, Jeffrey E. Bedard <jefbed@gmail.com>
 // Copyright 1999-2015, Ciaran Anscomb <jbwm@6809.org.uk>
 // See README for license and other details.
-
 #include "client.h"
-
 #include "ewmh.h"
 #include "ewmh_state.h"
 #include "JBWMEnv.h"
@@ -12,9 +10,7 @@
 #include "screen.h"
 #include "titlebar.h"
 #include "util.h"
-
 #include <X11/Xatom.h>
-
 // Free result with XFree if not NULL
 char * jbwm_get_title(const jbwm_window_t w)
 {
@@ -23,7 +19,6 @@ char * jbwm_get_title(const jbwm_window_t w)
 		  return NULL;
 	return (char *)tp.value;
 }
-
 void jbwm_set_client_vdesk(struct JBWMClient * restrict c, const uint8_t d)
 {
 	LOG("jbwm_set_client_vdesk");
@@ -33,7 +28,6 @@ void jbwm_set_client_vdesk(struct JBWMClient * restrict c, const uint8_t d)
 	c->vdesk = jbwm_set_vdesk(c->screen, d);
 	jbwm_set_vdesk(c->screen, p);
 }
-
 static struct JBWMClient * search(struct JBWMClient * c,
 	const jbwm_window_t w)
 {
@@ -44,13 +38,11 @@ static struct JBWMClient * search(struct JBWMClient * c,
 #endif//USE_TBAR
 		? c : search(c->next, w);
 }
-
 // Return the client that has specified window as either window or parent
 struct JBWMClient * jbwm_get_client(const jbwm_window_t w)
 {
 	return search(jbwm.head, w);
 }
-
 static void unselect_current(void)
 {
 	if(!jbwm.current) return;
@@ -60,13 +52,11 @@ static void unselect_current(void)
 	ewmh_remove_state(jbwm.current->window, ewmh[WM_STATE_FOCUSED]);
 #endif//EWMH
 }
-
 static void set_border(struct JBWMClient * restrict c)
 {
 	XSetWindowBorder(jbwm.d, c->parent, c->opt.sticky
 		? c->screen->pixels.fc : c->screen->pixels.fg);
 }
-
 void jbwm_select_client(struct JBWMClient * c)
 {
 	if(!c)
@@ -82,7 +72,6 @@ void jbwm_select_client(struct JBWMClient * c)
 	ewmh_add_state(c->window, ewmh[WM_STATE_FOCUSED]);
 #endif//EWMH
 }
-
 void jbwm_toggle_sticky(struct JBWMClient * c)
 {
 	LOG("stick");
@@ -94,7 +83,6 @@ void jbwm_toggle_sticky(struct JBWMClient * c)
 		ewmh[WM_STATE_STICKY]);
 #endif//EWMH
 }
-
 // Returns 0 on failure.
 static Status xmsg(const jbwm_window_t w, const Atom a, const long x)
 {
@@ -105,36 +93,30 @@ static Status xmsg(const jbwm_window_t w, const Atom a, const long x)
 		.xclient.data.l[0] = x, .xclient.data.l[1] = CurrentTime
 	});
 }
-
 static jbwm_atom_t get_atom(jbwm_atom_t * a, const char * name)
 {
 	return *a ? *a : (*a = XInternAtom(jbwm.d, name, false));
 }
-
 static jbwm_atom_t get_wm_protocols(void)
 {
 	static jbwm_atom_t a;
 	return get_atom(&a, "WM_PROTOCOLS");
 }
-
 static jbwm_atom_t get_wm_delete_window(void)
 {
 	static jbwm_atom_t a;
 	return get_atom(&a, "WM_DELETE_WINDOW");
 }
-
 jbwm_atom_t jbwm_get_wm_state(void)
 {
 	static jbwm_atom_t a;
 	return get_atom(&a, "WM_STATE");
 }
-
 void jbwm_set_wm_state(struct JBWMClient * restrict c, const int8_t state)
 {
 	jbwm_set_property(c->window, jbwm_get_wm_state(),
 		XA_CARDINAL, &(uint32_t){state}, 1);
 }
-
 static bool has_delete_proto(const jbwm_window_t w)
 {
 	bool found=false;
@@ -147,7 +129,6 @@ static bool has_delete_proto(const jbwm_window_t w)
 	}
 	return found;
 }
-
 void jbwm_send_wm_delete(struct JBWMClient * restrict c)
 {
 	if (c->opt.remove) { // this allows a second click to force a kill
@@ -158,4 +139,3 @@ void jbwm_send_wm_delete(struct JBWMClient * restrict c)
 	has_delete_proto(c->window)?xmsg(c->window, get_wm_protocols(),
 		get_wm_delete_window()): XKillClient(jbwm.d, c->window);
 }
-

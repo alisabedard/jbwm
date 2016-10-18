@@ -2,9 +2,7 @@
 // Copyright 2008-2016, Jeffrey E. Bedard <jefbed@gmail.com>
 // Copyright 1999-2015, Ciaran Anscomb <jbwm@6809.org.uk>
 // See README for license and other details.
-
 #include "events.h"
-
 #include "button_event.h"
 #include "client.h"
 #include "ewmh_state.h"
@@ -16,10 +14,8 @@
 #include "screen.h"
 #include "titlebar.h"
 #include "util.h"
-
 #include <stdlib.h>
 #include <X11/Xatom.h>
-
 __attribute__((pure))
 static struct JBWMScreen * get_screen(const int8_t i,
 	const jbwm_window_t root)
@@ -27,7 +23,6 @@ static struct JBWMScreen * get_screen(const int8_t i,
 	return jbwm.s[i].root == root ? &jbwm.s[i]
 		: get_screen(i - 1, root);
 }
-
 // Relink c's linked list to exclude c
 static void relink_window_list(struct JBWMClient * c)
 {
@@ -45,7 +40,6 @@ static void relink_window_list(struct JBWMClient * c)
 		}
 	}
 }
-
 void jbwm_free_client(struct JBWMClient * restrict c)
 {
 	const jbwm_window_t w = c->window;
@@ -63,7 +57,6 @@ void jbwm_free_client(struct JBWMClient * restrict c)
 	jbwm.last = 0; /* allow this client's window id to be reused
 			  for another client.  */
 }
-
 static void cleanup(void)
 {
 	LOG("cleanup");
@@ -77,7 +70,6 @@ static void cleanup(void)
 		jbwm_free_client(c);
 	} while(i && (c = i));
 }
-
 static void handle_property_change(XPropertyEvent * restrict e,
 	struct JBWMClient * restrict c)
 {
@@ -94,7 +86,6 @@ static void handle_property_change(XPropertyEvent * restrict e,
 		jbwm_print_atom(e->atom, __FILE__, __LINE__);
 	}
 }
-
 static void handle_configure_request(XConfigureRequestEvent * e)
 {
 	LOG("handle_configure_request");
@@ -104,7 +95,6 @@ static void handle_configure_request(XConfigureRequestEvent * e)
 		.border_width = e->border_width,
 		.sibling = e->above, .stack_mode = e->detail});
 }
-
 static void iteration(void)
 {
 	XEvent ev;
@@ -178,7 +168,6 @@ static void iteration(void)
 		jbwm.last=0; // Fix ignoring every other new window
 	}
 }
-
 void main_event_loop(void)
 {
 	for(;;)

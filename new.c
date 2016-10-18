@@ -2,9 +2,7 @@
 // Copyright 2008-2016, Jeffrey E. Bedard <jefbed@gmail.com>
 // Copyright 1999-2015, Ciaran Anscomb <jbwm@6809.org.uk>
 // See README for license and other details.
-
 #include "new.h"
-
 #include "ewmh.h"
 #include "JBWMEnv.h"
 #include "log.h"
@@ -13,10 +11,8 @@
 #include "shape.h"
 #include "titlebar.h"
 #include "util.h"
-
 #include <stdlib.h>
 #include <X11/Xatom.h>
-
 #ifdef EWMH
 static uint8_t wm_desktop(const jbwm_window_t w, uint8_t vdesk)
 {
@@ -36,7 +32,6 @@ static uint8_t wm_desktop(const jbwm_window_t w, uint8_t vdesk)
 #else//!EWMH
 #define wm_desktop(w, vdesk) vdesk
 #endif//EWMH
-
 #ifdef EWMH
 __attribute__((nonnull))
 static void set_frame_extents(struct JBWMClient * c)
@@ -50,7 +45,6 @@ static void set_frame_extents(struct JBWMClient * c)
 #else//!EWMH
 #define set_frame_extents(c)
 #endif//EWMH
-
 __attribute__((nonnull))
 static void init_properties(struct JBWMClient * c)
 {
@@ -58,7 +52,6 @@ static void init_properties(struct JBWMClient * c)
 	c->vdesk = c->screen->vdesk;
 	c->vdesk = wm_desktop(c->window, c->vdesk);
 }
-
 __attribute__((nonnull))
 static void init_geometry(struct JBWMClient * c)
 {
@@ -76,11 +69,9 @@ static void init_geometry(struct JBWMClient * c)
 		- (c->size.width >> 1);
 	c->size.y = pos ? attr.y : (c->screen->size.h >> 1)
 		- (c->size.height >> 1);
-
 	// Test if the reparent that is to come would trigger an unmap event.
 	c->ignore_unmap += attr.map_state == IsViewable ? 1 : 0;
 }
-
 __attribute__((nonnull))
 static Window get_parent(struct JBWMClient * restrict c)
 {
@@ -91,9 +82,7 @@ static Window get_parent(struct JBWMClient * restrict c)
 		.override_redirect=true, .event_mask
 		= SubstructureRedirectMask | SubstructureNotifyMask
 		| ButtonPressMask | EnterWindowMask});
-
 }
-
 __attribute__((nonnull))
 static void reparent(struct JBWMClient * c) // use of restrict here is a bug
 {
@@ -104,7 +93,6 @@ static void reparent(struct JBWMClient * c) // use of restrict here is a bug
 	XReparentWindow(jbwm.d, w, p, 0, 0);
 	XMapWindow(jbwm.d, w);
 }
-
 // Allocate the client structure with some defaults set
 static struct JBWMClient * get_JBWMClient(const jbwm_window_t w,
 	struct JBWMScreen * s)
@@ -114,7 +102,6 @@ static struct JBWMClient * get_JBWMClient(const jbwm_window_t w,
 		.next = jbwm.head};
 	return c;
 }
-
 // Grab input and setup EWMH for client window
 static void do_grabs(const jbwm_window_t w)
 {
@@ -123,7 +110,6 @@ static void do_grabs(const jbwm_window_t w)
 	jbwm_grab_button(w, jbwm.keymasks.grab, AnyButton);
 	set_ewmh_allowed_actions(w);
 }
-
 void jbwm_new_client(const jbwm_window_t w, struct JBWMScreen * s)
 {
 	LOG("jbwm_new_client(%d,s)", (int)w);

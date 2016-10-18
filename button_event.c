@@ -2,15 +2,12 @@
 // Copyright 2008-2016, Jeffrey E. Bedard <jefbed@gmail.com>
 // Copyright 1999-2015, Ciaran Anscomb <jbwm@6809.org.uk>
 // See README for license and other details.
-
 #include "button_event.h"
-
 #include "client.h"
 #include "JBWMEnv.h"
 #include "log.h"
 #include "screen.h"
 #include "titlebar.h"
-
 #ifdef USE_TBAR
 static void handle_titlebar_button(XButtonEvent * restrict e,
 	struct JBWMClient * restrict c)
@@ -31,7 +28,6 @@ static void handle_titlebar_button(XButtonEvent * restrict e,
 #else//!USE_TBAR
 #define handle_titlebar_button(e, c) jbwm_drag(c, false)
 #endif//USE_TBAR
-
 void jbwm_handle_button_event(XButtonEvent * restrict e,
 	struct JBWMClient * restrict c)
 {

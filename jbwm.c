@@ -2,9 +2,7 @@
 // Copyright 2008-2016, Jeffrey E. Bedard <jefbed@gmail.com>
 // Copyright 1999-2015, Ciaran Anscomb <jbwm@6809.org.uk>
 // See README for license and other details.
-
 #include "JBWMEnv.h"
-
 #include "client.h"
 #include "config.h"
 #include "events.h"
@@ -13,27 +11,21 @@
 #include "log.h"
 #include "new.h"
 #include "util.h"
-
 #include <stdlib.h>
 #include <unistd.h>
 #include <X11/cursorfont.h>
 #include <X11/Xproto.h>
-
 #ifdef STDIO
 #include <stdio.h>
 #endif//STDIO
-
 // Main application data structure.
 struct JBWMEnv jbwm;
-
 static void print(const size_t sz, const char * buf)
 {
 	if (write(1, buf, sz) == -1)
 		abort();
 }
-
 #ifdef USE_ARGV
-
 /* Used for overriding the default WM modifiers */
 __attribute__((warn_unused_result))
 static uint16_t parse_modifiers(char * restrict arg)
@@ -64,7 +56,6 @@ static uint16_t parse_modifiers(char * restrict arg)
 	// everything else becomes mod1
 	return Mod1Mask;
 }
-
 static void parse_argv(uint8_t argc, char **argv)
 {
 	LOG("parse_argv(%d,%s...)", argc, argv[0]);
@@ -112,7 +103,6 @@ static void parse_argv(uint8_t argc, char **argv)
 #else//!USE_ARGV
 #define parse_argv(a, b)
 #endif//USE_ARGV
-
 __attribute__((noreturn))
 static void jbwm_error(const char * restrict msg)
 {
@@ -122,7 +112,6 @@ static void jbwm_error(const char * restrict msg)
 	print(1, "\n");
 	exit(1);
 }
-
 #ifdef USE_TBAR
 static void setup_fonts(void)
 {
@@ -140,7 +129,6 @@ static void setup_fonts(void)
 #else//!USE_TBAR
 #define setup_fonts()
 #endif//USE_TBAR
-
 static void setup_event_listeners(const jbwm_window_t root)
 {
 	XChangeWindowAttributes(jbwm.d, root, CWEventMask,
@@ -148,7 +136,6 @@ static void setup_event_listeners(const jbwm_window_t root)
 		| SubstructureNotifyMask | EnterWindowMask | PropertyChangeMask
 		| ColormapChangeMask});
 }
-
 static void allocate_colors(struct JBWMScreen * restrict s)
 {
 	const uint8_t n = s->screen;
@@ -162,14 +149,12 @@ static void allocate_colors(struct JBWMScreen * restrict s)
 	s->pixels.stick = jbwm_get_pixel(n, getenv(JBWM_ENV_STICK));
 #endif//USE_TBAR
 }
-
 static bool check_redirect(const jbwm_window_t w)
 {
 	XWindowAttributes a;
 	XGetWindowAttributes(jbwm.d, w, &a);
 	return (!a.override_redirect && (a.map_state == IsViewable));
 }
-
 static void setup_clients(struct JBWMScreen * restrict s)
 {
 	Window * w, d; // don't use jbwm_window_t here
@@ -182,7 +167,6 @@ static void setup_clients(struct JBWMScreen * restrict s)
 			jbwm_new_client(w[n], s);
 	XFree(w);
 }
-
 static void setup_screen_elements(const uint8_t i)
 {
 	struct JBWMScreen *restrict s = &jbwm.s[i];
@@ -193,7 +177,6 @@ static void setup_screen_elements(const uint8_t i)
 	s->size.w = DisplayWidth(d, i);
 	s->size.h = DisplayHeight(d, i);
 }
-
 static void setup_gc(struct JBWMScreen * restrict s)
 {
 	allocate_colors(s);
@@ -211,7 +194,6 @@ static void setup_gc(struct JBWMScreen * restrict s)
 #endif//USE_TBAR&&!USE_XFT
 	s->gc = XCreateGC(jbwm.d, s->root, vm, &gv);
 }
-
 static void setup_screen(const uint8_t i)
 {
 	struct JBWMScreen *s = &jbwm.s[i];
@@ -223,7 +205,6 @@ static void setup_screen(const uint8_t i)
 	setup_clients(s);
 	setup_ewmh_for_screen(s);
 }
-
 __attribute__((pure))
 static int handle_xerror(Display * restrict dpy __attribute__ ((unused)),
 	XErrorEvent * restrict e)
@@ -240,7 +221,6 @@ static int handle_xerror(Display * restrict dpy __attribute__ ((unused)),
 	LOG("xerror: %d, %d\n", e->error_code, e->request_code);
 	return 0; // Ignore everything else.
 }
-
 static void jbwm_set_defaults(void)
 {
 	setenv(JBWM_ENV_FG, JBWM_DEF_FG, 0);
@@ -255,7 +235,6 @@ static void jbwm_set_defaults(void)
 	setenv(JBWM_ENV_FONT, JBWM_DEF_FONT, 0);
 #endif//USE_TBAR
 }
-
 int main(
 #ifdef USE_ARGV
 		int argc, char **argv)

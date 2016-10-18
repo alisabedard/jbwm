@@ -2,27 +2,22 @@
 // Copyright 2008-2016, Jeffrey E. Bedard <jefbed@gmail.com>
 // Copyright 1999-2015, Ciaran Anscomb <jbwm@6809.org.uk>
 // See README for license and other details.
-
 #include "titlebar.h"
 #include "client.h"
 #include "ewmh.h"
 #include "ewmh_state.h"
 #include "screen.h"
 #include "util.h"
-
 #include <X11/Xatom.h>
-
 #ifdef USE_XFT
 #include "config.h"
 #include <X11/Xft/Xft.h>
 #endif//USE_XFT
-
 void jbwm_toggle_shade(struct JBWMClient * restrict c)
 {
 	// Honor !MWM_FUNC_MINIMIZE
 	if (c->opt.no_min || c->opt.fullscreen)
 		return;
-
 	/* This implements window shading, a substitute
 	   for iconification.  */
 	if (c->opt.shaded) {
@@ -42,7 +37,6 @@ void jbwm_toggle_shade(struct JBWMClient * restrict c)
 	}
 	jbwm_update_titlebar(c);
 }
-
 static void move_buttons(struct JBWMClient * restrict c)
 {
 	uint16_t x = c->size.width - TDIM;
@@ -51,18 +45,15 @@ static void move_buttons(struct JBWMClient * restrict c)
 	XMoveWindow(jbwm.d, c->tb.shade, x, 0);
 	XMoveWindow(jbwm.d, c->tb.stick, x, TDIM >> 1);
 }
-
 static Window get_win(const Window p, const uint16_t w, const uint16_t h,
 	const jbwm_pixel_t bg)
 {
 	return XCreateSimpleWindow(jbwm.d, p, 0, 0, w, h, 0, 0, bg);
 }
-
 static Window get_button(const Window p, const jbwm_pixel_t bg)
 {
 	return get_win(p, TDIM, TDIM, bg);
 }
-
 static jbwm_window_t new_titlebar(struct JBWMClient * restrict c)
 {
 	const struct JBWMPixels * p = &c->screen->pixels;
@@ -85,7 +76,6 @@ static jbwm_window_t new_titlebar(struct JBWMClient * restrict c)
 #endif//EWMH
 	return t;
 }
-
 #ifdef USE_XFT
 static void
 draw_xft(struct JBWMClient * restrict c, const XPoint * restrict p,
@@ -109,7 +99,6 @@ draw_xft(struct JBWMClient * restrict c, const XPoint * restrict p,
 	XftColorFree(jbwm.d, v, cm, &color);
 }
 #endif//USE_XFT
-
 static void draw_title(struct JBWMClient * restrict c)
 {
 	char * name = jbwm_get_title(c->window);
@@ -126,7 +115,6 @@ static void draw_title(struct JBWMClient * restrict c)
 #endif//USE_XFT
 	XFree(name);
 }
-
 static void remove_titlebar(struct JBWMClient * restrict c)
 {
 	c->ignore_unmap++;
@@ -139,7 +127,6 @@ static void remove_titlebar(struct JBWMClient * restrict c)
 		(&(jbwm_atom_t[]){b, b, b, b}), 4);
 #endif//EWMH
 }
-
 void jbwm_update_titlebar(struct JBWMClient * c)
 {
 	if (c->opt.shaped)
@@ -149,10 +136,8 @@ void jbwm_update_titlebar(struct JBWMClient * c)
 		remove_titlebar(c);
 		return;
 	}
-
 	if (!w)
 		w = new_titlebar(c);
-
 	/* Expand/Contract the titlebar width as necessary:  */
 	XResizeWindow(jbwm.d, w, c->size.width, TDIM);
 	move_buttons(c);
@@ -161,4 +146,3 @@ void jbwm_update_titlebar(struct JBWMClient * c)
 	if (c->opt.no_titlebar)
 		remove_titlebar(c);
 }
-

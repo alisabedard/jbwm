@@ -2,16 +2,12 @@
 // Copyright 2008-2016, Jeffrey E. Bedard <jefbed@gmail.com>
 // Copyright 1999-2015, Ciaran Anscomb <jbwm@6809.org.uk>
 // See README for license and other details.
-
 #include "snap.h"
-
 #include "config.h"
 #include "JBWMEnv.h"
 #include "log.h"
 #include "titlebar.h"
-
 #include <stdlib.h>
-
 __attribute__ ((const, hot, warn_unused_result))
 static int16_t sborder(const int16_t xy, const int16_t edge)
 {
@@ -19,7 +15,6 @@ static int16_t sborder(const int16_t xy, const int16_t edge)
 		  return - edge;
 	return xy;
 }
-
 void snap_border(struct JBWMClient *restrict c)
 {
 	XSizeHints *restrict g = &(c->size);
@@ -31,13 +26,11 @@ void snap_border(struct JBWMClient *restrict c)
 	g->y=sborder(g->y, 0 - (c->opt.no_titlebar?0:TDIM));
 	g->y=sborder(g->y, g->height + b - s.height);
 }
-
 __attribute__ ((const, hot, warn_unused_result))
 static inline int16_t absmin(const int16_t a, const int16_t b)
 {
 	return abs(a) < abs(b) ? a : b;
 }
-
 __attribute__ ((const))
 static int16_t
 snap_dim(const int16_t cxy, const uint16_t cwh, const int16_t cixy,
@@ -51,7 +44,6 @@ snap_dim(const int16_t cxy, const uint16_t cwh, const int16_t cixy,
 	d = absmin(d, s);
 	return d;
 }
-
 static XPoint search(struct JBWMClient * c)
 {
 	XPoint d = { JBWM_SNAP, JBWM_SNAP };
@@ -73,7 +65,6 @@ static XPoint search(struct JBWMClient * c)
 	}
 	return d;
 }
-
 void snap_client(struct JBWMClient * c)
 {
 	snap_border(c);
