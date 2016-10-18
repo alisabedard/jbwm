@@ -4,11 +4,13 @@
 
 #include <stdbool.h>
 
-#undef MAX
+#ifndef MAX
 #define MAX(a,b) ((a) > (b) ? (a) : (b))
+#endif//!MAX
 
-#undef MIN
+#ifndef MIN
 #define MIN(a,b) ((a) < (b) ? (a) : (b))
+#endif//!MIN
 
 #define JB_LIMIT(var, max, min) {var = MAX(MIN(var, max), min);}
 
