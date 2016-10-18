@@ -12,7 +12,8 @@ void jbwm_set_property(const jbwm_window_t win,
 	const jbwm_atom_t property, const jbwm_atom_t type,
 	void * restrict data, int16_t size);
 
-unsigned long jbwm_get_pixel(const uint8_t screen, const char * restrict name);
+unsigned long jbwm_get_pixel(const uint8_t screen,
+	const char * restrict name);
 
 #if defined(EWMH) || defined(MWM)
 
