@@ -1,16 +1,17 @@
-#include <stdio.h>
-
-#define DEBUG
-
+#include "file.h"
 #include "util.h"
 
-int main(int argc, char ** argv)
+int main(int argc __attribute__((unused)),
+char ** argv __attribute__((unused)))
 {
-	puts("Testing libjb..");
+	// test success
+	fd_t f = jb_open("/dev/null", O_RDONLY);
+	close(f);
+	// test failure
+	f = jb_open("/dev/does_not_exist", O_RDONLY);
+	// test check
 	jb_check(true, "true");
-	int a = 0;
-	int b = 1;
-	jb_check(a == b, "a != b");
 	jb_check(false, "false");
+	return 0;
 }
 
