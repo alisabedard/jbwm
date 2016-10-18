@@ -1,66 +1,33 @@
 // Copyright 2016, Jeffrey E. Bedard
 
-// Prevent behavior changes when DEBUG defined from affecting this file.
-#undef DEBUG
-
 #include "util.h"
-
-#include "log.h"
-
-#include <errno.h>
-#include <fcntl.h>
-#include <stdio.h>
+#include <stdint.h>
 #include <stdlib.h>
-#include <sys/stat.h>
-#include <sys/types.h>
 #include <unistd.h>
 
-void jb_close(const fd_t fd)
+// If val is false, print msg then return !val
+bool jb_check(const bool val, const char * msg)
 {
-	if (close(fd) != -1)
-		return; // success
-	const uint8_t sz = 32;
-	char buf[sz];
-	snprintf(buf, sz, "Could not close fd %d", fd);
-	perror(buf);
-}
-
-fd_t jb_open(const char * path, const int flags)
-{
-	fd_t r = open(path, flags);
-	if (r != -1)
-		return r; // success
-	const uint8_t sz = 64;
-	char buf[sz];
-	snprintf(buf, sz, "Could not open %s", path);
-	perror(buf);
-	return -1;
-}
-
-bool jb_check(const bool val, char * msg)
-{
-	if (!val) {
-		char * e = msg ? msg : "Error";
-		if (errno)
-			perror(e);
-		else
-			fprintf(stderr, "%s\n", e);
+	if (!val) { // failure
+		uint16_t l = 0;
+		while (msg[++l]);
+		write(2, msg, l);
+		write(2, "\n", 1);
 	}
-	errno = 0; // reset
 	return !val;
 }
 
-void jb_assert(const bool val, char * msg)
+// If val is false, print msg then exit(1)
+void jb_require(const bool val, const char * msg)
 {
 	if (jb_check(val, msg))
 		exit(1);
 }
 
-bool jb_abort_if_false(bool val, char * msg)
+// If val is false, print msg then abort()
+void jb_assert(const bool val, char * msg)
 {
-	val = jb_check(val, msg);
-	if (val)
+	if (jb_check(val, msg))
 		abort();
-	return val;
 }
 

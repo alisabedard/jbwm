@@ -25,7 +25,7 @@ LDFLAGS+=-L/usr/X11R6/lib -Wl,-R/usr/X11R6/lib
 LDFLAGS+=-lxcb
 PREFIX=/usr
 prog=xstatus
-objs=util.o xcb.o time.o
+objs=util.o xcb.o time.o file.o
 
 installdir=${DESTDIR}${PREFIX}
 
