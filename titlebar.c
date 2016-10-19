@@ -37,34 +37,30 @@ void jbwm_toggle_shade(struct JBWMClient * restrict c)
 	}
 	jbwm_update_titlebar(c);
 }
-static void move_buttons(struct JBWMClient * restrict c)
+static uint16_t mv(const jbwm_window_t w, uint16_t x)
 {
-	uint16_t x = c->size.width - TDIM;
-	XMoveWindow(jbwm.d, c->tb.resize, x, 0);
 	x -= TDIM;
-	XMoveWindow(jbwm.d, c->tb.shade, x, 0);
-	XMoveWindow(jbwm.d, c->tb.stick, x, TDIM >> 1);
+	XMoveWindow(jbwm.d, w, x, 0);
+	return x;
 }
-static Window get_win(const Window p, const uint16_t w, const uint16_t h,
-	const jbwm_pixel_t bg)
+static void move_buttons(struct JBWMClientTitlebar * restrict t,
+	const uint16_t width)
 {
-	return XCreateSimpleWindow(jbwm.d, p, 0, 0, w, h, 0, 0, bg);
+	mv(t->stick, mv(t->shade, mv(t->resize, width)));
 }
-static Window get_button(const Window p, const jbwm_pixel_t bg)
+static jbwm_window_t get_win(const Window p, const jbwm_pixel_t bg)
 {
-	return get_win(p, TDIM, TDIM, bg);
+	return XCreateSimpleWindow(jbwm.d, p, 0, 0, TDIM, TDIM, 0, 0, bg);
 }
 static jbwm_window_t new_titlebar(struct JBWMClient * restrict c)
 {
 	const struct JBWMPixels * p = &c->screen->pixels;
-	const jbwm_window_t t = c->tb.win = get_win(c->parent,
-		c->size.width, TDIM, p->bg);
+	const jbwm_window_t t = c->tb.win = get_win(c->parent, p->bg);
 	XSelectInput(jbwm.d, t, ExposureMask);
-	c->tb.close = get_button(t, p->close);
-	c->tb.resize = get_button(t, p->resize);
-	c->tb.shade = get_button(t, p->shade);
-	c->tb.stick = get_button(t, p->stick);
-	move_buttons(c);
+	c->tb.close = get_win(t, p->close);
+	c->tb.resize = get_win(t, p->resize);
+	c->tb.shade = get_win(t, p->shade);
+	c->tb.stick = get_win(t, p->stick);
 	XMapRaised(jbwm.d, t);
 	XMapSubwindows(jbwm.d, t);
 	jbwm_grab_button(t, 0, AnyButton);
@@ -139,8 +135,11 @@ void jbwm_update_titlebar(struct JBWMClient * c)
 	if (!w)
 		w = new_titlebar(c);
 	/* Expand/Contract the titlebar width as necessary:  */
-	XResizeWindow(jbwm.d, w, c->size.width, TDIM);
-	move_buttons(c);
+	{
+		const uint16_t width = c->size.width;
+		XResizeWindow(jbwm.d, w, width, TDIM);
+		move_buttons(&c->tb, width);
+	}
 	XClearWindow(jbwm.d, w);
 	draw_title(c);
 	if (c->opt.no_titlebar)
