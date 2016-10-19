@@ -4,10 +4,10 @@
 // See README for license and other details.
 #ifndef JBWM_MWM_H
 #define JBWM_MWM_H
-#ifdef MWM
+#ifdef JBWM_USE_MWM
 #include "JBWMClient.h"
 void jbwm_handle_mwm_hints(struct JBWMClient * c);
-#else//!MWM
+#else//!JBWM_USE_MWM
 #define jbwm_handle_mwm_hints(c)
-#endif//MWM
+#endif//JBWM_USE_MWM
 #endif//!JBWM_MWM_H

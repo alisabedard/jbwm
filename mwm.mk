@@ -1,3 +1,3 @@
 # MWM hints support
-CFLAGS+=-DMWM
+CFLAGS+=-DJBWM_USE_MWM
 OBJS+=mwm.o
