@@ -18,8 +18,7 @@ void jbwm_toggle_shade(struct JBWMClient * restrict c)
 	// Honor !MWM_FUNC_MINIMIZE
 	if (c->opt.no_min || c->opt.fullscreen)
 		return;
-	/* This implements window shading, a substitute
-	   for iconification.  */
+	// This implements window shading, a substitute for iconification.
 	if (c->opt.shaded) {
 		// Unshade
 		c->size.height = c->old_size.height;
@@ -134,7 +133,7 @@ void jbwm_update_title_bar(struct JBWMClient * c)
 	}
 	if (!w)
 		w = new_title_bar(c);
-	/* Expand/Contract the title_bar width as necessary:  */
+	/* Expand/Contract the title bar width as necessary:  */
 	{
 		const uint16_t width = c->size.width;
 		XResizeWindow(jbwm.d, w, width, TDIM);
