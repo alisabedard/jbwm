@@ -13,7 +13,7 @@
 #include "util.h"
 #include <stdlib.h>
 #include <X11/Xatom.h>
-#ifdef EWMH
+#ifdef JBWM_EWMH
 static uint8_t wm_desktop(const jbwm_window_t w, uint8_t vdesk)
 {
 	uint16_t n;
@@ -29,10 +29,10 @@ static uint8_t wm_desktop(const jbwm_window_t w, uint8_t vdesk)
 	LOG("wm_desktop(): vdesk is %d\n", vdesk);
 	return vdesk;
 }
-#else//!EWMH
+#else//!JBWM_EWMH
 #define wm_desktop(w, vdesk) vdesk
-#endif//EWMH
-#ifdef EWMH
+#endif//JBWM_EWMH
+#ifdef JBWM_EWMH
 __attribute__((nonnull))
 static void set_frame_extents(struct JBWMClient * c)
 {
@@ -42,9 +42,9 @@ static void set_frame_extents(struct JBWMClient * c)
 		(&(jbwm_atom_t[]){b, b, b + (c->opt.no_titlebar ? 0 : TDIM),
 		 b}), 4);
 }
-#else//!EWMH
+#else//!JBWM_EWMH
 #define set_frame_extents(c)
-#endif//EWMH
+#endif//JBWM_EWMH
 __attribute__((nonnull))
 static void init_properties(struct JBWMClient * c)
 {
@@ -102,7 +102,7 @@ static struct JBWMClient * get_JBWMClient(const jbwm_window_t w,
 		.next = jbwm.head};
 	return c;
 }
-// Grab input and setup EWMH for client window
+// Grab input and setup JBWM_EWMH for client window
 static void do_grabs(const jbwm_window_t w)
 {
 	XSelectInput(jbwm.d, w, EnterWindowMask

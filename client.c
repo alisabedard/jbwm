@@ -48,9 +48,9 @@ static void unselect_current(void)
 	if(!jbwm.current) return;
 	XSetWindowBorder(jbwm.d, jbwm.current->parent,
 		jbwm.current->screen->pixels.bg);
-#ifdef EWMH
+#ifdef JBWM_EWMH
 	ewmh_remove_state(jbwm.current->window, ewmh[WM_STATE_FOCUSED]);
-#endif//EWMH
+#endif//JBWM_EWMH
 }
 static void set_border(struct JBWMClient * restrict c)
 {
@@ -66,11 +66,11 @@ void jbwm_select_client(struct JBWMClient * c)
 	XSetInputFocus(jbwm.d, c->window, RevertToPointerRoot, CurrentTime);
 	set_border(c);
 	jbwm.current = c;
-#ifdef EWMH
+#ifdef JBWM_EWMH
 	jbwm_set_property(c->screen->root, ewmh[ACTIVE_WINDOW],
 		XA_WINDOW, &(c->parent), 1);
 	ewmh_add_state(c->window, ewmh[WM_STATE_FOCUSED]);
-#endif//EWMH
+#endif//JBWM_EWMH
 }
 void jbwm_toggle_sticky(struct JBWMClient * c)
 {
@@ -78,10 +78,10 @@ void jbwm_toggle_sticky(struct JBWMClient * c)
 	c->opt.sticky ^= true; // toggle
 	jbwm_select_client(c);
 	jbwm_update_titlebar(c);
-#ifdef EWMH
+#ifdef JBWM_EWMH
 	(c->opt.sticky ? ewmh_add_state : ewmh_remove_state)(c->window,
 		ewmh[WM_STATE_STICKY]);
-#endif//EWMH
+#endif//JBWM_EWMH
 }
 // Returns 0 on failure.
 static Status xmsg(const jbwm_window_t w, const Atom a, const long x)

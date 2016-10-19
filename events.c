@@ -43,11 +43,11 @@ static void relink_window_list(struct JBWMClient * c)
 void jbwm_free_client(struct JBWMClient * restrict c)
 {
 	const jbwm_window_t w = c->window;
-#ifdef EWMH
-	// Per ICCCM + EWMH:
+#ifdef JBWM_EWMH
+	// Per ICCCM + JBWM_EWMH:
 	XDeleteProperty(jbwm.d, w, ewmh[WM_STATE]);
 	XDeleteProperty(jbwm.d, w, ewmh[WM_DESKTOP]);
-#endif//EWMH
+#endif//JBWM_EWMH
 	XReparentWindow(jbwm.d, w, c->screen->root, c->size.x, c->size.y);
 	XRemoveFromSaveSet(jbwm.d, w);
 	if(c->parent)
@@ -118,12 +118,12 @@ static void iteration(void)
 			  jbwm_update_titlebar(c);
 		break;
 #endif//USE_TBAR
-#ifdef EWMH
+#ifdef JBWM_EWMH
 	case CreateNotify:
 	case DestroyNotify:
 		ewmh_update_client_list();
 		break;
-#endif//EWMH
+#endif//JBWM_EWMH
 	case UnmapNotify:
 		if(!c)
 			  break;
@@ -153,11 +153,11 @@ static void iteration(void)
 			XInstallColormap(jbwm.d, c->cmap);
 		}
 		break;
-#ifdef EWMH
+#ifdef JBWM_EWMH
 	case ClientMessage:
 		ewmh_client_message(&ev.xclient, c);
 		break;
-#endif//EWMH
+#endif//JBWM_EWMH
 #ifdef EVENT_DEBUG
 	default:
 		LOG("Unhandled event (%d)", ev.type);

@@ -64,12 +64,12 @@ static jbwm_window_t new_titlebar(struct JBWMClient * restrict c)
 	XMapRaised(jbwm.d, t);
 	XMapSubwindows(jbwm.d, t);
 	jbwm_grab_button(t, 0, AnyButton);
-#ifdef EWMH
+#ifdef JBWM_EWMH
 	// Required by wm-spec 1.4:
 	const uint8_t b = c->border;
 	jbwm_set_property(c->window, ewmh[FRAME_EXTENTS], XA_CARDINAL,
 		(&(jbwm_atom_t[]){b, b, b + TDIM, b}), 4);
-#endif//EWMH
+#endif//JBWM_EWMH
 	return t;
 }
 #ifdef USE_XFT
@@ -116,12 +116,12 @@ static void remove_titlebar(struct JBWMClient * restrict c)
 	c->ignore_unmap++;
 	XDestroyWindow(jbwm.d, c->tb.win);
 	c->tb.win = 0;
-#ifdef EWMH
+#ifdef JBWM_EWMH
 	// Required by wm-spec 1.4:
 	const uint8_t b = c->border;
 	jbwm_set_property(c->window, ewmh[FRAME_EXTENTS], XA_CARDINAL,
 		(&(jbwm_atom_t[]){b, b, b, b}), 4);
-#endif//EWMH
+#endif//JBWM_EWMH
 }
 void jbwm_update_titlebar(struct JBWMClient * c)
 {

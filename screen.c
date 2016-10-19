@@ -150,8 +150,8 @@ uint8_t jbwm_set_vdesk(struct JBWMScreen * s, uint8_t v)
 	for (struct JBWMClient * c = jbwm.head; c; c = c->next)
 		check_visibility(s, c, v);
 	s->vdesk = v;
-#ifdef EWMH
+#ifdef JBWM_EWMH
 	jbwm_set_property(s->root, ewmh[CURRENT_DESKTOP], XA_CARDINAL, &v, 1);
-#endif//EWMH
+#endif//JBWM_EWMH
 	return s->vdesk;
 }

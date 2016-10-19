@@ -158,14 +158,14 @@ void ewmh_client_message(XClientMessageEvent * restrict e,
 	struct JBWMClient * restrict c)
 {
 	const Atom t = e->message_type;
-#ifdef EWMH_DEBUG
+#ifdef JBWM_EWMH_DEBUG
 	dprintf(STDERR_FILENO, "----CLIENTMESSAGE----");
 	jbwm_print_atom(t, __FILE__, __LINE__);
 	jbwm_print_atom(e->data.l[0], __FILE__, __LINE__);
 	jbwm_print_atom(e->data.l[1], __FILE__, __LINE__);
 	jbwm_print_atom(e->data.l[2], __FILE__, __LINE__);
 	jbwm_print_atom(e->data.l[3], __FILE__, __LINE__);
-#endif//EWMH_DEBUG
+#endif//JBWM_EWMH_DEBUG
 	struct JBWMScreen *s = c ? c->screen : jbwm.s;
 	if(c && client_specific_message(e, c, t))
 		  return;

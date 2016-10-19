@@ -11,7 +11,7 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include <X11/Xatom.h>
-Atom ewmh[EWMH_ATOMS_COUNT];
+Atom ewmh[JBWM_EWMH_ATOMS_COUNT];
 static char * atom_names [] = { // This list must match 1:1 with enum
 	"_NET_SUPPORTED",
 	"_NET_CURRENT_DESKTOP",
@@ -55,8 +55,8 @@ static char * atom_names [] = { // This list must match 1:1 with enum
 };
 void ewmh_init(void)
 {
-	LOG("atom_names: %d\n", EWMH_ATOMS_COUNT);
-	XInternAtoms(jbwm.d, atom_names, EWMH_ATOMS_COUNT, false, ewmh);
+	LOG("atom_names: %d\n", JBWM_EWMH_ATOMS_COUNT);
+	XInternAtoms(jbwm.d, atom_names, JBWM_EWMH_ATOMS_COUNT, false, ewmh);
 }
 static uint16_t get_client_count(void)
 {
@@ -122,7 +122,7 @@ __attribute__((nonnull(1)))
 void setup_ewmh_for_screen(struct JBWMScreen * restrict s)
 {
 	jbwm_window_t r = s->root;
-	jbwm_set_property(r, ewmh[SUPPORTED], XA_ATOM, ewmh, EWMH_ATOMS_COUNT);
+	jbwm_set_property(r, ewmh[SUPPORTED], XA_ATOM, ewmh, JBWM_EWMH_ATOMS_COUNT);
 	jbwm_set_property(r, ewmh[WM_NAME], XA_STRING, "jbwm", 4);
 	// Set this to the root window until we have some clients.
 	jbwm_set_property(r, ewmh[CLIENT_LIST], XA_WINDOW, &r, 1);

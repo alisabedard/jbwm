@@ -20,7 +20,7 @@ unsigned long jbwm_get_pixel(const uint8_t screen, const char * restrict name)
 		name, &c, &d);
 	return c.pixel;
 }
-#if defined(EWMH) || defined(MWM)
+#if defined(JBWM_EWMH) || defined(MWM)
 __attribute__((warn_unused_result))
 void *jbwm_get_property(jbwm_window_t w, Atom property, uint16_t * num_items)
 {
@@ -35,7 +35,7 @@ void *jbwm_get_property(jbwm_window_t w, Atom property, uint16_t * num_items)
 	*num_items = n;
 	return prop;
 }
-#endif//EWMH||MWM
+#endif//JBWM_EWMH||MWM
 void jbwm_grab_button(const jbwm_window_t w, const unsigned int mask,
 		 const unsigned int btn)
 {
