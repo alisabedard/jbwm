@@ -243,8 +243,8 @@ int main(
 #endif//USE_ARGV
 {
 	jbwm_set_defaults();
-	jbwm.keymasks.grab = GRAB_MASK;
-	jbwm.keymasks.mod = MOD_MASK;
+	jbwm.keymasks.grab = JBWM_KEYMASK_GRAB;
+	jbwm.keymasks.mod = JBWM_KEYMASK_MOD;
 	parse_argv(argc, argv);
 	if (!(jbwm.d = XOpenDisplay(NULL)))
 		jbwm_error(JBWM_ENV_DISPLAY);

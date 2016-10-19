@@ -32,9 +32,8 @@
 #define JBWM_ENV_FONT "JBWM_FONT"
 #define JBWM_ENV_TERM "JBWM_TERM"
 enum {
-	GRAB_MASK = Mod4Mask,
-	LOCK_MASK = LockMask,
-	MOD_MASK = ControlMask
+	JBWM_KEYMASK_GRAB = Mod4Mask,
+	JBWM_KEYMASK_MOD = ControlMask
 };
 enum {
 	JBWM_SNAP = 12,
