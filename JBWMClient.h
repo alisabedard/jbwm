@@ -27,24 +27,24 @@ struct JBWMClientOptions {
 	bool sticky : 1;
 	bool tearoff : 1;
 };
-#ifdef USE_TBAR
+#ifdef JBWM_USE_TITLE_BAR
 struct JBWMClientTitlebar {
 	jbwm_window_t win, close, resize, shade, stick;
 };
-#endif//USE_TBAR
+#endif//JBWM_USE_TITLE_BAR
 struct JBWMClient {
 	struct JBWMClient *next;
 	struct JBWMScreen *screen;
 	XSizeHints size;
 	jbwm_rectangle_t old_size;
 	jbwm_window_t window, parent;
-#ifdef USE_TBAR
+#ifdef JBWM_USE_TITLE_BAR
 	struct JBWMClientTitlebar tb;
-#endif//USE_TBAR
+#endif//JBWM_USE_TITLE_BAR
 	jbwm_cmap_t cmap;
-#ifdef USE_TBAR
+#ifdef JBWM_USE_TITLE_BAR
 	uint16_t exposed_width;
-#endif//USE_TBAR
+#endif//JBWM_USE_TITLE_BAR
 	int8_t ignore_unmap:3;
 	uint8_t vdesk:4;
 	uint8_t border:1;

@@ -112,7 +112,7 @@ static void jbwm_error(const char * restrict msg)
 	print(1, "\n");
 	exit(1);
 }
-#ifdef USE_TBAR
+#ifdef JBWM_USE_TITLE_BAR
 static void setup_fonts(void)
 {
 	char * font = getenv(JBWM_ENV_FONT);
@@ -126,9 +126,9 @@ static void setup_fonts(void)
 	if (!jbwm.font)
 		jbwm_error(JBWM_ENV_FONT);
 }
-#else//!USE_TBAR
+#else//!JBWM_USE_TITLE_BAR
 #define setup_fonts()
-#endif//USE_TBAR
+#endif//JBWM_USE_TITLE_BAR
 static void setup_event_listeners(const jbwm_window_t root)
 {
 	XChangeWindowAttributes(jbwm.d, root, CWEventMask,
@@ -142,12 +142,12 @@ static void allocate_colors(struct JBWMScreen * restrict s)
 	s->pixels.fg=jbwm_get_pixel(n, getenv(JBWM_ENV_FG));
 	s->pixels.bg=jbwm_get_pixel(n, getenv(JBWM_ENV_BG));
 	s->pixels.fc=jbwm_get_pixel(n, getenv(JBWM_ENV_FC));
-#ifdef USE_TBAR
+#ifdef JBWM_USE_TITLE_BAR
 	s->pixels.close = jbwm_get_pixel(n, getenv(JBWM_ENV_CLOSE));
 	s->pixels.resize = jbwm_get_pixel(n, getenv(JBWM_ENV_RESIZE));
 	s->pixels.shade = jbwm_get_pixel(n, getenv(JBWM_ENV_SHADE));
 	s->pixels.stick = jbwm_get_pixel(n, getenv(JBWM_ENV_STICK));
-#endif//USE_TBAR
+#endif//JBWM_USE_TITLE_BAR
 }
 static bool check_redirect(const jbwm_window_t w)
 {
@@ -188,10 +188,10 @@ static void setup_gc(struct JBWMScreen * restrict s)
 		.subwindow_mode = IncludeInferiors,
 		.line_width = 1
 	};
-#if defined(USE_TBAR) && !defined(JBWM_USE_XFT)
+#if defined(JBWM_USE_TITLE_BAR) && !defined(JBWM_USE_XFT)
 	gv.font = jbwm.font->fid;
 	vm |= GCFont;
-#endif//USE_TBAR&&!JBWM_USE_XFT
+#endif//JBWM_USE_TITLE_BAR&&!JBWM_USE_XFT
 	s->gc = XCreateGC(jbwm.d, s->root, vm, &gv);
 }
 static void setup_screen(const uint8_t i)
@@ -227,13 +227,13 @@ static void jbwm_set_defaults(void)
 	setenv(JBWM_ENV_FC, JBWM_DEF_FC, 0);
 	setenv(JBWM_ENV_BG, JBWM_DEF_BG, 0);
 	setenv(JBWM_ENV_TERM, JBWM_DEF_TERM, 0);
-#ifdef USE_TBAR
+#ifdef JBWM_USE_TITLE_BAR
 	setenv(JBWM_ENV_CLOSE, JBWM_DEF_CLOSE, 0);
 	setenv(JBWM_ENV_RESIZE, JBWM_DEF_RESIZE, 0);
 	setenv(JBWM_ENV_SHADE, JBWM_DEF_SHADE, 0);
 	setenv(JBWM_ENV_STICK, JBWM_DEF_STICK, 0);
 	setenv(JBWM_ENV_FONT, JBWM_DEF_FONT, 0);
-#endif//USE_TBAR
+#endif//JBWM_USE_TITLE_BAR
 }
 int main(
 #ifdef USE_ARGV

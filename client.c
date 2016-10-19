@@ -31,11 +31,11 @@ void jbwm_set_client_vdesk(struct JBWMClient * restrict c, const uint8_t d)
 static struct JBWMClient * search(struct JBWMClient * c,
 	const jbwm_window_t w)
 {
-#ifdef USE_TBAR
+#ifdef JBWM_USE_TITLE_BAR
 	return (!c || c->parent == w || c->window == w || c->tb.win == w)
-#else//!USE_TBAR
+#else//!JBWM_USE_TITLE_BAR
 	return (!c || c->parent == w || c->window == w)
-#endif//USE_TBAR
+#endif//JBWM_USE_TITLE_BAR
 		? c : search(c->next, w);
 }
 // Return the client that has specified window as either window or parent

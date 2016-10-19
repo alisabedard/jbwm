@@ -13,13 +13,13 @@ struct JBWMEnv {
 	// Client tracking:
 	struct JBWMClient * current, * head;
 	struct JBWMScreen * s;
-#ifdef USE_TBAR
+#ifdef JBWM_USE_TITLE_BAR
 #ifdef JBWM_USE_XFT
 	XftFont * font;
 #else//! JBWM_USE_XFT
 	XFontStruct * font;
 #endif//JBWM_USE_XFT
-#endif//USE_TBAR
+#endif//JBWM_USE_TITLE_BAR
 	jbwm_window_t last;
 	struct {
 		uint16_t grab, mod;

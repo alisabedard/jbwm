@@ -112,12 +112,12 @@ static void iteration(void)
 		if(c && (ev.xcrossing.window == c->parent))
 			  jbwm_select_client(c);
 		break;
-#ifdef USE_TBAR
+#ifdef JBWM_USE_TITLE_BAR
 	case Expose:
 		if (c && !ev.xexpose.count)
 			  jbwm_update_title_bar(c);
 		break;
-#endif//USE_TBAR
+#endif//JBWM_USE_TITLE_BAR
 #ifdef JBWM_USE_EWMH
 	case CreateNotify:
 	case DestroyNotify:

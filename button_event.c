@@ -8,7 +8,7 @@
 #include "log.h"
 #include "screen.h"
 #include "title_bar.h"
-#ifdef USE_TBAR
+#ifdef JBWM_USE_TITLE_BAR
 static void handle_title_bar_button(XButtonEvent * restrict e,
 	struct JBWMClient * restrict c)
 {
@@ -25,9 +25,9 @@ static void handle_title_bar_button(XButtonEvent * restrict e,
 	else
 		jbwm_drag(c, false);
 }
-#else//!USE_TBAR
+#else//!JBWM_USE_TITLE_BAR
 #define handle_title_bar_button(e, c) jbwm_drag(c, false)
-#endif//USE_TBAR
+#endif//JBWM_USE_TITLE_BAR
 void jbwm_handle_button_event(XButtonEvent * restrict e,
 	struct JBWMClient * restrict c)
 {
