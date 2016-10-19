@@ -6,12 +6,12 @@
 #define JBWM_CONFIG_H
 #define JBWM_DEF_TERM "xterm"
 /* Default fonts */
-#ifdef USE_XFT
+#ifdef JBWM_USE_XFT
 #define JBWM_DEF_FONT "Sans"
 #define JBWM_FONT_SIZE 10.0
-#else /* ! USE_XFT */
+#else /* ! JBWM_USE_XFT */
 #define JBWM_DEF_FONT "variable"
-#endif /* USE_XFT */
+#endif /* JBWM_USE_XFT */
 /* Default colors */
 #define JBWM_DEF_FG "#ddd"
 #define JBWM_DEF_FC "#8f8"

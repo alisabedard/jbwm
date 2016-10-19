@@ -116,13 +116,13 @@ static void jbwm_error(const char * restrict msg)
 static void setup_fonts(void)
 {
 	char * font = getenv(JBWM_ENV_FONT);
-#ifdef USE_XFT
+#ifdef JBWM_USE_XFT
 	jbwm.font = XftFontOpen(jbwm.d, DefaultScreen(jbwm.d),
 		XFT_FAMILY, XftTypeString, font, XFT_SIZE,
 		XftTypeDouble, JBWM_FONT_SIZE, NULL);
-#else//!USE_XFT
+#else//!JBWM_USE_XFT
 	jbwm.font = XLoadQueryFont(jbwm.d, font);
-#endif//USE_XFT
+#endif//JBWM_USE_XFT
 	if (!jbwm.font)
 		jbwm_error(JBWM_ENV_FONT);
 }
@@ -188,10 +188,10 @@ static void setup_gc(struct JBWMScreen * restrict s)
 		.subwindow_mode = IncludeInferiors,
 		.line_width = 1
 	};
-#if defined(USE_TBAR) && !defined(USE_XFT)
+#if defined(USE_TBAR) && !defined(JBWM_USE_XFT)
 	gv.font = jbwm.font->fid;
 	vm |= GCFont;
-#endif//USE_TBAR&&!USE_XFT
+#endif//USE_TBAR&&!JBWM_USE_XFT
 	s->gc = XCreateGC(jbwm.d, s->root, vm, &gv);
 }
 static void setup_screen(const uint8_t i)

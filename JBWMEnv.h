@@ -5,20 +5,20 @@
 #ifndef JBWM_ENVIRONMENT_H
 #define JBWM_ENVIRONMENT_H
 #include "JBWMClient.h"
-#ifdef USE_XFT
+#ifdef JBWM_USE_XFT
 #include <X11/Xft/Xft.h>
-#endif//USE_XFT
+#endif//JBWM_USE_XFT
 struct JBWMEnv {
 	Display * d;
 	// Client tracking:
 	struct JBWMClient * current, * head;
 	struct JBWMScreen * s;
 #ifdef USE_TBAR
-#ifdef USE_XFT
+#ifdef JBWM_USE_XFT
 	XftFont * font;
-#else//! USE_XFT
+#else//! JBWM_USE_XFT
 	XFontStruct * font;
-#endif//USE_XFT
+#endif//JBWM_USE_XFT
 #endif//USE_TBAR
 	jbwm_window_t last;
 	struct {

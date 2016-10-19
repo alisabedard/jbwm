@@ -1,5 +1,5 @@
 # Titlebar Xft support:
-CFLAGS+=-DUSE_XFT
+CFLAGS+=-DJBWM_USE_XFT
 CFLAGS+=`pkg-config --cflags xft`
 LDFLAGS+=-lXft
 # NetBSD:

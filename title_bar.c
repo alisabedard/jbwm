@@ -9,10 +9,10 @@
 #include "screen.h"
 #include "util.h"
 #include <X11/Xatom.h>
-#ifdef USE_XFT
+#ifdef JBWM_USE_XFT
 #include "config.h"
 #include <X11/Xft/Xft.h>
-#endif//USE_XFT
+#endif//JBWM_USE_XFT
 void jbwm_toggle_shade(struct JBWMClient * restrict c)
 {
 	// Honor !MWM_FUNC_MINIMIZE
@@ -71,7 +71,7 @@ static jbwm_window_t new_title_bar(struct JBWMClient * restrict c)
 #endif//JBWM_USE_EWMH
 	return t;
 }
-#ifdef USE_XFT
+#ifdef JBWM_USE_XFT
 static void
 draw_xft(struct JBWMClient * restrict c, const XPoint * restrict p,
 	 char * restrict name, const size_t l)
@@ -93,7 +93,7 @@ draw_xft(struct JBWMClient * restrict c, const XPoint * restrict p,
 	XftDrawDestroy(xd);
 	XftColorFree(jbwm.d, v, cm, &color);
 }
-#endif//USE_XFT
+#endif//JBWM_USE_XFT
 static void draw_title(struct JBWMClient * restrict c)
 {
 	char * name = jbwm_get_title(c->window);
@@ -102,12 +102,12 @@ static void draw_title(struct JBWMClient * restrict c)
 	size_t l = 0; // strlen
 	while(name[++l])
 		  ;
-#ifdef USE_XFT
+#ifdef JBWM_USE_XFT
 	draw_xft(c, &p, name, l);
-#else//!USE_XFT
+#else//!JBWM_USE_XFT
 	XDrawString(jbwm.d, c->tb.win, c->screen->gc,
 		p.x, p.y, name, l);
-#endif//USE_XFT
+#endif//JBWM_USE_XFT
 	XFree(name);
 }
 static void remove_title_bar(struct JBWMClient * restrict c)
