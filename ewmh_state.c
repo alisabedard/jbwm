@@ -54,7 +54,7 @@ void jbwm_ewmh_add_state(const Window w, Atom state)
   data.l[3] = source indication
   other data.l[] elements = 0 */
 static void set_state(struct JBWMClient * restrict c,
-	const bool add, const JBWMAtomIndex t)
+	const bool add, const enum JBWMAtomIndex t)
 {
 	if (!c)
 		return;
@@ -86,7 +86,7 @@ static void set_state(struct JBWMClient * restrict c,
 }
 __attribute__((nonnull(1,3)))
 static void check_state(XClientMessageEvent * e,	// event data
-			const JBWMAtomIndex t,	// state to test
+			const enum JBWMAtomIndex t,	// state to test
 			struct JBWMClient *c)
 {
 	const Atom state = ewmh[t];
