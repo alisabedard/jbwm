@@ -23,7 +23,7 @@ void jbwm_set_shape(struct JBWMClient * c)
 			1, 1, c->window, ShapeBounding, ShapeSet);
 	}
 }
-void jbwm_set_up_shaped_client(struct JBWMClient * c)
+void jbwm_new_shaped_client(struct JBWMClient * c)
 {
 	if (is_shaped(c)) {
 		JBWM_LOG("Window %d is shaped", (int)c->window);

@@ -87,7 +87,7 @@ __attribute__((nonnull))
 static void reparent(struct JBWMClient * c) // use of restrict here is a bug
 {
 	JBWM_LOG("reparent()");
-	jbwm_set_up_shaped_client(c);
+	jbwm_new_shaped_client(c);
 	const jbwm_window_t p = c->parent = get_parent(c), w = c->window;
 	XAddToSaveSet(jbwm.d, w);
 	XReparentWindow(jbwm.d, w, p, 0, 0);
