@@ -168,7 +168,7 @@ static void iteration(void)
 		jbwm.last=0; // Fix ignoring every other new window
 	}
 }
-void main_event_loop(void)
+void jbwm_event_loop(void)
 {
 	for(;;)
 		iteration();

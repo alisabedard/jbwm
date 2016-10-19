@@ -258,6 +258,6 @@ int main(
 	jbwm.s = s;
 	while (i--)
 		setup_screen(i);
-	main_event_loop();
+	jbwm_event_loop();
 	return 0;
 }
