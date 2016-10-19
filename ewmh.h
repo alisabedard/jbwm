@@ -4,7 +4,7 @@
 // See README for license and other details.
 #ifndef JBWM_EWMH_H
 #define JBWM_EWMH_H
-#ifdef JBWM_EWMH
+#ifdef JBWM_USE_EWMH
 #include "JBWMClient.h"
 void ewmh_update_client_list(void);
 void set_ewmh_allowed_actions(const jbwm_window_t w);
@@ -33,10 +33,10 @@ WM_STATE, WM_STATE_STICKY, WM_STATE_MAXIMIZED_VERT,
     JBWM_EWMH_ATOMS_COUNT
 } AtomIndex;
 extern Atom ewmh[];
-#else//!JBWM_EWMH
+#else//!JBWM_USE_EWMH
 #define ewmh_update_client_list()
 #define set_ewmh_allowed_actions(w)
 #define setup_ewmh_for_screen(s)
 #define ewmh_init()
-#endif//JBWM_EWMH
+#endif//JBWM_USE_EWMH
 #endif//!JBWM_EWMH_H

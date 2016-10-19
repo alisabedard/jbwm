@@ -26,9 +26,9 @@ struct JBWMScreen {
 	union {
 		jbwm_window_t root, r;
 	};
-#ifdef JBWM_EWMH
+#ifdef JBWM_USE_EWMH
 	jbwm_window_t supporting;
-#endif//JBWM_EWMH
+#endif//JBWM_USE_EWMH
 	struct JBWMPixels pixels;
 	struct JBWMSize size;
 	uint8_t screen, vdesk;
