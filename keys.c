@@ -55,12 +55,12 @@ static void handle_key_move(struct JBWMClient * restrict c,
 		return;
 	struct KeyMoveFlags f = {.mod = mod, .pos = true};
 	switch (k) {
-	case KEY_LEFT:
+	case JBWM_KEY_LEFT:
 		f.pos = false;
-	case KEY_RIGHT:
+	case JBWM_KEY_RIGHT:
 		f.horz = true;
 		break;
-	case KEY_UP:
+	case JBWM_KEY_UP:
 		f.pos = false;
 	}
 	key_move(c, f);
@@ -87,47 +87,47 @@ static void handle_client_key_event(const bool mod,
 	LOG("handle_client_key_event: %d", (int)key);
 	if (c->opt.fullscreen) {
 		// only allow exiting from fullscreen
-		if (key == KEY_FS) {
+		if (key == JBWM_KEY_FS) {
 			jbwm_set_not_fullscreen(c);
 		}
 		return; // prevent other operations while fullscreen
 	}
 	switch (key) {
-	case KEY_LEFT:
-	case KEY_RIGHT:
-	case KEY_UP:
-	case KEY_DOWN:
+	case JBWM_KEY_LEFT:
+	case JBWM_KEY_RIGHT:
+	case JBWM_KEY_UP:
+	case JBWM_KEY_DOWN:
 		handle_key_move(c, key, mod);
 		break;
-	case KEY_KILL:
+	case JBWM_KEY_KILL:
 		jbwm_send_wm_delete(c);
 		break;
-	case KEY_LOWER:
-	case KEY_ALTLOWER:
+	case JBWM_KEY_LOWER:
+	case JBWM_KEY_ALTLOWER:
 		XLowerWindow(jbwm.d, c->parent);
 		break;
-	case KEY_RAISE:
+	case JBWM_KEY_RAISE:
 		XRaiseWindow(jbwm.d, c->parent);
 		break;
-	case KEY_FS:
+	case JBWM_KEY_FS:
 		jbwm_set_fullscreen(c);
 		break;
-	case KEY_MAX:
+	case JBWM_KEY_MAX:
 		toggle_maximize(c);
 		break;
-	case KEY_MAX_H:
+	case JBWM_KEY_MAX_H:
 		(c->opt.max_horz ? jbwm_set_not_horz : jbwm_set_horz)(c);
 		break;
-	case KEY_MAX_V:
+	case JBWM_KEY_MAX_V:
 		(c->opt.max_vert ? jbwm_set_not_vert : jbwm_set_vert)(c);
 		break;
-	case KEY_STICK:
+	case JBWM_KEY_STICK:
 		jbwm_toggle_sticky(c);
 		break;
-	case KEY_MOVE:
+	case JBWM_KEY_MOVE:
 		jbwm_drag(c, false);
 		break;
-	case KEY_SHADE:
+	case JBWM_KEY_SHADE:
 		jbwm_toggle_shade(c);
 		break;
 	}
@@ -181,12 +181,12 @@ void jbwm_handle_key_event(XKeyEvent * e)
 		bool zero:1;
 	} opt = {s->vdesk, e->state & jbwm.keymasks.mod, 0};
 	switch (key) {
-	case KEY_NEW:
+	case JBWM_KEY_NEW:
 		start_terminal();
 		break;
-	case KEY_QUIT:
+	case JBWM_KEY_QUIT:
 		exit(0);
-	case KEY_NEXT:
+	case JBWM_KEY_NEXT:
 		next();
 		break;
 	case XK_0:
@@ -196,10 +196,10 @@ void jbwm_handle_key_event(XKeyEvent * e)
 		// First desktop 0, per wm-spec
 		cond_client_to_desk(c, s, opt.zero ? 10 : key - XK_1, opt.mod);
 		break;
-	case KEY_PREVDESK:
+	case JBWM_KEY_PREVDESK:
 		cond_client_to_desk(c, s, s->vdesk - 1, opt.mod);
 		break;
-	case KEY_NEXTDESK:
+	case JBWM_KEY_NEXTDESK:
 		cond_client_to_desk(c, s, s->vdesk + 1, opt.mod);
 		break;
 	default:
@@ -216,7 +216,7 @@ static void grab(struct JBWMScreen * restrict s, KeySym * restrict ks,
 			 jbwm.keymasks.grab | mask, s->root, true,
 			 GrabModeAsync, GrabModeAsync);
 }
-void grab_keys_for_screen(struct JBWMScreen * restrict s)
+void jbwm_grab_screen_keys(struct JBWMScreen * restrict s)
 {
 	grab(s, (KeySym[]){JBWM_KEYS_TO_GRAB}, 0);
 	grab(s, (KeySym[]){JBWM_ALT_KEYS_TO_GRAB}, jbwm.keymasks.mod);
