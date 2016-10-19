@@ -26,13 +26,13 @@ void jbwm_toggle_shade(struct JBWMClient * restrict c)
 		c->opt.shaded = false;
 		jbwm_move_resize(c);
 		jbwm_set_wm_state(c, NormalState);
-		ewmh_remove_state(c->window, ewmh[WM_STATE_SHADED]);
+		jbwm_ewmh_remove_state(c->window, ewmh[WM_STATE_SHADED]);
 	} else {		// Shade the client
 		c->old_size.height = c->size.height;
 		c->size.height = -1;
 		c->opt.shaded = true;
 		jbwm_set_wm_state(c, IconicState);
-		ewmh_add_state(c->window, ewmh[WM_STATE_SHADED]);
+		jbwm_ewmh_add_state(c->window, ewmh[WM_STATE_SHADED]);
 		jbwm_select_client(c);
 	}
 	jbwm_update_titlebar(c);

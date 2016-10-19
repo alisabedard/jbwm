@@ -155,7 +155,7 @@ static void iteration(void)
 		break;
 #ifdef JBWM_USE_EWMH
 	case ClientMessage:
-		ewmh_client_message(&ev.xclient, c);
+		jbwm_ewmh_handle_client_message(&ev.xclient, c);
 		break;
 #endif//JBWM_USE_EWMH
 #ifdef EVENT_DEBUG

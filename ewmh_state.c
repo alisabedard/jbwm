@@ -9,7 +9,7 @@
 #include "util.h"
 #include <X11/Xatom.h>
 // Remove specified atom from WM_STATE
-void ewmh_remove_state(const Window w, const Atom state)
+void jbwm_ewmh_remove_state(const Window w, const Atom state)
 {
 	uint16_t n;
 	Atom *a = jbwm_get_property(w, ewmh[WM_STATE], &n);
@@ -35,7 +35,7 @@ static bool ewmh_get_state(const Window w, const Atom state)
 	}
 	return found;
 }
-void ewmh_add_state(const Window w, Atom state)
+void jbwm_ewmh_add_state(const Window w, Atom state)
 {
 	XChangeProperty(jbwm.d, w, ewmh[WM_STATE],
 		XA_ATOM, 32, PropModePrepend,
@@ -98,16 +98,16 @@ static void check_state(XClientMessageEvent * e,	// event data
 	default:
 	case 0:	// remove
 		set_state(c, false, t);
-		ewmh_remove_state(e->window, state);
+		jbwm_ewmh_remove_state(e->window, state);
 		break;
 	case 1:	// add
 		set_state(c, true, t);
-		ewmh_add_state(e->window, state);
+		jbwm_ewmh_add_state(e->window, state);
 		break;
 	case 2:{	// toggle
 			const bool add = !ewmh_get_state(e->window, state);
 			set_state(c, add, t);
-			(add ? ewmh_add_state : ewmh_remove_state)
+			(add ? jbwm_ewmh_add_state : jbwm_ewmh_remove_state)
 				(e->window, state);
 		}
 	}
@@ -154,7 +154,7 @@ static void handle_moveresize(XClientMessageEvent * restrict e)
 		.width = e->data.l[3],
 		.height = e->data.l[4]});
 }
-void ewmh_client_message(XClientMessageEvent * restrict e,
+void jbwm_ewmh_handle_client_message(XClientMessageEvent * restrict e,
 	struct JBWMClient * restrict c)
 {
 	const Atom t = e->message_type;

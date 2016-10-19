@@ -123,13 +123,13 @@ static void hide(struct JBWMClient * restrict c)
 {
 	XUnmapWindow(jbwm.d, c->parent);
 	jbwm_set_wm_state(c, IconicState);
-	ewmh_add_state(c->window, ewmh[WM_STATE_HIDDEN]);
+	jbwm_ewmh_add_state(c->window, ewmh[WM_STATE_HIDDEN]);
 }
 void jbwm_restore_client(struct JBWMClient * restrict c)
 {
 	XMapWindow(jbwm.d, c->parent);
 	jbwm_set_wm_state(c, NormalState);
-	ewmh_remove_state(c->window, ewmh[WM_STATE_HIDDEN]);
+	jbwm_ewmh_remove_state(c->window, ewmh[WM_STATE_HIDDEN]);
 }
 static void check_visibility(struct JBWMScreen * s,
 	struct JBWMClient * restrict c, const uint8_t v)

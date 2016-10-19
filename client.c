@@ -49,7 +49,7 @@ static void unselect_current(void)
 	XSetWindowBorder(jbwm.d, jbwm.current->parent,
 		jbwm.current->screen->pixels.bg);
 #ifdef JBWM_USE_EWMH
-	ewmh_remove_state(jbwm.current->window, ewmh[WM_STATE_FOCUSED]);
+	jbwm_ewmh_remove_state(jbwm.current->window, ewmh[WM_STATE_FOCUSED]);
 #endif//JBWM_USE_EWMH
 }
 static void set_border(struct JBWMClient * restrict c)
@@ -69,7 +69,7 @@ void jbwm_select_client(struct JBWMClient * c)
 #ifdef JBWM_USE_EWMH
 	jbwm_set_property(c->screen->root, ewmh[ACTIVE_WINDOW],
 		XA_WINDOW, &(c->parent), 1);
-	ewmh_add_state(c->window, ewmh[WM_STATE_FOCUSED]);
+	jbwm_ewmh_add_state(c->window, ewmh[WM_STATE_FOCUSED]);
 #endif//JBWM_USE_EWMH
 }
 void jbwm_toggle_sticky(struct JBWMClient * c)
@@ -79,7 +79,7 @@ void jbwm_toggle_sticky(struct JBWMClient * c)
 	jbwm_select_client(c);
 	jbwm_update_titlebar(c);
 #ifdef JBWM_USE_EWMH
-	(c->opt.sticky ? ewmh_add_state : ewmh_remove_state)(c->window,
+	(c->opt.sticky ? jbwm_ewmh_add_state : jbwm_ewmh_remove_state)(c->window,
 		ewmh[WM_STATE_STICKY]);
 #endif//JBWM_USE_EWMH
 }
