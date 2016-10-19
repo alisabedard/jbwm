@@ -12,9 +12,10 @@ unsigned long jbwm_get_pixel(const uint8_t screen,
 	const char * restrict name);
 #if defined(EWMH) || defined(MWM)
 // Free the result with XFree
-void * jbwm_get_property(Window w, Atom property, uint16_t * num_items);
+void * jbwm_get_property(const jbwm_window_t w,
+	Atom property, uint16_t * num_items);
 #endif//EWMH||MWM
-void jbwm_grab_button(const Window w, const unsigned int mask,
+void jbwm_grab_button(const jbwm_window_t w, const unsigned int mask,
 		 const unsigned int btn);
 #ifdef DEBUG
 void jbwm_print_atom(const Atom a, const char * src, const uint16_t line);

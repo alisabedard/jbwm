@@ -24,18 +24,21 @@ unsigned long jbwm_get_pixel(const uint8_t screen, const char * restrict name)
 }
 #if defined(EWMH) || defined(MWM)
 __attribute__((warn_unused_result))
-void *jbwm_get_property(Window w, Atom property, uint16_t * num_items)
+void *jbwm_get_property(jbwm_window_t w, Atom property, uint16_t * num_items)
 {
 	unsigned char * prop;
-	long unsigned int n, b;
-	int d;
-	XGetWindowProperty(jbwm.d, w, property, 0, 1024, false,
-		AnyPropertyType, &property, &d, &n, &b, &prop);
+	long unsigned int n;
+	{
+		long unsigned int b;
+		int d;
+		XGetWindowProperty(jbwm.d, w, property, 0, 1024, false,
+			AnyPropertyType, &property, &d, &n, &b, &prop);
+	}
 	*num_items = n;
 	return prop;
 }
 #endif//EWMH||MWM
-void jbwm_grab_button(const Window w, const unsigned int mask,
+void jbwm_grab_button(const jbwm_window_t w, const unsigned int mask,
 		 const unsigned int btn)
 {
 	XGrabButton(jbwm.d, btn, mask, w, false,
