@@ -53,7 +53,7 @@ static char * atom_names [] = { // This list must match 1:1 with enum
 	"_NET_WM_STATE_BELOW",
 	"_NET_WM_STATE_FOCUSED",
 };
-void ewmh_init(void)
+void jbwm_ewmh_init(void)
 {
 	LOG("atom_names: %d\n", JBWM_EWMH_ATOMS_COUNT);
 	XInternAtoms(jbwm.d, atom_names, JBWM_EWMH_ATOMS_COUNT, false, ewmh);
@@ -66,7 +66,7 @@ static uint16_t get_client_count(void)
 		i = i->next, ++j);
 	return j;
 }
-void ewmh_update_client_list(void)
+void jbwm_ewmh_update_client_list(void)
 {
 	jbwm_window_t wl[get_client_count()];
 	size_t wl_sz = 0;
@@ -86,7 +86,7 @@ static void set_root_vdesk(jbwm_window_t r)
 		(&(long[]){0, 0}), 2);
 	jbwm_set_property(r, ewmh[VIRTUAL_ROOTS], XA_WINDOW, &r, 1);
 }
-void set_ewmh_allowed_actions(const jbwm_window_t w)
+void jbwm_ewmh_set_allowed_actions(const jbwm_window_t w)
 {
 	Atom a[] = {
 		ewmh[WM_ALLOWED_ACTIONS],
@@ -119,7 +119,7 @@ static jbwm_window_t init_supporting(const jbwm_window_t r)
 	return w;
 }
 __attribute__((nonnull(1)))
-void setup_ewmh_for_screen(struct JBWMScreen * restrict s)
+void jbwm_ewmh_init_screen(struct JBWMScreen * restrict s)
 {
 	jbwm_window_t r = s->root;
 	jbwm_set_property(r, ewmh[SUPPORTED], XA_ATOM, ewmh, JBWM_EWMH_ATOMS_COUNT);

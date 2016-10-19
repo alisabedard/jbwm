@@ -108,7 +108,7 @@ static void do_grabs(const jbwm_window_t w)
 	XSelectInput(jbwm.d, w, EnterWindowMask
 		| PropertyChangeMask | ColormapChangeMask);
 	jbwm_grab_button(w, jbwm.keymasks.grab, AnyButton);
-	set_ewmh_allowed_actions(w);
+	jbwm_ewmh_set_allowed_actions(w);
 }
 void jbwm_new_client(const jbwm_window_t w, struct JBWMScreen * s)
 {

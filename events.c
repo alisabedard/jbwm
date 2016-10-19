@@ -121,7 +121,7 @@ static void iteration(void)
 #ifdef JBWM_USE_EWMH
 	case CreateNotify:
 	case DestroyNotify:
-		ewmh_update_client_list();
+		jbwm_ewmh_update_client_list();
 		break;
 #endif//JBWM_USE_EWMH
 	case UnmapNotify:
