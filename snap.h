@@ -6,12 +6,12 @@
 #define JBWM_SNAP_H
 #ifdef USE_SNAP
 #include "JBWMClient.h"
-void snap_border(struct JBWMClient * restrict c)
+void jbwm_snap_border(struct JBWMClient * restrict c)
 	__attribute__((nonnull));
-void snap_client(struct JBWMClient * c)
+void jbwm_snap_client(struct JBWMClient * c)
 	__attribute__((nonnull));
 #else//!USE_SNAP
-#define snap_border(c)
-#define snap_client(c)
+#define jbwm_snap_border(c)
+#define jbwm_snap_client(c)
 #endif//USE_SNAP
 #endif//JBWM_SNAP_H

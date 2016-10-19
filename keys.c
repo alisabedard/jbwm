@@ -26,7 +26,7 @@ static void point(struct JBWMClient * restrict c, const int16_t x,
 __attribute__((nonnull(1)))
 static void commit_key_move(struct JBWMClient * restrict c)
 {
-	snap_border(c);
+	jbwm_snap_border(c);
 	jbwm_move_resize(c);
 	point(c, 1, 1);
 }

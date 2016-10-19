@@ -62,7 +62,7 @@ static void set_position(struct JBWMClient * restrict c,
 {
 	c->size.x = old.x - start.x + x;
 	c->size.y = old.y - start.y + y;
-	snap_client(c);
+	jbwm_snap_client(c);
 }
 static void do_changes(struct JBWMClient * restrict c, const bool resize,
 	const jbwm_point_t start, const jbwm_point_t original,
