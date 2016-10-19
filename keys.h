@@ -8,6 +8,8 @@
 #include <X11/keysym.h>
 void jbwm_handle_key_event(XKeyEvent * restrict e)
 	__attribute__((nonnull));
+void jbwm_grab_screen_keys(struct JBWMScreen * restrict s)
+	__attribute__((nonnull));
 enum { JBWM_KEY_NEXT=XK_Tab, JBWM_KEY_NEW=XK_Return, JBWM_KEY_QUIT=XK_Escape,
 	JBWM_KEY_TOPLEFT=XK_KP_Home, JBWM_KEY_TOPRIGHT=XK_KP_Page_Up,
 	JBWM_KEY_BOTTOMLEFT=XK_KP_End, JBWM_KEY_BOTTOMRIGHT=XK_KP_Page_Down,
@@ -37,6 +39,4 @@ enum { JBWM_KEY_NEXT=XK_Tab, JBWM_KEY_NEW=XK_Return, JBWM_KEY_QUIT=XK_Escape,
 	JBWM_KEY_MAX_H, JBWM_KEY_MAX_V, JBWM_KEY_FS, 0
 #define JBWM_ALT_KEYS_TO_GRAB JBWM_KEY_KILL, JBWM_DIRECTION_KEYS,\
 	JBWM_VWM_KEYS, 0
-void jbwm_grab_screen_keys(struct JBWMScreen * restrict s)
-	__attribute__((nonnull));
 #endif /* JBWM_KEYS_H */
