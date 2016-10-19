@@ -48,7 +48,7 @@ static void set_frame_extents(struct JBWMClient * c)
 __attribute__((nonnull))
 static void init_properties(struct JBWMClient * c)
 {
-	handle_mwm_hints(c);
+	jbwm_handle_mwm_hints(c);
 	c->vdesk = c->screen->vdesk;
 	c->vdesk = wm_desktop(c->window, c->vdesk);
 }

@@ -6,8 +6,8 @@
 #define JBWM_MWM_H
 #ifdef MWM
 #include "JBWMClient.h"
-void handle_mwm_hints(struct JBWMClient * c);
+void jbwm_handle_mwm_hints(struct JBWMClient * c);
 #else//!MWM
-#define handle_mwm_hints(c)
+#define jbwm_handle_mwm_hints(c)
 #endif//MWM
 #endif//!JBWM_MWM_H
