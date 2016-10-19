@@ -117,7 +117,7 @@ void jbwm_move_resize(struct JBWMClient * restrict c)
 	if(offset) { // Leave braces in case titlebar support was disabled.
 		jbwm_update_titlebar(c);
 	} // Skip shaped and fullscreen clients.
-	set_shape(c);
+	jbwm_set_shape(c);
 }
 static void hide(struct JBWMClient * restrict c)
 {

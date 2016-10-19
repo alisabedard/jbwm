@@ -15,7 +15,7 @@ static bool is_shaped(struct JBWMClient * c)
 	return XShapeQueryExtents(jbwm.d, c->window, &s, &d, &d,
 		&u, &u, &d, &d, &d, &u, &u) && s;
 }
-void set_shape(struct JBWMClient * c)
+void jbwm_set_shape(struct JBWMClient * c)
 {
 	if(c->opt.shaped) {
 		LOG("XShapeCombineShape: %d", (int)c->window);
@@ -23,7 +23,7 @@ void set_shape(struct JBWMClient * c)
 			1, 1, c->window, ShapeBounding, ShapeSet);
 	}
 }
-void setup_shaped(struct JBWMClient * c)
+void jbwm_set_up_shaped_client(struct JBWMClient * c)
 {
 	if (is_shaped(c)) {
 		LOG("Window %d is shaped", (int)c->window);

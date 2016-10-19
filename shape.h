@@ -4,14 +4,14 @@
 // See README for license and other details.
 #ifndef JBWM_SHAPE_H
 #define JBWM_SHAPE_H
-#ifdef USE_SHAPE
+#ifdef JBWM_USE_SHAPE
 #include "JBWMClient.h"
-void setup_shaped(struct JBWMClient * c)
+void jbwm_set_up_shaped_client(struct JBWMClient * c)
 	__attribute__((nonnull));
-void set_shape(struct JBWMClient * c)
+void jbwm_set_shape(struct JBWMClient * c)
 	__attribute__((nonnull));
-#else//!USE_SHAPE
-#define setup_shaped(c)
-#define set_shape(c)
-#endif//USE_SHAPE
+#else//!JBWM_USE_SHAPE
+#define jbwm_set_up_shaped_client(c)
+#define jbwm_set_shape(c)
+#endif//JBWM_USE_SHAPE
 #endif//!JBWM_SHAPE_H
