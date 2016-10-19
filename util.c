@@ -4,8 +4,6 @@
 // See README for license and other details.
 #include "util.h"
 #include "JBWMEnv.h"
-#include <string.h>
-#include <unistd.h>
 void jbwm_set_property(const jbwm_window_t win,
 	const jbwm_atom_t property, const jbwm_atom_t type,
 	void * restrict data, int16_t size)
