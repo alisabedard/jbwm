@@ -128,7 +128,7 @@ static bool client_specific_message(XClientMessageEvent * restrict e,
 {
 	if (t == ewmh[WM_DESKTOP])
 		jbwm_set_client_vdesk(c, e->data.l[0]);
-	// If user moves window (client-side titlebars):
+	// If user moves window (client-side title bars):
 	else if (t == ewmh[WM_MOVERESIZE]) {
 		XRaiseWindow(jbwm.d, c->parent);
 		jbwm_drag(c, false);

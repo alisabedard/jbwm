@@ -2,7 +2,7 @@
 // Copyright 2008-2016, Jeffrey E. Bedard <jefbed@gmail.com>
 // Copyright 1999-2015, Ciaran Anscomb <jbwm@6809.org.uk>
 // See README for license and other details.
-#include "titlebar.h"
+#include "title_bar.h"
 #include "client.h"
 #include "ewmh.h"
 #include "ewmh_state.h"
@@ -35,7 +35,7 @@ void jbwm_toggle_shade(struct JBWMClient * restrict c)
 		jbwm_ewmh_add_state(c->window, ewmh[WM_STATE_SHADED]);
 		jbwm_select_client(c);
 	}
-	jbwm_update_titlebar(c);
+	jbwm_update_title_bar(c);
 }
 static uint16_t mv(const jbwm_window_t w, uint16_t x)
 {
@@ -52,7 +52,7 @@ static jbwm_window_t get_win(const Window p, const jbwm_pixel_t bg)
 {
 	return XCreateSimpleWindow(jbwm.d, p, 0, 0, TDIM, TDIM, 0, 0, bg);
 }
-static jbwm_window_t new_titlebar(struct JBWMClient * restrict c)
+static jbwm_window_t new_title_bar(struct JBWMClient * restrict c)
 {
 	const struct JBWMPixels * p = &c->screen->pixels;
 	const jbwm_window_t t = c->tb.win = get_win(c->parent, p->bg);
@@ -111,7 +111,7 @@ static void draw_title(struct JBWMClient * restrict c)
 #endif//USE_XFT
 	XFree(name);
 }
-static void remove_titlebar(struct JBWMClient * restrict c)
+static void remove_title_bar(struct JBWMClient * restrict c)
 {
 	c->ignore_unmap++;
 	XDestroyWindow(jbwm.d, c->tb.win);
@@ -123,18 +123,18 @@ static void remove_titlebar(struct JBWMClient * restrict c)
 		(&(jbwm_atom_t[]){b, b, b, b}), 4);
 #endif//JBWM_USE_EWMH
 }
-void jbwm_update_titlebar(struct JBWMClient * c)
+void jbwm_update_title_bar(struct JBWMClient * c)
 {
 	if (c->opt.shaped)
 		return;
 	jbwm_window_t w = c->tb.win;
 	if (c->opt.fullscreen && w) {
-		remove_titlebar(c);
+		remove_title_bar(c);
 		return;
 	}
 	if (!w)
-		w = new_titlebar(c);
-	/* Expand/Contract the titlebar width as necessary:  */
+		w = new_title_bar(c);
+	/* Expand/Contract the title_bar width as necessary:  */
 	{
 		const uint16_t width = c->size.width;
 		XResizeWindow(jbwm.d, w, width, TDIM);
@@ -142,6 +142,6 @@ void jbwm_update_titlebar(struct JBWMClient * c)
 	}
 	XClearWindow(jbwm.d, w);
 	draw_title(c);
-	if (c->opt.no_titlebar)
-		remove_titlebar(c);
+	if (c->opt.no_title_bar)
+		remove_title_bar(c);
 }

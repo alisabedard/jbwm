@@ -1,2 +1,2 @@
 CFLAGS+=-DUSE_TBAR
-OBJS+=titlebar.o
+OBJS+=title_bar.o

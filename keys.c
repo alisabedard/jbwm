@@ -10,7 +10,7 @@
 #include "max.h"
 #include "screen.h"
 #include "snap.h"
-#include "titlebar.h"
+#include "title_bar.h"
 #include "util.h"
 #include <stdio.h>
 #include <stdlib.h>

@@ -5,7 +5,7 @@
 #include "JBWMEnv.h"
 #include "log.h"
 #include "screen.h"
-#include "titlebar.h"
+#include "title_bar.h"
 /* In this file, the static companion functions perform the requested option
    directly, while the global functions call the corresponding static
    function and perform sanity checks and adjustments.  */
@@ -72,7 +72,7 @@ void jbwm_set_vert(struct JBWMClient * restrict c)
 	set_vert(c);
 	// Offset to hide borders:
 	c->size.height -= c->border << 1;
-	if (!c->opt.no_titlebar) {
+	if (!c->opt.no_title_bar) {
 		c->size.y += TDIM + c->border;
 		c->size.height -= TDIM + (c->border << 1);
 	}
@@ -85,7 +85,7 @@ static void set_not_fullscreen(struct JBWMClient * restrict c)
 	set_not_vert(c);
 	XSetWindowBorderWidth(jbwm.d, c->parent, c->border);
 	jbwm_ewmh_remove_state(c->window, ewmh[WM_STATE_FULLSCREEN]);
-	jbwm_update_titlebar(c);
+	jbwm_update_title_bar(c);
 }
 void jbwm_set_not_fullscreen(struct JBWMClient * restrict c)
 {
@@ -109,7 +109,7 @@ static void set_fullscreen(struct JBWMClient * restrict c)
 	set_vert(c);
 	XSetWindowBorderWidth(jbwm.d, c->parent, 0);
 	jbwm_ewmh_add_state(c->window, ewmh[WM_STATE_FULLSCREEN]);
-	jbwm_update_titlebar(c);
+	jbwm_update_title_bar(c);
 }
 void jbwm_set_fullscreen(struct JBWMClient * restrict c)
 {

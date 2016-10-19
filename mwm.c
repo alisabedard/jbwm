@@ -37,7 +37,7 @@ static void process_flags(struct JBWMClient * c)
 	struct JBWMClientOptions * o = &c->opt;
 	if (o->tearoff) {
 		o->no_border = o->no_resize = o->no_min = o->no_max
-			= o->no_titlebar = true;
+			= o->no_title_bar = true;
 	}
 	c->border = o->no_border ? 0 : 1;
 }
@@ -64,7 +64,7 @@ static void do_decorations(struct JBWMClientOptions * restrict o,
 	if (!(f & MWM_DECOR_MINIMIZE))
 		o->no_min_decor = true;
 	if (!(f & MWM_DECOR_TITLE))
-		o->no_titlebar = true;
+		o->no_title_bar = true;
 }
 static Atom get_mwm_hints_atom(void)
 {

@@ -28,6 +28,6 @@ void jbwm_new_shaped_client(struct JBWMClient * c)
 	if (is_shaped(c)) {
 		JBWM_LOG("Window %d is shaped", (int)c->window);
 		c->border = 0;
-		c->opt.no_titlebar=c->opt.shaped=true;
+		c->opt.no_title_bar=c->opt.shaped=true;
 	}
 }

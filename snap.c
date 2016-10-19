@@ -6,7 +6,7 @@
 #include "config.h"
 #include "JBWMEnv.h"
 #include "log.h"
-#include "titlebar.h"
+#include "title_bar.h"
 #include <stdlib.h>
 __attribute__ ((const, hot, warn_unused_result))
 static int16_t sborder(const int16_t xy, const int16_t edge)
@@ -23,7 +23,7 @@ void jbwm_snap_border(struct JBWMClient *restrict c)
 	g->x=sborder(g->x, 0 - b);
 	const struct JBWMSize s = c->screen->size;
 	g->x=sborder(g->x, g->width - s.width + b);
-	g->y=sborder(g->y, 0 - (c->opt.no_titlebar?0:TDIM));
+	g->y=sborder(g->y, 0 - (c->opt.no_title_bar?0:TDIM));
 	g->y=sborder(g->y, g->height + b - s.height);
 }
 __attribute__ ((const, hot, warn_unused_result))

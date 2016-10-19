@@ -12,7 +12,7 @@
 #include "log.h"
 #include "new.h"
 #include "screen.h"
-#include "titlebar.h"
+#include "title_bar.h"
 #include "util.h"
 #include <stdlib.h>
 #include <X11/Xatom.h>
@@ -79,7 +79,7 @@ static void handle_property_change(XPropertyEvent * restrict e,
 	if(e->state != PropertyNewValue)
 		  return;
 	if (e->atom == XA_WM_NAME)
-		jbwm_update_titlebar(c);
+		jbwm_update_title_bar(c);
 	else {
 		if (e->atom == jbwm_get_wm_state())
 			jbwm_move_resize(c);
@@ -115,7 +115,7 @@ static void iteration(void)
 #ifdef USE_TBAR
 	case Expose:
 		if (c && !ev.xexpose.count)
-			  jbwm_update_titlebar(c);
+			  jbwm_update_title_bar(c);
 		break;
 #endif//USE_TBAR
 #ifdef JBWM_USE_EWMH

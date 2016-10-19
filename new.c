@@ -9,7 +9,7 @@
 #include "mwm.h"
 #include "screen.h"
 #include "shape.h"
-#include "titlebar.h"
+#include "title_bar.h"
 #include "util.h"
 #include <stdlib.h>
 #include <X11/Xatom.h>
@@ -39,7 +39,7 @@ static void set_frame_extents(struct JBWMClient * c)
 	// Required by wm-spec 1.4:
 	const uint8_t b = c->border;
 	jbwm_set_property(c->window, ewmh[FRAME_EXTENTS], XA_CARDINAL,
-		(&(jbwm_atom_t[]){b, b, b + (c->opt.no_titlebar ? 0 : TDIM),
+		(&(jbwm_atom_t[]){b, b, b + (c->opt.no_title_bar ? 0 : TDIM),
 		 b}), 4);
 }
 #else//!JBWM_USE_EWMH
@@ -120,5 +120,5 @@ void jbwm_new_client(const jbwm_window_t w, struct JBWMScreen * s)
 	reparent(c);
 	set_frame_extents(c);
 	jbwm_restore_client(c);
-	jbwm_update_titlebar(c);
+	jbwm_update_title_bar(c);
 }

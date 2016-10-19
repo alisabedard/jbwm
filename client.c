@@ -8,7 +8,7 @@
 #include "JBWMEnv.h"
 #include "log.h"
 #include "screen.h"
-#include "titlebar.h"
+#include "title_bar.h"
 #include "util.h"
 #include <X11/Xatom.h>
 // Free result with XFree if not NULL
@@ -77,7 +77,7 @@ void jbwm_toggle_sticky(struct JBWMClient * c)
 	JBWM_LOG("stick");
 	c->opt.sticky ^= true; // toggle
 	jbwm_select_client(c);
-	jbwm_update_titlebar(c);
+	jbwm_update_title_bar(c);
 #ifdef JBWM_USE_EWMH
 	(c->opt.sticky ? jbwm_ewmh_add_state : jbwm_ewmh_remove_state)(c->window,
 		ewmh[WM_STATE_STICKY]);

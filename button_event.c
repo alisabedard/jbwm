@@ -7,12 +7,12 @@
 #include "JBWMEnv.h"
 #include "log.h"
 #include "screen.h"
-#include "titlebar.h"
+#include "title_bar.h"
 #ifdef USE_TBAR
-static void handle_titlebar_button(XButtonEvent * restrict e,
+static void handle_title_bar_button(XButtonEvent * restrict e,
 	struct JBWMClient * restrict c)
 {
-	JBWM_LOG("e->window: %d, c->titlebar: %d, e->subwindow: %d",
+	JBWM_LOG("e->window: %d, c->title_bar: %d, e->subwindow: %d",
 		(int)e->window, (int)c->tb.win, (int)e->subwindow);
 	if (e->subwindow == c->tb.close)
 		jbwm_send_wm_delete(c);
@@ -26,7 +26,7 @@ static void handle_titlebar_button(XButtonEvent * restrict e,
 		jbwm_drag(c, false);
 }
 #else//!USE_TBAR
-#define handle_titlebar_button(e, c) jbwm_drag(c, false)
+#define handle_title_bar_button(e, c) jbwm_drag(c, false)
 #endif//USE_TBAR
 void jbwm_handle_button_event(XButtonEvent * restrict e,
 	struct JBWMClient * restrict c)
@@ -38,7 +38,7 @@ void jbwm_handle_button_event(XButtonEvent * restrict e,
 		if (fs)
 			XRaiseWindow(jbwm.d, c->parent);
 		else
-			handle_titlebar_button(e, c);
+			handle_title_bar_button(e, c);
 		break;
 	case Button2:
 		XLowerWindow(jbwm.d, c->parent);

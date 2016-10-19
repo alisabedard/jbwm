@@ -24,6 +24,6 @@ include ewmh.mk
 include mwm.mk
 include shape.mk
 include snap.mk
-include titlebar.mk
+include title_bar.mk
 include xft.mk
 include jbwm.mk

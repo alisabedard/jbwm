@@ -5,6 +5,6 @@
 CFLAGS+=-Wall -Wextra
 # Titlebar Xft support:
 include xft.mk
-# Uncomment to enable titlebars
-include titlebar.mk
+# Uncomment to enable title bars
+include title_bar.mk
 include jbwm.mk

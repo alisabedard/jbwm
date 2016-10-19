@@ -10,7 +10,7 @@
 #include "log.h"
 #include "shape.h"
 #include "snap.h"
-#include "titlebar.h"
+#include "title_bar.h"
 #include "util.h"
 #include <stdlib.h>
 #include <X11/Xatom.h>
@@ -20,7 +20,7 @@ static void draw_outline(struct JBWMClient * restrict c)
 {
 	if (!c->border)
 		return;
-	const uint8_t offset = c->opt.no_titlebar ? 0 : TDIM;
+	const uint8_t offset = c->opt.no_title_bar ? 0 : TDIM;
 	XDrawRectangle(jbwm.d, c->screen->root, c->screen->gc,
 		c->size.x, c->size.y - offset,
 		c->size.width + c->border,
@@ -106,7 +106,7 @@ void jbwm_drag(struct JBWMClient * restrict c, const bool resize)
 void jbwm_move_resize(struct JBWMClient * restrict c)
 {
 	JBWM_LOG("jbwm_move_resize");
-	const uint8_t offset = c->opt.no_titlebar || c->opt.fullscreen
+	const uint8_t offset = c->opt.no_title_bar || c->opt.fullscreen
 		? 0 : TDIM;
 	XMoveResizeWindow(jbwm.d, c->parent,
 		c->size.x, c->size.y - offset,
@@ -114,8 +114,8 @@ void jbwm_move_resize(struct JBWMClient * restrict c)
 	XMoveResizeWindow(jbwm.d, c->window,
 		0, offset,
 		c->size.width, c->size.height);
-	if(offset) { // Leave braces in case titlebar support was disabled.
-		jbwm_update_titlebar(c);
+	if(offset) { // Leave braces in case title_bar support was disabled.
+		jbwm_update_title_bar(c);
 	} // Skip shaped and fullscreen clients.
 	jbwm_set_shape(c);
 }
