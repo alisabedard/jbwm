@@ -1,3 +1,3 @@
 # Window snaping support
-CFLAGS+=-DUSE_SNAP
+CFLAGS+=-DJBWM_USE_SNAP
 OBJS+=snap.o
