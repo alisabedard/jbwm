@@ -49,7 +49,7 @@ static void do_functions(struct JBWMClientOptions * restrict o,
 	o->no_min=!(f & MWM_FUNC_MINIMIZE);
 	o->no_max=!(f & MWM_FUNC_MAXIMIZE);
 	o->no_move=!(f & MWM_FUNC_MOVE);
-	LOG("MWM_HINTS_FUNCTIONS\topts: %d, %d, %d, %d, %d",
+	JBWM_LOG("MWM_HINTS_FUNCTIONS\topts: %d, %d, %d, %d, %d",
 		o->no_resize, o->no_close, o->no_min, o->no_max,
 		o->no_move);
 }

@@ -26,7 +26,7 @@ static struct JBWMScreen * get_screen(const int8_t i,
 // Relink c's linked list to exclude c
 static void relink_window_list(struct JBWMClient * c)
 {
-	LOG("relink_window_list");
+	JBWM_LOG("relink_window_list");
 	if (jbwm.current == c) // Remove selection target
 		jbwm.current = NULL;
 	if (jbwm.head == c) {
@@ -59,7 +59,7 @@ void jbwm_free_client(struct JBWMClient * restrict c)
 }
 static void cleanup(void)
 {
-	LOG("cleanup");
+	JBWM_LOG("cleanup");
 	jbwm.need_cleanup = false;
 	struct JBWMClient * c = jbwm.head;
 	struct JBWMClient * i;
@@ -88,7 +88,7 @@ static void handle_property_change(XPropertyEvent * restrict e,
 }
 static void handle_configure_request(XConfigureRequestEvent * e)
 {
-	LOG("handle_configure_request");
+	JBWM_LOG("handle_configure_request");
 	XConfigureWindow(jbwm.d, e->window, e->value_mask,
 		&(XWindowChanges){ .x = e->x, .y = e->y,
 		.width = e->width, .height = e->height,
@@ -127,11 +127,11 @@ static void iteration(void)
 	case UnmapNotify:
 		if(!c)
 			  break;
-		LOG("UnmapNotify: ignore_unmap is %d", c->ignore_unmap);
+		JBWM_LOG("UnmapNotify: ignore_unmap is %d", c->ignore_unmap);
 		c->opt.remove=jbwm.need_cleanup=(c->ignore_unmap--<1);
 		break;
 	case MapRequest:
-		LOG("MapRequest, send_event:%d", ev.xmaprequest.send_event);
+		JBWM_LOG("MapRequest, send_event:%d", ev.xmaprequest.send_event);
 		/* This check fixes a race condition in libreoffice dialogs,
 		   where an attempt is made to request mapping twice.  */
 		if(c || ev.xmaprequest.window == jbwm.last)
@@ -148,7 +148,7 @@ static void iteration(void)
 		break;
 	case ColormapNotify:
 		if (c && ev.xcolormap.new) {
-			LOG("ColormapNotify");
+			JBWM_LOG("ColormapNotify");
 			c->cmap = ev.xcolormap.colormap;
 			XInstallColormap(jbwm.d, c->cmap);
 		}
@@ -160,7 +160,7 @@ static void iteration(void)
 #endif//JBWM_USE_EWMH
 #ifdef EVENT_DEBUG
 	default:
-		LOG("Unhandled event (%d)", ev.type);
+		JBWM_LOG("Unhandled event (%d)", ev.type);
 #endif//EVENT_DEBUG
 	}
 	if (jbwm.need_cleanup) {

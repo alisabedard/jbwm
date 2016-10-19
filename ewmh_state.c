@@ -72,7 +72,7 @@ static void set_state(struct JBWMClient * restrict c,
 		(add ? XLowerWindow : XRaiseWindow)(jbwm.d, c->parent);
 		break;
 	case WM_STATE_HIDDEN:
-		LOG("HIDDEN");
+		JBWM_LOG("HIDDEN");
 		break;
 	case WM_STATE_MAXIMIZED_VERT:
 		(add ? jbwm_set_vert : jbwm_set_not_vert)(c);

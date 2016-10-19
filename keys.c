@@ -84,7 +84,7 @@ __attribute__((nonnull(2)))
 static void handle_client_key_event(const bool mod,
 	struct JBWMClient * restrict c, const KeySym key)
 {
-	LOG("handle_client_key_event: %d", (int)key);
+	JBWM_LOG("handle_client_key_event: %d", (int)key);
 	if (c->opt.fullscreen) {
 		// only allow exiting from fullscreen
 		if (key == JBWM_KEY_FS) {
@@ -171,7 +171,7 @@ static void start_terminal(void)
 }
 void jbwm_handle_key_event(XKeyEvent * e)
 {
-	LOG("jbwm_handle_key_event");
+	JBWM_LOG("jbwm_handle_key_event");
 	const KeySym key = XLookupKeysym(e, 0);
 	struct JBWMClient *c = jbwm.current;
 	struct JBWMScreen *s = c ? c->screen : jbwm.s;

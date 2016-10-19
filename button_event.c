@@ -12,7 +12,7 @@
 static void handle_titlebar_button(XButtonEvent * restrict e,
 	struct JBWMClient * restrict c)
 {
-	LOG("e->window: %d, c->titlebar: %d, e->subwindow: %d",
+	JBWM_LOG("e->window: %d, c->titlebar: %d, e->subwindow: %d",
 		(int)e->window, (int)c->tb.win, (int)e->subwindow);
 	if (e->subwindow == c->tb.close)
 		jbwm_send_wm_delete(c);
@@ -31,7 +31,7 @@ static void handle_titlebar_button(XButtonEvent * restrict e,
 void jbwm_handle_button_event(XButtonEvent * restrict e,
 	struct JBWMClient * restrict c)
 {
-	LOG("jbwm_handle_button_event");
+	JBWM_LOG("jbwm_handle_button_event");
 	const bool fs = c->opt.fullscreen;
 	switch (e->button) {
 	case Button1:

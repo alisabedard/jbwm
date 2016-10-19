@@ -26,7 +26,7 @@ static uint8_t wm_desktop(const jbwm_window_t w, uint8_t vdesk)
 				XA_CARDINAL, &vdesk, 1);
 		XFree(lprop);
 	}
-	LOG("wm_desktop(): vdesk is %d\n", vdesk);
+	JBWM_LOG("wm_desktop(): vdesk is %d\n", vdesk);
 	return vdesk;
 }
 #else//!JBWM_USE_EWMH
@@ -86,7 +86,7 @@ static Window get_parent(struct JBWMClient * restrict c)
 __attribute__((nonnull))
 static void reparent(struct JBWMClient * c) // use of restrict here is a bug
 {
-	LOG("reparent()");
+	JBWM_LOG("reparent()");
 	jbwm_set_up_shaped_client(c);
 	const jbwm_window_t p = c->parent = get_parent(c), w = c->window;
 	XAddToSaveSet(jbwm.d, w);
@@ -112,7 +112,7 @@ static void do_grabs(const jbwm_window_t w)
 }
 void jbwm_new_client(const jbwm_window_t w, struct JBWMScreen * s)
 {
-	LOG("jbwm_new_client(%d,s)", (int)w);
+	JBWM_LOG("jbwm_new_client(%d,s)", (int)w);
 	struct JBWMClient * c = jbwm.head = get_JBWMClient(w, s);
 	do_grabs(w);
 	init_properties(c);

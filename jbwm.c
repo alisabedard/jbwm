@@ -30,7 +30,7 @@ static void print(const size_t sz, const char * buf)
 __attribute__((warn_unused_result))
 static uint16_t parse_modifiers(char * restrict arg)
 {
-	LOG("parse_modifiers()");
+	JBWM_LOG("parse_modifiers()");
 	size_t s = 0; // strlen
 	while(arg[++s])
 		  ;
@@ -58,7 +58,7 @@ static uint16_t parse_modifiers(char * restrict arg)
 }
 static void parse_argv(uint8_t argc, char **argv)
 {
-	LOG("parse_argv(%d,%s...)", argc, argv[0]);
+	JBWM_LOG("parse_argv(%d,%s...)", argc, argv[0]);
 	static const char optstring[] = "1:2:b:d:F:f:hs:V";
 	int8_t opt;
 	while((opt=getopt(argc, argv, optstring)) != -1) {
@@ -218,7 +218,7 @@ static int handle_xerror(Display * restrict dpy __attribute__ ((unused)),
 		if (c) // match found
 			jbwm_free_client(c);
 	}
-	LOG("xerror: %d, %d\n", e->error_code, e->request_code);
+	JBWM_LOG("xerror: %d, %d\n", e->error_code, e->request_code);
 	return 0; // Ignore everything else.
 }
 static void jbwm_set_defaults(void)

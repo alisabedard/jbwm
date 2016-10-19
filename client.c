@@ -21,7 +21,7 @@ char * jbwm_get_title(const jbwm_window_t w)
 }
 void jbwm_set_client_vdesk(struct JBWMClient * restrict c, const uint8_t d)
 {
-	LOG("jbwm_set_client_vdesk");
+	JBWM_LOG("jbwm_set_client_vdesk");
 	const uint8_t p = c->vdesk;
 	c->vdesk = d;
 	// use jbwm_set_vdesk to validate d:
@@ -74,7 +74,7 @@ void jbwm_select_client(struct JBWMClient * c)
 }
 void jbwm_toggle_sticky(struct JBWMClient * c)
 {
-	LOG("stick");
+	JBWM_LOG("stick");
 	c->opt.sticky ^= true; // toggle
 	jbwm_select_client(c);
 	jbwm_update_titlebar(c);
@@ -86,7 +86,7 @@ void jbwm_toggle_sticky(struct JBWMClient * c)
 // Returns 0 on failure.
 static Status xmsg(const jbwm_window_t w, const Atom a, const long x)
 {
-	LOG("xmsg");
+	JBWM_LOG("xmsg");
 	return XSendEvent(jbwm.d, w, false, NoEventMask, &(XEvent){
 		.xclient.type = ClientMessage, .xclient.window = w,
 		.xclient.message_type = a, .xclient.format = 32,

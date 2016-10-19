@@ -2,16 +2,16 @@
 // Copyright 2008-2016, Jeffrey E. Bedard <jefbed@gmail.com>
 // Copyright 1999-2015, Ciaran Anscomb <jbwm@6809.org.uk>
 // See README for license and other details.
-#ifndef JBWM__LOG_H__
-#define JBWM__LOG_H__
+#ifndef JBWM_LOG_H
+#define JBWM_LOG_H
 #ifdef DEBUG
 #include <stdio.h>
-#define LOG(...)\
+#define JBWM_LOG(...)\
 {\
 	fprintf(stderr, __VA_ARGS__);\
 	fprintf(stderr, " @ %s:%d\n", __FILE__, __LINE__);\
 }
 #else//!DEBUG
-#define LOG(...)
+#define JBWM_LOG(...)
 #endif//DEBUG
-#endif /* JBWM__LOG_H__ */
+#endif /* JBWM_LOG_H */

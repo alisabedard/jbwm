@@ -105,7 +105,7 @@ void jbwm_drag(struct JBWMClient * restrict c, const bool resize)
 }
 void jbwm_move_resize(struct JBWMClient * restrict c)
 {
-	LOG("jbwm_move_resize");
+	JBWM_LOG("jbwm_move_resize");
 	const uint8_t offset = c->opt.no_titlebar || c->opt.fullscreen
 		? 0 : TDIM;
 	XMoveResizeWindow(jbwm.d, c->parent,
@@ -144,7 +144,7 @@ static void check_visibility(struct JBWMScreen * s,
 }
 uint8_t jbwm_set_vdesk(struct JBWMScreen * s, uint8_t v)
 {
-	LOG("jbwm_set_vdesk");
+	JBWM_LOG("jbwm_set_vdesk");
 	if (v == s->vdesk || v > JBWM_MAX_DESKTOPS)
 		return s->vdesk;
 	for (struct JBWMClient * c = jbwm.head; c; c = c->next)

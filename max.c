@@ -18,7 +18,7 @@ static void set_not_horz(struct JBWMClient * restrict c)
 }
 void jbwm_set_not_horz(struct JBWMClient * restrict c)
 {
-	LOG("jbwm_set_not_horz");
+	JBWM_LOG("jbwm_set_not_horz");
 	if (c->opt.max_horz)
 		set_not_horz(c);
 	jbwm_move_resize(c);
@@ -33,7 +33,7 @@ static void set_horz(struct JBWMClient * restrict c)
 }
 void jbwm_set_horz(struct JBWMClient * restrict c)
 {
-	LOG("jbwm_set_horz");
+	JBWM_LOG("jbwm_set_horz");
 	if (c->opt.max_horz) return;
 	jbwm_ewmh_add_state(c->window, ewmh[WM_STATE_MAXIMIZED_HORZ]);
 	set_horz(c);
@@ -50,7 +50,7 @@ static void set_not_vert(struct JBWMClient * restrict c)
 }
 void jbwm_set_not_vert(struct JBWMClient * restrict c)
 {
-	LOG("jbwm_set_not_vert");
+	JBWM_LOG("jbwm_set_not_vert");
 	if (c->opt.max_vert && !c->opt.shaded)
 		set_not_vert(c);
 	jbwm_move_resize(c);
@@ -66,7 +66,7 @@ static void set_vert(struct JBWMClient * restrict c)
 }
 void jbwm_set_vert(struct JBWMClient * restrict c)
 {
-	LOG("jbwm_set_vert");
+	JBWM_LOG("jbwm_set_vert");
 	if (c->opt.max_vert || c->opt.shaded)
 		return;
 	set_vert(c);
@@ -89,7 +89,7 @@ static void set_not_fullscreen(struct JBWMClient * restrict c)
 }
 void jbwm_set_not_fullscreen(struct JBWMClient * restrict c)
 {
-	LOG("jbwm_set_not_fullscreen");
+	JBWM_LOG("jbwm_set_not_fullscreen");
 	if(c->opt.fullscreen)
 		set_not_fullscreen(c);
 	jbwm_move_resize(c);
@@ -113,7 +113,7 @@ static void set_fullscreen(struct JBWMClient * restrict c)
 }
 void jbwm_set_fullscreen(struct JBWMClient * restrict c)
 {
-	LOG("jbwm_set_fullscreen");
+	JBWM_LOG("jbwm_set_fullscreen");
 	if (c->opt.fullscreen || c->opt.shaded || c->opt.no_max)
 		return;
 	set_fullscreen(c);
