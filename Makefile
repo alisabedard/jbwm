@@ -22,9 +22,7 @@ objs=util.o xcb.o time.o file.o
 installdir=${DESTDIR}${PREFIX}
 libjb.a: ${objs}
 	ar rcs libjb.a ${objs}
-*.h:
-	make clean
-${objs}: *.h
+include depend.mk
 clean:
 	rm -f libjb.a *.o
 install:
@@ -33,5 +31,7 @@ install:
 	install libjb.a /usr/lib
 	install *.h /usr/include/jb
 check: libjb.a
-	cc test.c libjb.a -o test
+	${CC} test.c libjb.a -o test
 	./test
+depend:
+	${CC} -E -MM *.c > depend.mk
