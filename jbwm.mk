@@ -59,9 +59,11 @@ INSTALL=install -c
 INSTALL_exe=$(INSTALL)
 INSTALL_DIR=install -d
 install: 
-	$(INSTALL_DIR) $(dest)/bin $(dest)/share/man/man1
-	$(INSTALL_exe) $(exe) $(dest)/bin
-	$(INSTALL) $(exe).1 $(dest)/share/man/man1
+	${INSTALL_DIR} ${dest}/bin ${dest}/share/man/man1 \
+		${dest}/share/licenses/${exe}
+	${INSTALL_exe} ${exe} ${dest}/bin
+	${INSTALL} ${exe}.1 ${dest}/share/man/man1
+	${INSTALL} -D -m644 LICENSE "${dest}/share/licenses/${exe}/LICENSE"
 clean:
 	rm -f $(exe) *.o
 distclean: clean
