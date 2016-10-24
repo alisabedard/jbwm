@@ -1,2 +1,2 @@
-CFLAGS+=-DJBWM_USE_EWMH
-OBJS+=ewmh.o ewmh_state.o
+jbwm_cflags+=-DJBWM_USE_EWMH
+objects+=ewmh.o ewmh_state.o

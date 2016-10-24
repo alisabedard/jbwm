@@ -1,9 +1,10 @@
-CFLAGS=-Os
+jbwm_cflags=-Os
 # Compile for current machine
-CFLAGS+=-march=native
+jbwm_cflags+=-march=native
 # Tuning
-CFLAGS+=-fomit-frame-pointer -pipe -flto
-#CFLAGS+=-W -Wall -Wextra
+jbwm_cflags+=-fomit-frame-pointer -pipe -flto
+#jbwm_cflags+=-W -Wall -Wextra
 # disable everything for minimal configuration 
-#CFLAGS+=-DNDEBUG
+#jbwm_cflags+=-DNDEBUG
+CFLAGS=${jbwm_cflags}
 include jbwm.mk

@@ -1,2 +1,2 @@
-CFLAGS+=-DJBWM_USE_TITLE_BAR
-OBJS+=title_bar.o
+jbwm_cflags+=-DJBWM_USE_TITLE_BAR
+objects+=title_bar.o
