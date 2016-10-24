@@ -41,11 +41,13 @@ INSTALL=install
 install:
 	${INSTALL} -d ${libdir} ${incdir}
 	install ${libjb_so} ${libdir}
+	install libjb.a ${libdir}
 	install *.h ${incdir}
 	ln -sf ${libdir}/${libjb_so} ${libdir}/${libjb_soname}
 	ln -sf ${libdir}/${libjb_so} ${libdir}/libjb.so
 uninstall:
 	rm -rf ${incdir}
+	rm -f ${libdir}/libjb.a
 	rm -f ${libdir}/${libjb_so}
 	rm -f ${libdir}/${libjb_soname}
 	rm -f ${libdir}/libjb.so
