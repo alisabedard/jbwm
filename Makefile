@@ -22,9 +22,11 @@ prog=xstatus
 objs=util.o xcb.o time.o file.o
 installdir=${DESTDIR}${PREFIX}
 libjb_so=libjb.so.1.0.0
+libjb_soname=libjb.so.1
 libjb: libjb.so libjb.a
 libjb.so: ${objs}
-	${CC} -shared -Wl,-soname,libjb.so -o ${libjb_so} ${objs} \
+	${CC} -shared -Wl,-soname,${libjb_soname} \
+		-o ${libjb_so} ${objs} \
 		${LDFLAGS} ${libjb_ldflags}
 libjb.a: ${objs}
 	ar rcs libjb.a ${objs}
@@ -40,9 +42,12 @@ install:
 	${INSTALL} -d ${libdir} ${incdir}
 	install ${libjb_so} ${libdir}
 	install *.h ${incdir}
+	ln -sf ${libdir}/${libjb_so} ${libdir}/${libjb_soname}
+	ln -sf ${libdir}/${libjb_so} ${libdir}/libjb.so
 uninstall:
 	rm -rf ${incdir}
 	rm -f ${libdir}/${libjb_so}
+	rm -f ${libdir}/${libjb_soname}
 check: libjb.a
 	${CC} test.c libjb.a -o test
 	./test
