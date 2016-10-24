@@ -21,10 +21,10 @@ PREFIX=/usr
 prog=xstatus
 objs=util.o xcb.o time.o file.o
 installdir=${DESTDIR}${PREFIX}
-libjb_out=libjb.so.1.0.1
-libjb: libjb.a libjb.so
+libjb_so=libjb.so.1.0.0
+libjb: libjb.so libjb.a
 libjb.so: ${objs}
-	${CC} -shared -Wl,-soname,libjb.so.1 -o ${libjb_out} ${objs} \
+	${CC} -shared -Wl,-soname,libjb.so -o ${libjb_so} ${objs} \
 		${LDFLAGS} ${libjb_ldflags}
 libjb.a: ${objs}
 	ar rcs libjb.a ${objs}
@@ -32,13 +32,17 @@ ${objs}:
 	${CC} ${CFLAGS} ${libjb_cflags} -c `basename -s .o $@`.c
 include depend.mk
 clean:
-	rm -f libjb.a *.o
+	rm -f ${libjb_so} libjb.a *.o
+libdir=${DESTDIR}${PREFIX}/lib
+incdir=${DESTDIR}${PREFIX}/include/libjb
+INSTALL=install
 install:
-	install -d /usr/lib
-	install -d /usr/include/jb
-	install libjb.a /usr/lib
-	install ${libjb_out} /usr/lib
-	install *.h /usr/include/jb
+	${INSTALL} -d ${libdir} ${incdir}
+	install ${libjb_so} ${libdir}
+	install *.h ${incdir}
+uninstall:
+	rm -rf ${incdir}
+	rm -f ${libdir}/${libjb_so}
 check: libjb.a
 	${CC} test.c libjb.a -o test
 	./test
