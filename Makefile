@@ -48,6 +48,7 @@ uninstall:
 	rm -rf ${incdir}
 	rm -f ${libdir}/${libjb_so}
 	rm -f ${libdir}/${libjb_soname}
+	rm -f ${libdir}/libjb.so
 check: libjb.a
 	${CC} test.c libjb.a -o test
 	./test
