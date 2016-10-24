@@ -16,24 +16,19 @@ jbwm_ldflags+=-L/usr/local/lib
 jbwm_cflags+=-I/usr/X11R6/include
 jbwm_cflags+=-I/usr/X11R6/include/freetype2
 jbwm_ldflags+=-L/usr/X11R6/lib
+# Old NetBSD:
+jbwm_ldflags+=-Wl,-R/usr/X11R6/lib
 # NetBSD:
 jbwm_cflags+=-I/usr/X11R7/include
 jbwm_cflags+=-I/usr/X11R7/include/freetype2
 jbwm_cflags+=-Wno-missing-field-initializers
-#jbwm_ldflags+=-Wl,-R/usr/X11R6/lib
 jbwm_ldflags+=-L/usr/X11R7/lib
 jbwm_ldflags+=-Wl,-R/usr/X11R7/lib
 jbwm_ldflags+=-lX11 
-# Uncomment to enable X11 miscellaneous debugging (events)
-#jbwm_cflags+=-DXDEBUG
 jbwm_cflags+=-DVERSION=\"$(version)\" $(DEBIAN)
 jbwm_cflags+=-D_XOPEN_SOURCE=700 -std=c11
-# Uncomment for static linking of binary:
-#jbwm_ldflags+=-static 
 objects+=client.o events.o jbwm.o new.o screen.o
 objects+=button_event.o keys.o util.o max.o
-#CFLAGS+=${jbwm_cflags}
-#LDFLAGS+=${jbwm_ldflags}
 
 $(exe): $(objects)
 	$(CC) ${jbwm_ldflags} $(LDFLAGS) $(objects) -o $@
