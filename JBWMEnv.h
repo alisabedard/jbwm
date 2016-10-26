@@ -20,7 +20,6 @@ struct JBWMEnv {
 	XFontStruct * font;
 #endif//JBWM_USE_XFT
 #endif//JBWM_USE_TITLE_BAR
-	jbwm_window_t last;
 	struct {
 		uint16_t grab, mod;
 	} keymasks;

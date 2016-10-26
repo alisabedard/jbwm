@@ -16,6 +16,7 @@
 #include "util.h"
 #include <stdlib.h>
 #include <X11/Xatom.h>
+static jbwm_window_t last_window;
 __attribute__((pure))
 static struct JBWMScreen * get_screen(const int8_t i,
 	const jbwm_window_t root)
@@ -54,7 +55,7 @@ void jbwm_free_client(struct JBWMClient * restrict c)
 		XDestroyWindow(jbwm.d, c->parent);
 	relink_window_list(c);
 	free(c);
-	jbwm.last = 0; /* allow this client's window id to be reused
+	last_window = 0; /* allow this client's window id to be reused
 			  for another client.  */
 }
 static void cleanup(void)
@@ -95,6 +96,18 @@ static void handle_configure_request(XConfigureRequestEvent * e)
 		.border_width = e->border_width,
 		.sibling = e->above, .stack_mode = e->detail});
 }
+static void handle_map_request(XMapRequestEvent * e)
+{
+	JBWM_LOG("MapRequest, send_event:%d", e->send_event);
+	/* This check fixes a race condition in libreoffice dialogs,
+	   where an attempt is made to request mapping twice.  */
+	if(e->window == last_window)
+		return;
+	last_window = e->window;
+	jbwm_new_client(e->window, get_screen(
+		ScreenCount(jbwm.d), e->parent));
+
+}
 static void iteration(void)
 {
 	XEvent ev;
@@ -131,14 +144,8 @@ static void iteration(void)
 		c->opt.remove=jbwm.need_cleanup=(c->ignore_unmap--<1);
 		break;
 	case MapRequest:
-		JBWM_LOG("MapRequest, send_event:%d", ev.xmaprequest.send_event);
-		/* This check fixes a race condition in libreoffice dialogs,
-		   where an attempt is made to request mapping twice.  */
-		if(c || ev.xmaprequest.window == jbwm.last)
-			break;
-		jbwm.last = ev.xmaprequest.window;
-		jbwm_new_client(ev.xmaprequest.window, get_screen(
-			ScreenCount(jbwm.d), ev.xmaprequest.parent));
+		if (!c)
+			handle_map_request(&ev.xmaprequest);
 		break;
 	case ConfigureRequest:
 		handle_configure_request(&ev.xconfigurerequest);
@@ -165,7 +172,7 @@ static void iteration(void)
 	}
 	if (jbwm.need_cleanup) {
 		cleanup();
-		jbwm.last=0; // Fix ignoring every other new window
+		last_window=0; // Fix ignoring every other new window
 	}
 }
 void jbwm_event_loop(void)
