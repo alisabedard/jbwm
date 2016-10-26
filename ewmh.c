@@ -5,10 +5,8 @@
 #include "ewmh.h"
 #include "JBWMEnv.h"
 #include "log.h"
-#include "max.h"
 #include "screen.h"
 #include "util.h"
-#include <stdlib.h>
 #include <unistd.h>
 #include <X11/Xatom.h>
 Atom ewmh[JBWM_EWMH_ATOMS_COUNT];
