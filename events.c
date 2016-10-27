@@ -104,7 +104,7 @@ static void iteration(void)
 	c = jbwm_get_client(ev.xany.window);
 	switch (ev.type) {
 	case KeyPress:
-		jbwm_handle_key_event(&ev.xkey);
+		jbwm_handle_key_event(d, &ev.xkey);
 		break;
 	case ButtonPress:
 		if(c) jbwm_handle_button_event(d, &ev.xbutton, c);

@@ -39,17 +39,19 @@ static void point(Display * restrict d,
 	XWarpPointer(d, None, c->window, 0, 0, 0, 0, x, y);
 }
 __attribute__((nonnull(1)))
-static void commit_key_move(struct JBWMClient * restrict c)
+static void commit_key_move(Display * restrict d,
+	struct JBWMClient * restrict c)
 {
 	jbwm_snap_border(c);
 	jbwm_move_resize(c);
-	point(jbwm_get_display(), c, 1, 1);
+	point(d, c, 1, 1);
 }
 struct KeyMoveFlags {
 	bool horz:1, pos:1, mod:1;
 };
 __attribute__((nonnull(1)))
-static void key_move(struct JBWMClient * restrict c,
+static void key_move(Display * restrict dpy,
+	struct JBWMClient * restrict c,
 	const struct KeyMoveFlags f)
 {
 	const int8_t d = f.pos ? JBWM_RESIZE_INCREMENT
@@ -59,10 +61,11 @@ static void key_move(struct JBWMClient * restrict c,
 	int * xy = f.horz ? &s->x : &s->y;
 	*(f.mod && (*wh > JBWM_RESIZE_INCREMENT<<1)
 		&& !c->opt.shaped && !c->opt.no_resize ? wh : xy) += d;
-	commit_key_move(c);
+	commit_key_move(dpy, c);
 }
 __attribute__((nonnull(1)))
-static void handle_key_move(struct JBWMClient * restrict c,
+static void handle_key_move(Display * restrict dpy,
+	struct JBWMClient * restrict c,
 	const KeySym k, const bool mod)
 {
 	/* These operations invalid when fullscreen.  */
@@ -78,7 +81,7 @@ static void handle_key_move(struct JBWMClient * restrict c,
 	case JBWM_KEY_UP:
 		f.pos = false;
 	}
-	key_move(c, f);
+	key_move(dpy, c, f);
 }
 static void set_maximized(struct JBWMClient * restrict c)
 {
@@ -111,22 +114,23 @@ static void handle_client_key_event(const bool mod,
 		}
 		return; // prevent other operations while fullscreen
 	}
+	Display * d = jbwm_get_display();
 	switch (key) {
 	case JBWM_KEY_LEFT:
 	case JBWM_KEY_RIGHT:
 	case JBWM_KEY_UP:
 	case JBWM_KEY_DOWN:
-		handle_key_move(c, key, mod);
+		handle_key_move(d, c, key, mod);
 		break;
 	case JBWM_KEY_KILL:
 		jbwm_send_wm_delete(c);
 		break;
 	case JBWM_KEY_LOWER:
 	case JBWM_KEY_ALTLOWER:
-		XLowerWindow(jbwm_get_display(), c->parent);
+		XLowerWindow(d, c->parent);
 		break;
 	case JBWM_KEY_RAISE:
-		XRaiseWindow(jbwm_get_display(), c->parent);
+		XRaiseWindow(d, c->parent);
 		break;
 	case JBWM_KEY_FS:
 		jbwm_set_fullscreen(c);
@@ -166,14 +170,13 @@ static struct JBWMClient * get_next_on_vdesk(void)
 	} while (c->vdesk != c->screen->vdesk);
 	return c;
 }
-static void next(void)
+static void next(Display * restrict d)
 {
 	struct JBWMClient * c = get_next_on_vdesk();
 	if (!c)
 		return;
 	jbwm_restore_client(c);
 	jbwm_select_client(c);
-	Display * d = jbwm_get_display();
 	point(d, c, 0, 0);
 	point(d, c, c->size.width, c->size.height);
 }
@@ -189,7 +192,7 @@ static void start_terminal(void)
 		execlp(t, t, (char*)NULL);
 	}
 }
-void jbwm_handle_key_event(XKeyEvent * e)
+void jbwm_handle_key_event(Display * restrict d, XKeyEvent * restrict e)
 {
 	JBWM_LOG("jbwm_handle_key_event");
 	const KeySym key = XLookupKeysym(e, 0);
@@ -207,7 +210,7 @@ void jbwm_handle_key_event(XKeyEvent * e)
 	case JBWM_KEY_QUIT:
 		exit(0);
 	case JBWM_KEY_NEXT:
-		next();
+		next(d);
 		break;
 	case XK_0:
 		opt.zero = true;
