@@ -6,6 +6,7 @@
 #include "client.h"
 #include "ewmh.h"
 #include "ewmh_state.h"
+#include "jbwm.h"
 #include "screen.h"
 #include "util.h"
 #include <X11/Xatom.h>
