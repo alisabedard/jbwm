@@ -36,7 +36,8 @@ void jbwm_free_client(struct JBWMClient * restrict c)
 	XDeleteProperty(jbwm_get_display(), w, ewmh[WM_STATE]);
 	XDeleteProperty(jbwm_get_display(), w, ewmh[WM_DESKTOP]);
 #endif//JBWM_USE_EWMH
-	XReparentWindow(jbwm_get_display(), w, c->screen->root, c->size.x, c->size.y);
+	XReparentWindow(jbwm_get_display(), w, c->screen->root,
+		c->size.x, c->size.y);
 	XRemoveFromSaveSet(jbwm_get_display(), w);
 	if(c->parent)
 		XDestroyWindow(jbwm_get_display(), c->parent);

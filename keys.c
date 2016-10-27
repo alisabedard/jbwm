@@ -239,8 +239,10 @@ static void grab(Display * restrict d, struct JBWMScreen * restrict s,
 			 jbwm_keys_data.grab_mask | mask, s->root, true,
 			 GrabModeAsync, GrabModeAsync);
 }
-void jbwm_grab_screen_keys(Display * restrict d, struct JBWMScreen * restrict s)
+void jbwm_grab_screen_keys(Display * restrict d,
+	struct JBWMScreen * restrict s)
 {
 	grab(d, s, (KeySym[]){JBWM_KEYS_TO_GRAB}, 0);
-	grab(d, s, (KeySym[]){JBWM_ALT_KEYS_TO_GRAB}, jbwm_keys_data.mod_mask);
+	grab(d, s, (KeySym[]){JBWM_ALT_KEYS_TO_GRAB},
+		jbwm_keys_data.mod_mask);
 }

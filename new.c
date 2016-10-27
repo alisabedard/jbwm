@@ -41,8 +41,9 @@ static void set_frame_extents(struct JBWMClient * c)
 	// Required by wm-spec 1.4:
 	const uint8_t b = c->border;
 	jbwm_set_property(c->window, ewmh[FRAME_EXTENTS], XA_CARDINAL,
-		(&(jbwm_atom_t[]){b, b, b + (c->opt.no_title_bar ? 0 : jbwm_get_font_height()),
-		 b}), 4);
+		(&(jbwm_atom_t[]){b, b, b
+		 + (c->opt.no_title_bar ? 0
+			 : jbwm_get_font_height()), b}), 4);
 }
 #else//!JBWM_USE_EWMH
 #define set_frame_extents(c)
@@ -77,10 +78,10 @@ static void init_geometry(struct JBWMClient * c)
 __attribute__((nonnull))
 static Window get_parent(struct JBWMClient * restrict c)
 {
-	return XCreateWindow(jbwm_get_display(), c->screen->root, c->size.x, c->size.y,
-		c->size.width, c->size.height, c->border, CopyFromParent,
-		CopyFromParent, CopyFromParent, CWOverrideRedirect
-		| CWEventMask, &(XSetWindowAttributes){
+	return XCreateWindow(jbwm_get_display(), c->screen->root,
+		c->size.x, c->size.y, c->size.width, c->size.height,
+		c->border, CopyFromParent, CopyFromParent, CopyFromParent,
+		CWOverrideRedirect | CWEventMask, &(XSetWindowAttributes){
 		.override_redirect=true, .event_mask
 		= SubstructureRedirectMask | SubstructureNotifyMask
 		| ButtonPressMask | EnterWindowMask});

@@ -153,9 +153,9 @@ static void setup_fonts(void)
 {
 	char * font = getenv(JBWM_ENV_FONT);
 #ifdef JBWM_USE_XFT
-	jbwm_data.font = XftFontOpen(jbwm_get_display(), DefaultScreen(jbwm_get_display()),
-		XFT_FAMILY, XftTypeString, font, XFT_SIZE,
-		XftTypeDouble, JBWM_FONT_SIZE, NULL);
+	jbwm_data.font = XftFontOpen(jbwm_data.display,
+		jbwm_data.screens->screen, XFT_FAMILY, XftTypeString,
+		font, XFT_SIZE, XftTypeDouble, JBWM_FONT_SIZE, NULL);
 #else//!JBWM_USE_XFT
 	jbwm_data.font = XLoadQueryFont(jbwm_get_display(), font);
 #endif//JBWM_USE_XFT

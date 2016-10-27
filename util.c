@@ -16,7 +16,8 @@ unsigned long jbwm_get_pixel(const uint8_t screen, const char * restrict name)
 	if (!name) // sanitize input to avoid segfault
 		return 0;
 	XColor c, d;
-	XAllocNamedColor(jbwm_get_display(), DefaultColormap(jbwm_get_display(), screen),
+	XAllocNamedColor(jbwm_get_display(),
+		DefaultColormap(jbwm_get_display(), screen),
 		name, &c, &d);
 	return c.pixel;
 }

@@ -98,7 +98,8 @@ void jbwm_select_client(struct JBWMClient * c)
 		return;
 	unselect_current();
 	XInstallColormap(jbwm_get_display(), c->cmap);
-	XSetInputFocus(jbwm_get_display(), c->window, RevertToPointerRoot, CurrentTime);
+	XSetInputFocus(jbwm_get_display(), c->window,
+		RevertToPointerRoot, CurrentTime);
 	set_border(c);
 	jbwm_client_data.current = c;
 #ifdef JBWM_USE_EWMH

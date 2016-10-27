@@ -55,7 +55,8 @@ static char * atom_names [] = { // This list must match 1:1 with enum
 void jbwm_ewmh_init(void)
 {
 	JBWM_LOG("atom_names: %d\n", JBWM_EWMH_ATOMS_COUNT);
-	XInternAtoms(jbwm_get_display(), atom_names, JBWM_EWMH_ATOMS_COUNT, false, ewmh);
+	XInternAtoms(jbwm_get_display(), atom_names,
+		JBWM_EWMH_ATOMS_COUNT, false, ewmh);
 }
 static uint16_t get_client_count(void)
 {
