@@ -31,7 +31,7 @@ libjb.so: ${objs}
 libjb.a: ${objs}
 	ar rcs libjb.a ${objs}
 ${objs}:
-	${CC} ${CFLAGS} ${libjb_cflags} -c `basename -s .o $@`.c
+	${CC} ${CFLAGS} ${libjb_cflags} -c `basename $@ .o`.c
 include depend.mk
 clean:
 	rm -f ${libjb_so} libjb.a *.o
