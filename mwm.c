@@ -3,7 +3,6 @@
 // Copyright 1999-2015, Ciaran Anscomb <jbwm@6809.org.uk>
 // See README for license and other details.
 #include "mwm.h"
-#include "JBWMEnv.h"
 #include "log.h"
 #include "util.h"
 // These are MWM-specific hints
@@ -66,14 +65,14 @@ static void do_decorations(struct JBWMClientOptions * restrict o,
 	if (!(f & MWM_DECOR_TITLE))
 		o->no_title_bar = true;
 }
-static Atom get_mwm_hints_atom(void)
+static Atom get_mwm_hints_atom(Display * restrict d)
 {
 	static Atom a;
-	return a ? a : (a = XInternAtom(jbwm.d, "_MOTIF_WM_HINTS", false));
+	return a ? a : (a = XInternAtom(d, "_MOTIF_WM_HINTS", false));
 }
-void jbwm_handle_mwm_hints(struct JBWMClient * c)
+void jbwm_handle_mwm_hints(Display * d, struct JBWMClient * c)
 {
-	const Atom mwm_hints = get_mwm_hints_atom();
+	const Atom mwm_hints = get_mwm_hints_atom(d);
 	struct JBWMMwm * m = jbwm_get_property(c->window,
 		mwm_hints, &(uint16_t){0});
 	if(!m)

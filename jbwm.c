@@ -18,8 +18,9 @@
 #include <stdio.h>
 #endif//STDIO
 // Main application data structure.
-struct JBWMEnv jbwm;
+//struct JBWMEnv jbwm;
 static struct {
+	Display * display;
 	struct JBWMScreen * screens;
 #ifdef JBWM_USE_TITLE_BAR
 #ifdef JBWM_USE_XFT
@@ -29,6 +30,10 @@ static struct {
 #endif//JBWM_USE_XFT
 #endif//JBWM_USE_TITLE_BAR
 } jbwm_data;
+Display * jbwm_get_display(void)
+{
+	return jbwm_data.display;
+}
 #ifdef JBWM_USE_TITLE_BAR
 void * jbwm_get_font(void)
 {
@@ -148,11 +153,11 @@ static void setup_fonts(void)
 {
 	char * font = getenv(JBWM_ENV_FONT);
 #ifdef JBWM_USE_XFT
-	jbwm_data.font = XftFontOpen(jbwm.d, DefaultScreen(jbwm.d),
+	jbwm_data.font = XftFontOpen(jbwm_get_display(), DefaultScreen(jbwm_get_display()),
 		XFT_FAMILY, XftTypeString, font, XFT_SIZE,
 		XftTypeDouble, JBWM_FONT_SIZE, NULL);
 #else//!JBWM_USE_XFT
-	jbwm_data.font = XLoadQueryFont(jbwm.d, font);
+	jbwm_data.font = XLoadQueryFont(jbwm_get_display(), font);
 #endif//JBWM_USE_XFT
 	if (!jbwm_data.font)
 		jbwm_error(JBWM_ENV_FONT);
@@ -162,7 +167,7 @@ static void setup_fonts(void)
 #endif//JBWM_USE_TITLE_BAR
 static void setup_event_listeners(const jbwm_window_t root)
 {
-	XChangeWindowAttributes(jbwm.d, root, CWEventMask,
+	XChangeWindowAttributes(jbwm_get_display(), root, CWEventMask,
 		&(XSetWindowAttributes){.event_mask = SubstructureRedirectMask
 		| SubstructureNotifyMask | EnterWindowMask | PropertyChangeMask
 		| ColormapChangeMask});
@@ -183,7 +188,7 @@ static void allocate_colors(struct JBWMScreen * restrict s)
 static bool check_redirect(const jbwm_window_t w)
 {
 	XWindowAttributes a;
-	XGetWindowAttributes(jbwm.d, w, &a);
+	XGetWindowAttributes(jbwm_get_display(), w, &a);
 	return (!a.override_redirect && (a.map_state == IsViewable));
 }
 static void setup_clients(struct JBWMScreen * restrict s)
@@ -191,7 +196,7 @@ static void setup_clients(struct JBWMScreen * restrict s)
 	Window * w, d; // don't use jbwm_window_t here
 	unsigned int n;
 	// XQueryTree depends on 64-bit types
-	if (!XQueryTree(jbwm.d, s->root, &d, &d, &w, &n))
+	if (!XQueryTree(jbwm_get_display(), s->root, &d, &d, &w, &n))
 		return; // failed
 	while (n--)
 		if (check_redirect(w[n]))
@@ -202,7 +207,7 @@ static void setup_screen_elements(const uint8_t i)
 {
 	struct JBWMScreen * restrict s = jbwm_data.screens;
 	s->screen = i;
-	Display * d = jbwm.d;
+	Display * d = jbwm_get_display();
 	s->root = RootWindow(d, i);
 	s->vdesk = 0;
 	s->size.w = DisplayWidth(d, i);
@@ -223,7 +228,7 @@ static void setup_gc(struct JBWMScreen * restrict s)
 	gv.font = jbwm_data.font->fid;
 	vm |= GCFont;
 #endif//JBWM_USE_TITLE_BAR&&!JBWM_USE_XFT
-	s->gc = XCreateGC(jbwm.d, s->root, vm, &gv);
+	s->gc = XCreateGC(jbwm_get_display(), s->root, vm, &gv);
 }
 static void setup_screen(const uint8_t i)
 {
@@ -275,13 +280,13 @@ int main(
 {
 	jbwm_set_defaults();
 	parse_argv(argc, argv);
-	if (!(jbwm.d = XOpenDisplay(NULL)))
+	if (!(jbwm_data.display = XOpenDisplay(NULL)))
 		jbwm_error(JBWM_ENV_DISPLAY);
 	XSetErrorHandler(handle_xerror);
 	jbwm_ewmh_init();
 	/* Fonts only needed with title bars */
 	setup_fonts();
-	uint8_t i = ScreenCount(jbwm.d);
+	uint8_t i = ScreenCount(jbwm_data.display);
 	struct JBWMScreen s[i]; // remains in scope till exit.
 	jbwm_data.screens = s;
 	while (i--)

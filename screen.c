@@ -22,7 +22,7 @@ static void draw_outline(struct JBWMClient * restrict c)
 	if (!c->border)
 		return;
 	const uint8_t offset = c->opt.no_title_bar ? 0 : jbwm_get_font_height();
-	XDrawRectangle(jbwm.d, c->screen->root, c->screen->gc,
+	XDrawRectangle(jbwm_get_display(), c->screen->root, c->screen->gc,
 		c->size.x, c->size.y - offset,
 		c->size.width + c->border,
 		c->size.height + c->border + offset);
@@ -30,7 +30,7 @@ static void draw_outline(struct JBWMClient * restrict c)
 __attribute__((nonnull))
 static void configure(XSizeHints * restrict g, const jbwm_window_t w)
 {
-	XSendEvent(jbwm.d, w, true, StructureNotifyMask, (XEvent *)
+	XSendEvent(jbwm_get_display(), w, true, StructureNotifyMask, (XEvent *)
 		&(XConfigureEvent){.x = g->x, .y = g->y, .width = g->width,
 		.height = g->height, .type = ConfigureNotify, .event = w });
 }
@@ -38,20 +38,20 @@ static void grab_pointer(const jbwm_window_t w)
 {
 	static Cursor c;
 	if (!c)
-		c = XCreateFontCursor(jbwm.d, XC_fleur);
-	XGrabPointer(jbwm.d, w, false, JBWMMouseMask, GrabModeAsync,
+		c = XCreateFontCursor(jbwm_get_display(), XC_fleur);
+	XGrabPointer(jbwm_get_display(), w, false, JBWMMouseMask, GrabModeAsync,
 		GrabModeAsync, None, c, CurrentTime);
 }
 static jbwm_point_t get_mouse_position(jbwm_window_t w)
 {
 	int x, y;
-	XQueryPointer(jbwm.d, w, &(Window){0}, &(Window){0},
+	XQueryPointer(jbwm_get_display(), w, &(Window){0}, &(Window){0},
 		&x, &y, &(int){0}, &(int){0}, &(unsigned int){0});
 	return (jbwm_point_t){x, y};
 }
 static void warp_corner(struct JBWMClient * restrict c)
 {
-	XWarpPointer(jbwm.d, None, c->window, 0, 0, 0, 0,
+	XWarpPointer(jbwm_get_display(), None, c->window, 0, 0, 0, 0,
 		c->size.width, c->size.height);
 }
 static void set_size(struct JBWMClient * restrict c,
@@ -83,7 +83,7 @@ static void drag_event_loop(struct JBWMClient * restrict c, const bool resize)
 	const jbwm_point_t original = {c->size.x, c->size.y};
 	for (;;) {
 		XEvent e;
-		XMaskEvent(jbwm.d, JBWMMouseMask, &e);
+		XMaskEvent(jbwm_get_display(), JBWMMouseMask, &e);
 		if (e.type != MotionNotify)
 			return;
 		draw_outline(c);
@@ -94,7 +94,7 @@ static void drag_event_loop(struct JBWMClient * restrict c, const bool resize)
 }
 void jbwm_drag(struct JBWMClient * restrict c, const bool resize)
 {
-	XRaiseWindow(jbwm.d, c->parent);
+	XRaiseWindow(jbwm_get_display(), c->parent);
 	if (resize && (c->opt.no_resize || c->opt.shaded))
 		return;
 	grab_pointer(c->screen->root);
@@ -102,7 +102,7 @@ void jbwm_drag(struct JBWMClient * restrict c, const bool resize)
 		warp_corner(c);
 	drag_event_loop(c, resize);
 	draw_outline(c);
-	XUngrabPointer(jbwm.d, CurrentTime);
+	XUngrabPointer(jbwm_get_display(), CurrentTime);
 	jbwm_move_resize(c);
 	if (!resize && !c->opt.tearoff)
 		configure((&c->size), c->window);
@@ -112,26 +112,26 @@ void jbwm_move_resize(struct JBWMClient * restrict c)
 	JBWM_LOG("jbwm_move_resize");
 	const uint8_t offset = c->opt.no_title_bar || c->opt.fullscreen
 		? 0 : jbwm_get_font_height();
-	XMoveResizeWindow(jbwm.d, c->parent,
+	XMoveResizeWindow(jbwm_get_display(), c->parent,
 		c->size.x, c->size.y - offset,
 		c->size.width, c->size.height + offset);
-	XMoveResizeWindow(jbwm.d, c->window,
+	XMoveResizeWindow(jbwm_get_display(), c->window,
 		0, offset,
 		c->size.width, c->size.height);
 	if(offset) { // Leave braces in case title bar support was disabled.
 		jbwm_update_title_bar(c);
 	} // Skip shaped and fullscreen clients.
-	jbwm_set_shape(c);
+	jbwm_set_shape(jbwm_get_display(), c);
 }
 static void hide(struct JBWMClient * restrict c)
 {
-	XUnmapWindow(jbwm.d, c->parent);
+	XUnmapWindow(jbwm_get_display(), c->parent);
 	jbwm_set_wm_state(c, IconicState);
 	jbwm_ewmh_add_state(c->window, ewmh[WM_STATE_HIDDEN]);
 }
 void jbwm_restore_client(struct JBWMClient * restrict c)
 {
-	XMapWindow(jbwm.d, c->parent);
+	XMapWindow(jbwm_get_display(), c->parent);
 	jbwm_set_wm_state(c, NormalState);
 	jbwm_ewmh_remove_state(c->window, ewmh[WM_STATE_HIDDEN]);
 }

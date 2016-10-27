@@ -83,7 +83,7 @@ static void set_not_fullscreen(struct JBWMClient * restrict c)
 	c->opt.fullscreen = false;
 	set_not_horz(c);
 	set_not_vert(c);
-	XSetWindowBorderWidth(jbwm.d, c->parent, c->border);
+	XSetWindowBorderWidth(jbwm_get_display(), c->parent, c->border);
 	jbwm_ewmh_remove_state(c->window, ewmh[WM_STATE_FULLSCREEN]);
 	jbwm_update_title_bar(c);
 }
@@ -107,7 +107,7 @@ static void set_fullscreen(struct JBWMClient * restrict c)
 		set_not_vert(c);
 	set_horz(c);
 	set_vert(c);
-	XSetWindowBorderWidth(jbwm.d, c->parent, 0);
+	XSetWindowBorderWidth(jbwm_get_display(), c->parent, 0);
 	jbwm_ewmh_add_state(c->window, ewmh[WM_STATE_FULLSCREEN]);
 	jbwm_update_title_bar(c);
 }

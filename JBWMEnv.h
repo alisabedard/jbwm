@@ -8,10 +8,6 @@
 #ifdef JBWM_USE_XFT
 #include <X11/Xft/Xft.h>
 #endif//JBWM_USE_XFT
-struct JBWMEnv {
-	Display * d;
-};
-extern struct JBWMEnv jbwm;
 #ifdef JBWM_USE_TITLE_BAR
 void * jbwm_get_font(void);
 uint8_t jbwm_get_font_ascent(void);
@@ -20,5 +16,6 @@ uint8_t jbwm_get_font_height(void);
 #else//!JBWM_USE_TITLE_BAR
 #define jbwm_get_font_height() 0
 #endif//JBWM_USE_TITLE_BAR
+Display * jbwm_get_display(void);
 struct JBWMScreen * jbwm_get_screens(void);
 #endif /* not JBWM_ENVIRONMENT_H */

@@ -37,7 +37,7 @@ static bool ewmh_get_state(const Window w, const Atom state)
 }
 void jbwm_ewmh_add_state(const Window w, Atom state)
 {
-	XChangeProperty(jbwm.d, w, ewmh[WM_STATE],
+	XChangeProperty(jbwm_get_display(), w, ewmh[WM_STATE],
 		XA_ATOM, 32, PropModePrepend,
 		(unsigned char *)&state, 1);
 }
@@ -66,10 +66,10 @@ static void set_state(struct JBWMClient * restrict c,
 		c->opt.sticky=add;
 		break;
 	case WM_STATE_ABOVE:
-		(add ? XRaiseWindow : XLowerWindow)(jbwm.d, c->parent);
+		(add ? XRaiseWindow : XLowerWindow)(jbwm_get_display(), c->parent);
 		break;
 	case WM_STATE_BELOW:
-		(add ? XLowerWindow : XRaiseWindow)(jbwm.d, c->parent);
+		(add ? XLowerWindow : XRaiseWindow)(jbwm_get_display(), c->parent);
 		break;
 	case WM_STATE_HIDDEN:
 		JBWM_LOG("HIDDEN");
@@ -130,7 +130,7 @@ static bool client_specific_message(XClientMessageEvent * restrict e,
 		jbwm_set_client_vdesk(c, e->data.l[0]);
 	// If user moves window (client-side title bars):
 	else if (t == ewmh[WM_MOVERESIZE]) {
-		XRaiseWindow(jbwm.d, c->parent);
+		XRaiseWindow(jbwm_get_display(), c->parent);
 		jbwm_drag(c, false);
 	} else if (t == ewmh[WM_STATE])
 		handle_wm_state_changes(e, c);

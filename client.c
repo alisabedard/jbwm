@@ -49,7 +49,7 @@ void jbwm_relink_client_list(struct JBWMClient * c)
 char * jbwm_get_title(const jbwm_window_t w)
 {
 	XTextProperty tp;
-	if (!XGetWMName(jbwm.d, w, &tp))
+	if (!XGetWMName(jbwm_get_display(), w, &tp))
 		  return NULL;
 	return (char *)tp.value;
 }
@@ -80,7 +80,7 @@ struct JBWMClient * jbwm_get_client(const jbwm_window_t w)
 static void unselect_current(void)
 {
 	if(!jbwm_client_data.current) return;
-	XSetWindowBorder(jbwm.d, jbwm_client_data.current->parent,
+	XSetWindowBorder(jbwm_get_display(), jbwm_client_data.current->parent,
 		jbwm_client_data.current->screen->pixels.bg);
 #ifdef JBWM_USE_EWMH
 	jbwm_ewmh_remove_state(jbwm_client_data.current->window,
@@ -89,7 +89,7 @@ static void unselect_current(void)
 }
 static void set_border(struct JBWMClient * restrict c)
 {
-	XSetWindowBorder(jbwm.d, c->parent, c->opt.sticky
+	XSetWindowBorder(jbwm_get_display(), c->parent, c->opt.sticky
 		? c->screen->pixels.fc : c->screen->pixels.fg);
 }
 void jbwm_select_client(struct JBWMClient * c)
@@ -97,8 +97,8 @@ void jbwm_select_client(struct JBWMClient * c)
 	if(!c)
 		return;
 	unselect_current();
-	XInstallColormap(jbwm.d, c->cmap);
-	XSetInputFocus(jbwm.d, c->window, RevertToPointerRoot, CurrentTime);
+	XInstallColormap(jbwm_get_display(), c->cmap);
+	XSetInputFocus(jbwm_get_display(), c->window, RevertToPointerRoot, CurrentTime);
 	set_border(c);
 	jbwm_client_data.current = c;
 #ifdef JBWM_USE_EWMH
@@ -122,7 +122,7 @@ void jbwm_toggle_sticky(struct JBWMClient * c)
 static Status xmsg(const jbwm_window_t w, const Atom a, const long x)
 {
 	JBWM_LOG("xmsg");
-	return XSendEvent(jbwm.d, w, false, NoEventMask, &(XEvent){
+	return XSendEvent(jbwm_get_display(), w, false, NoEventMask, &(XEvent){
 		.xclient.type = ClientMessage, .xclient.window = w,
 		.xclient.message_type = a, .xclient.format = 32,
 		.xclient.data.l[0] = x, .xclient.data.l[1] = CurrentTime
@@ -130,7 +130,7 @@ static Status xmsg(const jbwm_window_t w, const Atom a, const long x)
 }
 static jbwm_atom_t get_atom(jbwm_atom_t * a, const char * name)
 {
-	return *a ? *a : (*a = XInternAtom(jbwm.d, name, false));
+	return *a ? *a : (*a = XInternAtom(jbwm_get_display(), name, false));
 }
 static jbwm_atom_t get_wm_protocols(void)
 {
@@ -157,7 +157,7 @@ static bool has_delete_proto(const jbwm_window_t w)
 	bool found=false;
 	Atom *p;
 	int i;
-	if(XGetWMProtocols(jbwm.d, w, &p, &i)) {
+	if(XGetWMProtocols(jbwm_get_display(), w, &p, &i)) {
 		while(i-- && !found)
 			found = p[i] == get_wm_delete_window();
 		XFree(p);
@@ -167,10 +167,10 @@ static bool has_delete_proto(const jbwm_window_t w)
 void jbwm_send_wm_delete(struct JBWMClient * restrict c)
 {
 	if (c->opt.remove) { // this allows a second click to force a kill
-		XKillClient(jbwm.d, c->window);
+		XKillClient(jbwm_get_display(), c->window);
 		return;
 	}
 	c->opt.remove = true;
 	has_delete_proto(c->window)?xmsg(c->window, get_wm_protocols(),
-		get_wm_delete_window()): XKillClient(jbwm.d, c->window);
+		get_wm_delete_window()): XKillClient(jbwm_get_display(), c->window);
 }

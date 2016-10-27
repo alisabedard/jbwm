@@ -50,7 +50,7 @@ static void set_frame_extents(struct JBWMClient * c)
 __attribute__((nonnull))
 static void init_properties(struct JBWMClient * c)
 {
-	jbwm_handle_mwm_hints(c);
+	jbwm_handle_mwm_hints(jbwm_get_display(), c);
 	c->vdesk = c->screen->vdesk;
 	c->vdesk = wm_desktop(c->window, c->vdesk);
 }
@@ -58,9 +58,9 @@ __attribute__((nonnull))
 static void init_geometry(struct JBWMClient * c)
 {
 	XWindowAttributes attr;
-	XGetWindowAttributes(jbwm.d, c->window, &attr);
+	XGetWindowAttributes(jbwm_get_display(), c->window, &attr);
 	c->cmap = attr.colormap;
-	XGetWMNormalHints(jbwm.d, c->window, &(c->size), &(long){0});
+	XGetWMNormalHints(jbwm_get_display(), c->window, &(c->size), &(long){0});
 	c->size.width = (attr.width >= c->size.min_width)
 		? attr.width : c->size.min_width;
 	c->size.height = (attr.height >= c->size.min_height)
@@ -77,7 +77,7 @@ static void init_geometry(struct JBWMClient * c)
 __attribute__((nonnull))
 static Window get_parent(struct JBWMClient * restrict c)
 {
-	return XCreateWindow(jbwm.d, c->screen->root, c->size.x, c->size.y,
+	return XCreateWindow(jbwm_get_display(), c->screen->root, c->size.x, c->size.y,
 		c->size.width, c->size.height, c->border, CopyFromParent,
 		CopyFromParent, CopyFromParent, CWOverrideRedirect
 		| CWEventMask, &(XSetWindowAttributes){
@@ -89,11 +89,11 @@ __attribute__((nonnull))
 static void reparent(struct JBWMClient * c) // use of restrict here is a bug
 {
 	JBWM_LOG("reparent()");
-	jbwm_new_shaped_client(c);
+	jbwm_new_shaped_client(jbwm_get_display(), c);
 	const jbwm_window_t p = c->parent = get_parent(c), w = c->window;
-	XAddToSaveSet(jbwm.d, w);
-	XReparentWindow(jbwm.d, w, p, 0, 0);
-	XMapWindow(jbwm.d, w);
+	XAddToSaveSet(jbwm_get_display(), w);
+	XReparentWindow(jbwm_get_display(), w, p, 0, 0);
+	XMapWindow(jbwm_get_display(), w);
 }
 // Allocate the client structure with some defaults set
 static struct JBWMClient * get_JBWMClient(const jbwm_window_t w,
@@ -107,7 +107,7 @@ static struct JBWMClient * get_JBWMClient(const jbwm_window_t w,
 // Grab input and setup JBWM_USE_EWMH for client window
 static void do_grabs(const jbwm_window_t w)
 {
-	XSelectInput(jbwm.d, w, EnterWindowMask
+	XSelectInput(jbwm_get_display(), w, EnterWindowMask
 		| PropertyChangeMask | ColormapChangeMask);
 	jbwm_grab_window_keys(w);
 	jbwm_ewmh_set_allowed_actions(w);

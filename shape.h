@@ -6,12 +6,14 @@
 #define JBWM_SHAPE_H
 #ifdef JBWM_USE_SHAPE
 #include "JBWMClient.h"
-void jbwm_new_shaped_client(struct JBWMClient * c)
+void jbwm_new_shaped_client(Display * restrict dpy,
+	struct JBWMClient * restrict c)
 	__attribute__((nonnull));
-void jbwm_set_shape(struct JBWMClient * c)
+void jbwm_set_shape(Display * restrict dpy,
+	struct JBWMClient * restrict c)
 	__attribute__((nonnull));
 #else//!JBWM_USE_SHAPE
-#define jbwm_new_shaped_client(c)
-#define jbwm_set_shape(c)
+#define jbwm_new_shaped_client(d, c)
+#define jbwm_set_shape(d, c)
 #endif//JBWM_USE_SHAPE
 #endif//!JBWM_SHAPE_H

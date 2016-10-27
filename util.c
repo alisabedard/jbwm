@@ -8,7 +8,7 @@ void jbwm_set_property(const jbwm_window_t win,
 	const jbwm_atom_t property, const jbwm_atom_t type,
 	void * restrict data, int16_t size)
 {
-	XChangeProperty(jbwm.d, win, property, type, 32, PropModeReplace,
+	XChangeProperty(jbwm_get_display(), win, property, type, 32, PropModeReplace,
 		data, size);
 }
 unsigned long jbwm_get_pixel(const uint8_t screen, const char * restrict name)
@@ -16,7 +16,7 @@ unsigned long jbwm_get_pixel(const uint8_t screen, const char * restrict name)
 	if (!name) // sanitize input to avoid segfault
 		return 0;
 	XColor c, d;
-	XAllocNamedColor(jbwm.d, DefaultColormap(jbwm.d, screen),
+	XAllocNamedColor(jbwm_get_display(), DefaultColormap(jbwm_get_display(), screen),
 		name, &c, &d);
 	return c.pixel;
 }
@@ -29,7 +29,7 @@ void *jbwm_get_property(jbwm_window_t w, Atom property, uint16_t * num_items)
 	{
 		long unsigned int b;
 		int d;
-		XGetWindowProperty(jbwm.d, w, property, 0, 1024, false,
+		XGetWindowProperty(jbwm_get_display(), w, property, 0, 1024, false,
 			AnyPropertyType, &property, &d, &n, &b, &prop);
 	}
 	*num_items = n;
@@ -39,7 +39,7 @@ void *jbwm_get_property(jbwm_window_t w, Atom property, uint16_t * num_items)
 void jbwm_grab_button(const jbwm_window_t w, const unsigned int mask,
 		 const unsigned int btn)
 {
-	XGrabButton(jbwm.d, btn, mask, w, false,
+	XGrabButton(jbwm_get_display(), btn, mask, w, false,
 		    ButtonPressMask | ButtonReleaseMask, GrabModeAsync,
 		    GrabModeSync, None, None);
 }
@@ -47,7 +47,7 @@ void jbwm_grab_button(const jbwm_window_t w, const unsigned int mask,
 #include <stdio.h>
 void jbwm_print_atom(const Atom a, const char * src, const uint16_t line)
 {
-	char *an = XGetAtomName(jbwm.d, a);
+	char *an = XGetAtomName(jbwm_get_display(), a);
 	fprintf(stderr, "\t%s:%d %s(%lu)\n", src, line, an, a);
 	XFree(an);
 }

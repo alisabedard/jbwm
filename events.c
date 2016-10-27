@@ -33,13 +33,13 @@ void jbwm_free_client(struct JBWMClient * restrict c)
 	const jbwm_window_t w = c->window;
 #ifdef JBWM_USE_EWMH
 	// Per ICCCM + JBWM_USE_EWMH:
-	XDeleteProperty(jbwm.d, w, ewmh[WM_STATE]);
-	XDeleteProperty(jbwm.d, w, ewmh[WM_DESKTOP]);
+	XDeleteProperty(jbwm_get_display(), w, ewmh[WM_STATE]);
+	XDeleteProperty(jbwm_get_display(), w, ewmh[WM_DESKTOP]);
 #endif//JBWM_USE_EWMH
-	XReparentWindow(jbwm.d, w, c->screen->root, c->size.x, c->size.y);
-	XRemoveFromSaveSet(jbwm.d, w);
+	XReparentWindow(jbwm_get_display(), w, c->screen->root, c->size.x, c->size.y);
+	XRemoveFromSaveSet(jbwm_get_display(), w);
 	if(c->parent)
-		XDestroyWindow(jbwm.d, c->parent);
+		XDestroyWindow(jbwm_get_display(), c->parent);
 	jbwm_relink_client_list(c);
 	free(c);
 	/* Allow this client's window id to be reused for another client: */
@@ -77,7 +77,7 @@ static void handle_property_change(XPropertyEvent * restrict e,
 static void handle_configure_request(XConfigureRequestEvent * e)
 {
 	JBWM_LOG("handle_configure_request");
-	XConfigureWindow(jbwm.d, e->window, e->value_mask,
+	XConfigureWindow(jbwm_get_display(), e->window, e->value_mask,
 		&(XWindowChanges){ .x = e->x, .y = e->y,
 		.width = e->width, .height = e->height,
 		.border_width = e->border_width,
@@ -92,21 +92,22 @@ static void handle_map_request(XMapRequestEvent * e)
 		return;
 	jbwm_events_data.last_window = e->window;
 	jbwm_new_client(e->window, get_screen(
-		ScreenCount(jbwm.d), e->parent));
+		ScreenCount(jbwm_get_display()), e->parent));
 
 }
 static void iteration(void)
 {
 	XEvent ev;
 	struct JBWMClient * c;
-	XNextEvent(jbwm.d, &ev);
+	Display * d = jbwm_get_display();
+	XNextEvent(d, &ev);
 	c = jbwm_get_client(ev.xany.window);
 	switch (ev.type) {
 	case KeyPress:
 		jbwm_handle_key_event(&ev.xkey);
 		break;
 	case ButtonPress:
-		if(c) jbwm_handle_button_event(&ev.xbutton, c);
+		if(c) jbwm_handle_button_event(d, &ev.xbutton, c);
 		break;
 	case EnterNotify:
 		if(c && (ev.xcrossing.window == c->parent))
@@ -145,7 +146,7 @@ static void iteration(void)
 		if (c && ev.xcolormap.new) {
 			JBWM_LOG("ColormapNotify");
 			c->cmap = ev.xcolormap.colormap;
-			XInstallColormap(jbwm.d, c->cmap);
+			XInstallColormap(d, c->cmap);
 		}
 		break;
 #ifdef JBWM_USE_EWMH

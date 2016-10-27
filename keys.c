@@ -34,8 +34,8 @@ __attribute__((nonnull(1)))
 static void point(struct JBWMClient * restrict c, const int16_t x,
 	const int16_t y)
 {
-	XRaiseWindow(jbwm.d, c->parent);
-	XWarpPointer(jbwm.d, None, c->window, 0, 0, 0, 0, x, y);
+	XRaiseWindow(jbwm_get_display(), c->parent);
+	XWarpPointer(jbwm_get_display(), None, c->window, 0, 0, 0, 0, x, y);
 }
 __attribute__((nonnull(1)))
 static void commit_key_move(struct JBWMClient * restrict c)
@@ -122,10 +122,10 @@ static void handle_client_key_event(const bool mod,
 		break;
 	case JBWM_KEY_LOWER:
 	case JBWM_KEY_ALTLOWER:
-		XLowerWindow(jbwm.d, c->parent);
+		XLowerWindow(jbwm_get_display(), c->parent);
 		break;
 	case JBWM_KEY_RAISE:
-		XRaiseWindow(jbwm.d, c->parent);
+		XRaiseWindow(jbwm_get_display(), c->parent);
 		break;
 	case JBWM_KEY_FS:
 		jbwm_set_fullscreen(c);
@@ -231,7 +231,8 @@ static void grab(struct JBWMScreen * restrict s, KeySym * restrict ks,
 	const uint32_t mask)
 {
 	for (; *ks; ++ks)
-		XGrabKey(jbwm.d, XKeysymToKeycode(jbwm.d, *ks),
+		XGrabKey(jbwm_get_display(),
+			XKeysymToKeycode(jbwm_get_display(), *ks),
 			 jbwm_keys_data.grab_mask | mask, s->root, true,
 			 GrabModeAsync, GrabModeAsync);
 }

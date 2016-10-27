@@ -28,7 +28,8 @@ static void handle_title_bar_button(XButtonEvent * restrict e,
 #else//!JBWM_USE_TITLE_BAR
 #define handle_title_bar_button(e, c) jbwm_drag(c, false)
 #endif//JBWM_USE_TITLE_BAR
-void jbwm_handle_button_event(XButtonEvent * restrict e,
+void jbwm_handle_button_event(Display * restrict d,
+	XButtonEvent * restrict e,
 	struct JBWMClient * restrict c)
 {
 	JBWM_LOG("jbwm_handle_button_event");
@@ -36,12 +37,12 @@ void jbwm_handle_button_event(XButtonEvent * restrict e,
 	switch (e->button) {
 	case Button1:
 		if (fs)
-			XRaiseWindow(jbwm.d, c->parent);
+			XRaiseWindow(d, c->parent);
 		else
 			handle_title_bar_button(e, c);
 		break;
 	case Button2:
-		XLowerWindow(jbwm.d, c->parent);
+		XLowerWindow(d, c->parent);
 		break;
 	case Button3:
 		/* Resize operations more useful here,
@@ -50,7 +51,7 @@ void jbwm_handle_button_event(XButtonEvent * restrict e,
 		   to register a middle button press, even
 		   with X Emulate3Buttons enabled.  */
 		if (fs)
-			XLowerWindow(jbwm.d, c->parent);
+			XLowerWindow(d, c->parent);
 		else
 			jbwm_drag(c, !c->opt.shaded);
 		break;
