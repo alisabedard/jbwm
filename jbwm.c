@@ -236,7 +236,7 @@ static void setup_screen(const uint8_t i)
 	setup_screen_elements(i);
 	setup_gc(s);
 	setup_event_listeners(s->root);
-	jbwm_grab_screen_keys(s);
+	jbwm_grab_screen_keys(jbwm_data.display, s);
 	/* scan all the windows on this screen */
 	setup_clients(s);
 	jbwm_ewmh_init_screen(s);

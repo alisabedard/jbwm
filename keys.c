@@ -102,8 +102,8 @@ static void toggle_maximize(struct JBWMClient * restrict c)
 		return;
 	(o.max_horz && o.max_vert ? set_maximized : set_not_maximized)(c);
 }
-__attribute__((nonnull(2)))
-static void handle_client_key_event(const bool mod,
+__attribute__((nonnull(1,3)))
+static void handle_client_key_event(Display * restrict d, const bool mod,
 	struct JBWMClient * restrict c, const KeySym key)
 {
 	JBWM_LOG("handle_client_key_event: %d", (int)key);
@@ -114,7 +114,6 @@ static void handle_client_key_event(const bool mod,
 		}
 		return; // prevent other operations while fullscreen
 	}
-	Display * d = jbwm_get_display();
 	switch (key) {
 	case JBWM_KEY_LEFT:
 	case JBWM_KEY_RIGHT:
@@ -228,21 +227,20 @@ void jbwm_handle_key_event(Display * restrict d, XKeyEvent * restrict e)
 		break;
 	default:
 		if (c)
-			handle_client_key_event(opt.mod, c, key);
+			handle_client_key_event(d, opt.mod, c, key);
 	}
 }
-__attribute__((nonnull(1,2)))
-static void grab(struct JBWMScreen * restrict s, KeySym * restrict ks,
-	const uint32_t mask)
+__attribute__((nonnull))
+static void grab(Display * restrict d, struct JBWMScreen * restrict s,
+	KeySym * restrict ks, const uint32_t mask)
 {
 	for (; *ks; ++ks)
-		XGrabKey(jbwm_get_display(),
-			XKeysymToKeycode(jbwm_get_display(), *ks),
+		XGrabKey(d, XKeysymToKeycode(d, *ks),
 			 jbwm_keys_data.grab_mask | mask, s->root, true,
 			 GrabModeAsync, GrabModeAsync);
 }
-void jbwm_grab_screen_keys(struct JBWMScreen * restrict s)
+void jbwm_grab_screen_keys(Display * restrict d, struct JBWMScreen * restrict s)
 {
-	grab(s, (KeySym[]){JBWM_KEYS_TO_GRAB}, 0);
-	grab(s, (KeySym[]){JBWM_ALT_KEYS_TO_GRAB}, jbwm_keys_data.mod_mask);
+	grab(d, s, (KeySym[]){JBWM_KEYS_TO_GRAB}, 0);
+	grab(d, s, (KeySym[]){JBWM_ALT_KEYS_TO_GRAB}, jbwm_keys_data.mod_mask);
 }
