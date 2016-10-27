@@ -41,7 +41,7 @@ static void set_frame_extents(struct JBWMClient * c)
 	// Required by wm-spec 1.4:
 	const uint8_t b = c->border;
 	jbwm_set_property(c->window, ewmh[FRAME_EXTENTS], XA_CARDINAL,
-		(&(jbwm_atom_t[]){b, b, b + (c->opt.no_title_bar ? 0 : TDIM),
+		(&(jbwm_atom_t[]){b, b, b + (c->opt.no_title_bar ? 0 : jbwm_get_font_height()),
 		 b}), 4);
 }
 #else//!JBWM_USE_EWMH

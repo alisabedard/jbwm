@@ -19,6 +19,33 @@
 #endif//STDIO
 // Main application data structure.
 struct JBWMEnv jbwm;
+static struct {
+#ifdef JBWM_USE_TITLE_BAR
+#ifdef JBWM_USE_XFT
+	XftFont * font;
+#else//! JBWM_USE_XFT
+	XFontStruct * font;
+#endif//JBWM_USE_XFT
+#endif//JBWM_USE_TITLE_BAR
+} jbwm_data;
+#ifdef JBWM_USE_TITLE_BAR
+void * jbwm_get_font(void)
+{
+	return jbwm_data.font;
+}
+uint8_t jbwm_get_font_ascent(void)
+{
+	return jbwm_data.font->ascent;
+}
+uint8_t jbwm_get_font_descent(void)
+{
+	return jbwm_data.font->descent;
+}
+uint8_t jbwm_get_font_height(void)
+{
+	return jbwm_data.font->ascent + jbwm_data.font->descent;
+}
+#endif//JBWM_USE_TITLE_BAR
 static void print(const size_t sz, const char * buf)
 {
 	if (write(1, buf, sz) == -1)
@@ -116,13 +143,13 @@ static void setup_fonts(void)
 {
 	char * font = getenv(JBWM_ENV_FONT);
 #ifdef JBWM_USE_XFT
-	jbwm.font = XftFontOpen(jbwm.d, DefaultScreen(jbwm.d),
+	jbwm_data.font = XftFontOpen(jbwm.d, DefaultScreen(jbwm.d),
 		XFT_FAMILY, XftTypeString, font, XFT_SIZE,
 		XftTypeDouble, JBWM_FONT_SIZE, NULL);
 #else//!JBWM_USE_XFT
-	jbwm.font = XLoadQueryFont(jbwm.d, font);
+	jbwm_data.font = XLoadQueryFont(jbwm.d, font);
 #endif//JBWM_USE_XFT
-	if (!jbwm.font)
+	if (!jbwm_data.font)
 		jbwm_error(JBWM_ENV_FONT);
 }
 #else//!JBWM_USE_TITLE_BAR
@@ -188,7 +215,7 @@ static void setup_gc(struct JBWMScreen * restrict s)
 		.line_width = 1
 	};
 #if defined(JBWM_USE_TITLE_BAR) && !defined(JBWM_USE_XFT)
-	gv.font = jbwm.font->fid;
+	gv.font = jbwm_data.font->fid;
 	vm |= GCFont;
 #endif//JBWM_USE_TITLE_BAR&&!JBWM_USE_XFT
 	s->gc = XCreateGC(jbwm.d, s->root, vm, &gv);

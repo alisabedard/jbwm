@@ -21,7 +21,7 @@ static void draw_outline(struct JBWMClient * restrict c)
 {
 	if (!c->border)
 		return;
-	const uint8_t offset = c->opt.no_title_bar ? 0 : TDIM;
+	const uint8_t offset = c->opt.no_title_bar ? 0 : jbwm_get_font_height();
 	XDrawRectangle(jbwm.d, c->screen->root, c->screen->gc,
 		c->size.x, c->size.y - offset,
 		c->size.width + c->border,
@@ -111,7 +111,7 @@ void jbwm_move_resize(struct JBWMClient * restrict c)
 {
 	JBWM_LOG("jbwm_move_resize");
 	const uint8_t offset = c->opt.no_title_bar || c->opt.fullscreen
-		? 0 : TDIM;
+		? 0 : jbwm_get_font_height();
 	XMoveResizeWindow(jbwm.d, c->parent,
 		c->size.x, c->size.y - offset,
 		c->size.width, c->size.height + offset);

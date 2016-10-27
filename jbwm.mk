@@ -39,7 +39,7 @@ $(exe): $(objects)
 include depend.mk
 # Use `` for basename for BSD make compatibility
 ${objects}:
-	${CC} ${CFLAGS} ${jbwm_cflags} -c `basename -s .o $@`.c
+	${CC} ${CFLAGS} ${jbwm_cflags} -c `basename $@ .o`.c
 strip: 
 	# Leave .plt.got
 	strip -s \

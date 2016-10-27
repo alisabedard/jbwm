@@ -24,7 +24,7 @@ void jbwm_snap_border(struct JBWMClient *restrict c)
 	g->x=sborder(g->x, 0 - b);
 	const struct JBWMSize s = c->screen->size;
 	g->x=sborder(g->x, g->width - s.width + b);
-	g->y=sborder(g->y, 0 - (c->opt.no_title_bar?0:TDIM));
+	g->y=sborder(g->y, 0 - (c->opt.no_title_bar?0:jbwm_get_font_height()));
 	g->y=sborder(g->y, g->height + b - s.height);
 }
 __attribute__ ((const, hot, warn_unused_result))

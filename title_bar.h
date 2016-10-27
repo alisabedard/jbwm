@@ -10,10 +10,7 @@ void jbwm_toggle_shade(struct JBWMClient * restrict c)
 	__attribute__((nonnull));
 void jbwm_update_title_bar(struct JBWMClient * c)
 	__attribute__((nonnull));
-/* Ensure that the title text fits within the title bar.  */
-#define TDIM (jbwm.font->ascent+jbwm.font->descent)
 #else//!JBWM_USE_TITLE_BAR
-#define TDIM 0
 #define jbwm_toggle_shade(c)
 #define jbwm_update_title_bar(c)
 #endif//JBWM_USE_TITLE_BAR

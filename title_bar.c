@@ -38,7 +38,7 @@ void jbwm_toggle_shade(struct JBWMClient * restrict c)
 }
 static uint16_t mv(const jbwm_window_t w, uint16_t x)
 {
-	x -= TDIM;
+	x -= jbwm_get_font_height();
 	XMoveWindow(jbwm.d, w, x, 0);
 	return x;
 }
@@ -49,7 +49,7 @@ static void move_buttons(struct JBWMClientTitlebar * restrict t,
 }
 static jbwm_window_t get_win(const Window p, const jbwm_pixel_t bg)
 {
-	return XCreateSimpleWindow(jbwm.d, p, 0, 0, TDIM, TDIM, 0, 0, bg);
+	return XCreateSimpleWindow(jbwm.d, p, 0, 0, jbwm_get_font_height(), jbwm_get_font_height(), 0, 0, bg);
 }
 static jbwm_window_t new_title_bar(struct JBWMClient * restrict c)
 {
@@ -67,7 +67,7 @@ static jbwm_window_t new_title_bar(struct JBWMClient * restrict c)
 	// Required by wm-spec 1.4:
 	const uint8_t b = c->border;
 	jbwm_set_property(c->window, ewmh[FRAME_EXTENTS], XA_CARDINAL,
-		(&(jbwm_atom_t[]){b, b, b + TDIM, b}), 4);
+		(&(jbwm_atom_t[]){b, b, b + jbwm_get_font_height(), b}), 4);
 #endif//JBWM_USE_EWMH
 	return t;
 }
@@ -76,8 +76,9 @@ static void
 draw_xft(struct JBWMClient * restrict c, const XPoint * restrict p,
 	 char * restrict name, const size_t l)
 {
+	XftFont * f = jbwm_get_font();
 	XGlyphInfo e;
-	XftTextExtentsUtf8(jbwm.d, jbwm.font, (XftChar8 *) name, l, &e);
+	XftTextExtentsUtf8(jbwm.d, f, (XftChar8 *) name, l, &e);
 	const uint8_t s = c->screen->screen;
 	Visual *v = DefaultVisual(jbwm.d, s);
 	const Colormap cm = DefaultColormap(jbwm.d, s);
@@ -85,11 +86,10 @@ draw_xft(struct JBWMClient * restrict c, const XPoint * restrict p,
 	XftColor color;
 	XftColorAllocName(jbwm.d, v, cm, getenv(JBWM_ENV_FG), &color);
 	/* Prevent the text from going over the resize button.  */
-	const uint16_t max_width = c->size.width - 3 * TDIM;
-	XftDrawStringUtf8(xd, &color, jbwm.font, p->x, p->y,
-			  (XftChar8 *) name,
-			  e.width > max_width
-			  && e.width > 0 ? l * max_width / e.width : l);
+	const uint16_t max_width = c->size.width - 3 * jbwm_get_font_height();
+	XftDrawStringUtf8(xd, &color, f, p->x, p->y, (XftChar8 *) name,
+			  e.width > max_width && e.width > 0
+			  ? l * max_width / e.width : l);
 	XftDrawDestroy(xd);
 	XftColorFree(jbwm.d, v, cm, &color);
 }
@@ -98,7 +98,7 @@ static void draw_title(struct JBWMClient * restrict c)
 {
 	char * name = jbwm_get_title(c->window);
 	if(!name) return; // No title could be loaded, abort
-	const XPoint p = { TDIM + 4, jbwm.font->ascent };
+	const XPoint p = { jbwm_get_font_height() + 4, jbwm_get_font_ascent()};
 	size_t l = 0; // strlen
 	while(name[++l])
 		  ;
@@ -136,7 +136,7 @@ void jbwm_update_title_bar(struct JBWMClient * c)
 	/* Expand/Contract the title bar width as necessary:  */
 	{
 		const uint16_t width = c->size.width;
-		XResizeWindow(jbwm.d, w, width, TDIM);
+		XResizeWindow(jbwm.d, w, width, jbwm_get_font_height());
 		move_buttons(&c->tb, width);
 	}
 	XClearWindow(jbwm.d, w);

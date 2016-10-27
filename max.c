@@ -73,8 +73,8 @@ void jbwm_set_vert(struct JBWMClient * restrict c)
 	// Offset to hide borders:
 	c->size.height -= c->border << 1;
 	if (!c->opt.no_title_bar) {
-		c->size.y += TDIM + c->border;
-		c->size.height -= TDIM + (c->border << 1);
+		c->size.y += jbwm_get_font_height() + c->border;
+		c->size.height -= jbwm_get_font_height() + (c->border << 1);
 	}
 	jbwm_move_resize(c);
 }

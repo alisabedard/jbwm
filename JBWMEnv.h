@@ -12,13 +12,14 @@ struct JBWMEnv {
 	Display * d;
 	// Client tracking:
 	struct JBWMScreen * s;
-#ifdef JBWM_USE_TITLE_BAR
-#ifdef JBWM_USE_XFT
-	XftFont * font;
-#else//! JBWM_USE_XFT
-	XFontStruct * font;
-#endif//JBWM_USE_XFT
-#endif//JBWM_USE_TITLE_BAR
 };
 extern struct JBWMEnv jbwm;
+#ifdef JBWM_USE_TITLE_BAR
+void * jbwm_get_font(void);
+uint8_t jbwm_get_font_ascent(void);
+uint8_t jbwm_get_font_descent(void);
+uint8_t jbwm_get_font_height(void);
+#else//!JBWM_USE_TITLE_BAR
+#define jbwm_get_font_height() 0
+#endif//JBWM_USE_TITLE_BAR
 #endif /* not JBWM_ENVIRONMENT_H */
