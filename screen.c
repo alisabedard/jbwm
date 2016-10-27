@@ -57,8 +57,8 @@ static void warp_corner(struct JBWMClient * restrict c)
 static void set_size(struct JBWMClient * restrict c,
 	const int16_t x, const int16_t y)
 {
-	c->size.width=abs(c->size.x - x);
-	c->size.height=abs(c->size.y - y);
+	c->size.width = abs(c->size.x - x);
+	c->size.height = abs(c->size.y - y);
 }
 static void set_position(struct JBWMClient * restrict c,
 	jbwm_point_t old, jbwm_point_t start,
