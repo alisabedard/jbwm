@@ -20,7 +20,6 @@ struct JBWMEnv {
 	XFontStruct * font;
 #endif//JBWM_USE_XFT
 #endif//JBWM_USE_TITLE_BAR
-	Cursor cursor;
 };
 extern struct JBWMEnv jbwm;
 #endif /* not JBWM_ENVIRONMENT_H */

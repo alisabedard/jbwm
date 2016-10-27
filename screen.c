@@ -13,6 +13,7 @@
 #include "title_bar.h"
 #include "util.h"
 #include <stdlib.h>
+#include <X11/cursorfont.h>
 #include <X11/Xatom.h>
 enum {JBWMMouseMask=(ButtonPressMask|ButtonReleaseMask|PointerMotionMask)};
 __attribute__ ((hot,nonnull))
@@ -35,8 +36,11 @@ static void configure(XSizeHints * restrict g, const jbwm_window_t w)
 }
 static void grab_pointer(const jbwm_window_t w)
 {
+	static Cursor c;
+	if (!c)
+		c = XCreateFontCursor(jbwm.d, XC_fleur);
 	XGrabPointer(jbwm.d, w, false, JBWMMouseMask, GrabModeAsync,
-		GrabModeAsync, None, jbwm.cursor, CurrentTime);
+		GrabModeAsync, None, c, CurrentTime);
 }
 static jbwm_point_t get_mouse_position(jbwm_window_t w)
 {

@@ -13,7 +13,6 @@
 #include "util.h"
 #include <stdlib.h>
 #include <unistd.h>
-#include <X11/cursorfont.h>
 #include <X11/Xproto.h>
 #ifdef STDIO
 #include <stdio.h>
@@ -250,7 +249,6 @@ int main(
 	jbwm_ewmh_init();
 	/* Fonts only needed with title bars */
 	setup_fonts();
-	jbwm.cursor = XCreateFontCursor(jbwm.d, XC_fleur);
 	uint8_t i = ScreenCount(jbwm.d);
 	struct JBWMScreen s[i]; // remains in scope till exit.
 	jbwm.s = s;
