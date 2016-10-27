@@ -5,7 +5,7 @@
 #include "keys.h"
 #include "client.h"
 #include "config.h"
-#include "JBWMEnv.h"
+#include "jbwm.h"
 #include "log.h"
 #include "max.h"
 #include "screen.h"

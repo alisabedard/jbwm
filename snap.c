@@ -5,7 +5,7 @@
 #include "snap.h"
 #include "client.h"
 #include "config.h"
-#include "JBWMEnv.h"
+#include "jbwm.h"
 #include "log.h"
 #include "title_bar.h"
 #include <stdlib.h>

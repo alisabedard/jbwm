@@ -7,7 +7,7 @@
 #include "client.h"
 #include "ewmh_state.h"
 #include "ewmh.h"
-#include "JBWMEnv.h"
+#include "jbwm.h"
 #include "keys.h"
 #include "log.h"
 #include "new.h"

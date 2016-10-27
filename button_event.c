@@ -4,7 +4,7 @@
 // See README for license and other details.
 #include "button_event.h"
 #include "client.h"
-#include "JBWMEnv.h"
+#include "jbwm.h"
 #include "log.h"
 #include "screen.h"
 #include "title_bar.h"

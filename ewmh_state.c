@@ -2,7 +2,7 @@
 #include "ewmh_state.h"
 #include "client.h"
 #include "ewmh.h"
-#include "JBWMEnv.h"
+#include "jbwm.h"
 #include "log.h"
 #include "max.h"
 #include "screen.h"

@@ -4,7 +4,7 @@
 // See README for license and other details.
 #include "ewmh.h"
 #include "client.h"
-#include "JBWMEnv.h"
+#include "jbwm.h"
 #include "log.h"
 #include "screen.h"
 #include "util.h"

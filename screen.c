@@ -6,7 +6,7 @@
 #include "client.h"
 #include "ewmh.h"
 #include "ewmh_state.h"
-#include "JBWMEnv.h"
+#include "jbwm.h"
 #include "log.h"
 #include "shape.h"
 #include "snap.h"

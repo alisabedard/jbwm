@@ -5,7 +5,7 @@
 #include "new.h"
 #include "client.h"
 #include "ewmh.h"
-#include "JBWMEnv.h"
+#include "jbwm.h"
 #include "keys.h"
 #include "log.h"
 #include "mwm.h"

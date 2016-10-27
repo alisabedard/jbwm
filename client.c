@@ -5,7 +5,7 @@
 #include "client.h"
 #include "ewmh.h"
 #include "ewmh_state.h"
-#include "JBWMEnv.h"
+#include "jbwm.h"
 #include "log.h"
 #include "screen.h"
 #include "title_bar.h"
