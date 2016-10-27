@@ -20,6 +20,7 @@
 // Main application data structure.
 struct JBWMEnv jbwm;
 static struct {
+	struct JBWMScreen * screens;
 #ifdef JBWM_USE_TITLE_BAR
 #ifdef JBWM_USE_XFT
 	XftFont * font;
@@ -46,6 +47,10 @@ uint8_t jbwm_get_font_height(void)
 	return jbwm_data.font->ascent + jbwm_data.font->descent;
 }
 #endif//JBWM_USE_TITLE_BAR
+struct JBWMScreen * jbwm_get_screens(void)
+{
+	return jbwm_data.screens;
+}
 static void print(const size_t sz, const char * buf)
 {
 	if (write(1, buf, sz) == -1)
@@ -195,7 +200,7 @@ static void setup_clients(struct JBWMScreen * restrict s)
 }
 static void setup_screen_elements(const uint8_t i)
 {
-	struct JBWMScreen *restrict s = &jbwm.s[i];
+	struct JBWMScreen * restrict s = jbwm_data.screens;
 	s->screen = i;
 	Display * d = jbwm.d;
 	s->root = RootWindow(d, i);
@@ -222,7 +227,7 @@ static void setup_gc(struct JBWMScreen * restrict s)
 }
 static void setup_screen(const uint8_t i)
 {
-	struct JBWMScreen *s = &jbwm.s[i];
+	struct JBWMScreen *s = &jbwm_data.screens[i];
 	setup_screen_elements(i);
 	setup_gc(s);
 	setup_event_listeners(s->root);
@@ -278,7 +283,7 @@ int main(
 	setup_fonts();
 	uint8_t i = ScreenCount(jbwm.d);
 	struct JBWMScreen s[i]; // remains in scope till exit.
-	jbwm.s = s;
+	jbwm_data.screens = s;
 	while (i--)
 		setup_screen(i);
 	jbwm_event_loop();

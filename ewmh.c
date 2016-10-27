@@ -72,11 +72,14 @@ void jbwm_ewmh_update_client_list(void)
 	for (struct JBWMClient * i = jbwm_get_head_client();
 		i; i = i->next, ++wl_sz)
 		wl[wl_sz] = i->window;
-	jbwm_set_property(jbwm.s->root, ewmh[CLIENT_LIST],
-		XA_WINDOW, &wl, wl_sz);
-	// FIXME: Does not correctly report stacking order.
-	jbwm_set_property(jbwm.s->root, ewmh[CLIENT_LIST_STACKING],
-		XA_WINDOW, &wl, wl_sz);
+	struct JBWMScreen * s = jbwm_get_screens();
+	for (uint8_t i = ScreenCount(jbwm.d); i; --i) {
+		jbwm_set_property(s[i].root, ewmh[CLIENT_LIST],
+			XA_WINDOW, &wl, wl_sz);
+		// FIXME: Does not correctly report stacking order.
+		jbwm_set_property(s[i].root, ewmh[CLIENT_LIST_STACKING],
+			XA_WINDOW, &wl, wl_sz);
+	}
 }
 static void set_root_vdesk(jbwm_window_t r)
 {

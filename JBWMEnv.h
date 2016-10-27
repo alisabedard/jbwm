@@ -10,8 +10,6 @@
 #endif//JBWM_USE_XFT
 struct JBWMEnv {
 	Display * d;
-	// Client tracking:
-	struct JBWMScreen * s;
 };
 extern struct JBWMEnv jbwm;
 #ifdef JBWM_USE_TITLE_BAR
@@ -22,4 +20,5 @@ uint8_t jbwm_get_font_height(void);
 #else//!JBWM_USE_TITLE_BAR
 #define jbwm_get_font_height() 0
 #endif//JBWM_USE_TITLE_BAR
+struct JBWMScreen * jbwm_get_screens(void);
 #endif /* not JBWM_ENVIRONMENT_H */

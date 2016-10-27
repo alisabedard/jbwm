@@ -166,12 +166,13 @@ void jbwm_ewmh_handle_client_message(XClientMessageEvent * restrict e,
 	jbwm_print_atom(e->data.l[2], __FILE__, __LINE__);
 	jbwm_print_atom(e->data.l[3], __FILE__, __LINE__);
 #endif//JBWM_EWMH_DEBUG
-	struct JBWMScreen *s = c ? c->screen : jbwm.s;
 	if(c && client_specific_message(e, c, t))
 		  return;
-	if (t == ewmh[CURRENT_DESKTOP])
+	if (t == ewmh[CURRENT_DESKTOP]) {
+		struct JBWMScreen *s = c ? c->screen
+			: jbwm_get_screens();
 		  jbwm_set_vdesk(s, e->data.l[0]);
-	// If something else moves the window:
-	else if (t == ewmh[MOVERESIZE_WINDOW])
+	} else if (t == ewmh[MOVERESIZE_WINDOW])
+		// If something else moves the window:
 		handle_moveresize(e);
 }

@@ -24,7 +24,8 @@ __attribute__((pure))
 static struct JBWMScreen * get_screen(const int8_t i,
 	const jbwm_window_t root)
 {
-	return jbwm.s[i].root == root ? &jbwm.s[i]
+	struct JBWMScreen * s = jbwm_get_screens();
+	return s[i].root == root ? s + i
 		: get_screen(i - 1, root);
 }
 void jbwm_free_client(struct JBWMClient * restrict c)
