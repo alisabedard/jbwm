@@ -31,18 +31,19 @@ void jbwm_grab_window_keys(const jbwm_window_t win)
 	jbwm_grab_button(win, jbwm_keys_data.grab_mask, AnyButton);
 }
 __attribute__((nonnull(1)))
-static void point(struct JBWMClient * restrict c, const int16_t x,
-	const int16_t y)
+static void point(Display * restrict d,
+	struct JBWMClient * restrict c,
+	const int16_t x, const int16_t y)
 {
-	XRaiseWindow(jbwm_get_display(), c->parent);
-	XWarpPointer(jbwm_get_display(), None, c->window, 0, 0, 0, 0, x, y);
+	XRaiseWindow(d, c->parent);
+	XWarpPointer(d, None, c->window, 0, 0, 0, 0, x, y);
 }
 __attribute__((nonnull(1)))
 static void commit_key_move(struct JBWMClient * restrict c)
 {
 	jbwm_snap_border(c);
 	jbwm_move_resize(c);
-	point(c, 1, 1);
+	point(jbwm_get_display(), c, 1, 1);
 }
 struct KeyMoveFlags {
 	bool horz:1, pos:1, mod:1;
@@ -172,8 +173,9 @@ static void next(void)
 		return;
 	jbwm_restore_client(c);
 	jbwm_select_client(c);
-	point(c, 0, 0);
-	point(c, c->size.width, c->size.height);
+	Display * d = jbwm_get_display();
+	point(d, c, 0, 0);
+	point(d, c, c->size.width, c->size.height);
 }
 static void cond_client_to_desk(struct JBWMClient * c, struct JBWMScreen * s,
 	const uint8_t d, const bool mod)
