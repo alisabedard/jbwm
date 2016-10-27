@@ -3,7 +3,6 @@
 // Copyright 1999-2015, Ciaran Anscomb <jbwm@6809.org.uk>
 // See README for license and other details.
 #include "shape.h"
-#include "jbwm.h"
 #include "log.h"
 #include <X11/extensions/shape.h>
 // Declared with pure attribute, as value may not change between calls.
