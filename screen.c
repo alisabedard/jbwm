@@ -112,16 +112,17 @@ void jbwm_move_resize(struct JBWMClient * restrict c)
 	JBWM_LOG("jbwm_move_resize");
 	const uint8_t offset = c->opt.no_title_bar || c->opt.fullscreen
 		? 0 : jbwm_get_font_height();
-	XMoveResizeWindow(jbwm_get_display(), c->parent,
+	Display * d = jbwm_get_display();
+	XMoveResizeWindow(d, c->parent,
 		c->size.x, c->size.y - offset,
 		c->size.width, c->size.height + offset);
-	XMoveResizeWindow(jbwm_get_display(), c->window,
+	XMoveResizeWindow(d, c->window,
 		0, offset,
 		c->size.width, c->size.height);
 	if(offset) { // Leave braces in case title bar support was disabled.
 		jbwm_update_title_bar(c);
 	} // Skip shaped and fullscreen clients.
-	jbwm_set_shape(jbwm_get_display(), c);
+	jbwm_set_shape(d, c);
 }
 static void hide(struct JBWMClient * restrict c)
 {
