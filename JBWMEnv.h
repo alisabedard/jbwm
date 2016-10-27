@@ -21,7 +21,6 @@ struct JBWMEnv {
 #endif//JBWM_USE_XFT
 #endif//JBWM_USE_TITLE_BAR
 	Cursor cursor;
-	bool need_cleanup:1;
 };
 extern struct JBWMEnv jbwm;
 #endif /* not JBWM_ENVIRONMENT_H */

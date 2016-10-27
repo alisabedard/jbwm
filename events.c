@@ -16,7 +16,10 @@
 #include "util.h"
 #include <stdlib.h>
 #include <X11/Xatom.h>
-static jbwm_window_t last_window;
+static struct {
+	jbwm_window_t last_window;
+	bool need_cleanup;
+} jbwm_events_data;
 __attribute__((pure))
 static struct JBWMScreen * get_screen(const int8_t i,
 	const jbwm_window_t root)
@@ -55,13 +58,13 @@ void jbwm_free_client(struct JBWMClient * restrict c)
 		XDestroyWindow(jbwm.d, c->parent);
 	relink_window_list(c);
 	free(c);
-	last_window = 0; /* allow this client's window id to be reused
-			  for another client.  */
+	/* Allow this client's window id to be reused for another client: */
+	jbwm_events_data.last_window = 0;
 }
 static void cleanup(void)
 {
 	JBWM_LOG("cleanup");
-	jbwm.need_cleanup = false;
+	jbwm_events_data.need_cleanup = false;
 	struct JBWMClient * c = jbwm.head;
 	struct JBWMClient * i;
 	do {
@@ -101,9 +104,9 @@ static void handle_map_request(XMapRequestEvent * e)
 	JBWM_LOG("MapRequest, send_event:%d", e->send_event);
 	/* This check fixes a race condition in libreoffice dialogs,
 	   where an attempt is made to request mapping twice.  */
-	if(e->window == last_window)
+	if(e->window == jbwm_events_data.last_window)
 		return;
-	last_window = e->window;
+	jbwm_events_data.last_window = e->window;
 	jbwm_new_client(e->window, get_screen(
 		ScreenCount(jbwm.d), e->parent));
 
@@ -141,7 +144,8 @@ static void iteration(void)
 		if(!c)
 			  break;
 		JBWM_LOG("UnmapNotify: ignore_unmap is %d", c->ignore_unmap);
-		c->opt.remove=jbwm.need_cleanup=(c->ignore_unmap--<1);
+		c->opt.remove=jbwm_events_data.need_cleanup
+			= (c->ignore_unmap--<1);
 		break;
 	case MapRequest:
 		if (!c)
@@ -170,9 +174,10 @@ static void iteration(void)
 		JBWM_LOG("Unhandled event (%d)", ev.type);
 #endif//EVENT_DEBUG
 	}
-	if (jbwm.need_cleanup) {
+	if (jbwm_events_data.need_cleanup) {
 		cleanup();
-		last_window=0; // Fix ignoring every other new window
+		// Fix ignoring every other new window:
+		jbwm_events_data.last_window=0;
 	}
 }
 void jbwm_event_loop(void)
