@@ -81,6 +81,16 @@ static void handle_key_move(struct JBWMClient * restrict c,
 	}
 	key_move(c, f);
 }
+static void set_maximized(struct JBWMClient * restrict c)
+{
+	jbwm_set_horz(c);
+	jbwm_set_vert(c);
+}
+static void set_not_maximized(struct JBWMClient * restrict c)
+{
+	jbwm_set_not_horz(c);
+	jbwm_set_not_vert(c);
+}
 static void toggle_maximize(struct JBWMClient * restrict c)
 {
 	const struct JBWMClientOptions o = c->opt;
@@ -88,13 +98,7 @@ static void toggle_maximize(struct JBWMClient * restrict c)
 	// Maximizing shaped windows is buggy, so return.
 	if (o.shaped || o.no_max || o.fullscreen)
 		return;
-	if (o.max_horz && o.max_vert) {
-		jbwm_set_not_horz(c);
-		jbwm_set_not_vert(c);
-	} else {
-		jbwm_set_horz(c);
-		jbwm_set_vert(c);
-	}
+	(o.max_horz && o.max_vert ? set_maximized : set_not_maximized)(c);
 }
 __attribute__((nonnull(2)))
 static void handle_client_key_event(const bool mod,
