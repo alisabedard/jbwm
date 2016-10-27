@@ -11,6 +11,40 @@
 #include "title_bar.h"
 #include "util.h"
 #include <X11/Xatom.h>
+static struct {
+	struct JBWMClient * current, * head;
+} jbwm_client_data;
+struct JBWMClient * jbwm_get_current_client(void)
+{
+	return jbwm_client_data.current;
+}
+struct JBWMClient * jbwm_get_head_client(void)
+{
+	return jbwm_client_data.head;
+}
+void jbwm_set_head_client(struct JBWMClient * restrict c)
+{
+	if (c)
+		jbwm_client_data.head = c;
+}
+// Relink c's linked list to exclude c
+void jbwm_relink_client_list(struct JBWMClient * c)
+{
+	JBWM_LOG("relink_window_list");
+	if (jbwm_client_data.current == c) // Remove selection target
+		jbwm_client_data.current = NULL;
+	if (jbwm_client_data.head == c) {
+		jbwm_client_data.head = c->next;
+		return;
+	}
+	for (struct JBWMClient * p = jbwm_client_data.head;
+		p && p->next; p = p->next) {
+		if (p->next == c) { // Close the link
+			p->next = c->next;
+			return;
+		}
+	}
+}
 // Free result with XFree if not NULL
 char * jbwm_get_title(const jbwm_window_t w)
 {
@@ -41,15 +75,16 @@ static struct JBWMClient * search(struct JBWMClient * c,
 // Return the client that has specified window as either window or parent
 struct JBWMClient * jbwm_get_client(const jbwm_window_t w)
 {
-	return search(jbwm.head, w);
+	return search(jbwm_client_data.head, w);
 }
 static void unselect_current(void)
 {
-	if(!jbwm.current) return;
-	XSetWindowBorder(jbwm.d, jbwm.current->parent,
-		jbwm.current->screen->pixels.bg);
+	if(!jbwm_client_data.current) return;
+	XSetWindowBorder(jbwm.d, jbwm_client_data.current->parent,
+		jbwm_client_data.current->screen->pixels.bg);
 #ifdef JBWM_USE_EWMH
-	jbwm_ewmh_remove_state(jbwm.current->window, ewmh[WM_STATE_FOCUSED]);
+	jbwm_ewmh_remove_state(jbwm_client_data.current->window,
+		ewmh[WM_STATE_FOCUSED]);
 #endif//JBWM_USE_EWMH
 }
 static void set_border(struct JBWMClient * restrict c)
@@ -65,7 +100,7 @@ void jbwm_select_client(struct JBWMClient * c)
 	XInstallColormap(jbwm.d, c->cmap);
 	XSetInputFocus(jbwm.d, c->window, RevertToPointerRoot, CurrentTime);
 	set_border(c);
-	jbwm.current = c;
+	jbwm_client_data.current = c;
 #ifdef JBWM_USE_EWMH
 	jbwm_set_property(c->screen->root, ewmh[ACTIVE_WINDOW],
 		XA_WINDOW, &(c->parent), 1);

@@ -5,6 +5,11 @@
 #ifndef JBWM_CLIENT_H
 #define JBWM_CLIENT_H
 #include "JBWMClient.h"
+struct JBWMClient * jbwm_get_current_client(void);
+struct JBWMClient * jbwm_get_head_client(void);
+void jbwm_set_head_client(struct JBWMClient * restrict c);
+// Relink c's linked list to exclude c:
+void jbwm_relink_client_list(struct JBWMClient * c);
 void jbwm_set_client_vdesk(struct JBWMClient * restrict c, const uint8_t d)
 	__attribute((nonnull));
 struct JBWMClient *jbwm_get_client(jbwm_window_t w)

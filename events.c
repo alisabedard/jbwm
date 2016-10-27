@@ -27,23 +27,6 @@ static struct JBWMScreen * get_screen(const int8_t i,
 	return jbwm.s[i].root == root ? &jbwm.s[i]
 		: get_screen(i - 1, root);
 }
-// Relink c's linked list to exclude c
-static void relink_window_list(struct JBWMClient * c)
-{
-	JBWM_LOG("relink_window_list");
-	if (jbwm.current == c) // Remove selection target
-		jbwm.current = NULL;
-	if (jbwm.head == c) {
-		jbwm.head = c->next;
-		return;
-	}
-	for (struct JBWMClient * p = jbwm.head; p && p->next; p = p->next) {
-		if (p->next == c) { // Close the link
-			p->next = c->next;
-			return;
-		}
-	}
-}
 void jbwm_free_client(struct JBWMClient * restrict c)
 {
 	const jbwm_window_t w = c->window;
@@ -56,7 +39,7 @@ void jbwm_free_client(struct JBWMClient * restrict c)
 	XRemoveFromSaveSet(jbwm.d, w);
 	if(c->parent)
 		XDestroyWindow(jbwm.d, c->parent);
-	relink_window_list(c);
+	jbwm_relink_client_list(c);
 	free(c);
 	/* Allow this client's window id to be reused for another client: */
 	jbwm_events_data.last_window = 0;
@@ -65,7 +48,7 @@ static void cleanup(void)
 {
 	JBWM_LOG("cleanup");
 	jbwm_events_data.need_cleanup = false;
-	struct JBWMClient * c = jbwm.head;
+	struct JBWMClient * c = jbwm_get_head_client();
 	struct JBWMClient * i;
 	do {
 		i = c->next;

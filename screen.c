@@ -151,7 +151,8 @@ uint8_t jbwm_set_vdesk(struct JBWMScreen * s, uint8_t v)
 	JBWM_LOG("jbwm_set_vdesk");
 	if (v == s->vdesk || v > JBWM_MAX_DESKTOPS)
 		return s->vdesk;
-	for (struct JBWMClient * c = jbwm.head; c; c = c->next)
+	for (struct JBWMClient * c = jbwm_get_head_client();
+		c; c = c->next)
 		check_visibility(s, c, v);
 	s->vdesk = v;
 #ifdef JBWM_USE_EWMH

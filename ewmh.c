@@ -3,6 +3,7 @@
 // Copyright 1999-2015, Ciaran Anscomb <jbwm@6809.org.uk>
 // See README for license and other details.
 #include "ewmh.h"
+#include "client.h"
 #include "JBWMEnv.h"
 #include "log.h"
 #include "screen.h"
@@ -60,15 +61,16 @@ static uint16_t get_client_count(void)
 {
 	uint16_t j = 0;
 	// Check against UINT16_MAX to avoid wrap-around
-	for (struct JBWMClient * i = jbwm.head; j < UINT16_MAX && i;
-		i = i->next, ++j);
+	for (struct JBWMClient * i = jbwm_get_head_client();
+		j < UINT16_MAX && i; i = i->next, ++j);
 	return j;
 }
 void jbwm_ewmh_update_client_list(void)
 {
 	jbwm_window_t wl[get_client_count()];
 	size_t wl_sz = 0;
-	for (struct JBWMClient * i = jbwm.head; i; i = i->next, ++wl_sz)
+	for (struct JBWMClient * i = jbwm_get_head_client();
+		i; i = i->next, ++wl_sz)
 		wl[wl_sz] = i->window;
 	jbwm_set_property(jbwm.s->root, ewmh[CLIENT_LIST],
 		XA_WINDOW, &wl, wl_sz);

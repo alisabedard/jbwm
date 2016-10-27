@@ -11,7 +11,6 @@
 struct JBWMEnv {
 	Display * d;
 	// Client tracking:
-	struct JBWMClient * current, * head;
 	struct JBWMScreen * s;
 #ifdef JBWM_USE_TITLE_BAR
 #ifdef JBWM_USE_XFT

@@ -3,6 +3,7 @@
 // Copyright 1999-2015, Ciaran Anscomb <jbwm@6809.org.uk>
 // See README for license and other details.
 #include "new.h"
+#include "client.h"
 #include "ewmh.h"
 #include "JBWMEnv.h"
 #include "keys.h"
@@ -100,7 +101,7 @@ static struct JBWMClient * get_JBWMClient(const jbwm_window_t w,
 {
 	struct JBWMClient * c = malloc(sizeof(struct JBWMClient));
 	*c = (struct JBWMClient) {.screen = s, .window = w, .border = 1,
-		.next = jbwm.head};
+		.next = jbwm_get_head_client()};
 	return c;
 }
 // Grab input and setup JBWM_USE_EWMH for client window
@@ -114,7 +115,8 @@ static void do_grabs(const jbwm_window_t w)
 void jbwm_new_client(const jbwm_window_t w, struct JBWMScreen * s)
 {
 	JBWM_LOG("jbwm_new_client(%d,s)", (int)w);
-	struct JBWMClient * c = jbwm.head = get_JBWMClient(w, s);
+	struct JBWMClient * c = get_JBWMClient(w, s);
+	jbwm_set_head_client(c);
 	do_grabs(w);
 	init_properties(c);
 	init_geometry(c);

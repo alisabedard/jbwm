@@ -152,15 +152,15 @@ static void handle_client_key_event(const bool mod,
 }
 static struct JBWMClient * get_next_on_vdesk(void)
 {
-	struct JBWMClient *c = jbwm.current;
+	struct JBWMClient *c = jbwm_get_current_client();
 	do {
 		if (c) {
 			c = c->next;
-			if (!c && !jbwm.current)
+			if (!c && !jbwm_get_current_client())
 				break;
 		}
-		if (!c) c = jbwm.head;
-		if (!c || (c == jbwm.current))
+		if (!c) c = jbwm_get_head_client();
+		if (!c || (c == jbwm_get_current_client()))
 			break;
 	} while (c->vdesk != c->screen->vdesk);
 	return c;
@@ -191,7 +191,7 @@ void jbwm_handle_key_event(XKeyEvent * e)
 {
 	JBWM_LOG("jbwm_handle_key_event");
 	const KeySym key = XLookupKeysym(e, 0);
-	struct JBWMClient *c = jbwm.current;
+	struct JBWMClient *c = jbwm_get_current_client();
 	struct JBWMScreen *s = c ? c->screen : jbwm.s;
 	struct {
 		uint8_t vdesk:4;

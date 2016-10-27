@@ -3,6 +3,7 @@
 // Copyright 1999-2015, Ciaran Anscomb <jbwm@6809.org.uk>
 // See README for license and other details.
 #include "snap.h"
+#include "client.h"
 #include "config.h"
 #include "JBWMEnv.h"
 #include "log.h"
@@ -47,7 +48,8 @@ jbwm_snap_dim(const int16_t cxy, const uint16_t cwh, const int16_t cixy,
 static XPoint search(struct JBWMClient * c)
 {
 	XPoint d = { JBWM_SNAP, JBWM_SNAP };
-	for (struct JBWMClient * ci = jbwm.head; ci; ci = ci->next) {
+	for (struct JBWMClient * ci = jbwm_get_head_client();
+		ci; ci = ci->next) {
 		// This test qualifies 'restrict'
 		if ((ci == c) || (ci->screen != c->screen)
 		    || (ci->vdesk != c->vdesk))
