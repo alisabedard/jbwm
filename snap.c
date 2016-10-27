@@ -6,8 +6,6 @@
 #include "client.h"
 #include "config.h"
 #include "jbwm.h"
-#include "log.h"
-#include "title_bar.h"
 #include <stdlib.h>
 __attribute__ ((const, hot, warn_unused_result))
 static int16_t sborder(const int16_t xy, const int16_t edge)
