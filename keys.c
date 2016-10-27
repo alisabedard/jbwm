@@ -12,9 +12,7 @@
 #include "snap.h"
 #include "title_bar.h"
 #include "util.h"
-#include <stdio.h>
 #include <stdlib.h>
-#include <sys/wait.h>
 #include <unistd.h>
 static struct {
 	uint16_t grab_mask, mod_mask;
