@@ -5,6 +5,7 @@
 #include "new.h"
 #include "ewmh.h"
 #include "JBWMEnv.h"
+#include "keys.h"
 #include "log.h"
 #include "mwm.h"
 #include "screen.h"
@@ -107,7 +108,7 @@ static void do_grabs(const jbwm_window_t w)
 {
 	XSelectInput(jbwm.d, w, EnterWindowMask
 		| PropertyChangeMask | ColormapChangeMask);
-	jbwm_grab_button(w, jbwm.keymasks.grab, AnyButton);
+	jbwm_grab_window_keys(w);
 	jbwm_ewmh_set_allowed_actions(w);
 }
 void jbwm_new_client(const jbwm_window_t w, struct JBWMScreen * s)

@@ -10,6 +10,9 @@ void jbwm_handle_key_event(XKeyEvent * restrict e)
 	__attribute__((nonnull));
 void jbwm_grab_screen_keys(struct JBWMScreen * restrict s)
 	__attribute__((nonnull));
+void jbwm_grab_window_keys(const jbwm_window_t win);
+void jbwm_set_grab_mask(const uint16_t mask);
+void jbwm_set_mod_mask(const uint16_t mask);
 enum { JBWM_KEY_NEXT=XK_Tab, JBWM_KEY_NEW=XK_Return, JBWM_KEY_QUIT=XK_Escape,
 	JBWM_KEY_TOPLEFT=XK_KP_Home, JBWM_KEY_TOPRIGHT=XK_KP_Page_Up,
 	JBWM_KEY_BOTTOMLEFT=XK_KP_End, JBWM_KEY_BOTTOMRIGHT=XK_KP_Page_Down,

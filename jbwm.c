@@ -64,10 +64,10 @@ static void parse_argv(uint8_t argc, char **argv)
 	while((opt=getopt(argc, argv, optstring)) != -1) {
 		switch (opt) {
 		case '1':
-			jbwm.keymasks.grab = parse_modifiers(optarg);
+			jbwm_set_grab_mask(parse_modifiers(optarg));
 			break;
 		case '2':
-			jbwm.keymasks.mod = parse_modifiers(optarg);
+			jbwm_set_mod_mask(parse_modifiers(optarg));
 			break;
 		case 'b':
 			setenv(JBWM_ENV_BG, optarg, 1);
@@ -243,8 +243,6 @@ int main(
 #endif//USE_ARGV
 {
 	jbwm_set_defaults();
-	jbwm.keymasks.grab = JBWM_KEYMASK_GRAB;
-	jbwm.keymasks.mod = JBWM_KEYMASK_MOD;
 	parse_argv(argc, argv);
 	if (!(jbwm.d = XOpenDisplay(NULL)))
 		jbwm_error(JBWM_ENV_DISPLAY);

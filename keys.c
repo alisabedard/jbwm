@@ -16,6 +16,22 @@
 #include <stdlib.h>
 #include <sys/wait.h>
 #include <unistd.h>
+static struct {
+	uint16_t grab_mask, mod_mask;
+} jbwm_keys_data = { .grab_mask = JBWM_KEYMASK_GRAB,
+	.mod_mask = JBWM_KEYMASK_MOD };
+void jbwm_set_grab_mask(const uint16_t mask)
+{
+	jbwm_keys_data.grab_mask = mask;
+}
+void jbwm_set_mod_mask(const uint16_t mask)
+{
+	jbwm_keys_data.mod_mask = mask;
+}
+void jbwm_grab_window_keys(const jbwm_window_t win)
+{
+	jbwm_grab_button(win, jbwm_keys_data.grab_mask, AnyButton);
+}
 __attribute__((nonnull(1)))
 static void point(struct JBWMClient * restrict c, const int16_t x,
 	const int16_t y)
@@ -179,7 +195,7 @@ void jbwm_handle_key_event(XKeyEvent * e)
 		uint8_t vdesk:4;
 		bool mod:1;
 		bool zero:1;
-	} opt = {s->vdesk, e->state & jbwm.keymasks.mod, 0};
+	} opt = {s->vdesk, e->state & jbwm_keys_data.mod_mask, 0};
 	switch (key) {
 	case JBWM_KEY_NEW:
 		start_terminal();
@@ -194,7 +210,8 @@ void jbwm_handle_key_event(XKeyEvent * e)
 	case XK_1: case XK_2: case XK_3: case XK_4: case XK_5: case XK_6:
 	case XK_7: case XK_8: case XK_9:
 		// First desktop 0, per wm-spec
-		cond_client_to_desk(c, s, opt.zero ? 10 : key - XK_1, opt.mod);
+		cond_client_to_desk(c, s, opt.zero
+			? 10 : key - XK_1, opt.mod);
 		break;
 	case JBWM_KEY_PREVDESK:
 		cond_client_to_desk(c, s, s->vdesk - 1, opt.mod);
@@ -213,11 +230,11 @@ static void grab(struct JBWMScreen * restrict s, KeySym * restrict ks,
 {
 	for (; *ks; ++ks)
 		XGrabKey(jbwm.d, XKeysymToKeycode(jbwm.d, *ks),
-			 jbwm.keymasks.grab | mask, s->root, true,
+			 jbwm_keys_data.grab_mask | mask, s->root, true,
 			 GrabModeAsync, GrabModeAsync);
 }
 void jbwm_grab_screen_keys(struct JBWMScreen * restrict s)
 {
 	grab(s, (KeySym[]){JBWM_KEYS_TO_GRAB}, 0);
-	grab(s, (KeySym[]){JBWM_ALT_KEYS_TO_GRAB}, jbwm.keymasks.mod);
+	grab(s, (KeySym[]){JBWM_ALT_KEYS_TO_GRAB}, jbwm_keys_data.mod_mask);
 }
