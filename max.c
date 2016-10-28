@@ -9,7 +9,12 @@
 /* In this file, the static companion functions perform the requested option
    directly, while the global functions call the corresponding static
    function and perform sanity checks and adjustments.  */
+#ifdef JBWM_USE_EWMH
 static void set_not_horz(Display * restrict d, struct JBWMClient * restrict c)
+#else//!JBWM_USE_EWMH
+static void set_not_horz(Display * restrict d __attribute__((unused)),
+	struct JBWMClient * restrict c)
+#endif//JBWM_USE_EWMH
 {
 	c->opt.max_horz = false;
 	c->size.x = c->old_size.x;
@@ -31,7 +36,12 @@ static void set_horz(struct JBWMClient * restrict c)
 	c->size.x = 0;
 	c->size.width = jbwm_get_screens()[c->screen].size.w;
 }
+#ifdef JBWM_USE_EWMH
 void jbwm_set_horz(Display * restrict d, struct JBWMClient * restrict c)
+#else//!JBWM_USE_EWMH
+void jbwm_set_horz(Display * restrict d __attribute__((unused)),
+	struct JBWMClient * restrict c)
+#endif//JBWM_USE_EWMH
 {
 	JBWM_LOG("jbwm_set_horz");
 	if (c->opt.max_horz) return;
@@ -40,7 +50,12 @@ void jbwm_set_horz(Display * restrict d, struct JBWMClient * restrict c)
 	c->size.width -= c->border << 1;
 	jbwm_move_resize(d, c);
 }
+#ifdef JBWM_USE_EWMH
 static void set_not_vert(Display * restrict d, struct JBWMClient * restrict c)
+#else//!JBWM_USE_EWMH
+static void set_not_vert(Display * restrict d __attribute__((unused)),
+	struct JBWMClient * restrict c)
+#endif//JBWM_USE_EWMH
 {
 	c->opt.max_vert = false;
 	c->size.y = c->old_size.y;
@@ -54,7 +69,12 @@ void jbwm_set_not_vert(Display * restrict d, struct JBWMClient * restrict c)
 		set_not_vert(d, c);
 	jbwm_move_resize(d, c);
 }
+#ifdef JBWM_USE_EWMH
 static void set_vert(Display * restrict d, struct JBWMClient * restrict c)
+#else//!JBWM_USE_EWMH
+static void set_vert(Display * restrict d __attribute__((unused)),
+	struct JBWMClient * restrict c)
+#endif//JBWM_USE_EWMH
 {
 	c->opt.max_vert = true;
 	c->old_size.y = c->size.y;
