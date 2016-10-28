@@ -50,22 +50,23 @@ static void move_buttons(Display * restrict d,
 {
 	mv(d, t->stick, mv(d, t->shade, mv(d, t->resize, width)));
 }
-static jbwm_window_t get_win(const Window p, const jbwm_pixel_t bg)
+static jbwm_window_t get_win(Display * restrict d, const Window p,
+	const jbwm_pixel_t bg)
 {
-	return XCreateSimpleWindow(jbwm_get_display(), p,
+	return XCreateSimpleWindow(d, p,
 		0, 0, jbwm_get_font_height(),
 		jbwm_get_font_height(), 0, 0, bg);
 }
-static jbwm_window_t new_title_bar(struct JBWMClient * restrict c)
+static jbwm_window_t new_title_bar(Display * restrict d,
+	struct JBWMClient * restrict c)
 {
 	const struct JBWMPixels * p = &jbwm_get_screens()[c->screen].pixels;
-	const jbwm_window_t t = c->tb.win = get_win(c->parent, p->bg);
-	Display * d = jbwm_get_display();
+	const jbwm_window_t t = c->tb.win = get_win(d, c->parent, p->bg);
 	XSelectInput(d, t, ExposureMask);
-	c->tb.close = get_win(t, p->close);
-	c->tb.resize = get_win(t, p->resize);
-	c->tb.shade = get_win(t, p->shade);
-	c->tb.stick = get_win(t, p->stick);
+	c->tb.close = get_win(d, t, p->close);
+	c->tb.resize = get_win(d, t, p->resize);
+	c->tb.shade = get_win(d, t, p->shade);
+	c->tb.stick = get_win(d, t, p->stick);
 	XMapRaised(d, t);
 	XMapSubwindows(d, t);
 	jbwm_grab_button(d, t, 0, AnyButton);
@@ -149,7 +150,7 @@ void jbwm_update_title_bar(Display * restrict d, struct JBWMClient * c)
 		return;
 	}
 	if (!w)
-		w = new_title_bar(c);
+		w = new_title_bar(d, c);
 	/* Expand/Contract the title bar width as necessary:  */
 	{
 		const uint16_t width = c->size.width;
