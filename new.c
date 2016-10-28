@@ -48,7 +48,7 @@ static void set_frame_extents(Display * restrict d, struct JBWMClient * c)
 			 : jbwm_get_font_height()), b}), 4);
 }
 #else//!JBWM_USE_EWMH
-#define set_frame_extents(c)
+#define set_frame_extents(d, c)
 #endif//JBWM_USE_EWMH
 __attribute__((nonnull))
 static void init_properties(
