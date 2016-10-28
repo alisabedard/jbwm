@@ -12,6 +12,6 @@ void jbwm_move_resize(struct JBWMClient * restrict c)
 	__attribute__((nonnull));
 uint8_t jbwm_set_vdesk(struct JBWMScreen * s, uint8_t v)
 	__attribute__((nonnull));
-void jbwm_restore_client(struct JBWMClient * restrict c)
-	__attribute__((nonnull));
+void jbwm_restore_client(Display * restrict d,
+	struct JBWMClient * restrict c) __attribute__((nonnull));
 #endif /* JBWM_SCREEN_H */

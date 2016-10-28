@@ -157,7 +157,7 @@ static void setup_fonts(void)
 		jbwm_data.screens->screen, XFT_FAMILY, XftTypeString,
 		font, XFT_SIZE, XftTypeDouble, JBWM_FONT_SIZE, NULL);
 #else//!JBWM_USE_XFT
-	jbwm_data.font = XLoadQueryFont(jbwm_get_display(), font);
+	jbwm_data.font = XLoadQueryFont(jbwm_data.display, font);
 #endif//JBWM_USE_XFT
 	if (!jbwm_data.font)
 		jbwm_error(JBWM_ENV_FONT);
@@ -167,7 +167,7 @@ static void setup_fonts(void)
 #endif//JBWM_USE_TITLE_BAR
 static void setup_event_listeners(const jbwm_window_t root)
 {
-	XChangeWindowAttributes(jbwm_get_display(), root, CWEventMask,
+	XChangeWindowAttributes(jbwm_data.display, root, CWEventMask,
 		&(XSetWindowAttributes){.event_mask = SubstructureRedirectMask
 		| SubstructureNotifyMask | EnterWindowMask | PropertyChangeMask
 		| ColormapChangeMask});
@@ -189,7 +189,7 @@ static void allocate_colors(struct JBWMScreen * restrict s)
 static bool check_redirect(const jbwm_window_t w)
 {
 	XWindowAttributes a;
-	XGetWindowAttributes(jbwm_get_display(), w, &a);
+	XGetWindowAttributes(jbwm_data.display, w, &a);
 	return (!a.override_redirect && (a.map_state == IsViewable));
 }
 static void setup_clients(struct JBWMScreen * restrict s)
@@ -197,18 +197,18 @@ static void setup_clients(struct JBWMScreen * restrict s)
 	Window * w, d; // don't use jbwm_window_t here
 	unsigned int n;
 	// XQueryTree depends on 64-bit types
-	if (!XQueryTree(jbwm_get_display(), s->root, &d, &d, &w, &n))
+	if (!XQueryTree(jbwm_data.display, s->root, &d, &d, &w, &n))
 		return; // failed
 	while (n--)
 		if (check_redirect(w[n]))
-			jbwm_new_client(w[n], s);
+			jbwm_new_client(jbwm_data.display, s, w[n]);
 	XFree(w);
 }
 static void setup_screen_elements(const uint8_t i)
 {
 	struct JBWMScreen * restrict s = jbwm_data.screens;
 	s->screen = i;
-	Display * d = jbwm_get_display();
+	Display * restrict d = jbwm_data.display;
 	s->root = RootWindow(d, i);
 	s->vdesk = 0;
 	s->size.w = DisplayWidth(d, i);
@@ -229,7 +229,7 @@ static void setup_gc(struct JBWMScreen * restrict s)
 	gv.font = jbwm_data.font->fid;
 	vm |= GCFont;
 #endif//JBWM_USE_TITLE_BAR&&!JBWM_USE_XFT
-	s->gc = XCreateGC(jbwm_get_display(), s->root, vm, &gv);
+	s->gc = XCreateGC(jbwm_data.display, s->root, vm, &gv);
 }
 static void setup_screen(const uint8_t i)
 {

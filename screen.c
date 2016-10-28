@@ -17,42 +17,44 @@
 #include <X11/Xatom.h>
 enum {JBWMMouseMask=(ButtonPressMask|ButtonReleaseMask|PointerMotionMask)};
 __attribute__ ((hot,nonnull))
-static void draw_outline(struct JBWMClient * restrict c)
+static void draw_outline(Display * restrict d, struct JBWMClient * restrict c)
 {
 	if (!c->border)
 		return;
-	const uint8_t offset = c->opt.no_title_bar ? 0 : jbwm_get_font_height();
+	const uint8_t offset = c->opt.no_title_bar
+		? 0 : jbwm_get_font_height();
 	struct JBWMScreen * s = &jbwm_get_screens()[c->screen];
-	XDrawRectangle(jbwm_get_display(), s->root, s->gc,
-		c->size.x, c->size.y - offset,
-		c->size.width + c->border,
-		c->size.height + c->border + offset);
+	XDrawRectangle(d, s->root, s->gc, c->size.x, c->size.y - offset,
+		c->size.width + c->border, c->size.height + c->border
+		+ offset);
 }
 __attribute__((nonnull))
-static void configure(XSizeHints * restrict g, const jbwm_window_t w)
+static void configure(Display * restrict d, XSizeHints * restrict g,
+	const jbwm_window_t w)
 {
-	XSendEvent(jbwm_get_display(), w, true, StructureNotifyMask, (XEvent *)
+	XSendEvent(d, w, true, StructureNotifyMask, (XEvent *)
 		&(XConfigureEvent){.x = g->x, .y = g->y, .width = g->width,
 		.height = g->height, .type = ConfigureNotify, .event = w });
 }
-static void grab_pointer(const jbwm_window_t w)
+static void grab_pointer(Display * restrict d, const jbwm_window_t w)
 {
 	static Cursor c;
 	if (!c)
-		c = XCreateFontCursor(jbwm_get_display(), XC_fleur);
-	XGrabPointer(jbwm_get_display(), w, false, JBWMMouseMask, GrabModeAsync,
+		c = XCreateFontCursor(d, XC_fleur);
+	XGrabPointer(d, w, false, JBWMMouseMask, GrabModeAsync,
 		GrabModeAsync, None, c, CurrentTime);
 }
-static jbwm_point_t get_mouse_position(jbwm_window_t w)
+static jbwm_point_t get_mouse_position(Display * restrict d,
+	const jbwm_window_t w)
 {
 	int x, y;
-	XQueryPointer(jbwm_get_display(), w, &(Window){0}, &(Window){0},
+	XQueryPointer(d, w, &(Window){0}, &(Window){0},
 		&x, &y, &(int){0}, &(int){0}, &(unsigned int){0});
 	return (jbwm_point_t){x, y};
 }
-static void warp_corner(struct JBWMClient * restrict c)
+static void warp_corner(Display * restrict d, struct JBWMClient * restrict c)
 {
-	XWarpPointer(jbwm_get_display(), None, c->window, 0, 0, 0, 0,
+	XWarpPointer(d, None, c->window, 0, 0, 0, 0,
 		c->size.width, c->size.height);
 }
 static void set_size(struct JBWMClient * restrict c,
@@ -80,18 +82,22 @@ static void do_changes(struct JBWMClient * restrict c, const bool resize,
 }
 static void drag_event_loop(struct JBWMClient * restrict c, const bool resize)
 {
-	const jbwm_point_t start = get_mouse_position(
+	Display * restrict d = jbwm_get_display();
+	const jbwm_point_t start = get_mouse_position(d,
 		jbwm_get_screens()[c->screen].root);
 	const jbwm_point_t original = {c->size.x, c->size.y};
 	for (;;) {
 		XEvent e;
-		XMaskEvent(jbwm_get_display(), JBWMMouseMask, &e);
+		XMaskEvent(d, JBWMMouseMask, &e);
 		if (e.type != MotionNotify)
 			return;
-		draw_outline(c);
+		draw_outline(d, c);
 		do_changes(c, resize, start, original,
 			e.xmotion.x, e.xmotion.y);
-		(c->border ? draw_outline : jbwm_move_resize)(c);
+		if (c->border)
+			draw_outline(d, c);
+		else
+			jbwm_move_resize(c);
 	}
 }
 void jbwm_drag(struct JBWMClient * restrict c, const bool resize)
@@ -100,15 +106,15 @@ void jbwm_drag(struct JBWMClient * restrict c, const bool resize)
 	XRaiseWindow(d, c->parent);
 	if (resize && (c->opt.no_resize || c->opt.shaded))
 		return;
-	grab_pointer(jbwm_get_screens()[c->screen].root);
+	grab_pointer(d, jbwm_get_screens()[c->screen].root);
 	if (resize)
-		warp_corner(c);
+		warp_corner(d, c);
 	drag_event_loop(c, resize);
-	draw_outline(c);
+	draw_outline(d, c);
 	XUngrabPointer(d, CurrentTime);
 	jbwm_move_resize(c);
 	if (!resize && !c->opt.tearoff)
-		configure((&c->size), c->window);
+		configure(d, (&c->size), c->window);
 }
 void jbwm_move_resize(struct JBWMClient * restrict c)
 {
@@ -119,51 +125,49 @@ void jbwm_move_resize(struct JBWMClient * restrict c)
 	XMoveResizeWindow(d, c->parent,
 		c->size.x, c->size.y - offset,
 		c->size.width, c->size.height + offset);
-	XMoveResizeWindow(d, c->window,
-		0, offset,
+	XMoveResizeWindow(d, c->window, 0, offset,
 		c->size.width, c->size.height);
 	if(offset) { // Leave braces in case title bar support was disabled.
 		jbwm_update_title_bar(c);
 	} // Skip shaped and fullscreen clients.
 	jbwm_set_shape(d, c);
 }
-static void hide(struct JBWMClient * restrict c)
+static void hide(Display * restrict d, struct JBWMClient * restrict c)
 {
-	Display * restrict d = jbwm_get_display();
 	XUnmapWindow(d, c->parent);
 	jbwm_set_wm_state(d, c, IconicState);
 	jbwm_ewmh_add_state(d, c->window, ewmh[WM_STATE_HIDDEN]);
 }
-void jbwm_restore_client(struct JBWMClient * restrict c)
+void jbwm_restore_client(Display * restrict d, struct JBWMClient * restrict c)
 {
-	Display * restrict d = jbwm_get_display();
 	XMapWindow(d, c->parent);
 	jbwm_set_wm_state(d, c, NormalState);
 	jbwm_ewmh_remove_state(d, c->window, ewmh[WM_STATE_HIDDEN]);
 }
-static void check_visibility(struct JBWMScreen * s,
+static void check_visibility(Display * restrict d, struct JBWMScreen * s,
 	struct JBWMClient * restrict c, const uint8_t v)
 {
 	if (c->screen != s->screen)
 		return;
 	if (c->vdesk == v || c->opt.sticky) {
 		c->vdesk = v; // allow moving windows by sticking
-		jbwm_restore_client(c);
+		jbwm_restore_client(d, c);
 	} else
-		hide(c);
+		hide(d, c);
 }
 uint8_t jbwm_set_vdesk(struct JBWMScreen * s, uint8_t v)
 {
 	JBWM_LOG("jbwm_set_vdesk");
 	if (v == s->vdesk || v > JBWM_MAX_DESKTOPS)
 		return s->vdesk;
+	Display * restrict d = jbwm_get_display();
 	for (struct JBWMClient * c = jbwm_get_head_client();
 		c; c = c->next)
-		check_visibility(s, c, v);
+		check_visibility(d, s, c, v);
 	s->vdesk = v;
 #ifdef JBWM_USE_EWMH
-	jbwm_set_property(jbwm_get_display(), s->root,
-		ewmh[CURRENT_DESKTOP], XA_CARDINAL, &v, 1);
+	jbwm_set_property(d, s->root, ewmh[CURRENT_DESKTOP],
+		XA_CARDINAL, &v, 1);
 #endif//JBWM_USE_EWMH
 	return s->vdesk;
 }

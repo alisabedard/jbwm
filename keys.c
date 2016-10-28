@@ -176,7 +176,7 @@ static void next(Display * restrict d)
 	struct JBWMClient * c = get_next_on_vdesk();
 	if (!c)
 		return;
-	jbwm_restore_client(c);
+	jbwm_restore_client(d, c);
 	jbwm_select_client(c);
 	point(d, c, 0, 0);
 	point(d, c, c->size.width, c->size.height);

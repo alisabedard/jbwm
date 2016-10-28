@@ -5,6 +5,6 @@
 #ifndef JBWM_NEW_H
 #define JBWM_NEW_H
 #include "JBWMScreen.h"
-void jbwm_new_client(const jbwm_window_t w, struct JBWMScreen * restrict s)
-	__attribute__((nonnull(2)));
+void jbwm_new_client(Display * restrict d, struct JBWMScreen * restrict s,
+	const jbwm_window_t w) __attribute__((nonnull));
 #endif//!JBWM_NEW_H

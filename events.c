@@ -94,8 +94,8 @@ static void handle_map_request(XMapRequestEvent * e)
 	if(e->window == jbwm_events_data.last_window)
 		return;
 	jbwm_events_data.last_window = e->window;
-	jbwm_new_client(e->window, get_screen(
-		ScreenCount(jbwm_get_display()), e->parent));
+	Display * restrict d = jbwm_get_display();
+	jbwm_new_client(d, get_screen(ScreenCount(d), e->parent), e->window);
 
 }
 static void iteration(void)

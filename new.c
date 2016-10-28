@@ -117,7 +117,8 @@ static void do_grabs(const jbwm_window_t w)
 	jbwm_grab_window_keys(w);
 	jbwm_ewmh_set_allowed_actions(w);
 }
-void jbwm_new_client(const jbwm_window_t w, struct JBWMScreen * s)
+void jbwm_new_client(Display * restrict d, struct JBWMScreen * restrict s,
+	const jbwm_window_t w)
 {
 	JBWM_LOG("jbwm_new_client(%d,s)", (int)w);
 	struct JBWMClient * c = get_JBWMClient(w, s);
@@ -127,6 +128,6 @@ void jbwm_new_client(const jbwm_window_t w, struct JBWMScreen * s)
 	init_geometry(c);
 	reparent(c);
 	set_frame_extents(c);
-	jbwm_restore_client(c);
+	jbwm_restore_client(d, c);
 	jbwm_update_title_bar(c);
 }
