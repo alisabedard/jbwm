@@ -71,11 +71,10 @@ struct JBWMClient * jbwm_get_client(const jbwm_window_t w)
 {
 	return search(jbwm_client_data.head, w);
 }
-static void unselect_current(void)
+static void unselect_current(Display * restrict d)
 {
 	if(!jbwm_client_data.current)
 		return;
-	Display * restrict d = jbwm_get_display();
 	XSetWindowBorder(d, jbwm_client_data.current->parent,
 		jbwm_get_screens()[jbwm_client_data.current->screen]
 		.pixels.bg);
@@ -90,12 +89,11 @@ static void set_border(struct JBWMClient * restrict c)
 	XSetWindowBorder(jbwm_get_display(), c->parent, c->opt.sticky
 		? s->pixels.fc : s->pixels.fg);
 }
-void jbwm_select_client(struct JBWMClient * c)
+void jbwm_select_client(Display * restrict d, struct JBWMClient * c)
 {
 	if(!c)
 		return;
-	unselect_current();
-	Display * d = jbwm_get_display();
+	unselect_current(d);
 	XInstallColormap(d, c->cmap);
 	XSetInputFocus(d, c->window,
 		RevertToPointerRoot, CurrentTime);
@@ -111,7 +109,7 @@ void jbwm_toggle_sticky(Display * restrict d, struct JBWMClient * c)
 {
 	JBWM_LOG("stick");
 	c->opt.sticky ^= true; // toggle
-	jbwm_select_client(c);
+	jbwm_select_client(d, c);
 	jbwm_update_title_bar(d, c);
 #ifdef JBWM_USE_EWMH
 	if (c->opt.sticky)

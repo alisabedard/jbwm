@@ -34,7 +34,7 @@ void jbwm_toggle_shade(Display * restrict d, struct JBWMClient * restrict c)
 		jbwm_set_wm_state(d, c, IconicState);
 		jbwm_ewmh_add_state(d, c->window,
 			ewmh[WM_STATE_SHADED]);
-		jbwm_select_client(c);
+		jbwm_select_client(d, c);
 	}
 	jbwm_update_title_bar(d, c);
 }

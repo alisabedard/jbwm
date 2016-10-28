@@ -15,7 +15,7 @@ void jbwm_set_client_vdesk(Display * restrict dpy,
 	__attribute((nonnull));
 struct JBWMClient *jbwm_get_client(jbwm_window_t w)
 	__attribute__((hot,pure));
-void jbwm_select_client(struct JBWMClient * c);
+void jbwm_select_client(Display * restrict d, struct JBWMClient * c);
 void jbwm_send_wm_delete(Display * restrict d, struct JBWMClient * restrict c)
 	__attribute__((nonnull));
 // Set WM_STATE property
