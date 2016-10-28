@@ -294,7 +294,7 @@ int main(
 	if (!(jbwm_data.display = XOpenDisplay(NULL)))
 		jbwm_error(JBWM_ENV_DISPLAY);
 	XSetErrorHandler(handle_xerror);
-	jbwm_ewmh_init();
+	jbwm_ewmh_init(jbwm_data.display);
 	uint8_t i = ScreenCount(jbwm_data.display);
 	struct JBWMScreen s[i]; // remains in scope till exit.
 	jbwm_data.screens = s;

@@ -52,11 +52,10 @@ static char * atom_names [] = { // This list must match 1:1 with enum
 	"_NET_WM_STATE_BELOW",
 	"_NET_WM_STATE_FOCUSED",
 };
-void jbwm_ewmh_init(void)
+void jbwm_ewmh_init(Display * restrict d)
 {
 	JBWM_LOG("atom_names: %d\n", JBWM_EWMH_ATOMS_COUNT);
-	XInternAtoms(jbwm_get_display(), atom_names,
-		JBWM_EWMH_ATOMS_COUNT, false, ewmh);
+	XInternAtoms(d, atom_names, JBWM_EWMH_ATOMS_COUNT, false, ewmh);
 }
 static uint16_t get_client_count(void)
 {
@@ -66,7 +65,7 @@ static uint16_t get_client_count(void)
 		j < UINT16_MAX && i; i = i->next, ++j);
 	return j;
 }
-void jbwm_ewmh_update_client_list(void)
+void jbwm_ewmh_update_client_list(Display * restrict d)
 {
 	jbwm_window_t wl[get_client_count()];
 	size_t wl_sz = 0;
@@ -74,7 +73,6 @@ void jbwm_ewmh_update_client_list(void)
 		i; i = i->next, ++wl_sz)
 		wl[wl_sz] = i->window;
 	struct JBWMScreen * s = jbwm_get_screens();
-	Display * d = jbwm_get_display();
 	for (uint8_t i = ScreenCount(d); i; --i) {
 		jbwm_set_property(d, s[i].root, ewmh[CLIENT_LIST],
 			XA_WINDOW, &wl, wl_sz);
@@ -91,7 +89,7 @@ static void set_root_vdesk(Display * restrict d, jbwm_window_t r)
 		(&(long[]){0, 0}), 2);
 	jbwm_set_property(d, r, ewmh[VIRTUAL_ROOTS], XA_WINDOW, &r, 1);
 }
-void jbwm_ewmh_set_allowed_actions(const jbwm_window_t w)
+void jbwm_ewmh_set_allowed_actions(Display * restrict d, const jbwm_window_t w)
 {
 	Atom a[] = {
 		ewmh[WM_ALLOWED_ACTIONS],
@@ -106,8 +104,7 @@ void jbwm_ewmh_set_allowed_actions(const jbwm_window_t w)
 		ewmh[WM_ACTION_MAXIMIZE_HORZ],
 		ewmh[WM_ACTION_MAXIMIZE_VERT]
 	};
-	jbwm_set_property(jbwm_get_display(), w, a[0], XA_ATOM,
-		&a, sizeof(a) / sizeof(Atom));
+	jbwm_set_property(d, w, a[0], XA_ATOM, &a, sizeof(a) / sizeof(Atom));
 }
 static void init_desktops(Display * restrict d,
 	struct JBWMScreen * restrict s)

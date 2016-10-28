@@ -119,7 +119,7 @@ static void do_grabs(Display * restrict d, const jbwm_window_t w)
 	XSelectInput(d, w, EnterWindowMask
 		| PropertyChangeMask | ColormapChangeMask);
 	jbwm_grab_window_keys(d, w);
-	jbwm_ewmh_set_allowed_actions(w);
+	jbwm_ewmh_set_allowed_actions(d, w);
 }
 void jbwm_new_client(Display * restrict d, struct JBWMScreen * restrict s,
 	const jbwm_window_t w)

@@ -6,11 +6,12 @@
 #define JBWM_EWMH_H
 #ifdef JBWM_USE_EWMH
 #include "JBWMClient.h"
-void jbwm_ewmh_update_client_list(void);
-void jbwm_ewmh_set_allowed_actions(const jbwm_window_t w);
+void jbwm_ewmh_update_client_list(Display * restrict d);
+void jbwm_ewmh_set_allowed_actions(Display * restrict d,
+	const jbwm_window_t w);
 void jbwm_ewmh_init_screen(Display * restrict d,
 	struct JBWMScreen * restrict s) __attribute__((nonnull));
-void jbwm_ewmh_init(void);
+void jbwm_ewmh_init(Display * restrict d);
 enum JBWMAtomIndex {
 SUPPORTED, CURRENT_DESKTOP, NUMBER_OF_JBWM_MAX_DESKTOPS, DESKTOP_VIEWPORT,
     DESKTOP_GEOMETRY, SUPPORTING_WM_CHECK, ACTIVE_WINDOW,
@@ -34,9 +35,9 @@ WM_STATE, WM_STATE_STICKY, WM_STATE_MAXIMIZED_VERT,
 };
 extern Atom ewmh[];
 #else//!JBWM_USE_EWMH
-#define jbwm_ewmh_update_client_list()
-#define jbwm_ewmh_set_allowed_actions(w)
+#define jbwm_ewmh_update_client_list(d)
+#define jbwm_ewmh_set_allowed_actions(d, w)
 #define jbwm_ewmh_init_screen(d, s)
-#define jbwm_ewmh_init()
+#define jbwm_ewmh_init(d)
 #endif//JBWM_USE_EWMH
 #endif//!JBWM_EWMH_H
