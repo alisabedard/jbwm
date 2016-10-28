@@ -214,11 +214,10 @@ static void setup_screen_elements(const uint8_t i)
 {
 	struct JBWMScreen * restrict s = jbwm_data.screens;
 	s->screen = i;
-	Display * restrict d = jbwm_data.display;
-	s->root = RootWindow(d, i);
+	s->root = RootWindow(jbwm_data.display, i);
 	s->vdesk = 0;
-	s->size.w = DisplayWidth(d, i);
-	s->size.h = DisplayHeight(d, i);
+	s->size.w = DisplayWidth(jbwm_data.display, i);
+	s->size.h = DisplayHeight(jbwm_data.display, i);
 }
 static void setup_gc(struct JBWMScreen * restrict s)
 {
