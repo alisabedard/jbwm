@@ -73,14 +73,14 @@ static void handle_property_change(XPropertyEvent * restrict e,
 	else {
 		if (e->atom == jbwm_get_wm_state())
 			jbwm_move_resize(c);
-		jbwm_print_atom(jbwm_get_display(), e->atom,
+		jbwm_print_atom(e->display, e->atom,
 			__FILE__, __LINE__);
 	}
 }
 static void handle_configure_request(XConfigureRequestEvent * e)
 {
 	JBWM_LOG("handle_configure_request");
-	XConfigureWindow(jbwm_get_display(), e->window, e->value_mask,
+	XConfigureWindow(e->display, e->window, e->value_mask,
 		&(XWindowChanges){ .x = e->x, .y = e->y,
 		.width = e->width, .height = e->height,
 		.border_width = e->border_width,
@@ -94,23 +94,23 @@ static void handle_map_request(XMapRequestEvent * e)
 	if(e->window == jbwm_events_data.last_window)
 		return;
 	jbwm_events_data.last_window = e->window;
-	Display * restrict d = jbwm_get_display();
+	Display * restrict d = e->display;
 	jbwm_new_client(d, get_screen(ScreenCount(d), e->parent), e->window);
 
 }
 static void iteration(void)
 {
 	XEvent ev;
-	struct JBWMClient * c;
-	Display * d = jbwm_get_display();
-	XNextEvent(d, &ev);
-	c = jbwm_get_client(ev.xany.window);
+	XNextEvent(jbwm_get_display(), &ev);
+	struct JBWMClient * restrict c = jbwm_get_client(ev.xany.window);
 	switch (ev.type) {
 	case KeyPress:
-		jbwm_handle_key_event(d, &ev.xkey);
+		jbwm_handle_key_event(ev.xkey.display, &ev.xkey);
 		break;
 	case ButtonPress:
-		if(c) jbwm_handle_button_event(d, &ev.xbutton, c);
+		if(c)
+			jbwm_handle_button_event(ev.xbutton.display,
+				&ev.xbutton, c);
 		break;
 	case EnterNotify:
 		if(c && (ev.xcrossing.window == c->parent))
@@ -143,13 +143,14 @@ static void iteration(void)
 		handle_configure_request(&ev.xconfigurerequest);
 		break;
 	case PropertyNotify:
-		if (c) handle_property_change(&ev.xproperty, c);
+		if (c)
+			handle_property_change(&ev.xproperty, c);
 		break;
 	case ColormapNotify:
 		if (c && ev.xcolormap.new) {
 			JBWM_LOG("ColormapNotify");
 			c->cmap = ev.xcolormap.colormap;
-			XInstallColormap(d, c->cmap);
+			XInstallColormap(ev.xcolormap.display, c->cmap);
 		}
 		break;
 #ifdef JBWM_USE_EWMH
