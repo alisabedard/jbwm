@@ -9,23 +9,26 @@
 #include "util.h"
 #include <X11/Xatom.h>
 // Remove specified atom from WM_STATE
-void jbwm_ewmh_remove_state(const Window w, const Atom state)
+void jbwm_ewmh_remove_state(Display * restrict d,
+	const Window w, const Atom state)
 {
 	uint16_t n;
-	Atom *a = jbwm_get_property(w, ewmh[WM_STATE], &n);
+	Atom *a = jbwm_get_property(d, w, ewmh[WM_STATE], &n);
 	if (!a)
 		return;
 	const uint16_t nitems = n;
 	while (n--) // decrement here to prevent offset error
 		if (a[n] == state)
 			a[n] = 0;
-	jbwm_set_property(w, ewmh[WM_STATE], XA_ATOM, a, nitems);
+	jbwm_set_property(d, w, ewmh[WM_STATE],
+		XA_ATOM, a, nitems);
 	XFree(a);
 }
 static bool ewmh_get_state(const Window w, const Atom state)
 {
 	uint16_t n;
-	Atom *a = jbwm_get_property(w, ewmh[WM_STATE], &n);
+	Atom *a = jbwm_get_property(jbwm_get_display(),
+		w, ewmh[WM_STATE], &n);
 	bool found = false;
 	if (a) {
 		while (n--) // prevent offset error
@@ -35,10 +38,9 @@ static bool ewmh_get_state(const Window w, const Atom state)
 	}
 	return found;
 }
-void jbwm_ewmh_add_state(const Window w, Atom state)
+void jbwm_ewmh_add_state(Display * d, const Window w, Atom state)
 {
-	XChangeProperty(jbwm_get_display(), w, ewmh[WM_STATE],
-		XA_ATOM, 32, PropModePrepend,
+	XChangeProperty(d, w, ewmh[WM_STATE], XA_ATOM, 32, PropModePrepend,
 		(unsigned char *)&state, 1);
 }
 /*      Reference, per wm-spec:
@@ -93,22 +95,26 @@ static void check_state(XClientMessageEvent * e,	// event data
 	// 2 atoms can be set at once
 	long * l = &e->data.l[0];
 	const bool set = l[1] == (long)state || l[2] == (long)state;
-	if(!set) return;
+	if(!set)
+		return;
+	Display * restrict d = jbwm_get_display();
 	switch (e->data.l[0]) {
 	default:
 	case 0:	// remove
 		set_state(c, false, t);
-		jbwm_ewmh_remove_state(e->window, state);
+		jbwm_ewmh_remove_state(d, e->window, state);
 		break;
 	case 1:	// add
 		set_state(c, true, t);
-		jbwm_ewmh_add_state(e->window, state);
+		jbwm_ewmh_add_state(d, e->window, state);
 		break;
 	case 2:{	// toggle
 			const bool add = !ewmh_get_state(e->window, state);
 			set_state(c, add, t);
-			(add ? jbwm_ewmh_add_state : jbwm_ewmh_remove_state)
-				(e->window, state);
+			if (add)
+				jbwm_ewmh_add_state(d, e->window, state);
+			else
+				jbwm_ewmh_remove_state(d, e->window, state);
 		}
 	}
 }

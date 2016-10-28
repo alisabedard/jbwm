@@ -79,11 +79,13 @@ struct JBWMClient * jbwm_get_client(const jbwm_window_t w)
 }
 static void unselect_current(void)
 {
-	if(!jbwm_client_data.current) return;
-	XSetWindowBorder(jbwm_get_display(), jbwm_client_data.current->parent,
+	if(!jbwm_client_data.current)
+		return;
+	Display * restrict d = jbwm_get_display();
+	XSetWindowBorder(d, jbwm_client_data.current->parent,
 		jbwm_client_data.current->screen->pixels.bg);
 #ifdef JBWM_USE_EWMH
-	jbwm_ewmh_remove_state(jbwm_client_data.current->window,
+	jbwm_ewmh_remove_state(d, jbwm_client_data.current->window,
 		ewmh[WM_STATE_FOCUSED]);
 #endif//JBWM_USE_EWMH
 }
@@ -97,15 +99,16 @@ void jbwm_select_client(struct JBWMClient * c)
 	if(!c)
 		return;
 	unselect_current();
-	XInstallColormap(jbwm_get_display(), c->cmap);
-	XSetInputFocus(jbwm_get_display(), c->window,
+	Display * d = jbwm_get_display();
+	XInstallColormap(d, c->cmap);
+	XSetInputFocus(d, c->window,
 		RevertToPointerRoot, CurrentTime);
 	set_border(c);
 	jbwm_client_data.current = c;
 #ifdef JBWM_USE_EWMH
-	jbwm_set_property(c->screen->root, ewmh[ACTIVE_WINDOW],
+	jbwm_set_property(d, c->screen->root, ewmh[ACTIVE_WINDOW],
 		XA_WINDOW, &(c->parent), 1);
-	jbwm_ewmh_add_state(c->window, ewmh[WM_STATE_FOCUSED]);
+	jbwm_ewmh_add_state(d, c->window, ewmh[WM_STATE_FOCUSED]);
 #endif//JBWM_USE_EWMH
 }
 void jbwm_toggle_sticky(struct JBWMClient * c)
@@ -115,8 +118,12 @@ void jbwm_toggle_sticky(struct JBWMClient * c)
 	jbwm_select_client(c);
 	jbwm_update_title_bar(c);
 #ifdef JBWM_USE_EWMH
-	(c->opt.sticky ? jbwm_ewmh_add_state : jbwm_ewmh_remove_state)(c->window,
-		ewmh[WM_STATE_STICKY]);
+	Display * restrict d = jbwm_get_display();
+	if (c->opt.sticky)
+		jbwm_ewmh_add_state(d, c->window, ewmh[WM_STATE_STICKY]);
+	else
+		jbwm_ewmh_remove_state(d, c->window,
+			ewmh[WM_STATE_STICKY]);
 #endif//JBWM_USE_EWMH
 }
 // Returns 0 on failure.
@@ -148,9 +155,10 @@ jbwm_atom_t jbwm_get_wm_state(void)
 	static jbwm_atom_t a;
 	return get_atom(&a, "WM_STATE");
 }
-void jbwm_set_wm_state(struct JBWMClient * restrict c, const int8_t state)
+void jbwm_set_wm_state(Display * restrict d,
+	struct JBWMClient * restrict c, const int8_t state)
 {
-	jbwm_set_property(c->window, jbwm_get_wm_state(),
+	jbwm_set_property(d, c->window, jbwm_get_wm_state(),
 		XA_CARDINAL, &(uint32_t){state}, 1);
 }
 static bool has_delete_proto(const jbwm_window_t w)

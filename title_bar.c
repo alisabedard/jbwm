@@ -20,19 +20,21 @@ void jbwm_toggle_shade(struct JBWMClient * restrict c)
 	if (c->opt.no_min || c->opt.fullscreen)
 		return;
 	// This implements window shading, a substitute for iconification.
+	Display * restrict d = jbwm_get_display();
 	if (c->opt.shaded) {
 		// Unshade
 		c->size.height = c->old_size.height;
 		c->opt.shaded = false;
 		jbwm_move_resize(c);
-		jbwm_set_wm_state(c, NormalState);
-		jbwm_ewmh_remove_state(c->window, ewmh[WM_STATE_SHADED]);
+		jbwm_set_wm_state(d, c, NormalState);
+		jbwm_ewmh_remove_state(d, c->window, ewmh[WM_STATE_SHADED]);
 	} else {		// Shade the client
 		c->old_size.height = c->size.height;
 		c->size.height = -1;
 		c->opt.shaded = true;
-		jbwm_set_wm_state(c, IconicState);
-		jbwm_ewmh_add_state(c->window, ewmh[WM_STATE_SHADED]);
+		jbwm_set_wm_state(d, c, IconicState);
+		jbwm_ewmh_add_state(d, c->window,
+			ewmh[WM_STATE_SHADED]);
 		jbwm_select_client(c);
 	}
 	jbwm_update_title_bar(c);
@@ -58,18 +60,19 @@ static jbwm_window_t new_title_bar(struct JBWMClient * restrict c)
 {
 	const struct JBWMPixels * p = &c->screen->pixels;
 	const jbwm_window_t t = c->tb.win = get_win(c->parent, p->bg);
-	XSelectInput(jbwm_get_display(), t, ExposureMask);
+	Display * d = jbwm_get_display();
+	XSelectInput(d, t, ExposureMask);
 	c->tb.close = get_win(t, p->close);
 	c->tb.resize = get_win(t, p->resize);
 	c->tb.shade = get_win(t, p->shade);
 	c->tb.stick = get_win(t, p->stick);
-	XMapRaised(jbwm_get_display(), t);
-	XMapSubwindows(jbwm_get_display(), t);
-	jbwm_grab_button(t, 0, AnyButton);
+	XMapRaised(d, t);
+	XMapSubwindows(d, t);
+	jbwm_grab_button(d, t, 0, AnyButton);
 #ifdef JBWM_USE_EWMH
 	// Required by wm-spec 1.4:
 	const uint8_t b = c->border;
-	jbwm_set_property(c->window, ewmh[FRAME_EXTENTS], XA_CARDINAL,
+	jbwm_set_property(d, c->window, ewmh[FRAME_EXTENTS], XA_CARDINAL,
 		(&(jbwm_atom_t[]){b, b, b + jbwm_get_font_height(), b}), 4);
 #endif//JBWM_USE_EWMH
 	return t;
@@ -121,7 +124,8 @@ static void remove_title_bar(struct JBWMClient * restrict c)
 #ifdef JBWM_USE_EWMH
 	// Required by wm-spec 1.4:
 	const uint8_t b = c->border;
-	jbwm_set_property(c->window, ewmh[FRAME_EXTENTS], XA_CARDINAL,
+	jbwm_set_property(jbwm_get_display(), c->window,
+		ewmh[FRAME_EXTENTS], XA_CARDINAL,
 		(&(jbwm_atom_t[]){b, b, b, b}), 4);
 #endif//JBWM_USE_EWMH
 }

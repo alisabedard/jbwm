@@ -73,7 +73,7 @@ static Atom get_mwm_hints_atom(Display * restrict d)
 void jbwm_handle_mwm_hints(Display * d, struct JBWMClient * c)
 {
 	const Atom mwm_hints = get_mwm_hints_atom(d);
-	struct JBWMMwm * m = jbwm_get_property(c->window,
+	struct JBWMMwm * m = jbwm_get_property(d, c->window,
 		mwm_hints, &(uint16_t){0});
 	if(!m)
 		return;

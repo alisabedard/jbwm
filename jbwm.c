@@ -175,14 +175,15 @@ static void setup_event_listeners(const jbwm_window_t root)
 static void allocate_colors(struct JBWMScreen * restrict s)
 {
 	const uint8_t n = s->screen;
-	s->pixels.fg=jbwm_get_pixel(n, getenv(JBWM_ENV_FG));
-	s->pixels.bg=jbwm_get_pixel(n, getenv(JBWM_ENV_BG));
-	s->pixels.fc=jbwm_get_pixel(n, getenv(JBWM_ENV_FC));
+	Display * restrict d = jbwm_data.display;
+	s->pixels.fg=jbwm_get_pixel(d, n, getenv(JBWM_ENV_FG));
+	s->pixels.bg=jbwm_get_pixel(d, n, getenv(JBWM_ENV_BG));
+	s->pixels.fc=jbwm_get_pixel(d, n, getenv(JBWM_ENV_FC));
 #ifdef JBWM_USE_TITLE_BAR
-	s->pixels.close = jbwm_get_pixel(n, getenv(JBWM_ENV_CLOSE));
-	s->pixels.resize = jbwm_get_pixel(n, getenv(JBWM_ENV_RESIZE));
-	s->pixels.shade = jbwm_get_pixel(n, getenv(JBWM_ENV_SHADE));
-	s->pixels.stick = jbwm_get_pixel(n, getenv(JBWM_ENV_STICK));
+	s->pixels.close = jbwm_get_pixel(d, n, getenv(JBWM_ENV_CLOSE));
+	s->pixels.resize = jbwm_get_pixel(d, n, getenv(JBWM_ENV_RESIZE));
+	s->pixels.shade = jbwm_get_pixel(d, n, getenv(JBWM_ENV_SHADE));
+	s->pixels.stick = jbwm_get_pixel(d, n, getenv(JBWM_ENV_STICK));
 #endif//JBWM_USE_TITLE_BAR
 }
 static bool check_redirect(const jbwm_window_t w)

@@ -72,7 +72,8 @@ static void handle_property_change(XPropertyEvent * restrict e,
 	else {
 		if (e->atom == jbwm_get_wm_state())
 			jbwm_move_resize(c);
-		jbwm_print_atom(e->atom, __FILE__, __LINE__);
+		jbwm_print_atom(jbwm_get_display(), e->atom,
+			__FILE__, __LINE__);
 	}
 }
 static void handle_configure_request(XConfigureRequestEvent * e)

@@ -14,7 +14,8 @@ static void set_not_horz(struct JBWMClient * restrict c)
 	c->opt.max_horz = false;
 	c->size.x = c->old_size.x;
 	c->size.width = c->old_size.width;
-	jbwm_ewmh_remove_state(c->window, ewmh[WM_STATE_MAXIMIZED_HORZ]);
+	jbwm_ewmh_remove_state(jbwm_get_display(),
+		c->window, ewmh[WM_STATE_MAXIMIZED_HORZ]);
 }
 void jbwm_set_not_horz(struct JBWMClient * restrict c)
 {
@@ -35,7 +36,8 @@ void jbwm_set_horz(struct JBWMClient * restrict c)
 {
 	JBWM_LOG("jbwm_set_horz");
 	if (c->opt.max_horz) return;
-	jbwm_ewmh_add_state(c->window, ewmh[WM_STATE_MAXIMIZED_HORZ]);
+	jbwm_ewmh_add_state(jbwm_get_display(), c->window,
+		ewmh[WM_STATE_MAXIMIZED_HORZ]);
 	set_horz(c);
 	c->size.width -= c->border << 1;
 	jbwm_move_resize(c);
@@ -45,7 +47,7 @@ static void set_not_vert(struct JBWMClient * restrict c)
 	c->opt.max_vert = false;
 	c->size.y = c->old_size.y;
 	c->size.height = c->old_size.height;
-	jbwm_ewmh_remove_state(c->window,
+	jbwm_ewmh_remove_state(jbwm_get_display(), c->window,
 		ewmh[WM_STATE_MAXIMIZED_VERT]);
 }
 void jbwm_set_not_vert(struct JBWMClient * restrict c)
@@ -62,7 +64,8 @@ static void set_vert(struct JBWMClient * restrict c)
 	c->old_size.height = c->size.height;
 	c->size.y = 0;
 	c->size.height = c->screen->size.h;
-	jbwm_ewmh_add_state(c->window, ewmh[WM_STATE_MAXIMIZED_VERT]);
+	jbwm_ewmh_add_state(jbwm_get_display(), c->window,
+		ewmh[WM_STATE_MAXIMIZED_VERT]);
 }
 void jbwm_set_vert(struct JBWMClient * restrict c)
 {
@@ -83,8 +86,9 @@ static void set_not_fullscreen(struct JBWMClient * restrict c)
 	c->opt.fullscreen = false;
 	set_not_horz(c);
 	set_not_vert(c);
-	XSetWindowBorderWidth(jbwm_get_display(), c->parent, c->border);
-	jbwm_ewmh_remove_state(c->window, ewmh[WM_STATE_FULLSCREEN]);
+	Display * restrict d = jbwm_get_display();
+	XSetWindowBorderWidth(d, c->parent, c->border);
+	jbwm_ewmh_remove_state(d, c->window, ewmh[WM_STATE_FULLSCREEN]);
 	jbwm_update_title_bar(c);
 }
 void jbwm_set_not_fullscreen(struct JBWMClient * restrict c)
@@ -107,8 +111,9 @@ static void set_fullscreen(struct JBWMClient * restrict c)
 		set_not_vert(c);
 	set_horz(c);
 	set_vert(c);
-	XSetWindowBorderWidth(jbwm_get_display(), c->parent, 0);
-	jbwm_ewmh_add_state(c->window, ewmh[WM_STATE_FULLSCREEN]);
+	Display * restrict d = jbwm_get_display();
+	XSetWindowBorderWidth(d, c->parent, 0);
+	jbwm_ewmh_add_state(d, c->window, ewmh[WM_STATE_FULLSCREEN]);
 	jbwm_update_title_bar(c);
 }
 void jbwm_set_fullscreen(struct JBWMClient * restrict c)

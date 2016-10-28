@@ -16,15 +16,16 @@
 #include <stdlib.h>
 #include <X11/Xatom.h>
 #ifdef JBWM_USE_EWMH
-static uint8_t wm_desktop(const jbwm_window_t w, uint8_t vdesk)
+static uint8_t wm_desktop(Display * d, const jbwm_window_t w, uint8_t vdesk)
 {
 	uint16_t n;
-	unsigned long *lprop = jbwm_get_property(w, ewmh[WM_DESKTOP], &n);
+	unsigned long *lprop = jbwm_get_property(d, w,
+		ewmh[WM_DESKTOP], &n);
 	if (lprop) {
 		if (n && lprop[0] < JBWM_MAX_DESKTOPS) // is valid
 			vdesk = lprop[0]; // Set vdesk to property value
 		else // Set to a valid desktop number:
-			jbwm_set_property(w, ewmh[WM_DESKTOP],
+			jbwm_set_property(d, w, ewmh[WM_DESKTOP],
 				XA_CARDINAL, &vdesk, 1);
 		XFree(lprop);
 	}
@@ -40,7 +41,8 @@ static void set_frame_extents(struct JBWMClient * c)
 {
 	// Required by wm-spec 1.4:
 	const uint8_t b = c->border;
-	jbwm_set_property(c->window, ewmh[FRAME_EXTENTS], XA_CARDINAL,
+	jbwm_set_property(jbwm_get_display(), c->window,
+		ewmh[FRAME_EXTENTS], XA_CARDINAL,
 		(&(jbwm_atom_t[]){b, b, b
 		 + (c->opt.no_title_bar ? 0
 			 : jbwm_get_font_height()), b}), 4);
@@ -51,9 +53,10 @@ static void set_frame_extents(struct JBWMClient * c)
 __attribute__((nonnull))
 static void init_properties(struct JBWMClient * c)
 {
-	jbwm_handle_mwm_hints(jbwm_get_display(), c);
+	Display * d = jbwm_get_display();
+	jbwm_handle_mwm_hints(d, c);
 	c->vdesk = c->screen->vdesk;
-	c->vdesk = wm_desktop(c->window, c->vdesk);
+	c->vdesk = wm_desktop(d, c->window, c->vdesk);
 }
 __attribute__((nonnull))
 static void init_geometry(struct JBWMClient * c)
