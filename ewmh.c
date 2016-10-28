@@ -112,13 +112,14 @@ void jbwm_ewmh_set_allowed_actions(const jbwm_window_t w)
 static void init_desktops(Display * restrict d,
 	struct JBWMScreen * restrict s)
 {
-	jbwm_set_property(d, s->r, ewmh[DESKTOP_GEOMETRY], XA_CARDINAL, &s->size, 2);
-	jbwm_set_property(d, s->r, ewmh[CURRENT_DESKTOP], XA_CARDINAL, &s->vdesk, 1);
+	jbwm_set_property(d, s->r, ewmh[DESKTOP_GEOMETRY],
+		XA_CARDINAL, &s->size, 2);
+	jbwm_set_property(d, s->r, ewmh[CURRENT_DESKTOP],
+		XA_CARDINAL, &s->vdesk, 1);
 	set_root_vdesk(d, s->r);
 }
-static jbwm_window_t init_supporting(const jbwm_window_t r)
+static jbwm_window_t init_supporting(Display * restrict d, const jbwm_window_t r)
 {
-	Display * d = jbwm_get_display();
 	jbwm_window_t w = XCreateSimpleWindow(d, r,
 		0, 0, 1, 1, 0, 0, 0);
 	jbwm_set_property(d, r, ewmh[SUPPORTING_WM_CHECK], XA_WINDOW, &w, 1);
@@ -127,16 +128,15 @@ static jbwm_window_t init_supporting(const jbwm_window_t r)
 	jbwm_set_property(d, w, ewmh[WM_PID], XA_CARDINAL, &(pid_t){getpid()}, 1);
 	return w;
 }
-__attribute__((nonnull(1)))
-void jbwm_ewmh_init_screen(struct JBWMScreen * restrict s)
+void jbwm_ewmh_init_screen(Display * restrict d,
+	struct JBWMScreen * restrict s)
 {
 	jbwm_window_t r = s->root;
-	Display * d = jbwm_get_display();
 	jbwm_set_property(d, r, ewmh[SUPPORTED], XA_ATOM, ewmh,
 		JBWM_EWMH_ATOMS_COUNT);
 	jbwm_set_property(d, r, ewmh[WM_NAME], XA_STRING, "jbwm", 4);
 	// Set this to the root window until we have some clients.
 	jbwm_set_property(d, r, ewmh[CLIENT_LIST], XA_WINDOW, &r, 1);
 	init_desktops(d, s);
-	s->supporting = init_supporting(r);
+	s->supporting = init_supporting(d, r);
 }

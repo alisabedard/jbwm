@@ -250,7 +250,7 @@ static void setup_screen(const uint8_t i)
 	jbwm_grab_screen_keys(jbwm_data.display, s);
 	/* scan all the windows on this screen */
 	setup_clients(s);
-	jbwm_ewmh_init_screen(s);
+	jbwm_ewmh_init_screen(jbwm_data.display, s);
 }
 __attribute__((pure))
 static int handle_xerror(Display * restrict dpy __attribute__ ((unused)),
