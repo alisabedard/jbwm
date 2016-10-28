@@ -38,16 +38,17 @@ void jbwm_toggle_shade(Display * restrict d, struct JBWMClient * restrict c)
 	}
 	jbwm_update_title_bar(d, c);
 }
-static uint16_t mv(const jbwm_window_t w, uint16_t x)
+static uint16_t mv(Display * restrict d, const jbwm_window_t w, uint16_t x)
 {
 	x -= jbwm_get_font_height();
-	XMoveWindow(jbwm_get_display(), w, x, 0);
+	XMoveWindow(d, w, x, 0);
 	return x;
 }
-static void move_buttons(struct JBWMClientTitlebar * restrict t,
+static void move_buttons(Display * restrict d,
+	struct JBWMClientTitlebar * restrict t,
 	const uint16_t width)
 {
-	mv(t->stick, mv(t->shade, mv(t->resize, width)));
+	mv(d, t->stick, mv(d, t->shade, mv(d, t->resize, width)));
 }
 static jbwm_window_t get_win(const Window p, const jbwm_pixel_t bg)
 {
@@ -153,7 +154,7 @@ void jbwm_update_title_bar(Display * restrict d, struct JBWMClient * c)
 	{
 		const uint16_t width = c->size.width;
 		XResizeWindow(d, w, width, jbwm_get_font_height());
-		move_buttons(&c->tb, width);
+		move_buttons(d, &c->tb, width);
 	}
 	XClearWindow(d, w);
 	draw_title(d, c);
