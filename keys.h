@@ -11,7 +11,7 @@ void jbwm_handle_key_event(Display * restrict d, XKeyEvent * restrict e)
 void jbwm_grab_screen_keys(Display * restrict d,
 	struct JBWMScreen * restrict s)
 	__attribute__((nonnull));
-void jbwm_grab_window_keys(const jbwm_window_t win);
+void jbwm_grab_window_keys(Display * restrict d, const jbwm_window_t win);
 void jbwm_set_grab_mask(const uint16_t mask);
 void jbwm_set_mod_mask(const uint16_t mask);
 enum { JBWM_KEY_NEXT=XK_Tab, JBWM_KEY_NEW=XK_Return, JBWM_KEY_QUIT=XK_Escape,

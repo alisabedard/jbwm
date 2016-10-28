@@ -115,11 +115,11 @@ static struct JBWMClient * get_JBWMClient(const jbwm_window_t w,
 	return c;
 }
 // Grab input and setup JBWM_USE_EWMH for client window
-static void do_grabs(const jbwm_window_t w)
+static void do_grabs(Display * restrict d, const jbwm_window_t w)
 {
-	XSelectInput(jbwm_get_display(), w, EnterWindowMask
+	XSelectInput(d, w, EnterWindowMask
 		| PropertyChangeMask | ColormapChangeMask);
-	jbwm_grab_window_keys(w);
+	jbwm_grab_window_keys(d, w);
 	jbwm_ewmh_set_allowed_actions(w);
 }
 void jbwm_new_client(Display * restrict d, struct JBWMScreen * restrict s,
@@ -128,7 +128,7 @@ void jbwm_new_client(Display * restrict d, struct JBWMScreen * restrict s,
 	JBWM_LOG("jbwm_new_client(%d,s)", (int)w);
 	struct JBWMClient * c = get_JBWMClient(w, s);
 	jbwm_set_head_client(c);
-	do_grabs(w);
+	do_grabs(d, w);
 	init_properties(d, c);
 	init_geometry(c);
 	reparent(c);

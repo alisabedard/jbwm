@@ -26,10 +26,9 @@ void jbwm_set_mod_mask(const uint16_t mask)
 {
 	jbwm_keys_data.mod_mask = mask;
 }
-void jbwm_grab_window_keys(const jbwm_window_t win)
+void jbwm_grab_window_keys(Display * restrict d, const jbwm_window_t win)
 {
-	jbwm_grab_button(jbwm_get_display(), win,
-		jbwm_keys_data.grab_mask, AnyButton);
+	jbwm_grab_button(d, win, jbwm_keys_data.grab_mask, AnyButton);
 }
 __attribute__((nonnull(1)))
 static void point(Display * restrict d,
