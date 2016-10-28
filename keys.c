@@ -151,7 +151,7 @@ static void handle_client_key_event(Display * restrict d, const bool mod,
 		jbwm_drag(c, false);
 		break;
 	case JBWM_KEY_SHADE:
-		jbwm_toggle_shade(c);
+		jbwm_toggle_shade(d, c);
 		break;
 	}
 }

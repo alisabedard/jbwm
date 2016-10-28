@@ -9,7 +9,8 @@
 #include "screen.h"
 #include "title_bar.h"
 #ifdef JBWM_USE_TITLE_BAR
-static void handle_title_bar_button(XButtonEvent * restrict e,
+static void handle_title_bar_button(Display * restrict d,
+	XButtonEvent * restrict e,
 	struct JBWMClient * restrict c)
 {
 	JBWM_LOG("e->window: %d, c->title_bar: %d, e->subwindow: %d",
@@ -19,14 +20,14 @@ static void handle_title_bar_button(XButtonEvent * restrict e,
 	else if (e->subwindow == c->tb.resize)
 		jbwm_drag(c, !c->opt.no_resize);
 	else if (e->subwindow == c->tb.shade && !c->opt.no_min)
-		jbwm_toggle_shade(c);
+		jbwm_toggle_shade(d, c);
 	else if (e->subwindow == c->tb.stick)
 		jbwm_toggle_sticky(c);
 	else
 		jbwm_drag(c, false);
 }
 #else//!JBWM_USE_TITLE_BAR
-#define handle_title_bar_button(e, c) jbwm_drag(c, false)
+#define handle_title_bar_button(d, e, c) jbwm_drag(c, false)
 #endif//JBWM_USE_TITLE_BAR
 void jbwm_handle_button_event(Display * restrict d,
 	XButtonEvent * restrict e,
@@ -39,7 +40,7 @@ void jbwm_handle_button_event(Display * restrict d,
 		if (fs)
 			XRaiseWindow(d, c->parent);
 		else
-			handle_title_bar_button(e, c);
+			handle_title_bar_button(d, e, c);
 		break;
 	case Button2:
 		XLowerWindow(d, c->parent);

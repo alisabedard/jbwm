@@ -14,13 +14,12 @@
 #include "config.h"
 #include <X11/Xft/Xft.h>
 #endif//JBWM_USE_XFT
-void jbwm_toggle_shade(struct JBWMClient * restrict c)
+void jbwm_toggle_shade(Display * restrict d, struct JBWMClient * restrict c)
 {
 	// Honor !MWM_FUNC_MINIMIZE
 	if (c->opt.no_min || c->opt.fullscreen)
 		return;
 	// This implements window shading, a substitute for iconification.
-	Display * restrict d = jbwm_get_display();
 	if (c->opt.shaded) {
 		// Unshade
 		c->size.height = c->old_size.height;
@@ -37,7 +36,7 @@ void jbwm_toggle_shade(struct JBWMClient * restrict c)
 			ewmh[WM_STATE_SHADED]);
 		jbwm_select_client(c);
 	}
-	jbwm_update_title_bar(c);
+	jbwm_update_title_bar(d, c);
 }
 static uint16_t mv(const jbwm_window_t w, uint16_t x)
 {
@@ -139,12 +138,11 @@ static void remove_title_bar(Display * restrict d,
 		(&(jbwm_atom_t[]){b, b, b, b}), 4);
 #endif//JBWM_USE_EWMH
 }
-void jbwm_update_title_bar(struct JBWMClient * c)
+void jbwm_update_title_bar(Display * restrict d, struct JBWMClient * c)
 {
 	if (c->opt.shaped)
 		return;
 	jbwm_window_t w = c->tb.win;
-	Display * restrict d = jbwm_get_display();
 	if (c->opt.fullscreen && w) {
 		remove_title_bar(d, c);
 		return;

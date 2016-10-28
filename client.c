@@ -111,9 +111,9 @@ void jbwm_toggle_sticky(struct JBWMClient * c)
 	JBWM_LOG("stick");
 	c->opt.sticky ^= true; // toggle
 	jbwm_select_client(c);
-	jbwm_update_title_bar(c);
-#ifdef JBWM_USE_EWMH
 	Display * restrict d = jbwm_get_display();
+	jbwm_update_title_bar(d, c);
+#ifdef JBWM_USE_EWMH
 	if (c->opt.sticky)
 		jbwm_ewmh_add_state(d, c->window, ewmh[WM_STATE_STICKY]);
 	else

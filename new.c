@@ -134,5 +134,5 @@ void jbwm_new_client(Display * restrict d, struct JBWMScreen * restrict s,
 	reparent(c);
 	set_frame_extents(c);
 	jbwm_restore_client(d, c);
-	jbwm_update_title_bar(c);
+	jbwm_update_title_bar(d, c);
 }

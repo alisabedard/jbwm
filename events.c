@@ -69,7 +69,7 @@ static void handle_property_change(XPropertyEvent * restrict e,
 	if(e->state != PropertyNewValue)
 		  return;
 	if (e->atom == XA_WM_NAME)
-		jbwm_update_title_bar(c);
+		jbwm_update_title_bar(e->display, c);
 	else {
 		if (e->atom == jbwm_get_wm_state())
 			jbwm_move_resize(c);
@@ -119,7 +119,7 @@ static void iteration(void)
 #ifdef JBWM_USE_TITLE_BAR
 	case Expose:
 		if (c && !ev.xexpose.count)
-			  jbwm_update_title_bar(c);
+			  jbwm_update_title_bar(ev.xexpose.display, c);
 		break;
 #endif//JBWM_USE_TITLE_BAR
 #ifdef JBWM_USE_EWMH
