@@ -136,8 +136,8 @@ static bool client_specific_message(XClientMessageEvent * restrict e,
 		jbwm_set_client_vdesk(c, e->data.l[0]);
 	// If user moves window (client-side title bars):
 	else if (t == ewmh[WM_MOVERESIZE]) {
-		XRaiseWindow(jbwm_get_display(), c->parent);
-		jbwm_drag(c, false);
+		XRaiseWindow(e->display, c->parent);
+		jbwm_drag(e->display, c, false);
 	} else if (t == ewmh[WM_STATE])
 		handle_wm_state_changes(e, c);
 	else if (t == ewmh[ACTIVE_WINDOW])
@@ -175,7 +175,8 @@ void jbwm_ewmh_handle_client_message(XClientMessageEvent * restrict e,
 	if(c && client_specific_message(e, c, t))
 		  return;
 	if (t == ewmh[CURRENT_DESKTOP])
-		  jbwm_set_vdesk(&jbwm_get_screens()[c ? c->screen : 0],
+		  jbwm_set_vdesk(e->display,
+			  &jbwm_get_screens()[c ? c->screen : 0],
 			  e->data.l[0]);
 	else if (t == ewmh[MOVERESIZE_WINDOW])
 		// If something else moves the window:

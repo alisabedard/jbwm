@@ -24,7 +24,7 @@ void jbwm_toggle_shade(Display * restrict d, struct JBWMClient * restrict c)
 		// Unshade
 		c->size.height = c->old_size.height;
 		c->opt.shaded = false;
-		jbwm_move_resize(c);
+		jbwm_move_resize(d, c);
 		jbwm_set_wm_state(d, c, NormalState);
 		jbwm_ewmh_remove_state(d, c->window, ewmh[WM_STATE_SHADED]);
 	} else {		// Shade the client

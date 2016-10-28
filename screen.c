@@ -80,9 +80,9 @@ static void do_changes(struct JBWMClient * restrict c, const bool resize,
 	else // drag
 		set_position(c, original, start, x, y);
 }
-static void drag_event_loop(struct JBWMClient * restrict c, const bool resize)
+static void drag_event_loop(Display * restrict d,
+	struct JBWMClient * restrict c, const bool resize)
 {
-	Display * restrict d = jbwm_get_display();
 	const jbwm_point_t start = get_mouse_position(d,
 		jbwm_get_screens()[c->screen].root);
 	const jbwm_point_t original = {c->size.x, c->size.y};
@@ -97,31 +97,30 @@ static void drag_event_loop(struct JBWMClient * restrict c, const bool resize)
 		if (c->border)
 			draw_outline(d, c);
 		else
-			jbwm_move_resize(c);
+			jbwm_move_resize(d, c);
 	}
 }
-void jbwm_drag(struct JBWMClient * restrict c, const bool resize)
+void jbwm_drag(Display * restrict d, struct JBWMClient * restrict c,
+	const bool resize)
 {
-	Display * restrict d = jbwm_get_display();
 	XRaiseWindow(d, c->parent);
 	if (resize && (c->opt.no_resize || c->opt.shaded))
 		return;
 	grab_pointer(d, jbwm_get_screens()[c->screen].root);
 	if (resize)
 		warp_corner(d, c);
-	drag_event_loop(c, resize);
+	drag_event_loop(d, c, resize);
 	draw_outline(d, c);
 	XUngrabPointer(d, CurrentTime);
-	jbwm_move_resize(c);
+	jbwm_move_resize(d, c);
 	if (!resize && !c->opt.tearoff)
 		configure(d, (&c->size), c->window);
 }
-void jbwm_move_resize(struct JBWMClient * restrict c)
+void jbwm_move_resize(Display * restrict d, struct JBWMClient * restrict c)
 {
 	JBWM_LOG("jbwm_move_resize");
 	const uint8_t offset = c->opt.no_title_bar || c->opt.fullscreen
 		? 0 : jbwm_get_font_height();
-	Display * d = jbwm_get_display();
 	XMoveResizeWindow(d, c->parent,
 		c->size.x, c->size.y - offset,
 		c->size.width, c->size.height + offset);
@@ -155,12 +154,11 @@ static void check_visibility(Display * restrict d, struct JBWMScreen * s,
 	} else
 		hide(d, c);
 }
-uint8_t jbwm_set_vdesk(struct JBWMScreen * s, uint8_t v)
+uint8_t jbwm_set_vdesk(Display * restrict d, struct JBWMScreen * s, uint8_t v)
 {
 	JBWM_LOG("jbwm_set_vdesk");
 	if (v == s->vdesk || v > JBWM_MAX_DESKTOPS)
 		return s->vdesk;
-	Display * restrict d = jbwm_get_display();
 	for (struct JBWMClient * c = jbwm_get_head_client();
 		c; c = c->next)
 		check_visibility(d, s, c, v);

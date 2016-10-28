@@ -52,8 +52,9 @@ void jbwm_set_client_vdesk(struct JBWMClient * restrict c, const uint8_t d)
 	c->vdesk = d;
 	// use jbwm_set_vdesk to validate d:
 	struct JBWMScreen * s = &jbwm_get_screens()[c->screen];
-	c->vdesk = jbwm_set_vdesk(s, d);
-	jbwm_set_vdesk(s, p);
+	Display * restrict dpy = jbwm_get_display();
+	c->vdesk = jbwm_set_vdesk(dpy, s, d);
+	jbwm_set_vdesk(dpy, s, p);
 }
 static struct JBWMClient * search(struct JBWMClient * c,
 	const jbwm_window_t w)

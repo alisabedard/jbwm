@@ -43,7 +43,7 @@ static void commit_key_move(Display * restrict d,
 	struct JBWMClient * restrict c)
 {
 	jbwm_snap_border(c);
-	jbwm_move_resize(c);
+	jbwm_move_resize(d, c);
 	point(d, c, 1, 1);
 }
 struct KeyMoveFlags {
@@ -151,7 +151,7 @@ static void handle_client_key_event(Display * restrict d, const bool mod,
 		jbwm_toggle_sticky(c);
 		break;
 	case JBWM_KEY_MOVE:
-		jbwm_drag(c, false);
+		jbwm_drag(d, c, false);
 		break;
 	case JBWM_KEY_SHADE:
 		jbwm_toggle_shade(d, c);
@@ -184,10 +184,11 @@ static void next(Display * restrict d)
 	point(d, c, 0, 0);
 	point(d, c, c->size.width, c->size.height);
 }
-static void cond_client_to_desk(struct JBWMClient * c, struct JBWMScreen * s,
+static void cond_client_to_desk(Display * restrict dpy,
+	struct JBWMClient * c, struct JBWMScreen * s,
 	const uint8_t d, const bool mod)
 {
-	mod && c ? jbwm_set_client_vdesk(c, d) : jbwm_set_vdesk(s, d);
+	mod && c ? jbwm_set_client_vdesk(c, d) : jbwm_set_vdesk(dpy, s, d);
 }
 static void start_terminal(void)
 {
@@ -221,14 +222,14 @@ void jbwm_handle_key_event(Display * restrict d, XKeyEvent * restrict e)
 	case XK_1: case XK_2: case XK_3: case XK_4: case XK_5: case XK_6:
 	case XK_7: case XK_8: case XK_9:
 		// First desktop 0, per wm-spec
-		cond_client_to_desk(c, s, opt.zero
+		cond_client_to_desk(d, c, s, opt.zero
 			? 10 : key - XK_1, opt.mod);
 		break;
 	case JBWM_KEY_PREVDESK:
-		cond_client_to_desk(c, s, s->vdesk - 1, opt.mod);
+		cond_client_to_desk(d, c, s, s->vdesk - 1, opt.mod);
 		break;
 	case JBWM_KEY_NEXTDESK:
-		cond_client_to_desk(c, s, s->vdesk + 1, opt.mod);
+		cond_client_to_desk(d, c, s, s->vdesk + 1, opt.mod);
 		break;
 	default:
 		if (c)
