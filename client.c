@@ -83,10 +83,10 @@ static void unselect_current(Display * restrict d)
 		ewmh[WM_STATE_FOCUSED]);
 #endif//JBWM_USE_EWMH
 }
-static void set_border(struct JBWMClient * restrict c)
+static void set_border(Display * restrict d, struct JBWMClient * restrict c)
 {
 	struct JBWMScreen * restrict s = &jbwm_get_screens()[c->screen];
-	XSetWindowBorder(jbwm_get_display(), c->parent, c->opt.sticky
+	XSetWindowBorder(d, c->parent, c->opt.sticky
 		? s->pixels.fc : s->pixels.fg);
 }
 void jbwm_select_client(Display * restrict d, struct JBWMClient * c)
@@ -97,7 +97,7 @@ void jbwm_select_client(Display * restrict d, struct JBWMClient * c)
 	XInstallColormap(d, c->cmap);
 	XSetInputFocus(d, c->window,
 		RevertToPointerRoot, CurrentTime);
-	set_border(c);
+	set_border(d, c);
 	jbwm_client_data.current = c;
 #ifdef JBWM_USE_EWMH
 	jbwm_set_property(d, jbwm_get_screens()[c->screen].root,
@@ -120,10 +120,11 @@ void jbwm_toggle_sticky(Display * restrict d, struct JBWMClient * c)
 #endif//JBWM_USE_EWMH
 }
 // Returns 0 on failure.
-static Status xmsg(const jbwm_window_t w, const Atom a, const long x)
+static Status xmsg(Display * restrict d, const jbwm_window_t w,
+	const Atom a, const long x)
 {
 	JBWM_LOG("xmsg");
-	return XSendEvent(jbwm_get_display(), w, false, NoEventMask, &(XEvent){
+	return XSendEvent(d, w, false, NoEventMask, &(XEvent){
 		.xclient.type = ClientMessage, .xclient.window = w,
 		.xclient.message_type = a, .xclient.format = 32,
 		.xclient.data.l[0] = x, .xclient.data.l[1] = CurrentTime
@@ -174,7 +175,7 @@ void jbwm_send_wm_delete(Display * restrict d, struct JBWMClient * restrict c)
 		return;
 	}
 	c->opt.remove = true;
-	has_delete_proto(d, c->window)?xmsg(c->window,
+	has_delete_proto(d, c->window)?xmsg(d, c->window,
 		get_wm_protocols(d), get_wm_delete_window(d))
 		: XKillClient(d, c->window);
 }
