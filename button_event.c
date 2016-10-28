@@ -22,7 +22,7 @@ static void handle_title_bar_button(Display * restrict d,
 	else if (e->subwindow == c->tb.shade && !c->opt.no_min)
 		jbwm_toggle_shade(d, c);
 	else if (e->subwindow == c->tb.stick)
-		jbwm_toggle_sticky(c);
+		jbwm_toggle_sticky(d, c);
 	else
 		jbwm_drag(d, c, false);
 }

@@ -107,12 +107,11 @@ void jbwm_select_client(struct JBWMClient * c)
 	jbwm_ewmh_add_state(d, c->window, ewmh[WM_STATE_FOCUSED]);
 #endif//JBWM_USE_EWMH
 }
-void jbwm_toggle_sticky(struct JBWMClient * c)
+void jbwm_toggle_sticky(Display * restrict d, struct JBWMClient * c)
 {
 	JBWM_LOG("stick");
 	c->opt.sticky ^= true; // toggle
 	jbwm_select_client(c);
-	Display * restrict d = jbwm_get_display();
 	jbwm_update_title_bar(d, c);
 #ifdef JBWM_USE_EWMH
 	if (c->opt.sticky)

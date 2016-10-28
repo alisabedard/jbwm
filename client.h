@@ -23,6 +23,6 @@ void jbwm_set_wm_state(Display * restrict d, struct JBWMClient * restrict c,
 	const int8_t state);
 // Return WM_STATE atom
 jbwm_atom_t jbwm_get_wm_state(void);
-void jbwm_toggle_sticky(struct JBWMClient * c)
+void jbwm_toggle_sticky(Display * restrict d, struct JBWMClient * c)
 	__attribute__((nonnull,cold));
 #endif /* JBWM_CLIENT_H */
