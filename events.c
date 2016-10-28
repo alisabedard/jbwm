@@ -31,16 +31,17 @@ static struct JBWMScreen * get_screen(const int8_t i,
 void jbwm_free_client(struct JBWMClient * restrict c)
 {
 	const jbwm_window_t w = c->window;
+	Display * restrict d = jbwm_get_display();
 #ifdef JBWM_USE_EWMH
 	// Per ICCCM + JBWM_USE_EWMH:
-	XDeleteProperty(jbwm_get_display(), w, ewmh[WM_STATE]);
-	XDeleteProperty(jbwm_get_display(), w, ewmh[WM_DESKTOP]);
+	XDeleteProperty(d, w, ewmh[WM_STATE]);
+	XDeleteProperty(d, w, ewmh[WM_DESKTOP]);
 #endif//JBWM_USE_EWMH
-	XReparentWindow(jbwm_get_display(), w, c->screen->root,
+	XReparentWindow(d, w, jbwm_get_screens()[c->screen].root,
 		c->size.x, c->size.y);
-	XRemoveFromSaveSet(jbwm_get_display(), w);
+	XRemoveFromSaveSet(d, w);
 	if(c->parent)
-		XDestroyWindow(jbwm_get_display(), c->parent);
+		XDestroyWindow(d, c->parent);
 	jbwm_relink_client_list(c);
 	free(c);
 	/* Allow this client's window id to be reused for another client: */

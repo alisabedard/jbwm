@@ -59,8 +59,9 @@ void jbwm_set_client_vdesk(struct JBWMClient * restrict c, const uint8_t d)
 	const uint8_t p = c->vdesk;
 	c->vdesk = d;
 	// use jbwm_set_vdesk to validate d:
-	c->vdesk = jbwm_set_vdesk(c->screen, d);
-	jbwm_set_vdesk(c->screen, p);
+	struct JBWMScreen * s = &jbwm_get_screens()[c->screen];
+	c->vdesk = jbwm_set_vdesk(s, d);
+	jbwm_set_vdesk(s, p);
 }
 static struct JBWMClient * search(struct JBWMClient * c,
 	const jbwm_window_t w)
@@ -83,7 +84,8 @@ static void unselect_current(void)
 		return;
 	Display * restrict d = jbwm_get_display();
 	XSetWindowBorder(d, jbwm_client_data.current->parent,
-		jbwm_client_data.current->screen->pixels.bg);
+		jbwm_get_screens()[jbwm_client_data.current->screen]
+		.pixels.bg);
 #ifdef JBWM_USE_EWMH
 	jbwm_ewmh_remove_state(d, jbwm_client_data.current->window,
 		ewmh[WM_STATE_FOCUSED]);
@@ -91,8 +93,9 @@ static void unselect_current(void)
 }
 static void set_border(struct JBWMClient * restrict c)
 {
+	struct JBWMScreen * restrict s = &jbwm_get_screens()[c->screen];
 	XSetWindowBorder(jbwm_get_display(), c->parent, c->opt.sticky
-		? c->screen->pixels.fc : c->screen->pixels.fg);
+		? s->pixels.fc : s->pixels.fg);
 }
 void jbwm_select_client(struct JBWMClient * c)
 {
@@ -106,8 +109,8 @@ void jbwm_select_client(struct JBWMClient * c)
 	set_border(c);
 	jbwm_client_data.current = c;
 #ifdef JBWM_USE_EWMH
-	jbwm_set_property(d, c->screen->root, ewmh[ACTIVE_WINDOW],
-		XA_WINDOW, &(c->parent), 1);
+	jbwm_set_property(d, jbwm_get_screens()[c->screen].root,
+		ewmh[ACTIVE_WINDOW], XA_WINDOW, &(c->parent), 1);
 	jbwm_ewmh_add_state(d, c->window, ewmh[WM_STATE_FOCUSED]);
 #endif//JBWM_USE_EWMH
 }

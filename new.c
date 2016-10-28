@@ -55,33 +55,34 @@ static void init_properties(struct JBWMClient * c)
 {
 	Display * d = jbwm_get_display();
 	jbwm_handle_mwm_hints(d, c);
-	c->vdesk = c->screen->vdesk;
+	c->vdesk = jbwm_get_screens()[c->screen].vdesk;
 	c->vdesk = wm_desktop(d, c->window, c->vdesk);
 }
 __attribute__((nonnull))
 static void init_geometry(struct JBWMClient * c)
 {
 	XWindowAttributes attr;
-	XGetWindowAttributes(jbwm_get_display(), c->window, &attr);
+	Display * restrict d = jbwm_get_display();
+	XGetWindowAttributes(d, c->window, &attr);
 	c->cmap = attr.colormap;
-	XGetWMNormalHints(jbwm_get_display(), c->window, &(c->size), &(long){0});
+	XGetWMNormalHints(d, c->window, &(c->size), &(long){0});
 	c->size.width = (attr.width >= c->size.min_width)
 		? attr.width : c->size.min_width;
 	c->size.height = (attr.height >= c->size.min_height)
 		? attr.height : c->size.min_height;
 	const bool pos = (attr.map_state == IsViewable)
 	    || (c->size.flags & USPosition);
-	c->size.x = pos ? attr.x : (c->screen->size.w >> 1)
-		- (c->size.width >> 1);
-	c->size.y = pos ? attr.y : (c->screen->size.h >> 1)
-		- (c->size.height >> 1);
+	struct JBWMScreen * s = &jbwm_get_screens()[c->screen];
+	c->size.x = pos ? attr.x : (s->size.w >> 1) - (c->size.width >> 1);
+	c->size.y = pos ? attr.y : (s->size.h >> 1) - (c->size.height >> 1);
 	// Test if the reparent that is to come would trigger an unmap event.
 	c->ignore_unmap += attr.map_state == IsViewable ? 1 : 0;
 }
 __attribute__((nonnull))
 static Window get_parent(struct JBWMClient * restrict c)
 {
-	return XCreateWindow(jbwm_get_display(), c->screen->root,
+	return XCreateWindow(jbwm_get_display(),
+		jbwm_get_screens()[c->screen].root,
 		c->size.x, c->size.y, c->size.width, c->size.height,
 		c->border, CopyFromParent, CopyFromParent, CopyFromParent,
 		CWOverrideRedirect | CWEventMask, &(XSetWindowAttributes){
@@ -104,7 +105,7 @@ static struct JBWMClient * get_JBWMClient(const jbwm_window_t w,
 	struct JBWMScreen * s)
 {
 	struct JBWMClient * c = malloc(sizeof(struct JBWMClient));
-	*c = (struct JBWMClient) {.screen = s, .window = w, .border = 1,
+	*c = (struct JBWMClient) {.screen = s->screen, .window = w, .border = 1,
 		.next = jbwm_get_head_client()};
 	return c;
 }

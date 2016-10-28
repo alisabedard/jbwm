@@ -22,7 +22,8 @@ static void draw_outline(struct JBWMClient * restrict c)
 	if (!c->border)
 		return;
 	const uint8_t offset = c->opt.no_title_bar ? 0 : jbwm_get_font_height();
-	XDrawRectangle(jbwm_get_display(), c->screen->root, c->screen->gc,
+	struct JBWMScreen * s = &jbwm_get_screens()[c->screen];
+	XDrawRectangle(jbwm_get_display(), s->root, s->gc,
 		c->size.x, c->size.y - offset,
 		c->size.width + c->border,
 		c->size.height + c->border + offset);
@@ -79,7 +80,8 @@ static void do_changes(struct JBWMClient * restrict c, const bool resize,
 }
 static void drag_event_loop(struct JBWMClient * restrict c, const bool resize)
 {
-	const jbwm_point_t start = get_mouse_position(c->screen->root);
+	const jbwm_point_t start = get_mouse_position(
+		jbwm_get_screens()[c->screen].root);
 	const jbwm_point_t original = {c->size.x, c->size.y};
 	for (;;) {
 		XEvent e;
@@ -94,15 +96,16 @@ static void drag_event_loop(struct JBWMClient * restrict c, const bool resize)
 }
 void jbwm_drag(struct JBWMClient * restrict c, const bool resize)
 {
-	XRaiseWindow(jbwm_get_display(), c->parent);
+	Display * restrict d = jbwm_get_display();
+	XRaiseWindow(d, c->parent);
 	if (resize && (c->opt.no_resize || c->opt.shaded))
 		return;
-	grab_pointer(c->screen->root);
+	grab_pointer(jbwm_get_screens()[c->screen].root);
 	if (resize)
 		warp_corner(c);
 	drag_event_loop(c, resize);
 	draw_outline(c);
-	XUngrabPointer(jbwm_get_display(), CurrentTime);
+	XUngrabPointer(d, CurrentTime);
 	jbwm_move_resize(c);
 	if (!resize && !c->opt.tearoff)
 		configure((&c->size), c->window);
@@ -141,7 +144,7 @@ void jbwm_restore_client(struct JBWMClient * restrict c)
 static void check_visibility(struct JBWMScreen * s,
 	struct JBWMClient * restrict c, const uint8_t v)
 {
-	if (c->screen != s)
+	if (c->screen != s->screen)
 		return;
 	if (c->vdesk == v || c->opt.sticky) {
 		c->vdesk = v; // allow moving windows by sticking

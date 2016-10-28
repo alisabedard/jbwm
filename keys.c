@@ -158,6 +158,7 @@ static void handle_client_key_event(Display * restrict d, const bool mod,
 static struct JBWMClient * get_next_on_vdesk(void)
 {
 	struct JBWMClient *c = jbwm_get_current_client();
+	struct JBWMScreen * restrict s = jbwm_get_screens();
 	do {
 		if (c) {
 			c = c->next;
@@ -167,7 +168,7 @@ static struct JBWMClient * get_next_on_vdesk(void)
 		if (!c) c = jbwm_get_head_client();
 		if (!c || (c == jbwm_get_current_client()))
 			break;
-	} while (c->vdesk != c->screen->vdesk);
+	} while (c->vdesk != s[c->screen].vdesk);
 	return c;
 }
 static void next(Display * restrict d)
@@ -197,7 +198,7 @@ void jbwm_handle_key_event(Display * restrict d, XKeyEvent * restrict e)
 	JBWM_LOG("jbwm_handle_key_event");
 	const KeySym key = XLookupKeysym(e, 0);
 	struct JBWMClient *c = jbwm_get_current_client();
-	struct JBWMScreen *s = c ? c->screen : jbwm_get_screens();
+	struct JBWMScreen *s = &jbwm_get_screens()[c ? c->screen : 0];
 	struct {
 		uint8_t vdesk:4;
 		bool mod:1;

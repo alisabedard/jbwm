@@ -34,7 +34,6 @@ struct JBWMClientTitlebar {
 #endif//JBWM_USE_TITLE_BAR
 struct JBWMClient {
 	struct JBWMClient *next;
-	struct JBWMScreen *screen;
 	XSizeHints size;
 	jbwm_rectangle_t old_size;
 	jbwm_window_t window, parent;
@@ -48,6 +47,7 @@ struct JBWMClient {
 	int8_t ignore_unmap:3;
 	uint8_t vdesk:4;
 	uint8_t border:1;
+	uint8_t screen;
 	struct JBWMClientOptions opt;
 };
 #endif /* JBWM_CLIENT_STRUCT_H */

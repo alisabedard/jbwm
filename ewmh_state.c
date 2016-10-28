@@ -174,11 +174,10 @@ void jbwm_ewmh_handle_client_message(XClientMessageEvent * restrict e,
 #endif//JBWM_EWMH_DEBUG
 	if(c && client_specific_message(e, c, t))
 		  return;
-	if (t == ewmh[CURRENT_DESKTOP]) {
-		struct JBWMScreen *s = c ? c->screen
-			: jbwm_get_screens();
-		  jbwm_set_vdesk(s, e->data.l[0]);
-	} else if (t == ewmh[MOVERESIZE_WINDOW])
+	if (t == ewmh[CURRENT_DESKTOP])
+		  jbwm_set_vdesk(&jbwm_get_screens()[c ? c->screen : 0],
+			  e->data.l[0]);
+	else if (t == ewmh[MOVERESIZE_WINDOW])
 		// If something else moves the window:
 		handle_moveresize(e);
 }
