@@ -118,7 +118,8 @@ static void init_desktops(Display * restrict d,
 		XA_CARDINAL, &s->vdesk, 1);
 	set_root_vdesk(d, s->r);
 }
-static jbwm_window_t init_supporting(Display * restrict d, const jbwm_window_t r)
+static jbwm_window_t init_supporting(Display * restrict d,
+	const jbwm_window_t r)
 {
 	jbwm_window_t w = XCreateSimpleWindow(d, r,
 		0, 0, 1, 1, 0, 0, 0);
