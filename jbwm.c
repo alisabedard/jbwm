@@ -95,7 +95,7 @@ static uint16_t parse_modifiers(char * restrict arg)
 static void parse_argv(uint8_t argc, char **argv)
 {
 	JBWM_LOG("parse_argv(%d,%s...)", argc, argv[0]);
-	static const char optstring[] = "1:2:b:d:F:f:hs:V";
+	static const char optstring[] = "1:2:b:d:F:f:hs:Vv";
 	int8_t opt;
 	while((opt=getopt(argc, argv, optstring)) != -1)
 		switch (opt) {
@@ -121,19 +121,24 @@ static void parse_argv(uint8_t argc, char **argv)
 			setenv(JBWM_ENV_FC, optarg, 1);
 			break;
 		case 'V':
-			print(sizeof(VERSION), VERSION);
-			print(1, "\n");
-			exit(0);
-		default: { // usage
-			size_t l = 0;
-			while (argv[0][++l]);
-			print(l, *argv);
-			print(4, " -[ ");
-			print(sizeof(optstring), optstring);
-			print(2, "]\n");
-			exit(1);
+		case 'v':
+			goto version;
+		default:
+			goto usage;
 		}
-		}
+	return;
+usage: {
+		size_t l = 0;
+		while (argv[0][++l]);
+		print(l, *argv);
+		print(4, " -[ ");
+		print(sizeof(optstring), optstring);
+		print(2, "]\n");
+       }
+version:
+	print(sizeof(VERSION), VERSION);
+	print(1, "\n");
+	exit(0);
 }
 #else//!USE_ARGV
 #define parse_argv(a, b)
