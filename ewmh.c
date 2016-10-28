@@ -89,7 +89,8 @@ static void set_root_vdesk(Display * restrict d, jbwm_window_t r)
 		(&(long[]){0, 0}), 2);
 	jbwm_set_property(d, r, ewmh[VIRTUAL_ROOTS], XA_WINDOW, &r, 1);
 }
-void jbwm_ewmh_set_allowed_actions(Display * restrict d, const jbwm_window_t w)
+void jbwm_ewmh_set_allowed_actions(Display * restrict d,
+	const jbwm_window_t w)
 {
 	Atom a[] = {
 		ewmh[WM_ALLOWED_ACTIONS],
