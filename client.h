@@ -10,7 +10,8 @@ struct JBWMClient * jbwm_get_head_client(void);
 void jbwm_set_head_client(struct JBWMClient * restrict c);
 // Relink c's linked list to exclude c:
 void jbwm_relink_client_list(struct JBWMClient * c);
-void jbwm_set_client_vdesk(struct JBWMClient * restrict c, const uint8_t d)
+void jbwm_set_client_vdesk(Display * restrict dpy,
+	struct JBWMClient * restrict c, const uint8_t d)
 	__attribute((nonnull));
 struct JBWMClient *jbwm_get_client(jbwm_window_t w)
 	__attribute__((hot,pure));

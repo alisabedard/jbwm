@@ -133,7 +133,7 @@ static bool client_specific_message(XClientMessageEvent * restrict e,
 	struct JBWMClient * restrict c, const Atom t)
 {
 	if (t == ewmh[WM_DESKTOP])
-		jbwm_set_client_vdesk(c, e->data.l[0]);
+		jbwm_set_client_vdesk(e->display, c, e->data.l[0]);
 	// If user moves window (client-side title bars):
 	else if (t == ewmh[WM_MOVERESIZE]) {
 		XRaiseWindow(e->display, c->parent);

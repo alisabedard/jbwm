@@ -45,14 +45,14 @@ void jbwm_relink_client_list(struct JBWMClient * c)
 		}
 	}
 }
-void jbwm_set_client_vdesk(struct JBWMClient * restrict c, const uint8_t d)
+void jbwm_set_client_vdesk(Display * restrict dpy,
+	struct JBWMClient * restrict c, const uint8_t d)
 {
 	JBWM_LOG("jbwm_set_client_vdesk");
 	const uint8_t p = c->vdesk;
 	c->vdesk = d;
 	// use jbwm_set_vdesk to validate d:
 	struct JBWMScreen * s = &jbwm_get_screens()[c->screen];
-	Display * restrict dpy = jbwm_get_display();
 	c->vdesk = jbwm_set_vdesk(dpy, s, d);
 	jbwm_set_vdesk(dpy, s, p);
 }
