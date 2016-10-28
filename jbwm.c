@@ -97,7 +97,7 @@ static void parse_argv(uint8_t argc, char **argv)
 	JBWM_LOG("parse_argv(%d,%s...)", argc, argv[0]);
 	static const char optstring[] = "1:2:b:d:F:f:hs:V";
 	int8_t opt;
-	while((opt=getopt(argc, argv, optstring)) != -1) {
+	while((opt=getopt(argc, argv, optstring)) != -1)
 		switch (opt) {
 		case '1':
 			jbwm_set_grab_mask(parse_modifiers(optarg));
@@ -134,7 +134,6 @@ static void parse_argv(uint8_t argc, char **argv)
 			exit(1);
 		}
 		}
-	}
 }
 #else//!USE_ARGV
 #define parse_argv(a, b)
@@ -192,13 +191,20 @@ static bool check_redirect(const jbwm_window_t w)
 	XGetWindowAttributes(jbwm_data.display, w, &a);
 	return (!a.override_redirect && (a.map_state == IsViewable));
 }
+// Free returned data with XFree()
+static jbwm_window_t * get_windows(const jbwm_window_t root,
+	uint16_t * restrict win_count)
+{
+	Window * w, d;
+	unsigned int n;
+	XQueryTree(jbwm_data.display, root, &d, &d, &w, &n);
+	*win_count = n;
+	return (jbwm_window_t *)w;
+}
 static void setup_clients(struct JBWMScreen * restrict s)
 {
-	Window * w, d; // don't use jbwm_window_t here
-	unsigned int n;
-	// XQueryTree depends on 64-bit types
-	if (!XQueryTree(jbwm_data.display, s->root, &d, &d, &w, &n))
-		return; // failed
+	uint16_t n;
+	jbwm_window_t * restrict w = get_windows(s->root, &n);
 	while (n--)
 		if (check_redirect(w[n]))
 			jbwm_new_client(jbwm_data.display, s, w[n]);
