@@ -77,7 +77,7 @@ static void handle_property_change(XPropertyEvent * restrict e,
 			__FILE__, __LINE__);
 	}
 }
-static void handle_configure_request(XConfigureRequestEvent * e)
+static void handle_configure_request(XConfigureRequestEvent * restrict e)
 {
 	JBWM_LOG("handle_configure_request");
 	XConfigureWindow(e->display, e->window, e->value_mask,
@@ -86,7 +86,7 @@ static void handle_configure_request(XConfigureRequestEvent * e)
 		.border_width = e->border_width,
 		.sibling = e->above, .stack_mode = e->detail});
 }
-static void handle_map_request(XMapRequestEvent * e)
+static void handle_map_request(XMapRequestEvent * restrict e)
 {
 	JBWM_LOG("MapRequest, send_event:%d", e->send_event);
 	/* This check fixes a race condition in libreoffice dialogs,

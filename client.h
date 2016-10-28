@@ -14,9 +14,6 @@ void jbwm_set_client_vdesk(struct JBWMClient * restrict c, const uint8_t d)
 	__attribute((nonnull));
 struct JBWMClient *jbwm_get_client(jbwm_window_t w)
 	__attribute__((hot,pure));
-// Free result with XFree if not NULL
-char * jbwm_get_title(const jbwm_window_t w)
-	__attribute__((pure));
 void jbwm_select_client(struct JBWMClient * c);
 void jbwm_send_wm_delete(struct JBWMClient * restrict c)
 	__attribute__((nonnull));

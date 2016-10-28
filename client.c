@@ -45,14 +45,6 @@ void jbwm_relink_client_list(struct JBWMClient * c)
 		}
 	}
 }
-// Free result with XFree if not NULL
-char * jbwm_get_title(const jbwm_window_t w)
-{
-	XTextProperty tp;
-	if (!XGetWMName(jbwm_get_display(), w, &tp))
-		  return NULL;
-	return (char *)tp.value;
-}
 void jbwm_set_client_vdesk(struct JBWMClient * restrict c, const uint8_t d)
 {
 	JBWM_LOG("jbwm_set_client_vdesk");
