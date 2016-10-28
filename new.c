@@ -37,11 +37,11 @@ static uint8_t wm_desktop(Display * d, const jbwm_window_t w, uint8_t vdesk)
 #endif//JBWM_USE_EWMH
 #ifdef JBWM_USE_EWMH
 __attribute__((nonnull))
-static void set_frame_extents(struct JBWMClient * c)
+static void set_frame_extents(Display * restrict d, struct JBWMClient * c)
 {
 	// Required by wm-spec 1.4:
 	const uint8_t b = c->border;
-	jbwm_set_property(jbwm_get_display(), c->window,
+	jbwm_set_property(d, c->window,
 		ewmh[FRAME_EXTENTS], XA_CARDINAL,
 		(&(jbwm_atom_t[]){b, b, b
 		 + (c->opt.no_title_bar ? 0
@@ -64,10 +64,9 @@ static void init_properties(
 	c->vdesk = wm_desktop(d, c->window, c->vdesk);
 }
 __attribute__((nonnull))
-static void init_geometry(struct JBWMClient * c)
+static void init_geometry(Display * restrict d, struct JBWMClient * c)
 {
 	XWindowAttributes attr;
-	Display * restrict d = jbwm_get_display();
 	XGetWindowAttributes(d, c->window, &attr);
 	c->cmap = attr.colormap;
 	XGetWMNormalHints(d, c->window, &(c->size), &(long){0});
@@ -84,10 +83,9 @@ static void init_geometry(struct JBWMClient * c)
 	c->ignore_unmap += attr.map_state == IsViewable ? 1 : 0;
 }
 __attribute__((nonnull))
-static Window get_parent(struct JBWMClient * restrict c)
+static Window get_parent(Display * restrict d, struct JBWMClient * restrict c)
 {
-	return XCreateWindow(jbwm_get_display(),
-		jbwm_get_screens()[c->screen].root,
+	return XCreateWindow(d, jbwm_get_screens()[c->screen].root,
 		c->size.x, c->size.y, c->size.width, c->size.height,
 		c->border, CopyFromParent, CopyFromParent, CopyFromParent,
 		CWOverrideRedirect | CWEventMask, &(XSetWindowAttributes){
@@ -96,14 +94,15 @@ static Window get_parent(struct JBWMClient * restrict c)
 		| ButtonPressMask | EnterWindowMask});
 }
 __attribute__((nonnull))
-static void reparent(struct JBWMClient * c) // use of restrict here is a bug
+static void reparent(Display * restrict d,
+	struct JBWMClient * c) // use of restrict on client here is wrong
 {
 	JBWM_LOG("reparent()");
-	jbwm_new_shaped_client(jbwm_get_display(), c);
-	const jbwm_window_t p = c->parent = get_parent(c), w = c->window;
-	XAddToSaveSet(jbwm_get_display(), w);
-	XReparentWindow(jbwm_get_display(), w, p, 0, 0);
-	XMapWindow(jbwm_get_display(), w);
+	jbwm_new_shaped_client(d, c);
+	const jbwm_window_t p = c->parent = get_parent(d, c), w = c->window;
+	XAddToSaveSet(d, w);
+	XReparentWindow(d, w, p, 0, 0);
+	XMapWindow(d, w);
 }
 // Allocate the client structure with some defaults set
 static struct JBWMClient * get_JBWMClient(const jbwm_window_t w,
@@ -130,9 +129,9 @@ void jbwm_new_client(Display * restrict d, struct JBWMScreen * restrict s,
 	jbwm_set_head_client(c);
 	do_grabs(d, w);
 	init_properties(d, c);
-	init_geometry(c);
-	reparent(c);
-	set_frame_extents(c);
+	init_geometry(d, c);
+	reparent(d, c);
+	set_frame_extents(d, c);
 	jbwm_restore_client(d, c);
 	jbwm_update_title_bar(d, c);
 }
