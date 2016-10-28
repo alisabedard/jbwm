@@ -83,24 +83,28 @@ static void handle_key_move(Display * restrict dpy,
 	}
 	key_move(dpy, c, f);
 }
-static void set_maximized(struct JBWMClient * restrict c)
+static void set_maximized(Display * restrict d,
+	struct JBWMClient * restrict c)
 {
-	jbwm_set_horz(c);
-	jbwm_set_vert(c);
+	jbwm_set_horz(d, c);
+	jbwm_set_vert(d, c);
 }
-static void set_not_maximized(struct JBWMClient * restrict c)
+static void set_not_maximized(Display * restrict d,
+	struct JBWMClient * restrict c)
 {
-	jbwm_set_not_horz(c);
-	jbwm_set_not_vert(c);
+	jbwm_set_not_horz(d, c);
+	jbwm_set_not_vert(d, c);
 }
-static void toggle_maximize(struct JBWMClient * restrict c)
+static void toggle_maximize(Display * restrict d,
+	struct JBWMClient * restrict c)
 {
 	const struct JBWMClientOptions o = c->opt;
 	// Honor !MWM_FUNC_MAXIMIZE
 	// Maximizing shaped windows is buggy, so return.
 	if (o.shaped || o.no_max || o.fullscreen)
 		return;
-	(o.max_horz && o.max_vert ? set_maximized : set_not_maximized)(c);
+	(o.max_horz && o.max_vert
+	 ? set_maximized : set_not_maximized)(d, c);
 }
 __attribute__((nonnull(1,3)))
 static void handle_client_key_event(Display * restrict d, const bool mod,
@@ -110,7 +114,7 @@ static void handle_client_key_event(Display * restrict d, const bool mod,
 	if (c->opt.fullscreen) {
 		// only allow exiting from fullscreen
 		if (key == JBWM_KEY_FS) {
-			jbwm_set_not_fullscreen(c);
+			jbwm_set_not_fullscreen(d, c);
 		}
 		return; // prevent other operations while fullscreen
 	}
@@ -132,16 +136,16 @@ static void handle_client_key_event(Display * restrict d, const bool mod,
 		XRaiseWindow(d, c->parent);
 		break;
 	case JBWM_KEY_FS:
-		jbwm_set_fullscreen(c);
+		jbwm_set_fullscreen(d, c);
 		break;
 	case JBWM_KEY_MAX:
-		toggle_maximize(c);
+		toggle_maximize(d, c);
 		break;
 	case JBWM_KEY_MAX_H:
-		(c->opt.max_horz ? jbwm_set_not_horz : jbwm_set_horz)(c);
+		(c->opt.max_horz ? jbwm_set_not_horz : jbwm_set_horz)(d, c);
 		break;
 	case JBWM_KEY_MAX_V:
-		(c->opt.max_vert ? jbwm_set_not_vert : jbwm_set_vert)(c);
+		(c->opt.max_vert ? jbwm_set_not_vert : jbwm_set_vert)(d, c);
 		break;
 	case JBWM_KEY_STICK:
 		jbwm_toggle_sticky(c);

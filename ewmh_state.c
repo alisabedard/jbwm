@@ -55,32 +55,32 @@ void jbwm_ewmh_add_state(Display * d, const Window w, Atom state)
   data.l[2] = second property to alter
   data.l[3] = source indication
   other data.l[] elements = 0 */
-static void set_state(struct JBWMClient * restrict c,
+static void set_state(Display * restrict d, struct JBWMClient * restrict c,
 	const bool add, const enum JBWMAtomIndex t)
 {
 	if (!c)
 		return;
 	switch(t) {
 	case WM_STATE_FULLSCREEN:
-		add?jbwm_set_fullscreen(c):jbwm_set_not_fullscreen(c);
+		add?jbwm_set_fullscreen(d, c):jbwm_set_not_fullscreen(d, c);
 		break;
 	case WM_STATE_STICKY:
 		c->opt.sticky=add;
 		break;
 	case WM_STATE_ABOVE:
-		(add ? XRaiseWindow : XLowerWindow)(jbwm_get_display(), c->parent);
+		(add ? XRaiseWindow : XLowerWindow)(d, c->parent);
 		break;
 	case WM_STATE_BELOW:
-		(add ? XLowerWindow : XRaiseWindow)(jbwm_get_display(), c->parent);
+		(add ? XLowerWindow : XRaiseWindow)(d, c->parent);
 		break;
 	case WM_STATE_HIDDEN:
 		JBWM_LOG("HIDDEN");
 		break;
 	case WM_STATE_MAXIMIZED_VERT:
-		(add ? jbwm_set_vert : jbwm_set_not_vert)(c);
+		(add ? jbwm_set_vert : jbwm_set_not_vert)(d, c);
 		break;
 	case WM_STATE_MAXIMIZED_HORZ:
-		(add ? jbwm_set_horz : jbwm_set_not_horz)(c);
+		(add ? jbwm_set_horz : jbwm_set_not_horz)(d, c);
 		break;
 	default:
 		break;
@@ -97,20 +97,20 @@ static void check_state(XClientMessageEvent * e,	// event data
 	const bool set = l[1] == (long)state || l[2] == (long)state;
 	if(!set)
 		return;
-	Display * restrict d = jbwm_get_display();
+	Display * restrict d = e->display;
 	switch (e->data.l[0]) {
 	default:
 	case 0:	// remove
-		set_state(c, false, t);
+		set_state(d, c, false, t);
 		jbwm_ewmh_remove_state(d, e->window, state);
 		break;
 	case 1:	// add
-		set_state(c, true, t);
+		set_state(d, c, true, t);
 		jbwm_ewmh_add_state(d, e->window, state);
 		break;
 	case 2:{	// toggle
 			const bool add = !ewmh_get_state(e->window, state);
-			set_state(c, add, t);
+			set_state(d, c, add, t);
 			if (add)
 				jbwm_ewmh_add_state(d, e->window, state);
 			else
