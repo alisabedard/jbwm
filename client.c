@@ -131,50 +131,52 @@ static Status xmsg(const jbwm_window_t w, const Atom a, const long x)
 		.xclient.data.l[0] = x, .xclient.data.l[1] = CurrentTime
 	});
 }
-static jbwm_atom_t get_atom(jbwm_atom_t * a, const char * name)
+static jbwm_atom_t get_atom(Display * restrict d,
+	jbwm_atom_t * a, const char * name)
 {
-	return *a ? *a : (*a = XInternAtom(jbwm_get_display(), name, false));
+	return *a ? *a : (*a = XInternAtom(d, name, false));
 }
-static jbwm_atom_t get_wm_protocols(void)
+static jbwm_atom_t get_wm_protocols(Display * restrict d)
 {
 	static jbwm_atom_t a;
-	return get_atom(&a, "WM_PROTOCOLS");
+	return get_atom(d, &a, "WM_PROTOCOLS");
 }
-static jbwm_atom_t get_wm_delete_window(void)
+static jbwm_atom_t get_wm_delete_window(Display * restrict d)
 {
 	static jbwm_atom_t a;
-	return get_atom(&a, "WM_DELETE_WINDOW");
+	return get_atom(d, &a, "WM_DELETE_WINDOW");
 }
-jbwm_atom_t jbwm_get_wm_state(void)
+jbwm_atom_t jbwm_get_wm_state(Display * restrict d)
 {
 	static jbwm_atom_t a;
-	return get_atom(&a, "WM_STATE");
+	return get_atom(d, &a, "WM_STATE");
 }
 void jbwm_set_wm_state(Display * restrict d,
 	struct JBWMClient * restrict c, const int8_t state)
 {
-	jbwm_set_property(d, c->window, jbwm_get_wm_state(),
+	jbwm_set_property(d, c->window, jbwm_get_wm_state(d),
 		XA_CARDINAL, &(uint32_t){state}, 1);
 }
-static bool has_delete_proto(const jbwm_window_t w)
+static bool has_delete_proto(Display * restrict d, const jbwm_window_t w)
 {
 	bool found=false;
 	Atom *p;
 	int i;
-	if(XGetWMProtocols(jbwm_get_display(), w, &p, &i)) {
+	if(XGetWMProtocols(d, w, &p, &i)) {
 		while(i-- && !found)
-			found = p[i] == get_wm_delete_window();
+			found = p[i] == get_wm_delete_window(d);
 		XFree(p);
 	}
 	return found;
 }
-void jbwm_send_wm_delete(struct JBWMClient * restrict c)
+void jbwm_send_wm_delete(Display * restrict d, struct JBWMClient * restrict c)
 {
 	if (c->opt.remove) { // this allows a second click to force a kill
-		XKillClient(jbwm_get_display(), c->window);
+		XKillClient(d, c->window);
 		return;
 	}
 	c->opt.remove = true;
-	has_delete_proto(c->window)?xmsg(c->window, get_wm_protocols(),
-		get_wm_delete_window()): XKillClient(jbwm_get_display(), c->window);
+	has_delete_proto(d, c->window)?xmsg(c->window,
+		get_wm_protocols(d), get_wm_delete_window(d))
+		: XKillClient(d, c->window);
 }

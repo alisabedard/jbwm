@@ -143,7 +143,7 @@ static bool client_specific_message(XClientMessageEvent * restrict e,
 	else if (t == ewmh[ACTIVE_WINDOW])
 		jbwm_select_client(c);
 	else if (t == ewmh[CLOSE_WINDOW])
-		jbwm_send_wm_delete(c);
+		jbwm_send_wm_delete(e->display, c);
 	else
 		  return false;
 	return true;

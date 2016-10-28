@@ -16,7 +16,7 @@ static void handle_title_bar_button(Display * restrict d,
 	JBWM_LOG("e->window: %d, c->title_bar: %d, e->subwindow: %d",
 		(int)e->window, (int)c->tb.win, (int)e->subwindow);
 	if (e->subwindow == c->tb.close)
-		jbwm_send_wm_delete(c);
+		jbwm_send_wm_delete(d, c);
 	else if (e->subwindow == c->tb.resize)
 		jbwm_drag(d, c, !c->opt.no_resize);
 	else if (e->subwindow == c->tb.shade && !c->opt.no_min)

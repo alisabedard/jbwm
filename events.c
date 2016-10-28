@@ -71,7 +71,7 @@ static void handle_property_change(XPropertyEvent * restrict e,
 	if (e->atom == XA_WM_NAME)
 		jbwm_update_title_bar(e->display, c);
 	else {
-		if (e->atom == jbwm_get_wm_state())
+		if (e->atom == jbwm_get_wm_state(e->display))
 			jbwm_move_resize(e->display, c);
 		jbwm_print_atom(e->display, e->atom,
 			__FILE__, __LINE__);

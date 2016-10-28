@@ -126,7 +126,7 @@ static void handle_client_key_event(Display * restrict d, const bool mod,
 		handle_key_move(d, c, key, mod);
 		break;
 	case JBWM_KEY_KILL:
-		jbwm_send_wm_delete(c);
+		jbwm_send_wm_delete(d, c);
 		break;
 	case JBWM_KEY_LOWER:
 	case JBWM_KEY_ALTLOWER:
