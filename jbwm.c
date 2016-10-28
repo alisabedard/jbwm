@@ -285,11 +285,10 @@ int main(
 		jbwm_error(JBWM_ENV_DISPLAY);
 	XSetErrorHandler(handle_xerror);
 	jbwm_ewmh_init();
-	/* Fonts only needed with title bars */
-	setup_fonts();
 	uint8_t i = ScreenCount(jbwm_data.display);
 	struct JBWMScreen s[i]; // remains in scope till exit.
 	jbwm_data.screens = s;
+	setup_fonts(); // screen must be created first
 	while (i--)
 		setup_screen(i);
 	jbwm_event_loop();

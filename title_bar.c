@@ -84,20 +84,21 @@ draw_xft(struct JBWMClient * restrict c, const XPoint * restrict p,
 {
 	XftFont * f = jbwm_get_font();
 	XGlyphInfo e;
-	XftTextExtentsUtf8(jbwm_get_display(), f, (XftChar8 *) name, l, &e);
-	const uint8_t s = c->screen->screen;
-	Visual *v = DefaultVisual(jbwm_get_display(), s);
-	const Colormap cm = DefaultColormap(jbwm_get_display(), s);
-	XftDraw *xd = XftDrawCreate(jbwm_get_display(), c->tb.win, v, cm);
+	Display * restrict d = jbwm_get_display();
+	XftTextExtentsUtf8(d, f, (XftChar8 *) name, l, &e);
+	const uint8_t s = c->screen;
+	Visual *v = DefaultVisual(d, s);
+	const Colormap cm = DefaultColormap(d, s);
+	XftDraw *xd = XftDrawCreate(d, c->tb.win, v, cm);
 	XftColor color;
-	XftColorAllocName(jbwm_get_display(), v, cm, getenv(JBWM_ENV_FG), &color);
+	XftColorAllocName(d, v, cm, getenv(JBWM_ENV_FG), &color);
 	/* Prevent the text from going over the resize button.  */
 	const uint16_t max_width = c->size.width - 3 * jbwm_get_font_height();
 	XftDrawStringUtf8(xd, &color, f, p->x, p->y, (XftChar8 *) name,
 			  e.width > max_width && e.width > 0
 			  ? l * max_width / e.width : l);
 	XftDrawDestroy(xd);
-	XftColorFree(jbwm_get_display(), v, cm, &color);
+	XftColorFree(d, v, cm, &color);
 }
 #endif//JBWM_USE_XFT
 static void draw_title(struct JBWMClient * restrict c)

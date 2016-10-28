@@ -33,7 +33,7 @@ static uint8_t wm_desktop(Display * d, const jbwm_window_t w, uint8_t vdesk)
 	return vdesk;
 }
 #else//!JBWM_USE_EWMH
-#define wm_desktop(w, vdesk) vdesk
+#define wm_desktop(d, w, vdesk) vdesk
 #endif//JBWM_USE_EWMH
 #ifdef JBWM_USE_EWMH
 __attribute__((nonnull))
@@ -51,9 +51,14 @@ static void set_frame_extents(struct JBWMClient * c)
 #define set_frame_extents(c)
 #endif//JBWM_USE_EWMH
 __attribute__((nonnull))
-static void init_properties(struct JBWMClient * c)
+static void init_properties(
+#if defined(JBWM_USE_EWMH) || defined(JBWM_USE_MWM)
+	Display * restrict d,
+#else//!JBWM_USE_EWMH&&!JBWM_USE_MWM
+	Display * restrict d __attribute__((unused)),
+#endif//JBWM_USE_EWMH||JBWM_USE_MWM
+	struct JBWMClient * c)
 {
-	Display * d = jbwm_get_display();
 	jbwm_handle_mwm_hints(d, c);
 	c->vdesk = jbwm_get_screens()[c->screen].vdesk;
 	c->vdesk = wm_desktop(d, c->window, c->vdesk);
@@ -124,7 +129,7 @@ void jbwm_new_client(Display * restrict d, struct JBWMScreen * restrict s,
 	struct JBWMClient * c = get_JBWMClient(w, s);
 	jbwm_set_head_client(c);
 	do_grabs(w);
-	init_properties(c);
+	init_properties(d, c);
 	init_geometry(c);
 	reparent(c);
 	set_frame_extents(c);
