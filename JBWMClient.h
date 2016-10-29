@@ -12,14 +12,14 @@ struct JBWMClientOptions {
 	bool max_horz : 1;
 	bool max_vert : 1;
 	bool no_border : 1;
-	bool no_close_decor : 1;
 	bool no_close : 1;
-	bool no_resize_decor : 1;
+	bool no_close_decor : 1;
 	bool no_max : 1;
-	bool no_min_decor : 1;
 	bool no_min : 1;
+	bool no_min_decor : 1;
 	bool no_move : 1;
 	bool no_resize : 1;
+	bool no_resize_decor : 1;
 	bool no_title_bar : 1;
 	bool remove : 1;
 	bool shaded : 1;
