@@ -4,8 +4,9 @@
 // See README for license and other details.
 #include "screen.h"
 #include "client.h"
-#include "ewmh.h"
+#include "config.h"
 #include "ewmh_state.h"
+#include "ewmh.h"
 #include "jbwm.h"
 #include "log.h"
 #include "shape.h"

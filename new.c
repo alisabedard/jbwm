@@ -4,6 +4,7 @@
 // See README for license and other details.
 #include "new.h"
 #include "client.h"
+#include "config.h"
 #include "ewmh.h"
 #include "jbwm.h"
 #include "keys.h"

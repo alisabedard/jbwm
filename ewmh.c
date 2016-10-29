@@ -4,9 +4,8 @@
 // See README for license and other details.
 #include "ewmh.h"
 #include "client.h"
+#include "config.h"
 #include "jbwm.h"
-#include "log.h"
-#include "screen.h"
 #include "util.h"
 #include <unistd.h>
 #include <X11/Xatom.h>

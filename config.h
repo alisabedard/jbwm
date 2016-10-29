@@ -31,13 +31,12 @@
 #define JBWM_ENV_RESIZE "JBWM_RESIZE"
 #define JBWM_ENV_FONT "JBWM_FONT"
 #define JBWM_ENV_TERM "JBWM_TERM"
-enum {
+enum JBWMDefaults {
 	JBWM_KEYMASK_GRAB = Mod4Mask,
-	JBWM_KEYMASK_MOD = ControlMask
-};
-enum {
+	JBWM_KEYMASK_MOD = ControlMask,
 	JBWM_SNAP = 12,
-	JBWM_RESIZE_INCREMENT = 20
+	JBWM_RESIZE_INCREMENT = 20,
+	JBWM_MAX_DESKTOPS = 10
 };
 #define JBWM_NAME "jbwm"
 #endif//JBWM_CONFIG_H
