@@ -91,7 +91,7 @@ static void
 draw_xft(Display * restrict d, struct JBWMClient * restrict c,
 	const XPoint * restrict p, char * restrict name, const size_t l)
 {
-	XftFont * f = jbwm_get_font(d);
+	XftFont * f = jbwm_get_font();
 	XGlyphInfo e;
 	XftTextExtentsUtf8(d, f, (XftChar8 *) name, l, &e);
 	const uint8_t s = c->screen;
@@ -123,7 +123,8 @@ static void draw_title(Display * restrict d, struct JBWMClient * restrict c)
 	char * name = jbwm_get_title(d, c->window);
 	if(!name)
 		return; // No title could be loaded, abort
-	const XPoint p = { jbwm_get_font_height() + 4, jbwm_get_font_ascent()};
+	const XPoint p = { jbwm_get_font_height() + 4,
+		jbwm_get_font_ascent()};
 	size_t l = 0; // strlen
 	while(name[++l])
 		  ;

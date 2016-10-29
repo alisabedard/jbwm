@@ -187,7 +187,7 @@ static void setup_gc(struct JBWMScreen * restrict s)
 		.line_width = 1
 	};
 #if defined(JBWM_USE_TITLE_BAR) && !defined(JBWM_USE_XFT)
-	XFontStruct * font = jbwm_get_font(jbwm_data.display);
+	XFontStruct * font = jbwm_get_font();
 	gv.font = font->fid;
 	vm |= GCFont;
 #endif//JBWM_USE_TITLE_BAR&&!JBWM_USE_XFT
@@ -240,6 +240,7 @@ int main(int argc, char **argv)
 	if (!(jbwm_data.display = XOpenDisplay(NULL)))
 		jbwm_error(JBWM_ENV_DISPLAY);
 	XSetErrorHandler(handle_xerror);
+	jbwm_open_font(jbwm_data.display);
 	uint8_t i = ScreenCount(jbwm_data.display);
 	struct JBWMScreen s[i]; // remains in scope till exit.
 	jbwm_data.screens = s;

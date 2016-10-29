@@ -14,7 +14,7 @@ static struct {
 #endif//JBWM_USE_XFT
 	uint8_t height;
 } jbwm_font_data;
-static void init(Display * restrict d)
+void jbwm_open_font(Display * restrict d)
 {
 	if (jbwm_font_data.font)
 		return; // already created
@@ -29,9 +29,8 @@ static void init(Display * restrict d)
 	if (!jbwm_font_data.font)
 		jbwm_error(JBWM_ENV_FONT);
 }
-void * jbwm_get_font(Display * restrict d)
+void * jbwm_get_font(void)
 {
-	init(d);
 	return jbwm_font_data.font;
 }
 uint8_t jbwm_get_font_ascent(void)
