@@ -14,6 +14,9 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include <X11/Xproto.h>
+#ifdef JBWM_USE_XFT
+#include <X11/Xft/Xft.h>
+#endif//JBWM_USE_XFT
 #ifdef STDIO
 #include <stdio.h>
 #endif//STDIO
@@ -30,10 +33,6 @@ static struct {
 #endif//JBWM_USE_XFT
 #endif//JBWM_USE_TITLE_BAR
 } jbwm_data;
-Display * jbwm_get_display(void)
-{
-	return jbwm_data.display;
-}
 #ifdef JBWM_USE_TITLE_BAR
 void * jbwm_get_font(void)
 {
@@ -296,6 +295,6 @@ int main(
 	setup_fonts(); // screen must be created first
 	while (i--)
 		setup_screen(i);
-	jbwm_event_loop();
+	jbwm_event_loop(jbwm_data.display);
 	return 0;
 }

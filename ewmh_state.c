@@ -24,11 +24,12 @@ void jbwm_ewmh_remove_state(Display * restrict d,
 	jbwm_set_property(d, w, ws, XA_ATOM, a, nitems);
 	XFree(a);
 }
-static bool ewmh_get_state(const Window w, const Atom state)
+static bool ewmh_get_state(Display * restrict d,
+	const Window w, const Atom state)
 {
 	uint16_t n;
-	Atom *a = jbwm_get_property(jbwm_get_display(),
-		w, jbwm_ewmh_get_atom(JBWM_EWMH_WM_STATE), &n);
+	Atom *a = jbwm_get_property(d, w,
+		jbwm_ewmh_get_atom(JBWM_EWMH_WM_STATE), &n);
 	bool found = false;
 	if (a) {
 		while (n--) // prevent offset error
@@ -110,7 +111,8 @@ static void check_state(XClientMessageEvent * e,	// event data
 		jbwm_ewmh_add_state(d, e->window, state);
 		break;
 	case 2:{	// toggle
-			const bool add = !ewmh_get_state(e->window, state);
+			const bool add = !ewmh_get_state(e->display,
+				e->window, state);
 			set_state(d, c, add, t);
 			if (add)
 				jbwm_ewmh_add_state(d, e->window, state);

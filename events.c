@@ -97,10 +97,10 @@ static void handle_map_request(XMapRequestEvent * restrict e)
 	jbwm_new_client(d, get_screen(ScreenCount(d), e->parent), e->window);
 
 }
-static void iteration(void)
+static void iteration(Display * restrict d)
 {
 	XEvent ev;
-	XNextEvent(jbwm_get_display(), &ev);
+	XNextEvent(d, &ev);
 	struct JBWMClient * restrict c = jbwm_get_client(ev.xany.window);
 	switch (ev.type) {
 	case KeyPress:
@@ -168,8 +168,8 @@ static void iteration(void)
 		jbwm_events_data.last_window=0;
 	}
 }
-void jbwm_event_loop(void)
+void jbwm_event_loop(Display * restrict d)
 {
 	for(;;)
-		iteration();
+		iteration(d);
 }
