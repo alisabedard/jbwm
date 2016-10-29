@@ -259,7 +259,7 @@ static int handle_xerror(Display * restrict dpy __attribute__ ((unused)),
 	if (e->error_code == BadWindow) { // cleanup zombie windows
 		struct JBWMClient * c = jbwm_get_client(e->resourceid);
 		if (c) // match found
-			jbwm_free_client(c);
+			jbwm_free_client(dpy, c);
 	}
 	JBWM_LOG("xerror: %d, %d\n", e->error_code, e->request_code);
 	return 0; // Ignore everything else.

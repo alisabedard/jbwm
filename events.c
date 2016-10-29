@@ -28,10 +28,9 @@ static struct JBWMScreen * get_screen(const int8_t i,
 	return s[i].root == root ? s + i
 		: get_screen(i - 1, root);
 }
-void jbwm_free_client(struct JBWMClient * restrict c)
+void jbwm_free_client(Display * restrict d, struct JBWMClient * restrict c)
 {
 	const jbwm_window_t w = c->window;
-	Display * restrict d = jbwm_get_display();
 #ifdef JBWM_USE_EWMH
 	// Per ICCCM + JBWM_USE_EWMH:
 	XDeleteProperty(d, w, jbwm_ewmh_get_atom(JBWM_EWMH_WM_STATE));
@@ -47,7 +46,7 @@ void jbwm_free_client(struct JBWMClient * restrict c)
 	/* Allow this client's window id to be reused for another client: */
 	jbwm_events_data.last_window = 0;
 }
-static void cleanup(void)
+static void cleanup(Display * restrict d)
 {
 	JBWM_LOG("cleanup");
 	jbwm_events_data.need_cleanup = false;
@@ -57,7 +56,7 @@ static void cleanup(void)
 		i = c->next;
 		if (!c->opt.remove)
 			  continue;
-		jbwm_free_client(c);
+		jbwm_free_client(d, c);
 	} while(i && (c = i));
 }
 static void handle_property_change(XPropertyEvent * restrict e,
@@ -164,7 +163,7 @@ static void iteration(void)
 #endif//EVENT_DEBUG
 	}
 	if (jbwm_events_data.need_cleanup) {
-		cleanup();
+		cleanup(ev.xany.display);
 		// Fix ignoring every other new window:
 		jbwm_events_data.last_window=0;
 	}
