@@ -15,7 +15,7 @@ jbwm_atom_t jbwm_ewmh_get_atom(const uint8_t index)
 {
 	return jbwm_ewmh[index];
 }
-void jbwm_ewmh_init(Display * restrict d)
+static void jbwm_ewmh_init(Display * restrict d)
 {
 	static char * atom_names [] = { // This list must match 1:1 with enum
 		"_NET_SUPPORTED",
@@ -140,6 +140,8 @@ static jbwm_window_t init_supporting(Display * restrict d,
 void jbwm_ewmh_init_screen(Display * restrict d,
 	struct JBWMScreen * restrict s)
 {
+	if (!jbwm_ewmh[0])
+		jbwm_ewmh_init(d);
 	jbwm_window_t r = s->root;
 	jbwm_set_property(d, r, jbwm_ewmh[JBWM_EWMH_SUPPORTED],
 		XA_ATOM, jbwm_ewmh, JBWM_EWMH_ATOMS_COUNT);

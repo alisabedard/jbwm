@@ -43,10 +43,6 @@ uint8_t jbwm_get_font_ascent(void)
 {
 	return jbwm_data.font->ascent;
 }
-uint8_t jbwm_get_font_descent(void)
-{
-	return jbwm_data.font->descent;
-}
 uint8_t jbwm_get_font_height(void)
 {
 	return jbwm_data.font->ascent + jbwm_data.font->descent;
@@ -294,7 +290,6 @@ int main(
 	if (!(jbwm_data.display = XOpenDisplay(NULL)))
 		jbwm_error(JBWM_ENV_DISPLAY);
 	XSetErrorHandler(handle_xerror);
-	jbwm_ewmh_init(jbwm_data.display);
 	uint8_t i = ScreenCount(jbwm_data.display);
 	struct JBWMScreen s[i]; // remains in scope till exit.
 	jbwm_data.screens = s;

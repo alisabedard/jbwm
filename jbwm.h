@@ -11,7 +11,6 @@
 #ifdef JBWM_USE_TITLE_BAR
 void * jbwm_get_font(void);
 uint8_t jbwm_get_font_ascent(void);
-uint8_t jbwm_get_font_descent(void);
 uint8_t jbwm_get_font_height(void);
 #else//!JBWM_USE_TITLE_BAR
 #define jbwm_get_font_height() 0
