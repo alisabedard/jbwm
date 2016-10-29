@@ -80,7 +80,7 @@ static void unselect_current(Display * restrict d)
 		.pixels.bg);
 #ifdef JBWM_USE_EWMH
 	jbwm_ewmh_remove_state(d, jbwm_client_data.current->window,
-		ewmh[WM_STATE_FOCUSED]);
+		jbwm_ewmh_get_atom(WM_STATE_FOCUSED));
 #endif//JBWM_USE_EWMH
 }
 static void set_border(Display * restrict d, struct JBWMClient * restrict c)
@@ -101,8 +101,8 @@ void jbwm_select_client(Display * restrict d, struct JBWMClient * c)
 	jbwm_client_data.current = c;
 #ifdef JBWM_USE_EWMH
 	jbwm_set_property(d, jbwm_get_screens()[c->screen].root,
-		ewmh[ACTIVE_WINDOW], XA_WINDOW, &(c->parent), 1);
-	jbwm_ewmh_add_state(d, c->window, ewmh[WM_STATE_FOCUSED]);
+		jbwm_ewmh_get_atom(ACTIVE_WINDOW), XA_WINDOW, &(c->parent), 1);
+	jbwm_ewmh_add_state(d, c->window, jbwm_ewmh_get_atom(WM_STATE_FOCUSED));
 #endif//JBWM_USE_EWMH
 }
 void jbwm_toggle_sticky(Display * restrict d, struct JBWMClient * c)
@@ -113,10 +113,10 @@ void jbwm_toggle_sticky(Display * restrict d, struct JBWMClient * c)
 	jbwm_update_title_bar(d, c);
 #ifdef JBWM_USE_EWMH
 	if (c->opt.sticky)
-		jbwm_ewmh_add_state(d, c->window, ewmh[WM_STATE_STICKY]);
+		jbwm_ewmh_add_state(d, c->window, jbwm_ewmh_get_atom(WM_STATE_STICKY));
 	else
 		jbwm_ewmh_remove_state(d, c->window,
-			ewmh[WM_STATE_STICKY]);
+			jbwm_ewmh_get_atom(WM_STATE_STICKY));
 #endif//JBWM_USE_EWMH
 }
 // Returns 0 on failure.

@@ -10,7 +10,7 @@
 #include "util.h"
 #include <unistd.h>
 #include <X11/Xatom.h>
-Atom ewmh[JBWM_EWMH_ATOMS_COUNT];
+static Atom jbwm_ewmh[JBWM_EWMH_ATOMS_COUNT];
 static char * atom_names [] = { // This list must match 1:1 with enum
 	"_NET_SUPPORTED",
 	"_NET_CURRENT_DESKTOP",
@@ -52,10 +52,14 @@ static char * atom_names [] = { // This list must match 1:1 with enum
 	"_NET_WM_STATE_BELOW",
 	"_NET_WM_STATE_FOCUSED",
 };
+jbwm_atom_t jbwm_ewmh_get_atom(const uint8_t index)
+{
+	return jbwm_ewmh[index];
+}
 void jbwm_ewmh_init(Display * restrict d)
 {
 	JBWM_LOG("atom_names: %d\n", JBWM_EWMH_ATOMS_COUNT);
-	XInternAtoms(d, atom_names, JBWM_EWMH_ATOMS_COUNT, false, ewmh);
+	XInternAtoms(d, atom_names, JBWM_EWMH_ATOMS_COUNT, false, jbwm_ewmh);
 }
 static uint16_t get_client_count(void)
 {
@@ -74,45 +78,45 @@ void jbwm_ewmh_update_client_list(Display * restrict d)
 		wl[wl_sz] = i->window;
 	struct JBWMScreen * s = jbwm_get_screens();
 	for (uint8_t i = ScreenCount(d); i; --i) {
-		jbwm_set_property(d, s[i].root, ewmh[CLIENT_LIST],
+		jbwm_set_property(d, s[i].root, jbwm_ewmh[CLIENT_LIST],
 			XA_WINDOW, &wl, wl_sz);
 		// FIXME: Does not correctly report stacking order.
-		jbwm_set_property(d, s[i].root, ewmh[CLIENT_LIST_STACKING],
+		jbwm_set_property(d, s[i].root, jbwm_ewmh[CLIENT_LIST_STACKING],
 			XA_WINDOW, &wl, wl_sz);
 	}
 }
 static void set_root_vdesk(Display * restrict d, jbwm_window_t r)
 {
-	jbwm_set_property(d, r, ewmh[NUMBER_OF_JBWM_MAX_DESKTOPS], XA_CARDINAL,
+	jbwm_set_property(d, r, jbwm_ewmh[NUMBER_OF_DESKTOPS], XA_CARDINAL,
 		&(long){JBWM_MAX_DESKTOPS}, 1);
-	jbwm_set_property(d, r, ewmh[DESKTOP_VIEWPORT], XA_CARDINAL,
+	jbwm_set_property(d, r, jbwm_ewmh[DESKTOP_VIEWPORT], XA_CARDINAL,
 		(&(long[]){0, 0}), 2);
-	jbwm_set_property(d, r, ewmh[VIRTUAL_ROOTS], XA_WINDOW, &r, 1);
+	jbwm_set_property(d, r, jbwm_ewmh[VIRTUAL_ROOTS], XA_WINDOW, &r, 1);
 }
 void jbwm_ewmh_set_allowed_actions(Display * restrict d,
 	const jbwm_window_t w)
 {
 	Atom a[] = {
-		ewmh[WM_ALLOWED_ACTIONS],
-		ewmh[WM_ACTION_MOVE],
-		ewmh[WM_ACTION_RESIZE],
-		ewmh[WM_ACTION_CLOSE],
-		ewmh[WM_ACTION_SHADE],
-		ewmh[WM_ACTION_FULLSCREEN],
-		ewmh[WM_ACTION_CHANGE_DESKTOP],
-		ewmh[WM_ACTION_ABOVE],
-		ewmh[WM_ACTION_BELOW],
-		ewmh[WM_ACTION_MAXIMIZE_HORZ],
-		ewmh[WM_ACTION_MAXIMIZE_VERT]
+		jbwm_ewmh[WM_ALLOWED_ACTIONS],
+		jbwm_ewmh[WM_ACTION_MOVE],
+		jbwm_ewmh[WM_ACTION_RESIZE],
+		jbwm_ewmh[WM_ACTION_CLOSE],
+		jbwm_ewmh[WM_ACTION_SHADE],
+		jbwm_ewmh[WM_ACTION_FULLSCREEN],
+		jbwm_ewmh[WM_ACTION_CHANGE_DESKTOP],
+		jbwm_ewmh[WM_ACTION_ABOVE],
+		jbwm_ewmh[WM_ACTION_BELOW],
+		jbwm_ewmh[WM_ACTION_MAXIMIZE_HORZ],
+		jbwm_ewmh[WM_ACTION_MAXIMIZE_VERT]
 	};
 	jbwm_set_property(d, w, a[0], XA_ATOM, &a, sizeof(a) / sizeof(Atom));
 }
 static void init_desktops(Display * restrict d,
 	struct JBWMScreen * restrict s)
 {
-	jbwm_set_property(d, s->r, ewmh[DESKTOP_GEOMETRY],
+	jbwm_set_property(d, s->r, jbwm_ewmh[DESKTOP_GEOMETRY],
 		XA_CARDINAL, &s->size, 2);
-	jbwm_set_property(d, s->r, ewmh[CURRENT_DESKTOP],
+	jbwm_set_property(d, s->r, jbwm_ewmh[CURRENT_DESKTOP],
 		XA_CARDINAL, &s->vdesk, 1);
 	set_root_vdesk(d, s->r);
 }
@@ -121,21 +125,24 @@ static jbwm_window_t init_supporting(Display * restrict d,
 {
 	jbwm_window_t w = XCreateSimpleWindow(d, r,
 		0, 0, 1, 1, 0, 0, 0);
-	jbwm_set_property(d, r, ewmh[SUPPORTING_WM_CHECK], XA_WINDOW, &w, 1);
-	jbwm_set_property(d, w, ewmh[SUPPORTING_WM_CHECK], XA_WINDOW, &w, 1);
-	jbwm_set_property(d, w, ewmh[WM_NAME], XA_STRING, "jbwm", 4);
-	jbwm_set_property(d, w, ewmh[WM_PID], XA_CARDINAL, &(pid_t){getpid()}, 1);
+	jbwm_set_property(d, r, jbwm_ewmh[SUPPORTING_WM_CHECK],
+		XA_WINDOW, &w, 1);
+	jbwm_set_property(d, w, jbwm_ewmh[SUPPORTING_WM_CHECK],
+		XA_WINDOW, &w, 1);
+	jbwm_set_property(d, w, jbwm_ewmh[WM_NAME], XA_STRING, "jbwm", 4);
+	jbwm_set_property(d, w, jbwm_ewmh[WM_PID],
+		XA_CARDINAL, &(pid_t){getpid()}, 1);
 	return w;
 }
 void jbwm_ewmh_init_screen(Display * restrict d,
 	struct JBWMScreen * restrict s)
 {
 	jbwm_window_t r = s->root;
-	jbwm_set_property(d, r, ewmh[SUPPORTED], XA_ATOM, ewmh,
+	jbwm_set_property(d, r, jbwm_ewmh[SUPPORTED], XA_ATOM, jbwm_ewmh,
 		JBWM_EWMH_ATOMS_COUNT);
-	jbwm_set_property(d, r, ewmh[WM_NAME], XA_STRING, "jbwm", 4);
+	jbwm_set_property(d, r, jbwm_ewmh[WM_NAME], XA_STRING, "jbwm", 4);
 	// Set this to the root window until we have some clients.
-	jbwm_set_property(d, r, ewmh[CLIENT_LIST], XA_WINDOW, &r, 1);
+	jbwm_set_property(d, r, jbwm_ewmh[CLIENT_LIST], XA_WINDOW, &r, 1);
 	init_desktops(d, s);
 	s->supporting = init_supporting(d, r);
 }

@@ -13,22 +13,22 @@ void jbwm_ewmh_remove_state(Display * restrict d,
 	const Window w, const Atom state)
 {
 	uint16_t n;
-	Atom *a = jbwm_get_property(d, w, ewmh[WM_STATE], &n);
+	const jbwm_atom_t ws = jbwm_ewmh_get_atom(WM_STATE);
+	Atom *a = jbwm_get_property(d, w, ws, &n);
 	if (!a)
 		return;
 	const uint16_t nitems = n;
 	while (n--) // decrement here to prevent offset error
 		if (a[n] == state)
 			a[n] = 0;
-	jbwm_set_property(d, w, ewmh[WM_STATE],
-		XA_ATOM, a, nitems);
+	jbwm_set_property(d, w, ws, XA_ATOM, a, nitems);
 	XFree(a);
 }
 static bool ewmh_get_state(const Window w, const Atom state)
 {
 	uint16_t n;
 	Atom *a = jbwm_get_property(jbwm_get_display(),
-		w, ewmh[WM_STATE], &n);
+		w, jbwm_ewmh_get_atom(WM_STATE), &n);
 	bool found = false;
 	if (a) {
 		while (n--) // prevent offset error
@@ -40,7 +40,8 @@ static bool ewmh_get_state(const Window w, const Atom state)
 }
 void jbwm_ewmh_add_state(Display * d, const Window w, Atom state)
 {
-	XChangeProperty(d, w, ewmh[WM_STATE], XA_ATOM, 32, PropModePrepend,
+	XChangeProperty(d, w, jbwm_ewmh_get_atom(WM_STATE),
+		XA_ATOM, 32, PropModePrepend,
 		(unsigned char *)&state, 1);
 }
 /*      Reference, per wm-spec:
@@ -91,7 +92,7 @@ static void check_state(XClientMessageEvent * e,	// event data
 			const enum JBWMAtomIndex t,	// state to test
 			struct JBWMClient *c)
 {
-	const Atom state = ewmh[t];
+	const Atom state = jbwm_ewmh_get_atom(t);
 	// 2 atoms can be set at once
 	long * l = &e->data.l[0];
 	const bool set = l[1] == (long)state || l[2] == (long)state;
@@ -132,17 +133,17 @@ static void handle_wm_state_changes(XClientMessageEvent * restrict e,
 static bool client_specific_message(XClientMessageEvent * restrict e,
 	struct JBWMClient * restrict c, const Atom t)
 {
-	if (t == ewmh[WM_DESKTOP])
+	if (t == jbwm_ewmh_get_atom(WM_DESKTOP))
 		jbwm_set_client_vdesk(e->display, c, e->data.l[0]);
 	// If user moves window (client-side title bars):
-	else if (t == ewmh[WM_MOVERESIZE]) {
+	else if (t == jbwm_ewmh_get_atom(WM_MOVERESIZE)) {
 		XRaiseWindow(e->display, c->parent);
 		jbwm_drag(e->display, c, false);
-	} else if (t == ewmh[WM_STATE])
+	} else if (t == jbwm_ewmh_get_atom(WM_STATE))
 		handle_wm_state_changes(e, c);
-	else if (t == ewmh[ACTIVE_WINDOW])
+	else if (t == jbwm_ewmh_get_atom(ACTIVE_WINDOW))
 		jbwm_select_client(e->display, c);
-	else if (t == ewmh[CLOSE_WINDOW])
+	else if (t == jbwm_ewmh_get_atom(CLOSE_WINDOW))
 		jbwm_send_wm_delete(e->display, c);
 	else
 		  return false;
@@ -174,11 +175,11 @@ void jbwm_ewmh_handle_client_message(XClientMessageEvent * restrict e,
 #endif//JBWM_EWMH_DEBUG
 	if(c && client_specific_message(e, c, t))
 		  return;
-	if (t == ewmh[CURRENT_DESKTOP])
+	if (t == jbwm_ewmh_get_atom(CURRENT_DESKTOP))
 		  jbwm_set_vdesk(e->display,
 			  &jbwm_get_screens()[c ? c->screen : 0],
 			  e->data.l[0]);
-	else if (t == ewmh[MOVERESIZE_WINDOW])
+	else if (t == jbwm_ewmh_get_atom(MOVERESIZE_WINDOW))
 		// If something else moves the window:
 		handle_moveresize(e);
 }

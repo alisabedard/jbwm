@@ -135,13 +135,13 @@ static void hide(Display * restrict d, struct JBWMClient * restrict c)
 {
 	XUnmapWindow(d, c->parent);
 	jbwm_set_wm_state(d, c, IconicState);
-	jbwm_ewmh_add_state(d, c->window, ewmh[WM_STATE_HIDDEN]);
+	jbwm_ewmh_add_state(d, c->window, jbwm_ewmh_get_atom(WM_STATE_HIDDEN));
 }
 void jbwm_restore_client(Display * restrict d, struct JBWMClient * restrict c)
 {
 	XMapWindow(d, c->parent);
 	jbwm_set_wm_state(d, c, NormalState);
-	jbwm_ewmh_remove_state(d, c->window, ewmh[WM_STATE_HIDDEN]);
+	jbwm_ewmh_remove_state(d, c->window, jbwm_ewmh_get_atom(WM_STATE_HIDDEN));
 }
 static void check_visibility(Display * restrict d, struct JBWMScreen * s,
 	struct JBWMClient * restrict c, const uint8_t v)
@@ -164,7 +164,7 @@ uint8_t jbwm_set_vdesk(Display * restrict d, struct JBWMScreen * s, uint8_t v)
 		check_visibility(d, s, c, v);
 	s->vdesk = v;
 #ifdef JBWM_USE_EWMH
-	jbwm_set_property(d, s->root, ewmh[CURRENT_DESKTOP],
+	jbwm_set_property(d, s->root, jbwm_ewmh_get_atom(CURRENT_DESKTOP),
 		XA_CARDINAL, &v, 1);
 #endif//JBWM_USE_EWMH
 	return s->vdesk;
