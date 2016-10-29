@@ -20,21 +20,20 @@ void jbwm_toggle_shade(Display * restrict d, struct JBWMClient * restrict c)
 	if (c->opt.no_min || c->opt.fullscreen)
 		return;
 	// This implements window shading, a substitute for iconification.
+	const jbwm_atom_t sa = jbwm_ewmh_get_atom(JBWM_EWMH_WM_STATE_SHADED);
 	if (c->opt.shaded) {
 		// Unshade
 		c->size.height = c->old_size.height;
 		c->opt.shaded = false;
 		jbwm_move_resize(d, c);
 		jbwm_set_wm_state(d, c, NormalState);
-		jbwm_ewmh_remove_state(d, c->window,
-			jbwm_ewmh_get_atom(JBWM_EWMH_WM_STATE_SHADED));
+		jbwm_ewmh_remove_state(d, c->window, sa);
 	} else {		// Shade the client
 		c->old_size.height = c->size.height;
 		c->size.height = -1;
 		c->opt.shaded = true;
 		jbwm_set_wm_state(d, c, IconicState);
-		jbwm_ewmh_add_state(d, c->window,
-			jbwm_ewmh_get_atom(JBWM_EWMH_WM_STATE_SHADED));
+		jbwm_ewmh_add_state(d, c->window, sa);
 		jbwm_select_client(d, c);
 	}
 	jbwm_update_title_bar(d, c);
