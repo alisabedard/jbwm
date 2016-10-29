@@ -6,6 +6,7 @@
 #include "client.h"
 #include "ewmh.h"
 #include "ewmh_state.h"
+#include "font.h"
 #include "jbwm.h"
 #include "screen.h"
 #include "util.h"
@@ -15,23 +16,25 @@
 #include <X11/Xft/Xft.h>
 #endif//JBWM_USE_XFT
 static void set_shaded(Display * restrict d,
-	struct JBWMClient * restrict c, const jbwm_atom_t sa)
+	struct JBWMClient * restrict c)
 {
 	c->old_size.height = c->size.height;
 	c->size.height = -1;
 	c->opt.shaded = true;
 	jbwm_set_wm_state(d, c, IconicState);
-	jbwm_ewmh_add_state(d, c->window, sa);
+	jbwm_ewmh_add_state(d, c->window,
+		jbwm_ewmh_get_atom(JBWM_EWMH_WM_STATE_SHADED));
 	jbwm_select_client(d, c);
 }
 static void set_not_shaded(Display * restrict d,
-	struct JBWMClient * restrict c, const jbwm_atom_t sa)
+	struct JBWMClient * restrict c)
 {
 	c->size.height = c->old_size.height;
 	c->opt.shaded = false;
 	jbwm_move_resize(d, c);
 	jbwm_set_wm_state(d, c, NormalState);
-	jbwm_ewmh_remove_state(d, c->window, sa);
+	jbwm_ewmh_remove_state(d, c->window,
+		jbwm_ewmh_get_atom(JBWM_EWMH_WM_STATE_SHADED));
 }
 void jbwm_toggle_shade(Display * restrict d, struct JBWMClient * restrict c)
 {
@@ -39,11 +42,7 @@ void jbwm_toggle_shade(Display * restrict d, struct JBWMClient * restrict c)
 	if (c->opt.no_min || c->opt.fullscreen)
 		return;
 	// This implements window shading, a substitute for iconification.
-	const jbwm_atom_t sa = jbwm_ewmh_get_atom(JBWM_EWMH_WM_STATE_SHADED);
-	if (c->opt.shaded)
-		set_not_shaded(d, c, sa);
-	else
-		set_shaded(d, c, sa);
+	(c->opt.shaded ? set_not_shaded : set_shaded)(d, c);
 	jbwm_update_title_bar(d, c);
 }
 static uint16_t mv(Display * restrict d, const jbwm_window_t w, uint16_t x)
@@ -92,7 +91,7 @@ static void
 draw_xft(Display * restrict d, struct JBWMClient * restrict c,
 	const XPoint * restrict p, char * restrict name, const size_t l)
 {
-	XftFont * f = jbwm_get_font();
+	XftFont * f = jbwm_get_font(d);
 	XGlyphInfo e;
 	XftTextExtentsUtf8(d, f, (XftChar8 *) name, l, &e);
 	const uint8_t s = c->screen;

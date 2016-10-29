@@ -2,6 +2,7 @@
 #include "max.h"
 #include "ewmh.h"
 #include "ewmh_state.h"
+#include "font.h"
 #include "jbwm.h"
 #include "log.h"
 #include "screen.h"

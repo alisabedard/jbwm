@@ -5,6 +5,7 @@
 #include "snap.h"
 #include "client.h"
 #include "config.h"
+#include "font.h"
 #include "jbwm.h"
 #include <stdlib.h>
 __attribute__ ((const, hot, warn_unused_result))

@@ -7,6 +7,7 @@
 #include "config.h"
 #include "events.h"
 #include "ewmh.h"
+#include "font.h"
 #include "keys.h"
 #include "log.h"
 #include "new.h"
@@ -22,28 +23,7 @@
 static struct {
 	Display * display;
 	struct JBWMScreen * screens;
-#ifdef JBWM_USE_TITLE_BAR
-#ifdef JBWM_USE_XFT
-	XftFont * font;
-#else//! JBWM_USE_XFT
-	XFontStruct * font;
-#endif//JBWM_USE_XFT
-#endif//JBWM_USE_TITLE_BAR
 } jbwm_data;
-#ifdef JBWM_USE_TITLE_BAR
-void * jbwm_get_font(void)
-{
-	return jbwm_data.font;
-}
-uint8_t jbwm_get_font_ascent(void)
-{
-	return jbwm_data.font->ascent;
-}
-uint8_t jbwm_get_font_height(void)
-{
-	return jbwm_data.font->ascent + jbwm_data.font->descent;
-}
-#endif//JBWM_USE_TITLE_BAR
 struct JBWMScreen * jbwm_get_screens(void)
 {
 	return jbwm_data.screens;
@@ -132,7 +112,7 @@ version:
 	exit(0);
 }
 __attribute__((noreturn))
-static void jbwm_error(const char * restrict msg)
+void jbwm_error(const char * restrict msg)
 {
 	size_t count = 0;
 	while (msg[++count]);
@@ -140,23 +120,6 @@ static void jbwm_error(const char * restrict msg)
 	print(1, "\n");
 	exit(1);
 }
-#ifdef JBWM_USE_TITLE_BAR
-static void setup_fonts(void)
-{
-	char * font = getenv(JBWM_ENV_FONT);
-#ifdef JBWM_USE_XFT
-	jbwm_data.font = XftFontOpen(jbwm_data.display,
-		jbwm_data.screens->screen, XFT_FAMILY, XftTypeString,
-		font, XFT_SIZE, XftTypeDouble, JBWM_FONT_SIZE, NULL);
-#else//!JBWM_USE_XFT
-	jbwm_data.font = XLoadQueryFont(jbwm_data.display, font);
-#endif//JBWM_USE_XFT
-	if (!jbwm_data.font)
-		jbwm_error(JBWM_ENV_FONT);
-}
-#else//!JBWM_USE_TITLE_BAR
-#define setup_fonts()
-#endif//JBWM_USE_TITLE_BAR
 static void setup_event_listeners(const jbwm_window_t root)
 {
 	XChangeWindowAttributes(jbwm_data.display, root, CWEventMask,
@@ -224,7 +187,8 @@ static void setup_gc(struct JBWMScreen * restrict s)
 		.line_width = 1
 	};
 #if defined(JBWM_USE_TITLE_BAR) && !defined(JBWM_USE_XFT)
-	gv.font = jbwm_data.font->fid;
+	XFontStruct * font = jbwm_get_font(jbwm_data.display);
+	gv.font = font->fid;
 	vm |= GCFont;
 #endif//JBWM_USE_TITLE_BAR&&!JBWM_USE_XFT
 	s->gc = XCreateGC(jbwm_data.display, s->root, vm, &gv);
@@ -279,7 +243,6 @@ int main(int argc, char **argv)
 	uint8_t i = ScreenCount(jbwm_data.display);
 	struct JBWMScreen s[i]; // remains in scope till exit.
 	jbwm_data.screens = s;
-	setup_fonts(); // screen must be created first
 	while (i--)
 		setup_screen(i);
 	jbwm_event_loop(jbwm_data.display);
