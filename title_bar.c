@@ -53,9 +53,8 @@ static void move_buttons(Display * restrict d,
 static jbwm_window_t get_win(Display * restrict d, const Window p,
 	const jbwm_pixel_t bg)
 {
-	return XCreateSimpleWindow(d, p,
-		0, 0, jbwm_get_font_height(),
-		jbwm_get_font_height(), 0, 0, bg);
+	uint8_t h = jbwm_get_font_height();
+	return XCreateSimpleWindow(d, p, 0, 0, h, h, 0, 0, bg);
 }
 static jbwm_window_t new_title_bar(Display * restrict d,
 	struct JBWMClient * restrict c)
