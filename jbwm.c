@@ -56,7 +56,6 @@ static void print(const size_t sz, const char * buf)
 	if (write(1, buf, sz) == -1)
 		abort();
 }
-#ifdef USE_ARGV
 /* Used for overriding the default WM modifiers */
 __attribute__((warn_unused_result))
 static uint16_t parse_modifiers(char * restrict arg)
@@ -135,9 +134,6 @@ version:
 	print(1, "\n");
 	exit(0);
 }
-#else//!USE_ARGV
-#define parse_argv(a, b)
-#endif//USE_ARGV
 __attribute__((noreturn))
 static void jbwm_error(const char * restrict msg)
 {
@@ -276,12 +272,7 @@ static void jbwm_set_defaults(void)
 	setenv(JBWM_ENV_FONT, JBWM_DEF_FONT, 0);
 #endif//JBWM_USE_TITLE_BAR
 }
-int main(
-#ifdef USE_ARGV
-		int argc, char **argv)
-#else//!USE_ARGV
-		void)
-#endif//USE_ARGV
+int main(int argc, char **argv)
 {
 	jbwm_set_defaults();
 	parse_argv(argc, argv);

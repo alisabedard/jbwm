@@ -14,9 +14,6 @@ include shape.mk
 # Titlebar Xft support:
 # Warning: valgrind reports that xft leaks memory.
 #include xft.mk
-# Uncomment to enable parsing command line arguments.
-#  Saves ~2030 bytes
-jbwm_cflags+=-DUSE_ARGV
 # Uncomment to enable title bars
 include title_bar.mk
 # Uncomment to enable window snapping. ~4k
