@@ -18,7 +18,6 @@ jbwm_cflags+=-Wlogical-op -Wmissing-prototypes
 jbwm_cflags+=-Wredundant-decls -Wpointer-sign
 jbwm_cflags+=-fstrict-aliasing -Wstrict-aliasing=2
 jbwm_cflags+=-Wformat=2
-jbwm_cflags+=-DSTDIO
 include ewmh.mk
 include mwm.mk
 include shape.mk

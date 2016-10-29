@@ -17,9 +17,6 @@
 #ifdef JBWM_USE_XFT
 #include <X11/Xft/Xft.h>
 #endif//JBWM_USE_XFT
-#ifdef STDIO
-#include <stdio.h>
-#endif//STDIO
 // Main application data structure.
 //struct jbwm jbwm;
 static struct {

@@ -18,8 +18,6 @@ include shape.mk
 include title_bar.mk
 # Uncomment to enable window snapping. ~4k
 include snap.mk
-# Uncomment to enable STDIO
-jbwm_cflags+=-DSTDIO
 # Uncomment to enable EWMH ~8k
 include ewmh.mk
 # Uncomment to enable MWM hints
