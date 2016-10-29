@@ -13,7 +13,7 @@ void jbwm_ewmh_remove_state(Display * restrict d,
 	const Window w, const Atom state)
 {
 	uint16_t n;
-	const jbwm_atom_t ws = jbwm_ewmh_get_atom(WM_STATE);
+	const jbwm_atom_t ws = jbwm_ewmh_get_atom(JBWM_EWMH_WM_STATE);
 	Atom *a = jbwm_get_property(d, w, ws, &n);
 	if (!a)
 		return;
@@ -28,7 +28,7 @@ static bool ewmh_get_state(const Window w, const Atom state)
 {
 	uint16_t n;
 	Atom *a = jbwm_get_property(jbwm_get_display(),
-		w, jbwm_ewmh_get_atom(WM_STATE), &n);
+		w, jbwm_ewmh_get_atom(JBWM_EWMH_WM_STATE), &n);
 	bool found = false;
 	if (a) {
 		while (n--) // prevent offset error
@@ -40,7 +40,7 @@ static bool ewmh_get_state(const Window w, const Atom state)
 }
 void jbwm_ewmh_add_state(Display * d, const Window w, Atom state)
 {
-	XChangeProperty(d, w, jbwm_ewmh_get_atom(WM_STATE),
+	XChangeProperty(d, w, jbwm_ewmh_get_atom(JBWM_EWMH_WM_STATE),
 		XA_ATOM, 32, PropModePrepend,
 		(unsigned char *)&state, 1);
 }
@@ -62,25 +62,25 @@ static void set_state(Display * restrict d, struct JBWMClient * restrict c,
 	if (!c)
 		return;
 	switch(t) {
-	case WM_STATE_FULLSCREEN:
+	case JBWM_EWMH_WM_STATE_FULLSCREEN:
 		add?jbwm_set_fullscreen(d, c):jbwm_set_not_fullscreen(d, c);
 		break;
-	case WM_STATE_STICKY:
+	case JBWM_EWMH_WM_STATE_STICKY:
 		c->opt.sticky=add;
 		break;
-	case WM_STATE_ABOVE:
+	case JBWM_EWMH_WM_STATE_ABOVE:
 		(add ? XRaiseWindow : XLowerWindow)(d, c->parent);
 		break;
-	case WM_STATE_BELOW:
+	case JBWM_EWMH_WM_STATE_BELOW:
 		(add ? XLowerWindow : XRaiseWindow)(d, c->parent);
 		break;
-	case WM_STATE_HIDDEN:
+	case JBWM_EWMH_WM_STATE_HIDDEN:
 		JBWM_LOG("HIDDEN");
 		break;
-	case WM_STATE_MAXIMIZED_VERT:
+	case JBWM_EWMH_WM_STATE_MAXIMIZED_VERT:
 		(add ? jbwm_set_vert : jbwm_set_not_vert)(d, c);
 		break;
-	case WM_STATE_MAXIMIZED_HORZ:
+	case JBWM_EWMH_WM_STATE_MAXIMIZED_HORZ:
 		(add ? jbwm_set_horz : jbwm_set_not_horz)(d, c);
 		break;
 	default:
@@ -123,27 +123,27 @@ __attribute__((nonnull(1,2)))
 static void handle_wm_state_changes(XClientMessageEvent * restrict e,
 	struct JBWMClient * restrict c)
 {
-	check_state(e, WM_STATE_ABOVE, c);
-	check_state(e, WM_STATE_BELOW, c);
-	check_state(e, WM_STATE_FULLSCREEN, c);
-	check_state(e, WM_STATE_MAXIMIZED_HORZ, c);
-	check_state(e, WM_STATE_MAXIMIZED_VERT, c);
-	check_state(e, WM_STATE_STICKY, c);
+	check_state(e, JBWM_EWMH_WM_STATE_ABOVE, c);
+	check_state(e, JBWM_EWMH_WM_STATE_BELOW, c);
+	check_state(e, JBWM_EWMH_WM_STATE_FULLSCREEN, c);
+	check_state(e, JBWM_EWMH_WM_STATE_MAXIMIZED_HORZ, c);
+	check_state(e, JBWM_EWMH_WM_STATE_MAXIMIZED_VERT, c);
+	check_state(e, JBWM_EWMH_WM_STATE_STICKY, c);
 }
 static bool client_specific_message(XClientMessageEvent * restrict e,
 	struct JBWMClient * restrict c, const Atom t)
 {
-	if (t == jbwm_ewmh_get_atom(WM_DESKTOP))
+	if (t == jbwm_ewmh_get_atom(JBWM_EWMH_WM_DESKTOP))
 		jbwm_set_client_vdesk(e->display, c, e->data.l[0]);
 	// If user moves window (client-side title bars):
-	else if (t == jbwm_ewmh_get_atom(WM_MOVERESIZE)) {
+	else if (t == jbwm_ewmh_get_atom(JBWM_EWMH_WM_MOVERESIZE)) {
 		XRaiseWindow(e->display, c->parent);
 		jbwm_drag(e->display, c, false);
-	} else if (t == jbwm_ewmh_get_atom(WM_STATE))
+	} else if (t == jbwm_ewmh_get_atom(JBWM_EWMH_WM_STATE))
 		handle_wm_state_changes(e, c);
-	else if (t == jbwm_ewmh_get_atom(ACTIVE_WINDOW))
+	else if (t == jbwm_ewmh_get_atom(JBWM_EWMH_ACTIVE_WINDOW))
 		jbwm_select_client(e->display, c);
-	else if (t == jbwm_ewmh_get_atom(CLOSE_WINDOW))
+	else if (t == jbwm_ewmh_get_atom(JBWM_EWMH_CLOSE_WINDOW))
 		jbwm_send_wm_delete(e->display, c);
 	else
 		  return false;
@@ -175,11 +175,11 @@ void jbwm_ewmh_handle_client_message(XClientMessageEvent * restrict e,
 #endif//JBWM_EWMH_DEBUG
 	if(c && client_specific_message(e, c, t))
 		  return;
-	if (t == jbwm_ewmh_get_atom(CURRENT_DESKTOP))
+	if (t == jbwm_ewmh_get_atom(JBWM_EWMH_CURRENT_DESKTOP))
 		  jbwm_set_vdesk(e->display,
 			  &jbwm_get_screens()[c ? c->screen : 0],
 			  e->data.l[0]);
-	else if (t == jbwm_ewmh_get_atom(MOVERESIZE_WINDOW))
+	else if (t == jbwm_ewmh_get_atom(JBWM_EWMH_MOVERESIZE_WINDOW))
 		// If something else moves the window:
 		handle_moveresize(e);
 }

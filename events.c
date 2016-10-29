@@ -34,8 +34,8 @@ void jbwm_free_client(struct JBWMClient * restrict c)
 	Display * restrict d = jbwm_get_display();
 #ifdef JBWM_USE_EWMH
 	// Per ICCCM + JBWM_USE_EWMH:
-	XDeleteProperty(d, w, jbwm_ewmh_get_atom(WM_STATE));
-	XDeleteProperty(d, w, jbwm_ewmh_get_atom(WM_DESKTOP));
+	XDeleteProperty(d, w, jbwm_ewmh_get_atom(JBWM_EWMH_WM_STATE));
+	XDeleteProperty(d, w, jbwm_ewmh_get_atom(JBWM_EWMH_WM_DESKTOP));
 #endif//JBWM_USE_EWMH
 	XReparentWindow(d, w, jbwm_get_screens()[c->screen].root,
 		c->size.x, c->size.y);
