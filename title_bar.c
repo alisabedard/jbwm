@@ -10,8 +10,8 @@
 #include "screen.h"
 #include "util.h"
 #include <X11/Xatom.h>
-#include "config.h"
 #ifdef JBWM_USE_XFT
+#include "config.h"
 #include <X11/Xft/Xft.h>
 #endif//JBWM_USE_XFT
 void jbwm_toggle_shade(Display * restrict d, struct JBWMClient * restrict c)
