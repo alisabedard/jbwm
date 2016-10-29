@@ -252,9 +252,8 @@ static int handle_xerror(Display * restrict dpy __attribute__ ((unused)),
 	XErrorEvent * restrict e)
 {
 	if ((e->error_code == BadAccess)
-	    && (e->request_code == X_ChangeWindowAttributes)) {
+	    && (e->request_code == X_ChangeWindowAttributes))
 		jbwm_error("ROOT");
-	}
 	if (e->error_code == BadWindow) { // cleanup zombie windows
 		struct JBWMClient * c = jbwm_get_client(e->resourceid);
 		if (c) // match found
