@@ -122,7 +122,7 @@ usage: {
 		size_t l = 0;
 		while (argv[0][++l]);
 		print(l, *argv);
-		print(4, " -[ ");
+		print(4, " -[");
 		print(sizeof(optstring), optstring);
 		print(2, "]\n");
        }
