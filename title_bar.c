@@ -14,6 +14,25 @@
 #include "config.h"
 #include <X11/Xft/Xft.h>
 #endif//JBWM_USE_XFT
+static void set_shaded(Display * restrict d,
+	struct JBWMClient * restrict c, const jbwm_atom_t sa)
+{
+	c->old_size.height = c->size.height;
+	c->size.height = -1;
+	c->opt.shaded = true;
+	jbwm_set_wm_state(d, c, IconicState);
+	jbwm_ewmh_add_state(d, c->window, sa);
+	jbwm_select_client(d, c);
+}
+static void set_not_shaded(Display * restrict d,
+	struct JBWMClient * restrict c, const jbwm_atom_t sa)
+{
+	c->size.height = c->old_size.height;
+	c->opt.shaded = false;
+	jbwm_move_resize(d, c);
+	jbwm_set_wm_state(d, c, NormalState);
+	jbwm_ewmh_remove_state(d, c->window, sa);
+}
 void jbwm_toggle_shade(Display * restrict d, struct JBWMClient * restrict c)
 {
 	// Honor !MJBWM_EWMH_WM_FUNC_MINIMIZE
@@ -21,21 +40,10 @@ void jbwm_toggle_shade(Display * restrict d, struct JBWMClient * restrict c)
 		return;
 	// This implements window shading, a substitute for iconification.
 	const jbwm_atom_t sa = jbwm_ewmh_get_atom(JBWM_EWMH_WM_STATE_SHADED);
-	if (c->opt.shaded) {
-		// Unshade
-		c->size.height = c->old_size.height;
-		c->opt.shaded = false;
-		jbwm_move_resize(d, c);
-		jbwm_set_wm_state(d, c, NormalState);
-		jbwm_ewmh_remove_state(d, c->window, sa);
-	} else {		// Shade the client
-		c->old_size.height = c->size.height;
-		c->size.height = -1;
-		c->opt.shaded = true;
-		jbwm_set_wm_state(d, c, IconicState);
-		jbwm_ewmh_add_state(d, c->window, sa);
-		jbwm_select_client(d, c);
-	}
+	if (c->opt.shaded)
+		set_not_shaded(d, c, sa);
+	else
+		set_shaded(d, c, sa);
 	jbwm_update_title_bar(d, c);
 }
 static uint16_t mv(Display * restrict d, const jbwm_window_t w, uint16_t x)
@@ -72,7 +80,8 @@ static jbwm_window_t new_title_bar(Display * restrict d,
 #ifdef JBWM_USE_EWMH
 	// Required by wm-spec 1.4:
 	const uint8_t b = c->border;
-	jbwm_set_property(d, c->window, jbwm_ewmh_get_atom(JBWM_EWMH_FRAME_EXTENTS),
+	jbwm_set_property(d, c->window,
+		jbwm_ewmh_get_atom(JBWM_EWMH_FRAME_EXTENTS),
 		XA_CARDINAL, (&(jbwm_atom_t[]){b, b, b
 		+ jbwm_get_font_height(), b}), 4);
 #endif//JBWM_USE_EWMH
@@ -136,7 +145,8 @@ static void remove_title_bar(Display * restrict d,
 #ifdef JBWM_USE_EWMH
 	// Required by wm-spec 1.4:
 	const uint8_t b = c->border;
-	jbwm_set_property(d, c->window, jbwm_ewmh_get_atom(JBWM_EWMH_FRAME_EXTENTS),
+	jbwm_set_property(d, c->window,
+		jbwm_ewmh_get_atom(JBWM_EWMH_FRAME_EXTENTS),
 		XA_CARDINAL, (&(jbwm_atom_t[]){b, b, b, b}), 4);
 #endif//JBWM_USE_EWMH
 }
