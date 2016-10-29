@@ -34,20 +34,17 @@ struct JBWMClientTitlebar {
 #endif//JBWM_USE_TITLE_BAR
 struct JBWMClient {
 	struct JBWMClient *next;
-	XSizeHints size;
-	jbwm_rectangle_t old_size;
-	jbwm_window_t window, parent;
 #ifdef JBWM_USE_TITLE_BAR
 	struct JBWMClientTitlebar tb;
 #endif//JBWM_USE_TITLE_BAR
+	XSizeHints size;
+	jbwm_rectangle_t old_size;
 	jbwm_cmap_t cmap;
-#ifdef JBWM_USE_TITLE_BAR
-	uint16_t exposed_width;
-#endif//JBWM_USE_TITLE_BAR
+	jbwm_window_t window, parent;
 	int8_t ignore_unmap:3;
-	uint8_t vdesk:4;
 	uint8_t border:1;
 	uint8_t screen;
+	uint8_t vdesk:4;
 	struct JBWMClientOptions opt;
 };
 #endif /* JBWM_CLIENT_STRUCT_H */
