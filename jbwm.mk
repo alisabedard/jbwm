@@ -28,7 +28,7 @@ jbwm_ldflags+=-lX11
 jbwm_cflags+=-DVERSION=\"$(version)\" $(DEBIAN)
 jbwm_cflags+=-D_XOPEN_SOURCE=700 -std=c11
 objects+=client.o events.o jbwm.o new.o screen.o
-objects+=button_event.o keys.o util.o max.o
+objects+=button_event.o keys.o util.o max.o snap.o
 
 $(exe): $(objects)
 	$(CC) ${jbwm_ldflags} $(LDFLAGS) $(objects) -o $@

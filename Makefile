@@ -16,8 +16,6 @@ include shape.mk
 #include xft.mk
 # Uncomment to enable title bars
 include title_bar.mk
-# Uncomment to enable window snapping. ~4k
-include snap.mk
 # Uncomment to enable EWMH ~8k
 include ewmh.mk
 # Uncomment to enable MWM hints
