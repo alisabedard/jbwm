@@ -18,6 +18,4 @@ include shape.mk
 include title_bar.mk
 # Uncomment to enable EWMH ~8k
 include ewmh.mk
-# Uncomment to enable MWM hints
-include mwm.mk
 include jbwm.mk
