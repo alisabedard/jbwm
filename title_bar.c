@@ -99,17 +99,17 @@ draw_xft(Display * restrict d, struct JBWMClient * restrict c,
 	XftTextExtentsUtf8(d, f, (XftChar8 *) name, l, &e);
 	const uint8_t s = c->screen;
 	Visual *v = DefaultVisual(d, s);
-	const Colormap cm = DefaultColormap(d, s);
-	XftDraw *xd = XftDrawCreate(d, c->tb.win, v, cm);
+	XftDraw *xd = XftDrawCreate(d, c->tb.win, v, c->cmap);
 	XftColor color;
-	XftColorAllocName(d, v, cm, getenv(JBWM_ENV_FG), &color);
+	XftColorAllocName(d, v, c->cmap, getenv(JBWM_ENV_FG), &color);
 	/* Prevent the text from going over the resize button.  */
-	const uint16_t max_width = c->size.width - 3 * jbwm_get_font_height();
-	XftDrawStringUtf8(xd, &color, f, p->x, p->y, (XftChar8 *) name,
-			  e.width > max_width && e.width > 0
-			  ? l * max_width / e.width : l);
+	const uint16_t max_width = c->size.width
+		- 3 * jbwm_get_font_height();
+	XftDrawStringUtf8(xd, &color, f, p->x, p->y,
+		(XftChar8 *) name, e.width > max_width
+		&& e.width > 0 ? l * max_width / e.width : l);
 	XftDrawDestroy(xd);
-	XftColorFree(d, v, cm, &color);
+	XftColorFree(d, v, c->cmap, &color);
 }
 #endif//JBWM_USE_XFT
 // Free result with XFree if not NULL

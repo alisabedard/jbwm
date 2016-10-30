@@ -4,11 +4,9 @@
 // See README for license and other details.
 #include "button_event.h"
 #include "client.h"
-#include "jbwm.h"
 #include "log.h"
 #include "screen.h"
 #include "title_bar.h"
-#include <stdlib.h>
 #ifdef JBWM_USE_TITLE_BAR
 static void handle_title_bar_button(Display * restrict d,
 	XButtonEvent * restrict e,
