@@ -105,7 +105,7 @@ static void toggle_maximize(Display * restrict d,
 	if (o.shaped || o.no_max || o.fullscreen)
 		return;
 	(o.max_horz && o.max_vert
-	 ? set_maximized : set_not_maximized)(d, c);
+	 ? set_not_maximized : set_maximized)(d, c);
 }
 __attribute__((nonnull(1,3)))
 static void handle_client_key_event(Display * restrict d, const bool mod,
@@ -221,8 +221,8 @@ void jbwm_handle_key_event(Display * restrict d, XKeyEvent * restrict e)
 		break;
 	case XK_0:
 		opt.zero = true;
-	case XK_1: case XK_2: case XK_3: case XK_4: case XK_5: case XK_6:
-	case XK_7: case XK_8: case XK_9:
+	case XK_1: case XK_2: case XK_3: case XK_4: case XK_5:
+	case XK_6: case XK_7: case XK_8: case XK_9:
 		// First desktop 0, per wm-spec
 		cond_client_to_desk(d, c, s, opt.zero
 			? 10 : key - XK_1, opt.mod);
