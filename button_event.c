@@ -8,6 +8,7 @@
 #include "log.h"
 #include "screen.h"
 #include "title_bar.h"
+#include <stdlib.h>
 #ifdef JBWM_USE_TITLE_BAR
 static void handle_title_bar_button(Display * restrict d,
 	XButtonEvent * restrict e,
@@ -15,9 +16,12 @@ static void handle_title_bar_button(Display * restrict d,
 {
 	JBWM_LOG("e->window: %d, c->title_bar: %d, e->subwindow: %d",
 		(int)e->window, (int)c->tb.win, (int)e->subwindow);
-	if (e->subwindow == c->tb.close)
+	struct JBWMClientOptions * o = &c->opt;
+	if (!e->subwindow)
+		jbwm_drag(d, c, false);
+	else if (e->subwindow == c->tb.close && !o->no_close)
 		jbwm_send_wm_delete(d, c);
-	else if (e->subwindow == c->tb.resize)
+	else if (e->subwindow == c->tb.resize && !o->no_resize)
 		jbwm_drag(d, c, !c->opt.no_resize);
 	else if (e->subwindow == c->tb.shade && !c->opt.no_min)
 		jbwm_toggle_shade(d, c);

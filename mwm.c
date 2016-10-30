@@ -43,11 +43,16 @@ static void process_flags(struct JBWMClient * c)
 static void do_functions(struct JBWMClientOptions * restrict o,
 	const enum MwmFunctions f)
 {
-	o->no_resize=!(f & MWM_FUNC_RESIZE);
-	o->no_close=!(f & MWM_FUNC_CLOSE);
-	o->no_min=!(f & MWM_FUNC_MINIMIZE);
-	o->no_max=!(f & MWM_FUNC_MAXIMIZE);
-	o->no_move=!(f & MWM_FUNC_MOVE);
+	if (!(f & MWM_FUNC_RESIZE))
+		o->no_resize = true;
+	if (!(f & MWM_FUNC_CLOSE))
+		o->no_close = true;
+	if (!(f & MWM_FUNC_MINIMIZE))
+		o->no_min = true;
+	if (!(f & MWM_FUNC_MAXIMIZE))
+		o->no_max = true;
+	if (!(f & MWM_FUNC_MOVE))
+		o->no_move = true;
 	JBWM_LOG("MWM_HINTS_FUNCTIONS\topts: %d, %d, %d, %d, %d",
 		o->no_resize, o->no_close, o->no_min, o->no_max,
 		o->no_move);
@@ -57,11 +62,11 @@ static void do_decorations(struct JBWMClientOptions * restrict o,
 {
 	o->no_border=!(f & MWM_DECOR_BORDER);
 	if (!(f & MWM_DECOR_RESIZEH))
-		o->no_resize_decor = true;
+		o->no_resize = true;
 	if (!(f & MWM_DECOR_MENU))
-		o->no_close_decor = true;
+		o->no_close = true;
 	if (!(f & MWM_DECOR_MINIMIZE))
-		o->no_min_decor = true;
+		o->no_min = true;
 	if (!(f & MWM_DECOR_TITLE))
 		o->no_title_bar = true;
 }

@@ -47,8 +47,10 @@ void jbwm_toggle_shade(Display * restrict d, struct JBWMClient * restrict c)
 }
 static uint16_t mv(Display * restrict d, const jbwm_window_t w, uint16_t x)
 {
-	x -= jbwm_get_font_height();
-	XMoveWindow(d, w, x, 0);
+	if (w) {
+		x -= jbwm_get_font_height();
+		XMoveWindow(d, w, x, 0);
+	}
 	return x;
 }
 static void move_buttons(Display * restrict d,
@@ -69,9 +71,10 @@ static jbwm_window_t new_title_bar(Display * restrict d,
 	const struct JBWMPixels * p = &jbwm_get_screens()[c->screen].pixels;
 	const jbwm_window_t t = c->tb.win = get_win(d, c->parent, p->bg);
 	XSelectInput(d, t, ExposureMask);
-	c->tb.close = get_win(d, t, p->close);
-	c->tb.resize = get_win(d, t, p->resize);
-	c->tb.shade = get_win(d, t, p->shade);
+	struct JBWMClientOptions * o = &c->opt;
+	c->tb.close = o->no_close ? 0 : get_win(d, t, p->close);
+	c->tb.resize = o->no_resize ? 0: get_win(d, t, p->resize);
+	c->tb.shade = o->no_min ? 0 : get_win(d, t, p->shade);
 	c->tb.stick = get_win(d, t, p->stick);
 	XMapRaised(d, t);
 	XMapSubwindows(d, t);
