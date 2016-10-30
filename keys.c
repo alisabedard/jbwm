@@ -30,7 +30,7 @@ void jbwm_grab_window_keys(Display * restrict d, const jbwm_window_t win)
 {
 	jbwm_grab_button(d, win, jbwm_keys_data.grab_mask, AnyButton);
 }
-__attribute__((nonnull(1)))
+__attribute__((nonnull))
 static void point(Display * restrict d,
 	struct JBWMClient * restrict c,
 	const int16_t x, const int16_t y)
@@ -38,7 +38,7 @@ static void point(Display * restrict d,
 	XRaiseWindow(d, c->parent);
 	XWarpPointer(d, None, c->window, 0, 0, 0, 0, x, y);
 }
-__attribute__((nonnull(1)))
+__attribute__((nonnull))
 static void commit_key_move(Display * restrict d,
 	struct JBWMClient * restrict c)
 {
@@ -50,7 +50,7 @@ struct KeyMoveFlags {
 	bool horz:1, pos:1, mod:1;
 	uint8_t pad:5;
 };
-__attribute__((nonnull(1)))
+__attribute__((nonnull))
 static void key_move(Display * restrict dpy,
 	struct JBWMClient * restrict c,
 	const struct KeyMoveFlags f)
