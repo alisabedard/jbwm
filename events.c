@@ -16,10 +16,8 @@
 #include "util.h"
 #include <stdlib.h>
 #include <X11/Xatom.h>
-static struct {
-	jbwm_window_t last_window;
-	bool need_cleanup;
-} jbwm_events_data;
+static jbwm_window_t events_last_window;
+static bool events_need_cleanup;
 __attribute__((pure))
 static struct JBWMScreen * get_screen(const int8_t i,
 	const jbwm_window_t root)
@@ -44,12 +42,12 @@ void jbwm_free_client(Display * restrict d, struct JBWMClient * restrict c)
 	jbwm_relink_client_list(c);
 	free(c);
 	/* Allow this client's window id to be reused for another client: */
-	jbwm_events_data.last_window = 0;
+	events_last_window = 0;
 }
 static void cleanup(Display * restrict d)
 {
 	JBWM_LOG("cleanup");
-	jbwm_events_data.need_cleanup = false;
+	events_need_cleanup = false;
 	struct JBWMClient * c = jbwm_get_head_client();
 	struct JBWMClient * i;
 	do {
@@ -90,9 +88,9 @@ static void handle_map_request(XMapRequestEvent * restrict e)
 	JBWM_LOG("MapRequest, send_event:%d", e->send_event);
 	/* This check fixes a race condition in libreoffice dialogs,
 	   where an attempt is made to request mapping twice.  */
-	if(e->window == jbwm_events_data.last_window)
+	if(e->window == events_last_window)
 		return;
-	jbwm_events_data.last_window = e->window;
+	events_last_window = e->window;
 	Display * restrict d = e->display;
 	jbwm_new_client(d, get_screen(ScreenCount(d), e->parent), e->window);
 
@@ -131,7 +129,7 @@ static void iteration(Display * restrict d)
 		if(!c)
 			  break;
 		JBWM_LOG("UnmapNotify: ignore_unmap is %d", c->ignore_unmap);
-		c->opt.remove=jbwm_events_data.need_cleanup
+		c->opt.remove=events_need_cleanup
 			= (c->ignore_unmap--<1);
 		break;
 	case MapRequest:
@@ -162,10 +160,10 @@ static void iteration(Display * restrict d)
 		JBWM_LOG("Unhandled event (%d)", ev.type);
 #endif//EVENT_DEBUG
 	}
-	if (jbwm_events_data.need_cleanup) {
+	if (events_need_cleanup) {
 		cleanup(ev.xany.display);
 		// Fix ignoring every other new window:
-		jbwm_events_data.last_window=0;
+		events_last_window=0;
 	}
 }
 void jbwm_event_loop(Display * restrict d)

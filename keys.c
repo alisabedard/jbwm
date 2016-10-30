@@ -48,6 +48,7 @@ static void commit_key_move(Display * restrict d,
 }
 struct KeyMoveFlags {
 	bool horz:1, pos:1, mod:1;
+	uint8_t pad:5;
 };
 __attribute__((nonnull(1)))
 static void key_move(Display * restrict dpy,
@@ -205,7 +206,7 @@ void jbwm_handle_key_event(Display * restrict d, XKeyEvent * restrict e)
 	struct JBWMClient *c = jbwm_get_current_client();
 	struct JBWMScreen *s = &jbwm_get_screens()[c ? c->screen : 0];
 	struct {
-		uint8_t vdesk:4;
+		uint8_t vdesk:6;
 		bool mod:1;
 		bool zero:1;
 	} opt = {s->vdesk, e->state & jbwm_keys_data.mod_mask, 0};

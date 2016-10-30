@@ -32,5 +32,5 @@ struct JBWMScreen {
 	struct JBWMPixels pixels;
 	struct JBWMSize size;
 	uint8_t screen, vdesk;
-};
+} __attribute__((packed));
 #endif /* not SCREENINFO_H */

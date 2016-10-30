@@ -26,6 +26,7 @@ struct JBWMClientOptions {
 	bool shaped : 1;
 	bool sticky : 1;
 	bool tearoff : 1;
+	int16_t pad : 14;
 };
 #ifdef JBWM_USE_TITLE_BAR
 struct JBWMClientTitlebar {
@@ -37,14 +38,14 @@ struct JBWMClient {
 #ifdef JBWM_USE_TITLE_BAR
 	struct JBWMClientTitlebar tb;
 #endif//JBWM_USE_TITLE_BAR
-	XSizeHints size;
 	jbwm_rectangle_t old_size;
 	jbwm_cmap_t cmap;
 	jbwm_window_t window, parent;
+	struct JBWMClientOptions opt;
 	int8_t ignore_unmap:3;
 	uint8_t border:1;
-	uint8_t screen;
 	uint8_t vdesk:4;
-	struct JBWMClientOptions opt;
-};
+	uint8_t screen;
+	XSizeHints size __attribute__((packed));
+} __attribute__((packed));
 #endif /* JBWM_CLIENT_STRUCT_H */
