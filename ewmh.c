@@ -59,30 +59,22 @@ static void jbwm_ewmh_init(Display * restrict d)
 	};
 	XInternAtoms(d, atom_names, JBWM_EWMH_ATOMS_COUNT, false, jbwm_ewmh);
 }
-static uint16_t get_client_count(void)
-{
-	uint16_t j = 0;
-	// Check against UINT16_MAX to avoid wrap-around
-	for (struct JBWMClient * i = jbwm_get_head_client();
-		j < UINT16_MAX && i; i = i->next, ++j);
-	return j;
-}
 void jbwm_ewmh_update_client_list(Display * restrict d)
 {
-	jbwm_window_t wl[get_client_count()];
-	size_t wl_sz = 0;
-	for (struct JBWMClient * i = jbwm_get_head_client();
-		i; i = i->next, ++wl_sz)
-		wl[wl_sz] = i->window;
 	struct JBWMScreen * s = jbwm_get_screens();
-	for (uint8_t i = ScreenCount(d); i; --i) {
-		jbwm_set_property(d, s[i].root,
-			jbwm_ewmh[JBWM_EWMH_CLIENT_LIST],
-			XA_WINDOW, &wl, wl_sz);
-		// FIXME: Does not correctly report stacking order.
-		jbwm_set_property(d, s[i].root,
-			jbwm_ewmh[JBWM_EWMH_CLIENT_LIST_STACKING],
-			XA_WINDOW, &wl, wl_sz);
+	int8_t i = ScreenCount(d);
+	while(i--) {
+		Window r, *wl;
+		unsigned int n;
+		if (XQueryTree(d, s[i].root, &r, &r, &wl, &n) && wl) {
+			jbwm_set_property(d, s[i].root,
+				jbwm_ewmh[JBWM_EWMH_CLIENT_LIST],
+				XA_WINDOW, &wl, n);
+			jbwm_set_property(d, s[i].root,
+				jbwm_ewmh[JBWM_EWMH_CLIENT_LIST_STACKING],
+				XA_WINDOW, &wl, n);
+			XFree(wl);
+		}
 	}
 }
 static void set_root_vdesk(Display * restrict d, jbwm_window_t r)
