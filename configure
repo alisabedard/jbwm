@@ -1,0 +1,70 @@
+#!/bin/sh
+# Copyright 2016, Jeffrey E. Bedard
+OS=`uname -s`
+CF=config.mk
+echo "# Configuration for $OS" > $CF
+echo "CFLAGS=${CFLAGS}" >> $CF
+echo "LDFLAGS=${LDFLAGS}" >> $CF
+echo "DESTDIR=${DESTDIR}" >> $CF
+echo "PREFIX=${PREFIX}" >> $CF
+DEBUG=false
+EWMH=true
+SHAPE=true
+TBAR=true
+XFT=true
+while getopts 'destx' opt; do
+	case $opt in
+	d) DEBUG=true ;;
+	e) EWMH=false ;;
+	s) SHAPE=false ;;
+	t) TBAR=false ;;
+	x) XFT=false ;;
+	?) for line in '-d enable debugging' '-e disable EWMH' \
+		'-s disable SHAPE' '-t disable title bars' \
+		'-x disable XFT'; do echo $line; done ;;
+	esac
+done
+case $OS in
+	FreeBSD) cat >> $CF <<- EOF
+		# FreeBSD:
+		jbwm_cflags+=-I/usr/local/include
+		jbwm_ldflags+=-L/usr/local/lib
+		EOF
+		;;
+	NetBSD) cat >> $CF <<- EOF
+		# Old NetBSD:
+		jbwm_ldflags+=-Wl,-R/usr/X11R6/lib
+		# NetBSD:
+		jbwm_cflags+=-I/usr/X11R7/include
+		jbwm_cflags+=-I/usr/X11R7/include/freetype2
+		jbwm_cflags+=-Wno-missing-field-initializers
+		jbwm_ldflags+=-L/usr/X11R7/lib
+		jbwm_ldflags+=-Wl,-R/usr/X11R7/lib
+		EOF
+		;;
+	OpenBSD) cat >> $CF <<- EOF
+		# OpenBSD:
+		jbwm_cflags+=-I/usr/X11R6/include
+		jbwm_cflags+=-I/usr/X11R6/include/freetype2
+		jbwm_ldflags+=-L/usr/X11R6/lib
+		EOF
+		;;
+	Linux|?) cat >> $CF <<- EOF
+		EOF
+		;;
+esac
+if $DEBUG; then
+	echo 'include debug.mk' >> $CF
+fi
+if $EWMH; then
+	echo 'include ewmh.mk' >> $CF
+fi
+if $SHAPE; then
+	echo 'include shape.mk' >> $CF
+fi
+if $TBAR; then
+	echo 'include title_bar.mk' >> $CF
+fi
+if $XFT; then
+	echo 'include xft.mk' >> $CF
+fi

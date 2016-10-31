@@ -22,7 +22,6 @@ jbwm_pixel_t jbwm_get_pixel(Display * restrict dpy,
 		name, &c, &d);
 	return c.pixel;
 }
-#if defined(JBWM_USE_EWMH) || defined(JBWM_USE_MWM)
 __attribute__((warn_unused_result))
 void *jbwm_get_property(Display * restrict dpy, jbwm_window_t w,
 	Atom property, uint16_t * num_items)
@@ -38,7 +37,6 @@ void *jbwm_get_property(Display * restrict dpy, jbwm_window_t w,
 	*num_items = n;
 	return prop;
 }
-#endif//JBWM_USE_EWMH||JBWM_USE_MWM
 void jbwm_grab_button(Display * restrict d, const jbwm_window_t w,
 	const unsigned int mask, const unsigned int btn)
 {

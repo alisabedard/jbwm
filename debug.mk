@@ -20,8 +20,3 @@ jbwm_cflags+=-Wpadded
 jbwm_cflags+=-Wredundant-decls -Wpointer-sign
 jbwm_cflags+=-fstrict-aliasing -Wstrict-aliasing=2
 jbwm_cflags+=-Wformat=2
-include ewmh.mk
-include shape.mk
-include title_bar.mk
-include xft.mk
-include jbwm.mk
