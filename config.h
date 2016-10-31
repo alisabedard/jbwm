@@ -8,7 +8,7 @@
 /* Default fonts */
 #ifdef JBWM_USE_XFT
 #define JBWM_DEF_FONT "Sans"
-#define JBWM_FONT_SIZE 10.0
+#define JBWM_FONT_SIZE 11.0
 #else /* ! JBWM_USE_XFT */
 #define JBWM_DEF_FONT "variable"
 #endif /* JBWM_USE_XFT */
