@@ -3,6 +3,7 @@
 OS=`uname -s`
 CF=config.mk
 echo "# Configuration for $OS" > $CF
+echo "CC=${CC}" >> $CF
 echo "CFLAGS=${CFLAGS}" >> $CF
 echo "LDFLAGS=${LDFLAGS}" >> $CF
 echo "DESTDIR=${DESTDIR}" >> $CF
@@ -42,8 +43,11 @@ case $OS in
 		jbwm_ldflags+=-Wl,-R/usr/X11R7/lib
 		EOF
 		;;
-	OpenBSD) cat >> $CF <<- EOF
+	OpenBSD)
+		echo 'Note:  OpenBSD requires clang'
+		cat >> $CF <<- EOF
 		# OpenBSD:
+		CC=clang
 		jbwm_cflags+=-I/usr/X11R6/include
 		jbwm_cflags+=-I/usr/X11R6/include/freetype2
 		jbwm_ldflags+=-L/usr/X11R6/lib
