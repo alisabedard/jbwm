@@ -3,7 +3,6 @@
 OS=`uname -s`
 CF=config.mk
 echo "# Configuration for $OS" > $CF
-echo "CC=${CC}" >> $CF
 echo "CFLAGS=${CFLAGS}" >> $CF
 echo "LDFLAGS=${LDFLAGS}" >> $CF
 echo "DESTDIR=${DESTDIR}" >> $CF
