@@ -1,4 +1,6 @@
+#define DEBUG
 #include "file.h"
+#include "log.h"
 #include "util.h"
 int main(int argc __attribute__((unused)),
 char ** argv __attribute__((unused)))
@@ -11,5 +13,7 @@ char ** argv __attribute__((unused)))
 	// test check
 	jb_check(true, "true");
 	jb_check(false, "false");
+	// test log
+	LOG("LOG %s", "param");
 	return 0;
 }
