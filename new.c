@@ -112,7 +112,8 @@ static struct JBWMClient * get_JBWMClient(const jbwm_window_t w,
 	struct JBWMScreen * s)
 {
 	struct JBWMClient * c = malloc(sizeof(struct JBWMClient));
-	*c = (struct JBWMClient) {.screen = s->screen, .window = w, .border = 1,
+	*c = (struct JBWMClient) {.screen = s->screen,
+		.window = w, .border = 1,
 		.next = jbwm_get_head_client()};
 	return c;
 }
