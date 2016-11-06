@@ -4,4 +4,4 @@
 /*.dbg
 /.*.swp
 /*.log
-
+/config.mk
