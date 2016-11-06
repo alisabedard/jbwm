@@ -1,0 +1,15 @@
+#!/usr/bin/awk -f
+# Copyright 2016, Jeffrey E. Bedard
+# Simple utility to show source code lines that are too long.
+BEGIN {
+	FS="\t";
+	maxc=80;
+}
+{
+	ntabs=NF-1;
+	line=NR;
+	tlen=length($(NF)) + ntabs * 8;
+	if (tlen >= maxc)
+		print("(" FILENAME ": line " NR \
+		      ": length " tlen ")\n\t" $(NF));
+}
