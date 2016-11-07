@@ -62,9 +62,9 @@ static void key_move(Display * restrict dpy,
 	int16_t * xy = f.horz ? &s->x : &s->y;
 	if(f.mod && (*wh > JBWM_RESIZE_INCREMENT << 1)
 		&& !c->opt.shaped && !c->opt.no_resize)
-		wh += d;
+		*wh += d;
 	else
-		xy += d;
+		*xy += d;
 	commit_key_move(dpy, c);
 }
 __attribute__((nonnull(1)))
