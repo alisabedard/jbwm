@@ -23,11 +23,15 @@ struct JBWMClientOptions {
 	bool shaped : 1;
 	bool sticky : 1;
 	bool tearoff : 1;
-	int16_t pad : 2;
-};
+	bool pad : 1;
+} __attribute__((packed));
 #ifdef JBWM_USE_TITLE_BAR
 struct JBWMClientTitlebar {
 	jbwm_window_t win, close, resize, shade, stick;
+};
+struct JBWMRectangle {
+	int16_t x, y;
+	uint16_t width, height;
 };
 #endif//JBWM_USE_TITLE_BAR
 struct JBWMClient {
@@ -43,6 +47,6 @@ struct JBWMClient {
 	uint8_t border:1;
 	uint8_t vdesk:4;
 	uint8_t screen;
-	XSizeHints size __attribute__((packed));
+	struct JBWMRectangle size;
 } __attribute__((packed));
 #endif /* JBWM_CLIENT_STRUCT_H */

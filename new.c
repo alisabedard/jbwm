@@ -66,24 +66,34 @@ static void init_properties(
 	c->vdesk = jbwm_get_screens()[c->screen].vdesk;
 	c->vdesk = wm_desktop(d, c->window, c->vdesk);
 }
-__attribute__((nonnull))
-static void init_geometry(Display * restrict d, struct JBWMClient * c)
+static bool get_viewable(Display * restrict d,
+	struct JBWMClient * restrict c)
 {
 	XWindowAttributes attr;
 	XGetWindowAttributes(d, c->window, &attr);
 	c->cmap = attr.colormap;
-	XGetWMNormalHints(d, c->window, &(c->size), &(long){0});
-	c->size.width = (attr.width >= c->size.min_width)
-		? attr.width : c->size.min_width;
-	c->size.height = (attr.height >= c->size.min_height)
-		? attr.height : c->size.min_height;
-	const bool pos = (attr.map_state == IsViewable)
-	    || (c->size.flags & USPosition);
-	struct JBWMScreen * s = &jbwm_get_screens()[c->screen];
-	c->size.x = pos ? attr.x : (s->size.w >> 1) - (c->size.width >> 1);
-	c->size.y = pos ? attr.y : (s->size.h >> 1) - (c->size.height >> 1);
+	c->size.x = attr.x;
+	c->size.y = attr.y;
+	c->size.width = attr.width;
+	c->size.height = attr.height;
+	return attr.map_state == IsViewable;
+}
+static void center(struct JBWMClient * restrict c)
+{
+	struct JBWMRectangle * restrict g = &c->size;
+	if (g->x || g->y)
+		return; // geometry has been set
+	const struct JBWMSize ss = jbwm_get_screens()[c->screen].size;
+	g->x = (ss.w >> 1) - (g->width >> 1);
+	g->y = (ss.h >> 1) - (g->height >> 1);
+}
+__attribute__((nonnull))
+static void init_geometry(Display * restrict d, struct JBWMClient * c)
+{
+	const bool v = get_viewable(d, c);
 	// Test if the reparent that is to come would trigger an unmap event.
-	c->ignore_unmap += attr.map_state == IsViewable ? 1 : 0;
+	c->ignore_unmap += v ? 1 : 0;
+	center(c);
 }
 __attribute__((nonnull))
 static Window get_parent(Display * restrict d, struct JBWMClient * restrict c)

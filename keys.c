@@ -57,11 +57,14 @@ static void key_move(Display * restrict dpy,
 {
 	const int8_t d = f.pos ? JBWM_RESIZE_INCREMENT
 		: -JBWM_RESIZE_INCREMENT;
-	XSizeHints * restrict s = &c->size;
-	int * wh = f.horz ? &s->width : &s->height;
-	int * xy = f.horz ? &s->x : &s->y;
-	*(f.mod && (*wh > JBWM_RESIZE_INCREMENT<<1)
-		&& !c->opt.shaped && !c->opt.no_resize ? wh : xy) += d;
+	struct JBWMRectangle * restrict s = &c->size;
+	uint16_t * wh = f.horz ? &s->width : &s->height;
+	int16_t * xy = f.horz ? &s->x : &s->y;
+	if(f.mod && (*wh > JBWM_RESIZE_INCREMENT << 1)
+		&& !c->opt.shaped && !c->opt.no_resize)
+		wh += d;
+	else
+		xy += d;
 	commit_key_move(dpy, c);
 }
 __attribute__((nonnull(1)))

@@ -31,7 +31,8 @@ static void draw_outline(Display * restrict d, struct JBWMClient * restrict c)
 		+ offset);
 }
 __attribute__((nonnull))
-static void configure(Display * restrict d, XSizeHints * restrict g,
+static void configure(Display * restrict d,
+	struct JBWMRectangle * restrict g,
 	const jbwm_window_t w)
 {
 	XSendEvent(d, w, true, StructureNotifyMask, (XEvent *)

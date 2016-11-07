@@ -17,7 +17,7 @@ static int16_t sborder(const int16_t xy, const int16_t edge)
 }
 void jbwm_snap_border(struct JBWMClient *restrict c)
 {
-	XSizeHints *restrict g = &(c->size);
+	struct JBWMRectangle * restrict g = &(c->size);
 	/* snap to screen border */
 	const uint8_t b = 2 * c->border;
 	g->x = sborder(g->x, 0 - b);
@@ -54,7 +54,7 @@ static XPoint search(struct JBWMClient * c)
 		if ((ci == c) || (ci->screen != c->screen)
 		    || (ci->vdesk != c->vdesk))
 			continue;
-		XSizeHints *restrict gi = &(ci->size);
+		struct JBWMRectangle * restrict gi = &(ci->size);
 		const uint8_t b = c->border;
 		if ((gi->y - c->size.height - c->size.y <= d.x)
 		    && (c->size.y - gi->height - gi->y <= d.x))
