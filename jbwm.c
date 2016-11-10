@@ -145,6 +145,11 @@ static bool check_redirect(const jbwm_window_t w)
 {
 	XWindowAttributes a;
 	XGetWindowAttributes(jbwm_data.display, w, &a);
+	JBWM_LOG("check_redirect(0x%x): override_redirect: %s, "
+		"map_state: %s", (int)w,
+		a.override_redirect ? "true" : "false",
+		a.map_state == IsViewable ? "IsViewable"
+		: "not IsViewable");
 	return (!a.override_redirect && (a.map_state == IsViewable));
 }
 // Free returned data with XFree()
@@ -161,9 +166,13 @@ static void setup_clients(struct JBWMScreen * restrict s)
 {
 	uint16_t n;
 	jbwm_window_t * restrict w = get_windows(s->root, &n);
+	JBWM_LOG("Started with %d clients", n);
 	while (n--)
-		if (check_redirect(w[n]))
+		if (check_redirect(w[n])) {
+			JBWM_LOG("Starting client %d, window 0x%x",
+				n, (int)w[n]);
 			jbwm_new_client(jbwm_data.display, s, w[n]);
+		}
 	XFree(w);
 }
 static void setup_screen_elements(const uint8_t i)
