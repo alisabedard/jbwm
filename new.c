@@ -54,13 +54,7 @@ static void set_frame_extents(Display * restrict d, struct JBWMClient * c)
 #define set_frame_extents(d, c)
 #endif//JBWM_USE_EWMH
 __attribute__((nonnull))
-static void init_properties(
-#if defined(JBWM_USE_EWMH) || defined(JBWM_USE_MWM)
-	Display * restrict d,
-#else//!JBWM_USE_EWMH&&!JBWM_USE_MWM
-	Display * restrict d __attribute__((unused)),
-#endif//JBWM_USE_EWMH||JBWM_USE_MWM
-	struct JBWMClient * c)
+static void init_properties(Display * restrict d, struct JBWMClient * c)
 {
 	jbwm_handle_mwm_hints(d, c);
 	c->vdesk = jbwm_get_screens()[c->screen].vdesk;
@@ -90,9 +84,9 @@ static void center(struct JBWMClient * restrict c)
 __attribute__((nonnull))
 static void init_geometry(Display * restrict d, struct JBWMClient * c)
 {
-	const bool v = get_viewable(d, c);
 	// Test if the reparent that is to come would trigger an unmap event.
-	c->ignore_unmap += v ? 1 : 0;
+	if (get_viewable(d, c))
+		++c->ignore_unmap;
 	center(c);
 }
 __attribute__((nonnull))
@@ -123,8 +117,7 @@ static struct JBWMClient * get_JBWMClient(const jbwm_window_t w,
 {
 	struct JBWMClient * c = malloc(sizeof(struct JBWMClient));
 	*c = (struct JBWMClient) {.screen = s->screen,
-		.window = w, .border = 1,
-		.next = jbwm_get_head_client()};
+		.window = w, .border = 1, .next = jbwm_get_head_client()};
 	return c;
 }
 // Grab input and setup JBWM_USE_EWMH for client window
