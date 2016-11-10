@@ -43,12 +43,14 @@ static void process_flags(struct JBWMClient * c)
 static void do_functions(struct JBWMClientOptions * restrict o,
 	const enum MwmFunctions f)
 {
+#if 0
 	if (!(f & MWM_FUNC_RESIZE))
 		o->no_resize = true;
 	if (!(f & MWM_FUNC_CLOSE))
 		o->no_close = true;
 	if (!(f & MWM_FUNC_MINIMIZE))
 		o->no_min = true;
+#endif
 	if (!(f & MWM_FUNC_MAXIMIZE))
 		o->no_max = true;
 	if (!(f & MWM_FUNC_MOVE))
