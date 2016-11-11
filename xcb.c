@@ -45,6 +45,7 @@ void jb_check_x(xcb_connection_t * x)
 }
 xcb_connection_t * jb_get_xcb_connection(const char * display, int * screen)
 {
+	errno = 0;
 	xcb_connection_t * x = xcb_connect(display, screen);
 	jb_check_x(x);
 	return x;
