@@ -1,13 +1,12 @@
 // Copyright 2016, Jeffrey E. Bedard
 #include "xcb.h"
 #include "log.h"
-#include "util.h"
-// Include this just to check syntax
+// Include here to check syntax:
 #include "size.h"
+#include "util.h"
 #include <errno.h>
 #include <string.h>
 #include <sys/select.h>
-#include <unistd.h>
 bool jb_xcb_cookie_has_error(xcb_connection_t * x, const xcb_void_cookie_t c)
 {
 	xcb_generic_error_t * e = xcb_request_check(x, c);
