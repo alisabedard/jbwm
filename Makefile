@@ -1,4 +1,5 @@
-version=0.2
+# Copyright 2016, Jeffrey E. Bedard
+version=0.3
 libjb_cflags+=-Wall -Wextra
 libjb_cflags+=-D_XOPEN_SOURCE=700
 libjb_cflags+=-DJB_VERSION=${version}
