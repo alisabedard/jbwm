@@ -43,14 +43,18 @@ static void process_flags(struct JBWMClient * c)
 static void do_functions(struct JBWMClientOptions * restrict o,
 	const enum MwmFunctions f)
 {
-#if 0
+	/* Qt 4 and 5 exhibit bad behavior if these three checks are
+	   not disabled.  Since Qt 4 and 5 applications are much more
+	   common than Motif applications today, defer to behavior
+	   which works with both.  */
+#ifdef JBWM_NO_QT_FIX
 	if (!(f & MWM_FUNC_RESIZE))
 		o->no_resize = true;
-	if (!(f & MWM_FUNC_CLOSE))
-		o->no_close = true;
 	if (!(f & MWM_FUNC_MINIMIZE))
 		o->no_min = true;
-#endif
+	if (!(f & MWM_FUNC_CLOSE))
+		o->no_close = true;
+#endif//JBWM_NO_QT_FIX
 	if (!(f & MWM_FUNC_MAXIMIZE))
 		o->no_max = true;
 	if (!(f & MWM_FUNC_MOVE))
