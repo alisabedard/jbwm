@@ -174,3 +174,14 @@ bool jb_next_event_timed(xcb_connection_t * x,
 	*e = xcb_poll_for_event(x);
 	return true;
 }
+bool jb_open_font(xcb_connection_t * xc, xcb_font_t fid,
+	const char * name)
+{
+	xcb_void_cookie_t c = xcb_open_font_checked(xc, fid,
+		strlen(name), name);
+	if (jb_xcb_cookie_has_error(xc, c)) {
+		LIBJB_WARN("Failed to load font: %s", name);
+		return false;
+	}
+	return true;
+}
