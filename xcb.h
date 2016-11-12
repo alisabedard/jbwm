@@ -25,6 +25,7 @@ xcb_connection_t * jb_get_xcb_connection(const char * display, int * screen);
 xcb_screen_t * jb_get_xcb_screen(xcb_connection_t * x);
 bool jb_next_event_timed(xcb_connection_t * x,
 	xcb_generic_event_t ** e, const uint32_t delay);
+// Open font specified by name.  initialized fid must be supplied
 bool jb_open_font(xcb_connection_t * xc, xcb_font_t fid,
 	const char * name);
 pixel_t jb_set_bg(xcb_connection_t * x, const xcb_gc_t gc, const pixel_t p);

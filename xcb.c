@@ -174,6 +174,7 @@ bool jb_next_event_timed(xcb_connection_t * x,
 	*e = xcb_poll_for_event(x);
 	return true;
 }
+// Open font specified by name.  initialized fid must be supplied
 bool jb_open_font(xcb_connection_t * xc, xcb_font_t fid,
 	const char * name)
 {
