@@ -96,6 +96,34 @@ xcb_atom_t jb_get_atom(xcb_connection_t * x, const char * name)
 	free(r);
 	return a;
 }
+/* Create a gc with foreground and background as specified.
+   If gc is passed as 0, a new gc value is generated and returned.  */
+xcb_gc_t jb_create_gc(xcb_connection_t * xc, xcb_gc_t gc,
+	const xcb_window_t win, const char * restrict fg,
+	const char * restrict bg)
+{
+	const xcb_get_window_attributes_cookie_t wac
+		= xcb_get_window_attributes(xc, win);
+	if (!gc)
+		gc = xcb_generate_id(xc);
+	{
+		xcb_void_cookie_t c
+			= xcb_create_gc_checked(xc, gc, win, 0, NULL);
+		xcb_generic_error_t * e = xcb_request_check (xc, c);
+		if (jb_check(!e, "Could not create gc"))
+			free(e);
+	}
+	xcb_get_window_attributes_reply_t * r
+		= xcb_get_window_attributes_reply(xc, wac, NULL);
+	jb_require(r, "Could not get colormap information.");
+	const xcb_colormap_t cm = r->colormap;
+	free(r);
+	const pixel_t fgpx = jb_get_pixel(xc, cm, fg);
+	const pixel_t bgpx = jb_get_pixel(xc, cm, bg);
+	xcb_change_gc(xc, gc, XCB_GC_FOREGROUND | XCB_GC_BACKGROUND,
+		(uint32_t[]){fgpx, bgpx});
+	return gc;
+}
 bool jb_next_event_timed(xcb_connection_t * x,
 	xcb_generic_event_t ** e, const uint32_t delay)
 {

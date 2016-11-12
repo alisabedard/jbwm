@@ -6,6 +6,9 @@
 #include <xcb/xcb.h>
 typedef uint32_t pixel_t;
 void jb_check_x(xcb_connection_t * x);
+xcb_gc_t jb_create_gc(xcb_connection_t * xc, xcb_gc_t gc,
+	const xcb_window_t win, const char * restrict fg,
+	const char * restrict bg);
 xcb_connection_t * jb_get_xcb_connection(const char * display, int * screen);
 xcb_screen_t * jb_get_xcb_screen(xcb_connection_t * x);
 pixel_t jb_get_pixel(xcb_connection_t * x, const xcb_colormap_t cmap,
