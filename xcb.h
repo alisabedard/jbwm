@@ -1,11 +1,13 @@
 // Copyright 2016, Jeffrey E. Bedard
-#ifndef JB_XCB_H
-#define JB_XCB_H
+#ifndef LIBJB_XCB_H
+#define LIBJB_XCB_H
 #include <stdbool.h>
 #include <stdint.h>
 #include <xcb/xcb.h>
 typedef uint32_t pixel_t;
 void jb_check_x(xcb_connection_t * x);
+/* Create a gc with foreground and background as specified.
+   If gc is passed as 0, a new gc value is generated and returned.  */
 xcb_gc_t jb_create_gc(xcb_connection_t * xc, xcb_gc_t gc,
 	const xcb_window_t win, const char * restrict fg,
 	const char * restrict bg);
@@ -22,4 +24,4 @@ bool jb_next_event_timed(xcb_connection_t * x,
 	xcb_generic_event_t ** e, const uint32_t delay);
 bool jb_xcb_cookie_has_error(xcb_connection_t * x,
 	const xcb_void_cookie_t c);
-#endif//!JB_XCB_H
+#endif//!LIBJB_XCB_H
