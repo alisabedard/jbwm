@@ -78,14 +78,21 @@ pixel_t jb_get_rgb_pixel(xcb_connection_t * x, const xcb_colormap_t cm,
 	free(rpl);
 	return p;
 }
+pixel_t jb_set_fg(xcb_connection_t * x, const xcb_gc_t gc, const pixel_t p)
+{
+	xcb_change_gc(x, gc, XCB_GC_FOREGROUND, &(uint32_t){p});
+	return p;
+}
+pixel_t jb_set_bg(xcb_connection_t * x, const xcb_gc_t gc, const pixel_t p)
+{
+	xcb_change_gc(x, gc, XCB_GC_BACKGROUND, &(uint32_t){p});
+	return p;
+}
 static pixel_t jb_set_named_color(xcb_connection_t * xc, const xcb_gc_t gc,
 	const char * color, const bool is_fg)
 {
-	pixel_t p;
-	xcb_change_gc(xc, gc, is_fg ? XCB_GC_FOREGROUND
-		: XCB_GC_BACKGROUND, &(uint32_t){p = jb_get_pixel(xc,
-		jb_get_default_colormap(xc), color)});
-	return p;
+	return (is_fg ? jb_set_fg : jb_set_bg)(xc, gc,
+		jb_get_pixel(xc, jb_get_default_colormap(xc), color));
 }
 pixel_t jb_set_named_fg(xcb_connection_t * xc, const xcb_gc_t gc,
 	const char * color)
@@ -96,16 +103,6 @@ pixel_t jb_set_named_bg(xcb_connection_t * xc, const xcb_gc_t gc,
 	const char * color)
 {
 	return jb_set_named_color(xc, gc, color, false);
-}
-pixel_t jb_set_fg(xcb_connection_t * x, const xcb_gc_t gc, const pixel_t p)
-{
-	xcb_change_gc(x, gc, XCB_GC_FOREGROUND, &(uint32_t){p});
-	return p;
-}
-pixel_t jb_set_bg(xcb_connection_t * x, const xcb_gc_t gc, const pixel_t p)
-{
-	xcb_change_gc(x, gc, XCB_GC_BACKGROUND, &(uint32_t){p});
-	return p;
 }
 xcb_atom_t jb_get_atom(xcb_connection_t * x, const char * name)
 {
