@@ -78,6 +78,25 @@ pixel_t jb_get_rgb_pixel(xcb_connection_t * x, const xcb_colormap_t cm,
 	free(rpl);
 	return p;
 }
+static pixel_t jb_set_named_color(xcb_connection_t * xc, const xcb_gc_t gc,
+	const char * color, const bool is_fg)
+{
+	pixel_t p;
+	xcb_change_gc(xc, gc, is_fg ? XCB_GC_FOREGROUND
+		: XCB_GC_BACKGROUND, &(uint32_t){p = jb_get_pixel(xc,
+		jb_get_default_colormap(xc), color)});
+	return p;
+}
+pixel_t jb_set_named_fg(xcb_connection_t * xc, const xcb_gc_t gc,
+	const char * color)
+{
+	return jb_set_named_color(xc, gc, color, true);
+}
+pixel_t jb_set_named_bg(xcb_connection_t * xc, const xcb_gc_t gc,
+	const char * color)
+{
+	return jb_set_named_color(xc, gc, color, false);
+}
 pixel_t jb_set_fg(xcb_connection_t * x, const xcb_gc_t gc, const pixel_t p)
 {
 	xcb_change_gc(x, gc, XCB_GC_FOREGROUND, &(uint32_t){p});
@@ -96,12 +115,33 @@ xcb_atom_t jb_get_atom(xcb_connection_t * x, const char * name)
 	free(r);
 	return a;
 }
+static xcb_colormap_t get_cmap_from_winattr(xcb_connection_t * xc,
+	xcb_get_window_attributes_cookie_t wac)
+{
+	xcb_get_window_attributes_reply_t * r
+		= xcb_get_window_attributes_reply(xc, wac, NULL);
+	jb_require(r, "Could not get colormap information.");
+	const xcb_colormap_t cm = r->colormap;
+	free(r);
+	return cm;
+}
+xcb_colormap_t jb_get_colormap(xcb_connection_t * xc,
+	const xcb_window_t win)
+{
+	return get_cmap_from_winattr(xc,
+		xcb_get_window_attributes(xc, win));
+}
+xcb_colormap_t jb_get_default_colormap(xcb_connection_t * xc)
+{
+	return jb_get_xcb_screen(xc)->default_colormap;
+}
 /* Create a gc with foreground and background as specified.
    If gc is passed as 0, a new gc value is generated and returned.  */
 xcb_gc_t jb_create_gc(xcb_connection_t * xc, xcb_gc_t gc,
 	const xcb_window_t win, const char * restrict fg,
 	const char * restrict bg)
 {
+	// defer processing reply
 	const xcb_get_window_attributes_cookie_t wac
 		= xcb_get_window_attributes(xc, win);
 	if (!gc)
@@ -113,11 +153,7 @@ xcb_gc_t jb_create_gc(xcb_connection_t * xc, xcb_gc_t gc,
 		if (jb_check(!e, "Could not create gc"))
 			free(e);
 	}
-	xcb_get_window_attributes_reply_t * r
-		= xcb_get_window_attributes_reply(xc, wac, NULL);
-	jb_require(r, "Could not get colormap information.");
-	const xcb_colormap_t cm = r->colormap;
-	free(r);
+	const xcb_colormap_t cm = get_cmap_from_winattr(xc, wac);
 	const pixel_t fgpx = jb_get_pixel(xc, cm, fg);
 	const pixel_t bgpx = jb_get_pixel(xc, cm, bg);
 	xcb_change_gc(xc, gc, XCB_GC_FOREGROUND | XCB_GC_BACKGROUND,
