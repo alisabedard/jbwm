@@ -186,3 +186,17 @@ bool jb_open_font(xcb_connection_t * xc, xcb_font_t fid,
 	}
 	return true;
 }
+void jb_set_window_name(xcb_connection_t * xc, const xcb_window_t win,
+	char * name)
+{
+	xcb_change_property(xc, XCB_PROP_MODE_REPLACE, win,
+		XCB_ATOM_WM_NAME, XCB_ATOM_STRING, 8,
+		strlen(name), name);
+}
+void jb_set_icon_name(xcb_connection_t * xc, const xcb_window_t win,
+	char * name)
+{
+	xcb_change_property(xc, XCB_PROP_MODE_REPLACE, win,
+		XCB_ATOM_WM_ICON_NAME, XCB_ATOM_STRING, 8,
+		strlen(name), name);
+}

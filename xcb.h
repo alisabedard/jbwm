@@ -30,10 +30,14 @@ bool jb_open_font(xcb_connection_t * xc, xcb_font_t fid,
 	const char * name);
 pixel_t jb_set_bg(xcb_connection_t * x, const xcb_gc_t gc, const pixel_t p);
 pixel_t jb_set_fg(xcb_connection_t * x, const xcb_gc_t gc, const pixel_t p);
+void jb_set_icon_name(xcb_connection_t * xc, const xcb_window_t win,
+	char * name);
 pixel_t jb_set_named_bg(xcb_connection_t * xc, const xcb_gc_t gc,
 	const char * color);
 pixel_t jb_set_named_fg(xcb_connection_t * xc, const xcb_gc_t gc,
 	const char * color);
+void jb_set_window_name(xcb_connection_t * xc, const xcb_window_t win,
+	char * name);
 bool jb_xcb_cookie_has_error(xcb_connection_t * x,
 	const xcb_void_cookie_t c);
 #endif//!LIBJB_XCB_H
