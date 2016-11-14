@@ -1,8 +1,8 @@
 // Copyright 2016, Jeffrey E. Bedard
 #include "xcb.h"
-#include "log.h"
 // Include here to check syntax:
-#include "size.h"
+#include "JBDim.h"
+#include "log.h"
 #include "util.h"
 #include <errno.h>
 #include <string.h>
