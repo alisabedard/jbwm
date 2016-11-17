@@ -54,40 +54,40 @@ static void set_frame_extents(Display * restrict d, struct JBWMClient * c)
 #define set_frame_extents(d, c)
 #endif//JBWM_USE_EWMH
 __attribute__((nonnull))
-static void init_properties(Display * restrict d, struct JBWMClient * c)
+static void init_properties(
+#if defined(JBWM_USE_EWMH) || defined(JBWM_USE_MWM)
+	Display * restrict d,
+#else//!JBWM_USE_EWMH&&!JBWM_USE_MWM
+	Display * restrict d __attribute__((unused)),
+#endif//JBWM_USE_EWMH||JBWM_USE_MWM
+	struct JBWMClient * c)
 {
 	jbwm_handle_mwm_hints(d, c);
 	c->vdesk = jbwm_get_screens()[c->screen].vdesk;
 	c->vdesk = wm_desktop(d, c->window, c->vdesk);
 }
-static bool get_viewable(Display * restrict d,
-	struct JBWMClient * restrict c)
+__attribute__((nonnull))
+static void init_geometry(Display * restrict d, struct JBWMClient * c)
 {
 	XWindowAttributes attr;
 	XGetWindowAttributes(d, c->window, &attr);
 	c->cmap = attr.colormap;
-	c->size.x = attr.x;
-	c->size.y = attr.y;
-	c->size.width = attr.width;
-	c->size.height = attr.height;
-	return attr.map_state == IsViewable;
-}
-static void center(struct JBWMClient * restrict c)
-{
-	struct JBWMRectangle * restrict g = &c->size;
-	if (g->x || g->y)
-		return; // geometry has been set
-	const struct JBWMSize ss = jbwm_get_screens()[c->screen].size;
-	g->x = (ss.w >> 1) - (g->width >> 1);
-	g->y = (ss.h >> 1) - (g->height >> 1);
-}
-__attribute__((nonnull))
-static void init_geometry(Display * restrict d, struct JBWMClient * c)
-{
+	bool pos = attr.map_state == IsViewable;
+	{ // h scope
+		XSizeHints h;
+		XGetWMNormalHints(d, c->window, &h, &(long){0});
+		c->size.width = (attr.width >= h.min_width)
+			? attr.width : h.min_width;
+		c->size.height = (attr.height >= h.min_height)
+			? attr.height : h.min_height;
+		if (h.flags & USPosition)
+			pos = true;
+	}
+	struct JBWMScreen * s = &jbwm_get_screens()[c->screen];
+	c->size.x = pos ? attr.x : (s->size.w >> 1) - (c->size.width >> 1);
+	c->size.y = pos ? attr.y : (s->size.h >> 1) - (c->size.height >> 1);
 	// Test if the reparent that is to come would trigger an unmap event.
-	if (get_viewable(d, c))
-		++c->ignore_unmap;
-	center(c);
+	c->ignore_unmap += attr.map_state == IsViewable ? 1 : 0;
 }
 __attribute__((nonnull))
 static Window get_parent(Display * restrict d, struct JBWMClient * restrict c)
@@ -117,7 +117,8 @@ static struct JBWMClient * get_JBWMClient(const jbwm_window_t w,
 {
 	struct JBWMClient * c = malloc(sizeof(struct JBWMClient));
 	*c = (struct JBWMClient) {.screen = s->screen,
-		.window = w, .border = 1, .next = jbwm_get_head_client()};
+		.window = w, .border = 1,
+		.next = jbwm_get_head_client()};
 	return c;
 }
 // Grab input and setup JBWM_USE_EWMH for client window
