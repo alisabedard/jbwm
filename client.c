@@ -35,7 +35,7 @@ void jbwm_relink_client_list(struct JBWMClient * c)
 		jbwm_client_data.current = NULL;
 	if (jbwm_client_data.head == c) {
 		jbwm_client_data.head = c->next;
-		return;
+		return; // removed first client
 	}
 	for (struct JBWMClient * p = jbwm_client_data.head;
 		p && p->next; p = p->next) {
@@ -49,7 +49,7 @@ void jbwm_set_client_vdesk(Display * restrict dpy,
 	struct JBWMClient * restrict c, const uint8_t d)
 {
 	JBWM_LOG("jbwm_set_client_vdesk");
-	const uint8_t p = c->vdesk;
+	const uint8_t p = c->vdesk; // save previous
 	c->vdesk = d;
 	// use jbwm_set_vdesk to validate d:
 	struct JBWMScreen * s = &jbwm_get_screens()[c->screen];
@@ -164,7 +164,7 @@ static bool has_delete_proto(Display * restrict d, const jbwm_window_t w)
 	bool found=false;
 	Atom *p;
 	int i;
-	if(XGetWMProtocols(d, w, &p, &i)) {
+	if (XGetWMProtocols(d, w, &p, &i)) {
 		while(i-- && !found)
 			found = p[i] == get_wm_delete_window(d);
 		XFree(p);
@@ -178,7 +178,7 @@ void jbwm_send_wm_delete(Display * restrict d, struct JBWMClient * restrict c)
 		return;
 	}
 	c->opt.remove = true;
-	has_delete_proto(d, c->window)?xmsg(d, c->window,
+	has_delete_proto(d, c->window) ? xmsg(d, c->window,
 		get_wm_protocols(d), get_wm_delete_window(d))
 		: XKillClient(d, c->window);
 }
