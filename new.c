@@ -17,6 +17,11 @@
 #include "util.h"
 #include <stdlib.h>
 #include <X11/Xatom.h>
+#define DEBUG_NEW
+#ifndef DEBUG_NEW
+#undef JBWM_LOG
+#define JBWM_LOG(...)
+#endif//!DEBUG_NEW
 #ifdef JBWM_USE_EWMH
 static uint8_t wm_desktop(Display * d, const jbwm_window_t w, uint8_t vdesk)
 {
@@ -32,7 +37,7 @@ static uint8_t wm_desktop(Display * d, const jbwm_window_t w, uint8_t vdesk)
 				XA_CARDINAL, &vdesk, 1);
 		XFree(lprop);
 	}
-	JBWM_LOG("wm_desktop(): vdesk is %d\n", vdesk);
+	JBWM_LOG("wm_desktop(w: %d): vdesk is %d\n", (int) w, vdesk);
 	return vdesk;
 }
 #else//!JBWM_USE_EWMH
@@ -84,6 +89,7 @@ static void init_geometry(Display * restrict d, struct JBWMClient * c)
 			pos = true;
 	}
 	struct JBWMScreen * s = &jbwm_get_screens()[c->screen];
+	JBWM_LOG("init_geometry() pos: %d", (int) pos);
 	c->size.x = pos ? attr.x : (s->size.w >> 1) - (c->size.width >> 1);
 	c->size.y = pos ? attr.y : (s->size.h >> 1) - (c->size.height >> 1);
 	// Test if the reparent that is to come would trigger an unmap event.
@@ -132,7 +138,7 @@ static void do_grabs(Display * restrict d, const jbwm_window_t w)
 void jbwm_new_client(Display * restrict d, struct JBWMScreen * restrict s,
 	const jbwm_window_t w)
 {
-	JBWM_LOG("jbwm_new_client(%d,s)", (int)w);
+	JBWM_LOG("jbwm_new_client(..., w: %d)", (int)w);
 	struct JBWMClient * c = get_JBWMClient(w, s);
 	jbwm_set_head_client(c);
 	do_grabs(d, w);

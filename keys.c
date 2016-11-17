@@ -14,6 +14,11 @@
 #include "util.h"
 #include <stdlib.h>
 #include <unistd.h>
+//#define DEBUG_KEYS
+#ifndef DEBUG_KEYS
+#undef JBWM_LOG
+#define JBWM_LOG(...)
+#endif//!DEBUG_KEYS
 static struct {
 	uint16_t grab_mask, mod_mask;
 } jbwm_keys_data = { .grab_mask = JBWM_KEYMASK_GRAB,

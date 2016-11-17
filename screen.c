@@ -17,6 +17,11 @@
 #include <stdlib.h>
 #include <X11/cursorfont.h>
 #include <X11/Xatom.h>
+//#define DEBUG_SCREEN
+#ifndef DEBUG_SCREEN
+#undef JBWM_LOG
+#define JBWM_LOG(...)
+#endif//!DEBUG_SCREEN
 enum {JBWMMouseMask=(ButtonPressMask|ButtonReleaseMask|PointerMotionMask)};
 __attribute__ ((hot,nonnull))
 static void draw_outline(Display * restrict d, struct JBWMClient * restrict c)

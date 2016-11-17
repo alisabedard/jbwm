@@ -16,6 +16,11 @@
 #include "util.h"
 #include <stdlib.h>
 #include <X11/Xatom.h>
+//#define DEBUG_EVENTS
+#ifndef DEBUG_EVENTS
+#undef JBWM_LOG
+#define JBWM_LOG(...)
+#endif//!DEBUG_EVENTS
 static jbwm_window_t events_last_window;
 static bool events_need_cleanup;
 __attribute__((pure))

@@ -18,6 +18,11 @@
 #ifdef JBWM_USE_XFT
 #include <X11/Xft/Xft.h>
 #endif//JBWM_USE_XFT
+//#define DEBUG_JBWM
+#ifndef DEBUG_JBWM
+#undef JBWM_LOG
+#define JBWM_LOG(...)
+#endif//!DEBUG_JBWM
 // Main application data structure.
 //struct jbwm jbwm;
 static struct {
