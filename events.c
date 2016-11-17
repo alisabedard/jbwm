@@ -19,7 +19,9 @@
 //#define DEBUG_EVENTS
 #ifndef DEBUG_EVENTS
 #undef JBWM_LOG
+#undef jbwm_print_atom
 #define JBWM_LOG(...)
+#define jbwm_print_atom(...)
 #endif//!DEBUG_EVENTS
 static jbwm_window_t events_last_window;
 static bool events_need_cleanup;
@@ -65,9 +67,7 @@ static void cleanup(Display * restrict d)
 static void handle_property_change(XPropertyEvent * restrict e,
 	struct JBWMClient * restrict c)
 {
-#ifdef EVENT_DEBUG
 	jbwm_print_atom(e->atom, __FILE__, __LINE__);
-#endif//EVENT_DEBUG
 	if(e->state != PropertyNewValue)
 		  return;
 	if (e->atom == XA_WM_NAME)
@@ -160,10 +160,10 @@ static void iteration(Display * restrict d)
 		jbwm_ewmh_handle_client_message(&ev.xclient, c);
 		break;
 #endif//JBWM_USE_EWMH
-#ifdef EVENT_DEBUG
+#ifdef DEBUG_EVENTS
 	default:
 		JBWM_LOG("Unhandled event (%d)", ev.type);
-#endif//EVENT_DEBUG
+#endif//DEBUG_EVENTS
 	}
 	if (events_need_cleanup) {
 		cleanup(ev.xany.display);
