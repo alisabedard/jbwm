@@ -5,11 +5,11 @@
 struct JBDim {
 	union {
 		uint16_t width, w, columns, cols, col, c;
-		int16_t x, top, t, max;
+		int16_t x, top, t, max, start;
 	};
 	union {
 		uint16_t height, h, row, rows, r;
-		int16_t y, bottom, bot, b, min, index;
+		int16_t y, bottom, bot, b, min, index, end;
 	};
 };
 #endif//!LIBJB_JBDIM_H
