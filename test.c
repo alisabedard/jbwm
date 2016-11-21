@@ -9,7 +9,9 @@ char ** argv __attribute__((unused)))
 	fd_t f = jb_open("/dev/null", O_RDONLY);
 	close(f);
 	// test failure
-	f = jb_open("/dev/does_not_exist", O_RDONLY);
+#define TF "/dev/does_not_exist"
+	f = jb_open(TF, O_RDONLY);
+	jb_check(f != -1, TF);
 	// test check
 	jb_check(true, "true");
 	jb_check(false, "false");
