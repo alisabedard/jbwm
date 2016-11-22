@@ -71,6 +71,11 @@ static void init_properties(
 	c->vdesk = jbwm_get_screens()[c->screen].vdesk;
 	c->vdesk = wm_desktop(d, c->window, c->vdesk);
 }
+__attribute__((const))
+static uint16_t get_per_min(uint16_t spec, uint16_t min)
+{
+	return (spec >= min) ? spec : min;
+}
 __attribute__((nonnull))
 static void init_geometry(Display * restrict d, struct JBWMClient * c)
 {
@@ -78,20 +83,19 @@ static void init_geometry(Display * restrict d, struct JBWMClient * c)
 	XGetWindowAttributes(d, c->window, &attr);
 	c->cmap = attr.colormap;
 	bool pos = attr.map_state == IsViewable;
+	struct JBWMRectangle * g = &c->size;
 	{ // h scope
 		XSizeHints h;
 		XGetWMNormalHints(d, c->window, &h, &(long){0});
-		c->size.width = (attr.width >= h.min_width)
-			? attr.width : h.min_width;
-		c->size.height = (attr.height >= h.min_height)
-			? attr.height : h.min_height;
+		g->width = get_per_min(attr.width, h.min_width);
+		g->height = get_per_min(attr.height, h.min_height);
 		if (h.flags & USPosition)
 			pos = true;
 	}
 	struct JBWMScreen * s = &jbwm_get_screens()[c->screen];
 	JBWM_LOG("init_geometry() pos: %d", (int) pos);
-	c->size.x = pos ? attr.x : (s->size.w >> 1) - (c->size.width >> 1);
-	c->size.y = pos ? attr.y : (s->size.h >> 1) - (c->size.height >> 1);
+	g->x = pos ? attr.x : (s->size.w >> 1) - (g->width >> 1);
+	g->y = pos ? attr.y : (s->size.h >> 1) - (g->height >> 1);
 	// Test if the reparent that is to come would trigger an unmap event.
 	c->ignore_unmap += attr.map_state == IsViewable ? 1 : 0;
 }
