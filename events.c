@@ -16,7 +16,7 @@
 #include "util.h"
 #include <stdlib.h>
 #include <X11/Xatom.h>
-//#define DEBUG_EVENTS
+#define DEBUG_EVENTS
 #ifndef DEBUG_EVENTS
 #undef JBWM_LOG
 #undef jbwm_print_atom
@@ -67,7 +67,7 @@ static void cleanup(Display * restrict d)
 static void handle_property_change(XPropertyEvent * restrict e,
 	struct JBWMClient * restrict c)
 {
-	jbwm_print_atom(e->atom, __FILE__, __LINE__);
+	jbwm_print_atom(e->display, e->atom, __FILE__, __LINE__);
 	if(e->state != PropertyNewValue)
 		  return;
 	if (e->atom == XA_WM_NAME)
@@ -98,7 +98,6 @@ static void handle_map_request(XMapRequestEvent * restrict e)
 	events_last_window = e->window;
 	Display * restrict d = e->display;
 	jbwm_new_client(d, get_screen(ScreenCount(d), e->parent), e->window);
-
 }
 static void iteration(Display * restrict d)
 {
@@ -106,6 +105,9 @@ static void iteration(Display * restrict d)
 	XNextEvent(d, &ev);
 	struct JBWMClient * restrict c = jbwm_get_client(ev.xany.window);
 	switch (ev.type) {
+	case MotionNotify:
+		// ignore
+		return;
 	case KeyPress:
 		jbwm_handle_key_event(ev.xkey.display, &ev.xkey);
 		break;
@@ -140,6 +142,10 @@ static void iteration(Display * restrict d)
 	case MapRequest:
 		if (!c)
 			handle_map_request(&ev.xmaprequest);
+		break;
+	case ConfigureNotify:
+		if (c)
+			jbwm_update_title_bar(ev.xconfigure.display, c);
 		break;
 	case ConfigureRequest:
 		handle_configure_request(&ev.xconfigurerequest);
