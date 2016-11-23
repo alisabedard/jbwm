@@ -5,6 +5,9 @@
 #ifndef JBWM_SCREEN_H
 #define JBWM_SCREEN_H
 #include "JBWMClient.h"
+void jbwm_configure_client(Display * restrict d,
+	struct JBWMClient * restrict c)
+	__attribute__((nonnull));
 void jbwm_drag(Display * restrict d,
 	struct JBWMClient * restrict c, const bool resize)
 	__attribute__((nonnull));

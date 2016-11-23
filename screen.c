@@ -44,6 +44,12 @@ static void configure(Display * restrict d,
 		&(XConfigureEvent){.x = g->x, .y = g->y, .width = g->width,
 		.height = g->height, .type = ConfigureNotify, .event = w });
 }
+__attribute__((nonnull))
+void jbwm_configure_client(Display * restrict d,
+	struct JBWMClient * restrict c)
+{
+	configure(d, &c->size, c->window);
+}
 static void grab_pointer(Display * restrict d, const jbwm_window_t w)
 {
 	static Cursor c;
@@ -124,7 +130,7 @@ void jbwm_drag(Display * restrict d, struct JBWMClient * restrict c,
 	XUngrabPointer(d, CurrentTime);
 	jbwm_move_resize(d, c);
 	if (!resize && !c->opt.tearoff)
-		configure(d, (&c->size), c->window);
+		jbwm_configure_client(d, c);
 }
 void jbwm_move_resize(Display * restrict d, struct JBWMClient * restrict c)
 {
