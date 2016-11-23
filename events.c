@@ -10,6 +10,7 @@
 #include "jbwm.h"
 #include "keys.h"
 #include "log.h"
+#include "macros.h"
 #include "new.h"
 #include "screen.h"
 #include "title_bar.h"
@@ -19,10 +20,13 @@
 #define DEBUG_EVENTS
 #ifndef DEBUG_EVENTS
 #undef JBWM_LOG
-#undef jbwm_print_atom
 #define JBWM_LOG(...)
-#define jbwm_print_atom(...)
 #endif//!DEBUG_EVENTS
+//#define DEBUG_ATOMS
+#ifndef DEBUG_ATOMS
+#undef jbwm_print_atom
+#define jbwm_print_atom(...)
+#endif//!DEBUG_ATOMS
 static jbwm_window_t events_last_window;
 static bool events_need_cleanup;
 __attribute__((pure))
@@ -81,7 +85,9 @@ static void handle_property_change(XPropertyEvent * restrict e,
 }
 static void handle_configure_request(XConfigureRequestEvent * restrict e)
 {
-	JBWM_LOG("handle_configure_request");
+	JBWM_LOG("handle_configure_request():"
+		"x: %d, y: %d, w: %d, h: %d",
+		e->x, e->y, e->width, e->height);
 	XConfigureWindow(e->display, e->window, e->value_mask,
 		&(XWindowChanges){ .x = e->x, .y = e->y,
 		.width = e->width, .height = e->height,
@@ -99,15 +105,22 @@ static void handle_map_request(XMapRequestEvent * restrict e)
 	Display * restrict d = e->display;
 	jbwm_new_client(d, get_screen(ScreenCount(d), e->parent), e->window);
 }
-static void iteration(Display * restrict d)
+void jbwm_event_loop(Display * restrict d)
 {
 	XEvent ev;
+event_loop:
 	XNextEvent(d, &ev);
 	struct JBWMClient * restrict c = jbwm_get_client(ev.xany.window);
 	switch (ev.type) {
+	case ButtonRelease:
+	case ConfigureNotify:
+	case KeyRelease:
+	case MapNotify:
+	case MappingNotify:
 	case MotionNotify:
+	case ReparentNotify:
 		// ignore
-		return;
+		goto event_loop;
 	case KeyPress:
 		jbwm_handle_key_event(ev.xkey.display, &ev.xkey);
 		break;
@@ -119,12 +132,12 @@ static void iteration(Display * restrict d)
 	case EnterNotify:
 		if(c && (ev.xcrossing.window == c->parent))
 			  jbwm_select_client(ev.xcrossing.display, c);
-		break;
+		goto event_loop;
 #ifdef JBWM_USE_TITLE_BAR
 	case Expose:
 		if (c && !ev.xexpose.count)
 			  jbwm_update_title_bar(ev.xexpose.display, c);
-		break;
+		goto event_loop;
 #endif//JBWM_USE_TITLE_BAR
 #ifdef JBWM_USE_EWMH
 	case CreateNotify:
@@ -136,32 +149,28 @@ static void iteration(Display * restrict d)
 		if(!c)
 			  break;
 		JBWM_LOG("UnmapNotify: ignore_unmap is %d", c->ignore_unmap);
-		c->opt.remove=events_need_cleanup
+		c->opt.remove = events_need_cleanup
 			= (c->ignore_unmap--<1);
 		break;
 	case MapRequest:
 		if (!c)
 			handle_map_request(&ev.xmaprequest);
-		break;
-	case ConfigureNotify:
-		if (c) {
-			jbwm_update_title_bar(ev.xconfigure.display, c);
-		}
-		break;
+		goto event_loop;
 	case ConfigureRequest:
-		handle_configure_request(&ev.xconfigurerequest);
-		break;
+		if (c)
+			handle_configure_request(&ev.xconfigurerequest);
+		goto event_loop;
 	case PropertyNotify:
 		if (c)
 			handle_property_change(&ev.xproperty, c);
-		break;
+		goto event_loop;
 	case ColormapNotify:
 		if (c && ev.xcolormap.new) {
 			JBWM_LOG("ColormapNotify");
 			c->cmap = ev.xcolormap.colormap;
 			XInstallColormap(ev.xcolormap.display, c->cmap);
 		}
-		break;
+		goto event_loop;
 #ifdef JBWM_USE_EWMH
 	case ClientMessage:
 		jbwm_ewmh_handle_client_message(&ev.xclient, c);
@@ -177,9 +186,6 @@ static void iteration(Display * restrict d)
 		// Fix ignoring every other new window:
 		events_last_window=0;
 	}
+	goto event_loop;
 }
-void jbwm_event_loop(Display * restrict d)
-{
-	for(;;)
-		iteration(d);
-}
+

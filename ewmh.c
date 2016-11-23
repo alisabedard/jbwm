@@ -123,7 +123,7 @@ static jbwm_window_t init_supporting(Display * restrict d,
 	jbwm_set_property(d, w, jbwm_ewmh[JBWM_EWMH_SUPPORTING_WM_CHECK],
 		XA_WINDOW, &w, 1);
 	jbwm_set_property(d, w, jbwm_ewmh[JBWM_EWMH_WM_NAME],
-		XA_STRING, "jbwm", 4);
+		XA_STRING, JBWM_NAME, sizeof(JBWM_NAME));
 	jbwm_set_property(d, w, jbwm_ewmh[JBWM_EWMH_WM_PID],
 		XA_CARDINAL, &(pid_t){getpid()}, 1);
 	return w;
