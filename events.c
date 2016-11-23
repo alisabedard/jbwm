@@ -144,8 +144,9 @@ static void iteration(Display * restrict d)
 			handle_map_request(&ev.xmaprequest);
 		break;
 	case ConfigureNotify:
-		if (c)
+		if (c) {
 			jbwm_update_title_bar(ev.xconfigure.display, c);
+		}
 		break;
 	case ConfigureRequest:
 		handle_configure_request(&ev.xconfigurerequest);

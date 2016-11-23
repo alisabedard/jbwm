@@ -29,11 +29,11 @@ struct JBWMClientOptions {
 struct JBWMClientTitlebar {
 	jbwm_window_t win, close, resize, shade, stick;
 };
+#endif//JBWM_USE_TITLE_BAR
 struct JBWMRectangle {
 	int16_t x, y;
 	uint16_t width, height;
 };
-#endif//JBWM_USE_TITLE_BAR
 struct JBWMClient {
 	struct JBWMClient *next;
 #ifdef JBWM_USE_TITLE_BAR
