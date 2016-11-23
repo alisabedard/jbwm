@@ -95,13 +95,15 @@ static void drag_event_loop(Display * restrict d,
 		jbwm_get_screens()[c->screen].root);
 	const jbwm_point_t original = {c->size.x, c->size.y};
 	for (;;) {
-		XEvent e;
-		XMaskEvent(d, JBWMMouseMask, &e);
-		if (e.type != MotionNotify)
-			return;
-		draw_outline(d, c);
-		do_changes(c, resize, start, original,
-			e.xmotion.x, e.xmotion.y);
+		{ // e scope
+			XEvent e;
+			XMaskEvent(d, JBWMMouseMask, &e);
+			if (e.type != MotionNotify)
+				return;
+			draw_outline(d, c);
+			do_changes(c, resize, start, original,
+				e.xmotion.x, e.xmotion.y);
+		}
 		if (c->border)
 			draw_outline(d, c);
 		else
