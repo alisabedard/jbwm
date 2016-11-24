@@ -28,6 +28,5 @@ void jbwm_set_client_vdesk(struct JBWMClient * restrict c, const uint8_t d)
 void jbwm_set_head_client(struct JBWMClient * restrict c);
 // Set WM_STATE property
 void jbwm_set_wm_state(struct JBWMClient * restrict c, const int8_t state);
-void jbwm_toggle_sticky(struct JBWMClient * c)
-	__attribute__((nonnull));
+void jbwm_toggle_sticky(struct JBWMClient * c) __attribute__((nonnull));
 #endif /* JBWM_CLIENT_H */

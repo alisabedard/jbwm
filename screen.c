@@ -45,10 +45,9 @@ static void configure(Display * restrict d,
 		.height = g->height, .type = ConfigureNotify, .event = w });
 }
 __attribute__((nonnull))
-void jbwm_configure_client(Display * restrict d,
-	struct JBWMClient * restrict c)
+static inline void jbwm_configure_client(struct JBWMClient * restrict c)
 {
-	configure(d, &c->size, c->window);
+	configure(c->d, &c->size, c->window);
 }
 static void grab_pointer(Display * restrict d, const jbwm_window_t w)
 {
@@ -130,7 +129,7 @@ void jbwm_drag(Display * restrict d, struct JBWMClient * restrict c,
 	XUngrabPointer(d, CurrentTime);
 	jbwm_move_resize(d, c);
 	if (!resize && !c->opt.tearoff)
-		jbwm_configure_client(d, c);
+		jbwm_configure_client(c);
 }
 void jbwm_move_resize(Display * restrict d, struct JBWMClient * restrict c)
 {
