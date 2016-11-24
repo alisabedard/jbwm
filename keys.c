@@ -90,15 +90,13 @@ static void handle_key_move(struct JBWMClient * restrict c,
 }
 static void set_maximized(struct JBWMClient * restrict c)
 {
-	Display * d = c->d;
-	jbwm_set_horz(d, c);
-	jbwm_set_vert(d, c);
+	jbwm_set_horz(c);
+	jbwm_set_vert(c);
 }
 static void set_not_maximized(struct JBWMClient * restrict c)
 {
-	Display * d = c->d;
-	jbwm_set_not_horz(d, c);
-	jbwm_set_not_vert(d, c);
+	jbwm_set_not_horz(c);
+	jbwm_set_not_vert(c);
 }
 static void toggle_maximize(struct JBWMClient * restrict c)
 {
@@ -118,9 +116,8 @@ static void handle_client_key_event(struct JBWMClient * restrict c,
 	JBWM_LOG("handle_client_key_event: %d", (int)key);
 	if (c->opt.fullscreen) {
 		// only allow exiting from fullscreen
-		if (key == JBWM_KEY_FS) {
-			jbwm_set_not_fullscreen(d, c);
-		}
+		if (key == JBWM_KEY_FS)
+			jbwm_set_not_fullscreen(c);
 		return; // prevent other operations while fullscreen
 	}
 	switch (key) {
@@ -141,16 +138,16 @@ static void handle_client_key_event(struct JBWMClient * restrict c,
 		XRaiseWindow(d, c->parent);
 		break;
 	case JBWM_KEY_FS:
-		jbwm_set_fullscreen(d, c);
+		jbwm_set_fullscreen(c);
 		break;
 	case JBWM_KEY_MAX:
 		toggle_maximize(c);
 		break;
 	case JBWM_KEY_MAX_H:
-		(c->opt.max_horz ? jbwm_set_not_horz : jbwm_set_horz)(d, c);
+		(c->opt.max_horz ? jbwm_set_not_horz : jbwm_set_horz)(c);
 		break;
 	case JBWM_KEY_MAX_V:
-		(c->opt.max_vert ? jbwm_set_not_vert : jbwm_set_vert)(d, c);
+		(c->opt.max_vert ? jbwm_set_not_vert : jbwm_set_vert)(c);
 		break;
 	case JBWM_KEY_STICK:
 		jbwm_toggle_sticky(c);

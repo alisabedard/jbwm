@@ -57,32 +57,32 @@ void jbwm_ewmh_add_state(Display * d, const Window w, Atom state)
   data.l[2] = second property to alter
   data.l[3] = source indication
   other data.l[] elements = 0 */
-static void set_state(Display * restrict d, struct JBWMClient * restrict c,
+static void set_state(struct JBWMClient * restrict c,
 	const bool add, const enum JBWMAtomIndex t)
 {
 	if (!c)
 		return;
 	switch(t) {
 	case JBWM_EWMH_WM_STATE_FULLSCREEN:
-		add?jbwm_set_fullscreen(d, c):jbwm_set_not_fullscreen(d, c);
+		(add?jbwm_set_fullscreen:jbwm_set_not_fullscreen)(c);
 		break;
 	case JBWM_EWMH_WM_STATE_STICKY:
 		c->opt.sticky=add;
 		break;
 	case JBWM_EWMH_WM_STATE_ABOVE:
-		(add ? XRaiseWindow : XLowerWindow)(d, c->parent);
+		(add ? XRaiseWindow : XLowerWindow)(c->d, c->parent);
 		break;
 	case JBWM_EWMH_WM_STATE_BELOW:
-		(add ? XLowerWindow : XRaiseWindow)(d, c->parent);
+		(add ? XLowerWindow : XRaiseWindow)(c->d, c->parent);
 		break;
 	case JBWM_EWMH_WM_STATE_HIDDEN:
 		JBWM_LOG("HIDDEN");
 		break;
 	case JBWM_EWMH_WM_STATE_MAXIMIZED_VERT:
-		(add ? jbwm_set_vert : jbwm_set_not_vert)(d, c);
+		(add ? jbwm_set_vert : jbwm_set_not_vert)(c);
 		break;
 	case JBWM_EWMH_WM_STATE_MAXIMIZED_HORZ:
-		(add ? jbwm_set_horz : jbwm_set_not_horz)(d, c);
+		(add ? jbwm_set_horz : jbwm_set_not_horz)(c);
 		break;
 	default:
 		break;
@@ -103,17 +103,17 @@ static void check_state(XClientMessageEvent * e,	// event data
 	switch (e->data.l[0]) {
 	default:
 	case 0:	// remove
-		set_state(d, c, false, t);
+		set_state(c, false, t);
 		jbwm_ewmh_remove_state(d, e->window, state);
 		break;
 	case 1:	// add
-		set_state(d, c, true, t);
+		set_state(c, true, t);
 		jbwm_ewmh_add_state(d, e->window, state);
 		break;
 	case 2:{	// toggle
 			const bool add = !ewmh_get_state(e->display,
 				e->window, state);
-			set_state(d, c, add, t);
+			set_state(c, add, t);
 			if (add)
 				jbwm_ewmh_add_state(d, e->window, state);
 			else
