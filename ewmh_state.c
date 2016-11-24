@@ -151,10 +151,11 @@ static bool client_specific_message(XClientMessageEvent * restrict e,
 }
 static void handle_moveresize(XClientMessageEvent * restrict e)
 {
-	const uint8_t src = (e->data.l[0] >> 12) & 3;
+	enum {SRC_SHIFT = 12, SRC_MASK = 3, VM_SHIFT = 8, VM_MASK = 0xf};
+	const uint8_t src = (e->data.l[0] >> SRC_SHIFT) & SRC_MASK;
 	if (src != 2)
 		return;
-	const int vm = (e->data.l[0] >> 8) & 0x0f;
+	const uint32_t vm = (e->data.l[0] >> VM_SHIFT) & VM_MASK;
 	XConfigureWindow(e->display, e->window,
 		vm, &(XWindowChanges){
 		.x = e->data.l[1], .y = e->data.l[2],
