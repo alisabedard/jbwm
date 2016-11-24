@@ -74,7 +74,7 @@ static void handle_property_change(XPropertyEvent * restrict e,
 	if(e->state != PropertyNewValue)
 		return;
 	if (e->atom == XA_WM_NAME)
-		jbwm_update_title_bar(e->display, c);
+		jbwm_update_title_bar(c);
 	else {
 		if (e->atom == jbwm_get_wm_state(e->display))
 			jbwm_move_resize(c);
@@ -125,8 +125,7 @@ event_loop:
 		break;
 	case ButtonPress:
 		if(c)
-			jbwm_handle_button_event(ev.xbutton.display,
-				&ev.xbutton, c);
+			jbwm_handle_button_event(&ev.xbutton, c);
 		break;
 	case EnterNotify:
 		if(c && (ev.xcrossing.window == c->parent))
@@ -135,7 +134,7 @@ event_loop:
 #ifdef JBWM_USE_TITLE_BAR
 	case Expose:
 		if (c && !ev.xexpose.count)
-			jbwm_update_title_bar(ev.xexpose.display, c);
+			jbwm_update_title_bar(c);
 		goto event_loop;
 #endif//JBWM_USE_TITLE_BAR
 #ifdef JBWM_USE_EWMH

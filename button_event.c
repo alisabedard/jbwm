@@ -8,8 +8,7 @@
 #include "screen.h"
 #include "title_bar.h"
 #ifdef JBWM_USE_TITLE_BAR
-static void handle_title_bar_button(Display * restrict d,
-	XButtonEvent * restrict e,
+static void handle_title_bar_button(XButtonEvent * restrict e,
 	struct JBWMClient * restrict c)
 {
 	JBWM_LOG("e->window: %d, c->title_bar: %d, e->subwindow: %d",
@@ -22,27 +21,28 @@ static void handle_title_bar_button(Display * restrict d,
 	else if (e->subwindow == c->tb.resize && !o->no_resize)
 		jbwm_drag(c, !c->opt.no_resize);
 	else if (e->subwindow == c->tb.shade && !c->opt.no_min)
-		jbwm_toggle_shade(d, c);
+		jbwm_toggle_shade(c);
 	else if (e->subwindow == c->tb.stick)
 		jbwm_toggle_sticky(c);
 	else
 		jbwm_drag(c, false);
 }
 #else//!JBWM_USE_TITLE_BAR
-#define handle_title_bar_button(d, e, c) jbwm_drag(d, c, false)
+#define handle_title_bar_button(e, c) jbwm_drag(c, false)
 #endif//JBWM_USE_TITLE_BAR
-void jbwm_handle_button_event(Display * restrict d,
-	XButtonEvent * restrict e,
+__attribute__((nonnull))
+void jbwm_handle_button_event(XButtonEvent * restrict e,
 	struct JBWMClient * restrict c)
 {
 	JBWM_LOG("jbwm_handle_button_event");
 	const bool fs = c->opt.fullscreen;
+	Display * d = e->display;
 	switch (e->button) {
 	case Button1:
 		if (fs)
-			XRaiseWindow(d, c->parent);
+			XRaiseWindow(c->d, c->parent);
 		else
-			handle_title_bar_button(d, e, c);
+			handle_title_bar_button(e, c);
 		break;
 	case Button2:
 		XLowerWindow(d, c->parent);
@@ -54,7 +54,7 @@ void jbwm_handle_button_event(Display * restrict d,
 		   to register a middle button press, even
 		   with X Emulate3Buttons enabled.  */
 		if (fs)
-			XLowerWindow(d, c->parent);
+			XLowerWindow(c->d, c->parent);
 		else
 			jbwm_drag(c, !c->opt.shaded);
 		break;

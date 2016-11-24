@@ -15,35 +15,33 @@
 #include "config.h"
 #include <X11/Xft/Xft.h>
 #endif//JBWM_USE_XFT
-static void set_shaded(Display * restrict d,
-	struct JBWMClient * restrict c)
+static void set_shaded(struct JBWMClient * restrict c)
 {
 	c->old_size.height = c->size.height;
 	c->size.height = -1;
 	c->opt.shaded = true;
 	jbwm_set_wm_state(c, IconicState);
-	jbwm_ewmh_add_state(d, c->window,
+	jbwm_ewmh_add_state(c->d, c->window,
 		jbwm_ewmh_get_atom(JBWM_EWMH_WM_STATE_SHADED));
 	jbwm_select_client(c);
 }
-static void set_not_shaded(Display * restrict d,
-	struct JBWMClient * restrict c)
+static void set_not_shaded(struct JBWMClient * restrict c)
 {
 	c->size.height = c->old_size.height;
 	c->opt.shaded = false;
 	jbwm_move_resize(c);
 	jbwm_set_wm_state(c, NormalState);
-	jbwm_ewmh_remove_state(d, c->window,
+	jbwm_ewmh_remove_state(c->d, c->window,
 		jbwm_ewmh_get_atom(JBWM_EWMH_WM_STATE_SHADED));
 }
-void jbwm_toggle_shade(Display * restrict d, struct JBWMClient * restrict c)
+void jbwm_toggle_shade(struct JBWMClient * restrict c)
 {
 	// Honor !MJBWM_EWMH_WM_FUNC_MINIMIZE
 	if (c->opt.no_min || c->opt.fullscreen)
 		return;
 	// This implements window shading, a substitute for iconification.
-	(c->opt.shaded ? set_not_shaded : set_shaded)(d, c);
-	jbwm_update_title_bar(d, c);
+	(c->opt.shaded ? set_not_shaded : set_shaded)(c);
+	jbwm_update_title_bar(c);
 }
 static uint16_t mv(Display * restrict d, const jbwm_window_t w, uint16_t x)
 {
@@ -145,11 +143,12 @@ static void remove_title_bar(Display * restrict d,
 		XA_CARDINAL, (&(jbwm_atom_t[]){b, b, b, b}), 4);
 #endif//JBWM_USE_EWMH
 }
-void jbwm_update_title_bar(Display * restrict d, struct JBWMClient * c)
+void jbwm_update_title_bar(struct JBWMClient * c)
 {
 	if (c->opt.shaped)
 		return;
 	jbwm_window_t w = c->tb.win;
+	Display * d = c->d;
 	if (c->opt.fullscreen && w) {
 		remove_title_bar(d, c);
 		return;

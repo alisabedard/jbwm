@@ -159,7 +159,7 @@ static void handle_client_key_event(struct JBWMClient * restrict c,
 		jbwm_drag(c, false);
 		break;
 	case JBWM_KEY_SHADE:
-		jbwm_toggle_shade(d, c);
+		jbwm_toggle_shade(c);
 		break;
 	}
 }
