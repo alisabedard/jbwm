@@ -115,10 +115,11 @@ static void toggle_maximize(Display * restrict d,
 	(o.max_horz && o.max_vert
 	 ? set_not_maximized : set_maximized)(d, c);
 }
-__attribute__((nonnull(1,3)))
-static void handle_client_key_event(Display * restrict d, const bool mod,
-	struct JBWMClient * restrict c, const KeySym key)
+__attribute__((nonnull))
+static void handle_client_key_event(struct JBWMClient * restrict c,
+	const bool mod, const KeySym key)
 {
+	Display * d = c->d;
 	JBWM_LOG("handle_client_key_event: %d", (int)key);
 	if (c->opt.fullscreen) {
 		// only allow exiting from fullscreen
@@ -243,7 +244,7 @@ void jbwm_handle_key_event(Display * restrict d, XKeyEvent * restrict e)
 		break;
 	default:
 		if (c)
-			handle_client_key_event(d, opt.mod, c, key);
+			handle_client_key_event(c, opt.mod, key);
 	}
 }
 __attribute__((nonnull))
