@@ -10,6 +10,7 @@
 #include "jbwm.h"
 #include "keys.h"
 #include "log.h"
+#include "macros.h"
 #include "mwm.h"
 #include "screen.h"
 #include "shape.h"
@@ -43,21 +44,6 @@ static uint8_t wm_desktop(Display * d, const jbwm_window_t w, uint8_t vdesk)
 #else//!JBWM_USE_EWMH
 #define wm_desktop(d, w, vdesk) vdesk
 #endif//JBWM_USE_EWMH
-#ifdef JBWM_USE_EWMH
-__attribute__((nonnull))
-static void set_frame_extents(Display * restrict d, struct JBWMClient * c)
-{
-	// Required by wm-spec 1.4:
-	const uint8_t b = c->border;
-	jbwm_set_property(d, c->window,
-		jbwm_ewmh_get_atom(JBWM_EWMH_FRAME_EXTENTS), XA_CARDINAL,
-		(&(jbwm_atom_t[]){b, b, b
-		 + (c->opt.no_title_bar ? 0
-			 : jbwm_get_font_height()), b}), 4);
-}
-#else//!JBWM_USE_EWMH
-#define set_frame_extents(d, c)
-#endif//JBWM_USE_EWMH
 __attribute__((nonnull))
 static void init_properties(
 #if defined(JBWM_USE_EWMH) || defined(JBWM_USE_MWM)
@@ -79,25 +65,37 @@ static uint16_t get_per_min(uint16_t spec, uint16_t min)
 __attribute__((nonnull))
 static void init_geometry(Display * restrict d, struct JBWMClient * c)
 {
-	XWindowAttributes attr;
-	XGetWindowAttributes(d, c->window, &attr);
-	c->cmap = attr.colormap;
-	bool pos = attr.map_state == IsViewable;
+	XWindowAttributes a;
+	XGetWindowAttributes(d, c->window, &a);
+	JBWM_LOG("XGetWindowAttributes() win: 0x%x, x: %d, y: %d, w: %d, h: %d",
+		(int)c->window, a.x, a.y, a.width, a.height);
+	c->cmap = a.colormap;
+	bool pos = a.map_state == IsViewable;
 	struct JBWMRectangle * g = &c->size;
 	{ // h scope
 		XSizeHints h;
 		XGetWMNormalHints(d, c->window, &h, &(long){0});
-		g->width = get_per_min(attr.width, h.min_width);
-		g->height = get_per_min(attr.height, h.min_height);
+		if (h.flags & USSize) {
+			// if size hints provided, use them
+			g->width = get_per_min(h.width, h.min_width);
+			g->height = get_per_min(h.height, h.min_height);
+		} else { // use existing window attributes
+			g->width = a.width;
+			g->height = a.height;
+		}
 		if (h.flags & USPosition)
 			pos = true;
 	}
 	struct JBWMScreen * s = &jbwm_get_screens()[c->screen];
-	JBWM_LOG("init_geometry() pos: %d", (int) pos);
-	g->x = pos ? attr.x : (s->size.w >> 1) - (g->width >> 1);
-	g->y = pos ? attr.y : (s->size.h >> 1) - (g->height >> 1);
+	// sanitize dimensions:
+	g->width = JB_MIN(g->width, s->size.w);
+	g->height = JB_MIN(g->height, s->size.h);
+	g->x = pos ? a.x : (s->size.w >> 1) - (g->width >> 1);
+	g->y = pos ? a.y : (s->size.h >> 1) - (g->height >> 1);
 	// Test if the reparent that is to come would trigger an unmap event.
-	c->ignore_unmap += attr.map_state == IsViewable ? 1 : 0;
+	c->ignore_unmap += a.map_state == IsViewable ? 1 : 0;
+	JBWM_LOG("init_geometry() win: 0x%x, x: %d, y: %d, w: %d, h: %d",
+		(int)c->window, g->x, g->y, g->width, g->height);
 }
 __attribute__((nonnull))
 static Window get_parent(Display * restrict d, struct JBWMClient * restrict c)
@@ -146,10 +144,8 @@ void jbwm_new_client(Display * restrict d, struct JBWMScreen * restrict s,
 	struct JBWMClient * c = get_JBWMClient(w, s);
 	jbwm_set_head_client(c);
 	do_grabs(d, w);
-	init_properties(d, c);
 	init_geometry(d, c);
+	init_properties(d, c);
 	reparent(d, c);
-	set_frame_extents(d, c);
 	jbwm_restore_client(d, c);
-	jbwm_update_title_bar(d, c);
 }
