@@ -63,10 +63,10 @@ static jbwm_window_t get_win(Display * restrict d, const Window p,
 	uint8_t h = jbwm_get_font_height();
 	return XCreateSimpleWindow(d, p, 0, 0, h, h, 0, 0, bg);
 }
-static jbwm_window_t new_title_bar(Display * restrict d,
-	struct JBWMClient * restrict c)
+static jbwm_window_t new_title_bar(struct JBWMClient * restrict c)
 {
 	const struct JBWMPixels * p = &jbwm_get_screens()[c->screen].pixels;
+	Display * d = c->d;
 	const jbwm_window_t t = c->tb.win = get_win(d, c->parent, p->bg);
 	XSelectInput(d, t, ExposureMask);
 	struct JBWMClientOptions * o = &c->opt;
@@ -81,11 +81,12 @@ static jbwm_window_t new_title_bar(Display * restrict d,
 }
 #ifdef JBWM_USE_XFT
 static void
-draw_xft(Display * restrict d, struct JBWMClient * restrict c,
-	const XPoint * restrict p, char * restrict name, const size_t l)
+draw_xft(struct JBWMClient * restrict c, const XPoint * restrict p,
+	char * restrict name, const size_t l)
 {
 	XftFont * f = jbwm_get_font();
 	XGlyphInfo e;
+	Display * d = c->d;
 	XftTextExtentsUtf8(d, f, (XftChar8 *) name, l, &e);
 	const uint8_t s = c->screen;
 	Visual *v = DefaultVisual(d, s);
@@ -111,8 +112,9 @@ static char * jbwm_get_title(Display * restrict d, const jbwm_window_t w)
 		  return NULL;
 	return (char *)tp.value;
 }
-static void draw_title(Display * restrict d, struct JBWMClient * restrict c)
+static void draw_title(struct JBWMClient * restrict c)
 {
+	Display * d = c->d;
 	char * name = jbwm_get_title(d, c->window);
 	if(!name)
 		return; // No title could be loaded, abort
@@ -122,17 +124,17 @@ static void draw_title(Display * restrict d, struct JBWMClient * restrict c)
 	while(name[++l])
 		  ;
 #ifdef JBWM_USE_XFT
-	draw_xft(d, c, &p, name, l);
+	draw_xft(c, &p, name, l);
 #else//!JBWM_USE_XFT
 	XDrawString(d, c->tb.win, jbwm_get_screens()[c->screen].gc,
 		p.x, p.y, name, l);
 #endif//JBWM_USE_XFT
 	XFree(name);
 }
-static void remove_title_bar(Display * restrict d,
-	struct JBWMClient * restrict c)
+static void remove_title_bar(struct JBWMClient * restrict c)
 {
 	c->ignore_unmap++;
+	Display * d = c->d;
 	XDestroyWindow(d, c->tb.win);
 	c->tb.win = 0;
 #ifdef JBWM_USE_EWMH
@@ -150,11 +152,11 @@ void jbwm_update_title_bar(struct JBWMClient * c)
 	jbwm_window_t w = c->tb.win;
 	Display * d = c->d;
 	if (c->opt.fullscreen && w) {
-		remove_title_bar(d, c);
+		remove_title_bar(c);
 		return;
 	}
 	if (!w)
-		w = new_title_bar(d, c);
+		w = new_title_bar(c);
 	/* Expand/Contract the title bar width as necessary:  */
 	{
 		const uint16_t width = c->size.width;
@@ -162,8 +164,8 @@ void jbwm_update_title_bar(struct JBWMClient * c)
 		move_buttons(d, &c->tb, width);
 	}
 	XClearWindow(d, w);
-	draw_title(d, c);
+	draw_title(c);
 	if (c->opt.no_title_bar)
-		remove_title_bar(d, c);
+		remove_title_bar(c);
 	jbwm_set_frame_extents(c);
 }
