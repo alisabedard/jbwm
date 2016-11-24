@@ -16,17 +16,17 @@ static void handle_title_bar_button(Display * restrict d,
 		(int)e->window, (int)c->tb.win, (int)e->subwindow);
 	struct JBWMClientOptions * o = &c->opt;
 	if (!e->subwindow)
-		jbwm_drag(d, c, false);
+		jbwm_drag(c, false);
 	else if (e->subwindow == c->tb.close && !o->no_close)
 		jbwm_send_wm_delete(c);
 	else if (e->subwindow == c->tb.resize && !o->no_resize)
-		jbwm_drag(d, c, !c->opt.no_resize);
+		jbwm_drag(c, !c->opt.no_resize);
 	else if (e->subwindow == c->tb.shade && !c->opt.no_min)
 		jbwm_toggle_shade(d, c);
 	else if (e->subwindow == c->tb.stick)
 		jbwm_toggle_sticky(c);
 	else
-		jbwm_drag(d, c, false);
+		jbwm_drag(c, false);
 }
 #else//!JBWM_USE_TITLE_BAR
 #define handle_title_bar_button(d, e, c) jbwm_drag(d, c, false)
@@ -56,7 +56,7 @@ void jbwm_handle_button_event(Display * restrict d,
 		if (fs)
 			XLowerWindow(d, c->parent);
 		else
-			jbwm_drag(d, c, !c->opt.shaded);
+			jbwm_drag(c, !c->opt.shaded);
 		break;
 	}
 }

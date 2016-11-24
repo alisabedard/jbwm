@@ -24,14 +24,14 @@
 #endif//!DEBUG_SCREEN
 enum {JBWMMouseMask=(ButtonPressMask|ButtonReleaseMask|PointerMotionMask)};
 __attribute__ ((hot,nonnull))
-static void draw_outline(Display * restrict d, struct JBWMClient * restrict c)
+static void draw_outline(struct JBWMClient * restrict c)
 {
 	if (!c->border)
 		return;
 	const uint8_t offset = c->opt.no_title_bar
 		? 0 : jbwm_get_font_height();
 	struct JBWMScreen * s = &jbwm_get_screens()[c->screen];
-	XDrawRectangle(d, s->root, s->gc, c->size.x, c->size.y - offset,
+	XDrawRectangle(c->d, s->root, s->gc, c->size.x, c->size.y - offset,
 		c->size.width + c->border, c->size.height + c->border
 		+ offset);
 }
@@ -65,9 +65,9 @@ static jbwm_point_t get_mouse_position(Display * restrict d,
 		&x, &y, &(int){0}, &(int){0}, &(unsigned int){0});
 	return (jbwm_point_t){x, y};
 }
-static void warp_corner(Display * restrict d, struct JBWMClient * restrict c)
+static void warp_corner(struct JBWMClient * restrict c)
 {
-	XWarpPointer(d, None, c->window, 0, 0, 0, 0,
+	XWarpPointer(c->d, None, c->window, 0, 0, 0, 0,
 		c->size.width, c->size.height);
 }
 static void set_size(struct JBWMClient * restrict c,
@@ -93,9 +93,9 @@ static void do_changes(struct JBWMClient * restrict c, const bool resize,
 	else // drag
 		set_position(c, original, start, x, y);
 }
-static void drag_event_loop(Display * restrict d,
-	struct JBWMClient * restrict c, const bool resize)
+static void drag_event_loop(struct JBWMClient * restrict c, const bool resize)
 {
+	Display * d = c->d;
 	const jbwm_point_t start = get_mouse_position(d,
 		jbwm_get_screens()[c->screen].root);
 	const jbwm_point_t original = {c->size.x, c->size.y};
@@ -105,37 +105,38 @@ static void drag_event_loop(Display * restrict d,
 			XMaskEvent(d, JBWMMouseMask, &e);
 			if (e.type != MotionNotify)
 				return;
-			draw_outline(d, c);
+			draw_outline(c);
 			do_changes(c, resize, start, original,
 				e.xmotion.x, e.xmotion.y);
 		}
 		if (c->border)
-			draw_outline(d, c);
+			draw_outline(c);
 		else
-			jbwm_move_resize(d, c);
+			jbwm_move_resize(c);
 	}
 }
-void jbwm_drag(Display * restrict d, struct JBWMClient * restrict c,
-	const bool resize)
+void jbwm_drag(struct JBWMClient * restrict c, const bool resize)
 {
+	Display * d = c->d;
 	XRaiseWindow(d, c->parent);
 	if (resize && (c->opt.no_resize || c->opt.shaded))
 		return;
 	grab_pointer(d, jbwm_get_screens()[c->screen].root);
 	if (resize)
-		warp_corner(d, c);
-	drag_event_loop(d, c, resize);
-	draw_outline(d, c);
+		warp_corner(c);
+	drag_event_loop(c, resize);
+	draw_outline(c);
 	XUngrabPointer(d, CurrentTime);
-	jbwm_move_resize(d, c);
+	jbwm_move_resize(c);
 	if (!resize && !c->opt.tearoff)
 		jbwm_configure_client(c);
 }
-void jbwm_move_resize(Display * restrict d, struct JBWMClient * restrict c)
+void jbwm_move_resize(struct JBWMClient * restrict c)
 {
 	JBWM_LOG("jbwm_move_resize");
 	const uint8_t offset = c->opt.no_title_bar || c->opt.fullscreen
 		? 0 : jbwm_get_font_height();
+	Display * d = c->d;
 	XMoveResizeWindow(d, c->parent,
 		c->size.x, c->size.y - offset,
 		c->size.width, c->size.height + offset);
@@ -146,30 +147,32 @@ void jbwm_move_resize(Display * restrict d, struct JBWMClient * restrict c)
 	} // Skip shaped and fullscreen clients.
 	jbwm_set_shape(d, c);
 }
-static void hide(Display * restrict d, struct JBWMClient * restrict c)
+static void hide(struct JBWMClient * restrict c)
 {
+	Display * d = c->d;
 	XUnmapWindow(d, c->parent);
 	jbwm_set_wm_state(c, IconicState);
 	jbwm_ewmh_add_state(d, c->window,
 		jbwm_ewmh_get_atom(JBWM_EWMH_WM_STATE_HIDDEN));
 }
-void jbwm_restore_client(Display * restrict d, struct JBWMClient * restrict c)
+void jbwm_restore_client(struct JBWMClient * restrict c)
 {
+	Display * d = c->d;
 	XMapWindow(d, c->parent);
 	jbwm_set_wm_state(c, NormalState);
 	jbwm_ewmh_remove_state(d, c->window,
 		jbwm_ewmh_get_atom(JBWM_EWMH_WM_STATE_HIDDEN));
 }
-static void check_visibility(Display * restrict d, struct JBWMScreen * s,
+static void check_visibility(struct JBWMScreen * s,
 	struct JBWMClient * restrict c, const uint8_t v)
 {
 	if (c->screen != s->screen)
 		return;
 	if (c->vdesk == v || c->opt.sticky) {
 		c->vdesk = v; // allow moving windows by sticking
-		jbwm_restore_client(d, c);
+		jbwm_restore_client(c);
 	} else
-		hide(d, c);
+		hide(c);
 }
 uint8_t jbwm_set_vdesk(Display * restrict d, struct JBWMScreen * s, uint8_t v)
 {
@@ -178,7 +181,7 @@ uint8_t jbwm_set_vdesk(Display * restrict d, struct JBWMScreen * s, uint8_t v)
 		return s->vdesk;
 	for (struct JBWMClient * c = jbwm_get_head_client();
 		c; c = c->next)
-		check_visibility(d, s, c, v);
+		check_visibility(s, c, v);
 	s->vdesk = v;
 #ifdef JBWM_USE_EWMH
 	jbwm_set_property(d, s->root,

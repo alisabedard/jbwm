@@ -31,7 +31,7 @@ static void set_not_shaded(Display * restrict d,
 {
 	c->size.height = c->old_size.height;
 	c->opt.shaded = false;
-	jbwm_move_resize(d, c);
+	jbwm_move_resize(c);
 	jbwm_set_wm_state(c, NormalState);
 	jbwm_ewmh_remove_state(d, c->window,
 		jbwm_ewmh_get_atom(JBWM_EWMH_WM_STATE_SHADED));

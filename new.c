@@ -144,5 +144,5 @@ void jbwm_new_client(Display * restrict d, struct JBWMScreen * restrict s,
 	init_geometry(c);
 	init_properties(c);
 	reparent(c);
-	jbwm_restore_client(d, c);
+	jbwm_restore_client(c);
 }

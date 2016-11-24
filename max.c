@@ -29,7 +29,7 @@ void jbwm_set_not_horz(Display * restrict d, struct JBWMClient * restrict c)
 	JBWM_LOG("jbwm_set_not_horz");
 	if (c->opt.max_horz)
 		set_not_horz(d, c);
-	jbwm_move_resize(d, c);
+	jbwm_move_resize(c);
 }
 static void set_horz(struct JBWMClient * restrict c)
 {
@@ -52,7 +52,7 @@ void jbwm_set_horz(Display * restrict d __attribute__((unused)),
 		jbwm_ewmh_get_atom(JBWM_EWMH_WM_STATE_MAXIMIZED_HORZ));
 	set_horz(c);
 	c->size.width -= c->border << 1;
-	jbwm_move_resize(d, c);
+	jbwm_move_resize(c);
 }
 #ifdef JBWM_USE_EWMH
 static void set_not_vert(Display * restrict d, struct JBWMClient * restrict c)
@@ -72,7 +72,7 @@ void jbwm_set_not_vert(Display * restrict d, struct JBWMClient * restrict c)
 	JBWM_LOG("jbwm_set_not_vert");
 	if (c->opt.max_vert && !c->opt.shaded)
 		set_not_vert(d, c);
-	jbwm_move_resize(d, c);
+	jbwm_move_resize(c);
 }
 #ifdef JBWM_USE_EWMH
 static void set_vert(Display * restrict d, struct JBWMClient * restrict c)
@@ -101,7 +101,7 @@ void jbwm_set_vert(Display * restrict d, struct JBWMClient * restrict c)
 		c->size.y += jbwm_get_font_height() + c->border;
 		c->size.height -= jbwm_get_font_height() + (c->border << 1);
 	}
-	jbwm_move_resize(d, c);
+	jbwm_move_resize(c);
 }
 static void set_not_fullscreen(Display * restrict d,
 	struct JBWMClient * restrict c)
@@ -120,7 +120,7 @@ void jbwm_set_not_fullscreen(Display * restrict d,
 	JBWM_LOG("jbwm_set_not_fullscreen");
 	if(c->opt.fullscreen)
 		set_not_fullscreen(d, c);
-	jbwm_move_resize(d, c);
+	jbwm_move_resize(c);
 }
 static void set_fullscreen(Display * restrict d,
 	struct JBWMClient * restrict c)
@@ -147,5 +147,5 @@ void jbwm_set_fullscreen(Display * restrict d, struct JBWMClient * restrict c)
 	if (c->opt.fullscreen || c->opt.shaded || c->opt.no_max)
 		return;
 	set_fullscreen(d, c);
-	jbwm_move_resize(d, c);
+	jbwm_move_resize(c);
 }

@@ -48,7 +48,7 @@ static void commit_key_move(Display * restrict d,
 	struct JBWMClient * restrict c)
 {
 	jbwm_snap_border(c);
-	jbwm_move_resize(d, c);
+	jbwm_move_resize(c);
 	point(d, c, 1, 1);
 }
 struct KeyMoveFlags {
@@ -161,7 +161,7 @@ static void handle_client_key_event(struct JBWMClient * restrict c,
 		jbwm_toggle_sticky(c);
 		break;
 	case JBWM_KEY_MOVE:
-		jbwm_drag(d, c, false);
+		jbwm_drag(c, false);
 		break;
 	case JBWM_KEY_SHADE:
 		jbwm_toggle_shade(d, c);
@@ -189,7 +189,7 @@ static void next(Display * restrict d)
 	struct JBWMClient * c = get_next_on_vdesk();
 	if (!c)
 		return;
-	jbwm_restore_client(d, c);
+	jbwm_restore_client(c);
 	jbwm_select_client(c);
 	point(d, c, 0, 0);
 	point(d, c, c->size.width, c->size.height);

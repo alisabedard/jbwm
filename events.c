@@ -77,7 +77,7 @@ static void handle_property_change(XPropertyEvent * restrict e,
 		jbwm_update_title_bar(e->display, c);
 	else {
 		if (e->atom == jbwm_get_wm_state(e->display))
-			jbwm_move_resize(e->display, c);
+			jbwm_move_resize(c);
 		jbwm_print_atom(e->display, e->atom,
 			__FILE__, __LINE__);
 	}
