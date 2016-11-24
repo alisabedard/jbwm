@@ -150,20 +150,22 @@ void jbwm_update_title_bar(struct JBWMClient * c)
 	if (c->opt.shaped)
 		return;
 	jbwm_window_t w = c->tb.win;
-	Display * d = c->d;
 	if (c->opt.fullscreen && w) {
 		remove_title_bar(c);
 		return;
 	}
 	if (!w)
 		w = new_title_bar(c);
-	/* Expand/Contract the title bar width as necessary:  */
-	{
-		const uint16_t width = c->size.width;
-		XResizeWindow(d, w, width, jbwm_get_font_height());
-		move_buttons(d, &c->tb, width);
+	{ // * d scope
+		Display * d = c->d;
+		/* Expand/Contract the title bar width as necessary:  */
+		{ // width scope
+			const uint16_t width = c->size.width;
+			XResizeWindow(d, w, width, jbwm_get_font_height());
+			move_buttons(d, &c->tb, width);
+		}
+		XClearWindow(d, w);
 	}
-	XClearWindow(d, w);
 	draw_title(c);
 	if (c->opt.no_title_bar)
 		remove_title_bar(c);
