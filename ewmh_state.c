@@ -88,10 +88,10 @@ static void set_state(struct JBWMClient * restrict c,
 		break;
 	}
 }
-__attribute__((nonnull(1,3)))
+__attribute__((nonnull))
 static void check_state(XClientMessageEvent * e,	// event data
 			const enum JBWMAtomIndex t,	// state to test
-			struct JBWMClient *c)
+			struct JBWMClient * c)
 {
 	const Atom state = jbwm_ewmh_get_atom(t);
 	// 2 atoms can be set at once
@@ -110,18 +110,16 @@ static void check_state(XClientMessageEvent * e,	// event data
 		set_state(c, true, t);
 		jbwm_ewmh_add_state(d, e->window, state);
 		break;
-	case 2:{	// toggle
+	case 2: { // toggle
 			const bool add = !ewmh_get_state(e->display,
 				e->window, state);
 			set_state(c, add, t);
-			if (add)
-				jbwm_ewmh_add_state(d, e->window, state);
-			else
-				jbwm_ewmh_remove_state(d, e->window, state);
+			(add ? jbwm_ewmh_add_state : jbwm_ewmh_remove_state)
+				(d, e->window, state);
 		}
 	}
 }
-__attribute__((nonnull(1,2)))
+__attribute__((nonnull))
 static void handle_wm_state_changes(XClientMessageEvent * restrict e,
 	struct JBWMClient * restrict c)
 {
