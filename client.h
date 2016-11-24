@@ -30,6 +30,6 @@ void jbwm_set_head_client(struct JBWMClient * restrict c);
 // Set WM_STATE property
 void jbwm_set_wm_state(Display * restrict d, struct JBWMClient * restrict c,
 	const int8_t state);
-void jbwm_toggle_sticky(Display * restrict d, struct JBWMClient * c)
-	__attribute__((nonnull,cold));
+void jbwm_toggle_sticky(struct JBWMClient * c)
+	__attribute__((nonnull));
 #endif /* JBWM_CLIENT_H */

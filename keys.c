@@ -157,7 +157,7 @@ static void handle_client_key_event(Display * restrict d, const bool mod,
 		(c->opt.max_vert ? jbwm_set_not_vert : jbwm_set_vert)(d, c);
 		break;
 	case JBWM_KEY_STICK:
-		jbwm_toggle_sticky(d, c);
+		jbwm_toggle_sticky(c);
 		break;
 	case JBWM_KEY_MOVE:
 		jbwm_drag(d, c, false);
