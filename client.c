@@ -172,14 +172,15 @@ static bool has_delete_proto(Display * restrict d, const jbwm_window_t w)
 	}
 	return found;
 }
-void jbwm_send_wm_delete(Display * restrict d, struct JBWMClient * restrict c)
+void jbwm_send_wm_delete(struct JBWMClient * restrict c)
 {
+	Display * d = c->d;
+	const jbwm_window_t w = c->window;
 	if (c->opt.remove) { // this allows a second click to force a kill
-		XKillClient(d, c->window);
+		XKillClient(d, w);
 		return;
 	}
 	c->opt.remove = true;
-	has_delete_proto(d, c->window) ? xmsg(d, c->window,
-		get_wm_protocols(d), get_wm_delete_window(d))
-		: XKillClient(d, c->window);
+	has_delete_proto(d, w) ? xmsg(d, w, get_wm_protocols(d),
+		get_wm_delete_window(d)) : XKillClient(d, w);
 }

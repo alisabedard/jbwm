@@ -19,7 +19,7 @@ void jbwm_relink_client_list(struct JBWMClient * c);
 // Set client as that receiving focus
 void jbwm_select_client(struct JBWMClient * c);
 // Send WM_DELETE message to the client
-void jbwm_send_wm_delete(Display * restrict d, struct JBWMClient * restrict c)
+void jbwm_send_wm_delete(struct JBWMClient * restrict c)
 	__attribute__((nonnull));
 // Move the client to the specified virtual desktop
 void jbwm_set_client_vdesk(struct JBWMClient * restrict c, const uint8_t d)
