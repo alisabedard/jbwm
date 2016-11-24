@@ -28,12 +28,12 @@ static void draw_outline(struct JBWMClient * restrict c)
 {
 	if (!c->border)
 		return;
-	const uint8_t offset = c->opt.no_title_bar
-		? 0 : jbwm_get_font_height();
-	struct JBWMScreen * s = &jbwm_get_screens()[c->screen];
-	XDrawRectangle(c->d, s->root, s->gc, c->size.x, c->size.y - offset,
-		c->size.width + c->border, c->size.height + c->border
-		+ offset);
+	const uint8_t o = c->opt.no_title_bar ? 0 : jbwm_get_font_height();
+	const struct JBWMScreen * s = &jbwm_get_screens()[c->screen];
+	const struct JBWMRectangle * restrict g = &c->size;
+	const uint8_t b = c->border;
+	XRectangle r = {g->x, g->y - o, g->width + b, g->height + b + o};
+	XDrawRectangles(c->d, s->root, s->gc, &r, 1);
 }
 __attribute__((nonnull))
 static void configure(Display * restrict d,
@@ -100,15 +100,17 @@ static void drag_event_loop(struct JBWMClient * restrict c, const bool resize)
 		jbwm_get_screens()[c->screen].root);
 	const jbwm_point_t original = {c->size.x, c->size.y};
 	for (;;) {
+		int16_t x, y;
 		{ // e scope
 			XEvent e;
 			XMaskEvent(d, JBWMMouseMask, &e);
 			if (e.type != MotionNotify)
 				return;
 			draw_outline(c);
-			do_changes(c, resize, start, original,
-				e.xmotion.x, e.xmotion.y);
+			x = e.xmotion.x;
+			y = e.xmotion.y;
 		}
+		do_changes(c, resize, start, original, x, y);
 		if (c->border)
 			draw_outline(c);
 		else
