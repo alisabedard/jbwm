@@ -115,12 +115,11 @@ void jbwm_toggle_sticky(struct JBWMClient * c)
 	jbwm_select_client(d, c);
 	jbwm_update_title_bar(d, c);
 #ifdef JBWM_USE_EWMH
+	const jbwm_atom_t a = jbwm_ewmh_get_atom(JBWM_EWMH_WM_STATE_STICKY);
 	if (c->opt.sticky)
-		jbwm_ewmh_add_state(d, c->window,
-			jbwm_ewmh_get_atom(JBWM_EWMH_WM_STATE_STICKY));
+		jbwm_ewmh_add_state(d, c->window, a);
 	else
-		jbwm_ewmh_remove_state(d, c->window,
-			jbwm_ewmh_get_atom(JBWM_EWMH_WM_STATE_STICKY));
+		jbwm_ewmh_remove_state(d, c->window, a);
 #endif//JBWM_USE_EWMH
 }
 // Returns 0 on failure.
