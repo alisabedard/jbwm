@@ -150,14 +150,14 @@ void jbwm_move_resize(Display * restrict d, struct JBWMClient * restrict c)
 static void hide(Display * restrict d, struct JBWMClient * restrict c)
 {
 	XUnmapWindow(d, c->parent);
-	jbwm_set_wm_state(d, c, IconicState);
+	jbwm_set_wm_state(c, IconicState);
 	jbwm_ewmh_add_state(d, c->window,
 		jbwm_ewmh_get_atom(JBWM_EWMH_WM_STATE_HIDDEN));
 }
 void jbwm_restore_client(Display * restrict d, struct JBWMClient * restrict c)
 {
 	XMapWindow(d, c->parent);
-	jbwm_set_wm_state(d, c, NormalState);
+	jbwm_set_wm_state(c, NormalState);
 	jbwm_ewmh_remove_state(d, c->window,
 		jbwm_ewmh_get_atom(JBWM_EWMH_WM_STATE_HIDDEN));
 }

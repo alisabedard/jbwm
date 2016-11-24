@@ -21,7 +21,7 @@ static void set_shaded(Display * restrict d,
 	c->old_size.height = c->size.height;
 	c->size.height = -1;
 	c->opt.shaded = true;
-	jbwm_set_wm_state(d, c, IconicState);
+	jbwm_set_wm_state(c, IconicState);
 	jbwm_ewmh_add_state(d, c->window,
 		jbwm_ewmh_get_atom(JBWM_EWMH_WM_STATE_SHADED));
 	jbwm_select_client(d, c);
@@ -32,7 +32,7 @@ static void set_not_shaded(Display * restrict d,
 	c->size.height = c->old_size.height;
 	c->opt.shaded = false;
 	jbwm_move_resize(d, c);
-	jbwm_set_wm_state(d, c, NormalState);
+	jbwm_set_wm_state(c, NormalState);
 	jbwm_ewmh_remove_state(d, c->window,
 		jbwm_ewmh_get_atom(JBWM_EWMH_WM_STATE_SHADED));
 }

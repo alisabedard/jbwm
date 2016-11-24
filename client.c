@@ -154,9 +154,9 @@ jbwm_atom_t jbwm_get_wm_state(Display * restrict d)
 	static jbwm_atom_t a;
 	return get_atom(d, &a, "WM_STATE");
 }
-void jbwm_set_wm_state(Display * restrict d,
-	struct JBWMClient * restrict c, const int8_t state)
+void jbwm_set_wm_state(struct JBWMClient * restrict c, const int8_t state)
 {
+	Display * restrict d = c->d;
 	jbwm_set_property(d, c->window, jbwm_get_wm_state(d),
 		XA_CARDINAL, &(uint32_t){state}, 1);
 }
