@@ -5,6 +5,7 @@
 #include "ewmh.h"
 #include "client.h"
 #include "config.h"
+#include "font.h"
 #include "jbwm.h"
 #include "util.h"
 #include <unistd.h>
@@ -143,4 +144,15 @@ void jbwm_ewmh_init_screen(Display * restrict d,
 		XA_WINDOW, &r, 1);
 	init_desktops(d, s);
 	s->supporting = init_supporting(d, r);
+}
+void jbwm_set_frame_extents(Display * restrict d,
+	struct JBWMClient * restrict c)
+{
+	// left, right, top, bottom
+	const uint8_t b = c->border;
+	const uint8_t t = c->tb.win ? jbwm_get_font_height() : b;
+	Atom f[] = {b, b, t, b};
+	jbwm_set_property(d, c->window, jbwm_ewmh[JBWM_EWMH_FRAME_EXTENTS],
+		XA_CARDINAL, &f, 4);
+	XFlush(d);
 }

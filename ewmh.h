@@ -12,6 +12,8 @@ void jbwm_ewmh_set_allowed_actions(Display * restrict d,
 	const jbwm_window_t w);
 void jbwm_ewmh_init_screen(Display * restrict d,
 	struct JBWMScreen * restrict s) __attribute__((nonnull));
+void jbwm_set_frame_extents(Display * restrict d,
+	struct JBWMClient * restrict c);
 enum JBWMAtomIndex {
 	JBWM_EWMH_SUPPORTED,
 	JBWM_EWMH_CURRENT_DESKTOP,
@@ -55,12 +57,12 @@ enum JBWMAtomIndex {
 	// The following entry must be last:
 	JBWM_EWMH_ATOMS_COUNT
 };
-
 extern Atom ewmh[];
 #else//!JBWM_USE_EWMH
 #define jbwm_ewmh_update_client_list(d)
 #define jbwm_ewmh_set_allowed_actions(d, w)
 #define jbwm_ewmh_init_screen(d, s)
 #define jbwm_ewmh_init(d)
+#define jbwm_set_frame_extents(d, c)
 #endif//JBWM_USE_EWMH
 #endif//!JBWM_EWMH_H

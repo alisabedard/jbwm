@@ -79,14 +79,6 @@ static jbwm_window_t new_title_bar(Display * restrict d,
 	XMapRaised(d, t);
 	XMapSubwindows(d, t);
 	jbwm_grab_button(d, t, 0, AnyButton);
-#ifdef JBWM_USE_EWMH
-	// Required by wm-spec 1.4:
-	const uint8_t b = c->border;
-	jbwm_set_property(d, c->window,
-		jbwm_ewmh_get_atom(JBWM_EWMH_FRAME_EXTENTS),
-		XA_CARDINAL, (&(jbwm_atom_t[]){b, b, b
-		+ jbwm_get_font_height(), b}), 4);
-#endif//JBWM_USE_EWMH
 	return t;
 }
 #ifdef JBWM_USE_XFT
@@ -174,4 +166,5 @@ void jbwm_update_title_bar(Display * restrict d, struct JBWMClient * c)
 	draw_title(d, c);
 	if (c->opt.no_title_bar)
 		remove_title_bar(d, c);
+	jbwm_set_frame_extents(d, c);
 }
