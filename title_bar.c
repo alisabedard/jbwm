@@ -165,5 +165,5 @@ void jbwm_update_title_bar(struct JBWMClient * c)
 	draw_title(d, c);
 	if (c->opt.no_title_bar)
 		remove_title_bar(d, c);
-	jbwm_set_frame_extents(d, c);
+	jbwm_set_frame_extents(c);
 }
