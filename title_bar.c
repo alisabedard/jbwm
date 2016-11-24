@@ -137,13 +137,7 @@ static void remove_title_bar(struct JBWMClient * restrict c)
 	Display * d = c->d;
 	XDestroyWindow(d, c->tb.win);
 	c->tb.win = 0;
-#ifdef JBWM_USE_EWMH
-	// Required by wm-spec 1.4:
-	const uint8_t b = c->border;
-	jbwm_set_property(d, c->window,
-		jbwm_ewmh_get_atom(JBWM_EWMH_FRAME_EXTENTS),
-		XA_CARDINAL, (&(jbwm_atom_t[]){b, b, b, b}), 4);
-#endif//JBWM_USE_EWMH
+	jbwm_set_frame_extents(c);
 }
 void jbwm_update_title_bar(struct JBWMClient * c)
 {
