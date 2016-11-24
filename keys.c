@@ -197,7 +197,7 @@ static void cond_client_to_desk(Display * restrict dpy,
 	struct JBWMClient * c, struct JBWMScreen * s,
 	const uint8_t d, const bool mod)
 {
-	mod && c ? jbwm_set_client_vdesk(dpy, c, d)
+	mod && c ? jbwm_set_client_vdesk(c, d)
 		: jbwm_set_vdesk(dpy, s, d);
 }
 static void start_terminal(void)

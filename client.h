@@ -22,8 +22,7 @@ void jbwm_select_client(Display * restrict d, struct JBWMClient * c);
 void jbwm_send_wm_delete(Display * restrict d, struct JBWMClient * restrict c)
 	__attribute__((nonnull));
 // Move the client to the specified virtual desktop
-void jbwm_set_client_vdesk(Display * restrict dpy,
-	struct JBWMClient * restrict c, const uint8_t d)
+void jbwm_set_client_vdesk(struct JBWMClient * restrict c, const uint8_t d)
 	__attribute((nonnull));
 // Assign c to the head of the JBWMClient linked list.
 void jbwm_set_head_client(struct JBWMClient * restrict c);
