@@ -189,7 +189,7 @@ static void next(Display * restrict d)
 	if (!c)
 		return;
 	jbwm_restore_client(d, c);
-	jbwm_select_client(d, c);
+	jbwm_select_client(c);
 	point(d, c, 0, 0);
 	point(d, c, c->size.width, c->size.height);
 }

@@ -89,10 +89,11 @@ static void set_border(Display * restrict d, struct JBWMClient * restrict c)
 	XSetWindowBorder(d, c->parent, c->opt.sticky
 		? s->pixels.fc : s->pixels.fg);
 }
-void jbwm_select_client(Display * restrict d, struct JBWMClient * c)
+void jbwm_select_client(struct JBWMClient * c)
 {
 	if(!c)
 		return;
+	Display * d = c->d;
 	unselect_current(d);
 	XInstallColormap(d, c->cmap);
 	XSetInputFocus(d, c->window,
@@ -112,7 +113,7 @@ void jbwm_toggle_sticky(struct JBWMClient * c)
 	JBWM_LOG("stick");
 	c->opt.sticky ^= true; // toggle
 	Display * d = c->d;
-	jbwm_select_client(d, c);
+	jbwm_select_client(c);
 	jbwm_update_title_bar(d, c);
 #ifdef JBWM_USE_EWMH
 	const jbwm_atom_t a = jbwm_ewmh_get_atom(JBWM_EWMH_WM_STATE_STICKY);

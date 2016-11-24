@@ -17,7 +17,7 @@ jbwm_atom_t jbwm_get_wm_state(Display * restrict d);
 // Relink c's linked list to exclude c
 void jbwm_relink_client_list(struct JBWMClient * c);
 // Set client as that receiving focus
-void jbwm_select_client(Display * restrict d, struct JBWMClient * c);
+void jbwm_select_client(struct JBWMClient * c);
 // Send WM_DELETE message to the client
 void jbwm_send_wm_delete(Display * restrict d, struct JBWMClient * restrict c)
 	__attribute__((nonnull));

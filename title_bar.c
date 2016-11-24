@@ -24,7 +24,7 @@ static void set_shaded(Display * restrict d,
 	jbwm_set_wm_state(c, IconicState);
 	jbwm_ewmh_add_state(d, c->window,
 		jbwm_ewmh_get_atom(JBWM_EWMH_WM_STATE_SHADED));
-	jbwm_select_client(d, c);
+	jbwm_select_client(c);
 }
 static void set_not_shaded(Display * restrict d,
 	struct JBWMClient * restrict c)
