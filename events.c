@@ -27,7 +27,6 @@
 #undef jbwm_print_atom
 #define jbwm_print_atom(...)
 #endif//!DEBUG_ATOMS
-static jbwm_window_t events_last_window;
 static bool events_need_cleanup;
 __attribute__((pure))
 static struct JBWMScreen * get_screen(const int8_t i,
@@ -39,21 +38,21 @@ static struct JBWMScreen * get_screen(const int8_t i,
 }
 void jbwm_free_client(Display * restrict d, struct JBWMClient * restrict c)
 {
-	const jbwm_window_t w = c->window;
+	{ // w scope
+		const jbwm_window_t w = c->window;
 #ifdef JBWM_USE_EWMH
-	// Per ICCCM + JBWM_USE_EWMH:
-	XDeleteProperty(d, w, jbwm_ewmh_get_atom(JBWM_EWMH_WM_STATE));
-	XDeleteProperty(d, w, jbwm_ewmh_get_atom(JBWM_EWMH_WM_DESKTOP));
+		// Per ICCCM + JBWM_USE_EWMH:
+		XDeleteProperty(d, w, jbwm_ewmh_get_atom(JBWM_EWMH_WM_STATE));
+		XDeleteProperty(d, w, jbwm_ewmh_get_atom(JBWM_EWMH_WM_DESKTOP));
 #endif//JBWM_USE_EWMH
-	XReparentWindow(d, w, jbwm_get_screens()[c->screen].root,
-		c->size.x, c->size.y);
-	XRemoveFromSaveSet(d, w);
+		XReparentWindow(d, w, jbwm_get_screens()[c->screen].root,
+			c->size.x, c->size.y);
+		XRemoveFromSaveSet(d, w);
+	}
 	if(c->parent)
 		XDestroyWindow(d, c->parent);
 	jbwm_relink_client_list(c);
 	free(c);
-	/* Allow this client's window id to be reused for another client: */
-	events_last_window = 0;
 }
 static void cleanup(Display * restrict d)
 {
@@ -64,7 +63,7 @@ static void cleanup(Display * restrict d)
 	do {
 		i = c->next;
 		if (!c->opt.remove)
-			  continue;
+			continue;
 		jbwm_free_client(d, c);
 	} while(i && (c = i));
 }
@@ -73,7 +72,7 @@ static void handle_property_change(XPropertyEvent * restrict e,
 {
 	jbwm_print_atom(e->display, e->atom, __FILE__, __LINE__);
 	if(e->state != PropertyNewValue)
-		  return;
+		return;
 	if (e->atom == XA_WM_NAME)
 		jbwm_update_title_bar(e->display, c);
 	else {
@@ -97,13 +96,13 @@ static void handle_configure_request(XConfigureRequestEvent * restrict e)
 static void handle_map_request(XMapRequestEvent * restrict e)
 {
 	JBWM_LOG("MapRequest, send_event:%d", e->send_event);
-	/* This check fixes a race condition in libreoffice dialogs,
-	   where an attempt is made to request mapping twice.  */
-	if(e->window == events_last_window)
-		return;
-	events_last_window = e->window;
 	Display * restrict d = e->display;
 	jbwm_new_client(d, get_screen(ScreenCount(d), e->parent), e->window);
+}
+static inline void mark_removal(struct JBWMClient * restrict c)
+{
+	JBWM_LOG("mark_removal(): ignore_unmap is %d", c->ignore_unmap);
+	c->opt.remove = events_need_cleanup = (c->ignore_unmap--<1);
 }
 void jbwm_event_loop(Display * restrict d)
 {
@@ -131,12 +130,12 @@ event_loop:
 		break;
 	case EnterNotify:
 		if(c && (ev.xcrossing.window == c->parent))
-			  jbwm_select_client(ev.xcrossing.display, c);
+			jbwm_select_client(ev.xcrossing.display, c);
 		goto event_loop;
 #ifdef JBWM_USE_TITLE_BAR
 	case Expose:
 		if (c && !ev.xexpose.count)
-			  jbwm_update_title_bar(ev.xexpose.display, c);
+			jbwm_update_title_bar(ev.xexpose.display, c);
 		goto event_loop;
 #endif//JBWM_USE_TITLE_BAR
 #ifdef JBWM_USE_EWMH
@@ -147,18 +146,15 @@ event_loop:
 #endif//JBWM_USE_EWMH
 	case UnmapNotify:
 		if(!c)
-			  break;
-		JBWM_LOG("UnmapNotify: ignore_unmap is %d", c->ignore_unmap);
-		c->opt.remove = events_need_cleanup
-			= (c->ignore_unmap--<1);
+			break;
+		mark_removal(c);
 		break;
 	case MapRequest:
 		if (!c)
 			handle_map_request(&ev.xmaprequest);
-		goto event_loop;
+		break;
 	case ConfigureRequest:
-		if (c)
-			handle_configure_request(&ev.xconfigurerequest);
+		handle_configure_request(&ev.xconfigurerequest);
 		goto event_loop;
 	case PropertyNotify:
 		if (c)
@@ -181,11 +177,8 @@ event_loop:
 		JBWM_LOG("Unhandled event (%d)", ev.type);
 #endif//DEBUG_EVENTS
 	}
-	if (events_need_cleanup) {
+	if (events_need_cleanup)
 		cleanup(ev.xany.display);
-		// Fix ignoring every other new window:
-		events_last_window=0;
-	}
 	goto event_loop;
 }
 
