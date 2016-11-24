@@ -45,14 +45,9 @@ static uint8_t wm_desktop(Display * d, const jbwm_window_t w, uint8_t vdesk)
 #define wm_desktop(d, w, vdesk) vdesk
 #endif//JBWM_USE_EWMH
 __attribute__((nonnull))
-static void init_properties(
-#if defined(JBWM_USE_EWMH) || defined(JBWM_USE_MWM)
-	Display * restrict d,
-#else//!JBWM_USE_EWMH&&!JBWM_USE_MWM
-	Display * restrict d __attribute__((unused)),
-#endif//JBWM_USE_EWMH||JBWM_USE_MWM
-	struct JBWMClient * c)
+static void init_properties(struct JBWMClient * c)
 {
+	Display * d = c->d;
 	jbwm_handle_mwm_hints(d, c);
 	c->vdesk = jbwm_get_screens()[c->screen].vdesk;
 	c->vdesk = wm_desktop(d, c->window, c->vdesk);
@@ -63,9 +58,10 @@ static uint16_t get_per_min(uint16_t spec, uint16_t min)
 	return (spec >= min) ? spec : min;
 }
 __attribute__((nonnull))
-static void init_geometry(Display * restrict d, struct JBWMClient * c)
+static void init_geometry(struct JBWMClient * c)
 {
 	XWindowAttributes a;
+	Display * d = c->d;
 	XGetWindowAttributes(d, c->window, &a);
 	JBWM_LOG("XGetWindowAttributes() win: 0x%x, x: %d, y: %d, w: %d, h: %d",
 		(int)c->window, a.x, a.y, a.width, a.height);
@@ -98,9 +94,9 @@ static void init_geometry(Display * restrict d, struct JBWMClient * c)
 		(int)c->window, g->x, g->y, g->width, g->height);
 }
 __attribute__((nonnull))
-static Window get_parent(Display * restrict d, struct JBWMClient * restrict c)
+static Window get_parent(struct JBWMClient * c)
 {
-	return XCreateWindow(d, jbwm_get_screens()[c->screen].root,
+	return XCreateWindow(c->d, jbwm_get_screens()[c->screen].root,
 		c->size.x, c->size.y, c->size.width, c->size.height,
 		c->border, CopyFromParent, CopyFromParent, CopyFromParent,
 		CWOverrideRedirect | CWEventMask, &(XSetWindowAttributes){
@@ -109,12 +105,12 @@ static Window get_parent(Display * restrict d, struct JBWMClient * restrict c)
 		| ButtonPressMask | EnterWindowMask});
 }
 __attribute__((nonnull))
-static void reparent(Display * restrict d,
-	struct JBWMClient * c) // use of restrict on client here is wrong
+static void reparent(struct JBWMClient * c)
 {
 	JBWM_LOG("reparent()");
+	Display * d = c->d;
 	jbwm_new_shaped_client(d, c);
-	const jbwm_window_t p = c->parent = get_parent(d, c), w = c->window;
+	const jbwm_window_t p = c->parent = get_parent(c), w = c->window;
 	XAddToSaveSet(d, w);
 	XReparentWindow(d, w, p, 0, 0);
 	XMapWindow(d, w);
@@ -142,10 +138,11 @@ void jbwm_new_client(Display * restrict d, struct JBWMScreen * restrict s,
 {
 	JBWM_LOG("jbwm_new_client(..., w: %d)", (int)w);
 	struct JBWMClient * c = get_JBWMClient(w, s);
+	c->d = d;
 	jbwm_set_head_client(c);
 	do_grabs(d, w);
-	init_geometry(d, c);
-	init_properties(d, c);
-	reparent(d, c);
+	init_geometry(c);
+	init_properties(c);
+	reparent(c);
 	jbwm_restore_client(d, c);
 }
