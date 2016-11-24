@@ -8,6 +8,11 @@
 #include "screen.h"
 #include "util.h"
 #include <X11/Xatom.h>
+//#define JBWM_DEBUG_EWMH_STATE
+#ifndef JBWM_DEBUG_EWMH_STATE
+#undef JBWM_LOG
+#define JBWM_LOG(...)
+#endif//!JBWM_DEBUG_EWMH_STATE
 // Remove specified atom from WM_STATE
 void jbwm_ewmh_remove_state(Display * restrict d,
 	const Window w, const Atom state)
@@ -166,14 +171,14 @@ void jbwm_ewmh_handle_client_message(XClientMessageEvent * restrict e,
 	struct JBWMClient * restrict c)
 {
 	const Atom t = e->message_type;
-#ifdef JBWM_EWMH_DEBUG
+#ifdef JBWM_DEBUG_EWMH_STATE
 	dprintf(STDERR_FILENO, "----CLIENTMESSAGE----");
 	jbwm_print_atom(t, __FILE__, __LINE__);
 	jbwm_print_atom(e->data.l[0], __FILE__, __LINE__);
 	jbwm_print_atom(e->data.l[1], __FILE__, __LINE__);
 	jbwm_print_atom(e->data.l[2], __FILE__, __LINE__);
 	jbwm_print_atom(e->data.l[3], __FILE__, __LINE__);
-#endif//JBWM_EWMH_DEBUG
+#endif//JBWM_DEBUG_EWMH_STATE
 	if(c && client_specific_message(e, c, t))
 		  return;
 	if (t == jbwm_ewmh_get_atom(JBWM_EWMH_CURRENT_DESKTOP))
