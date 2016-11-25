@@ -86,17 +86,17 @@ static Window * get_ordered_client_list(Display * restrict d)
 	static Window window_list[MAX_CLIENTS];
 	// get ordered list of all windows on default screen:
 	unsigned int n = 0;
-	const Window r = DefaultRootWindow(d);
 	{ // * wl, nil scope
 		Window * wl, nil;
-		if (XQueryTree(d, r, &nil, &nil, &wl, &n)) {
+		if (XQueryTree(d, DefaultRootWindow(d), &nil, &nil, &wl, &n)) {
 			n = JB_MIN(n, MAX_CLIENTS); // limit to MAX_CLIENTS
 			memcpy(window_list, wl, n * sizeof(Window));
 			XFree(wl);
 		}
 	}
 	JBWM_LOG("get_ordered_client_list() n: %d", n);
-	jbwm_set_property(d, r, jbwm_ewmh[JBWM_EWMH_CLIENT_LIST_STACKING],
+	jbwm_set_property(d, DefaultRootWindow(d),
+		jbwm_ewmh[JBWM_EWMH_CLIENT_LIST_STACKING],
 		XA_WINDOW, window_list, n);
 	return window_list;
 }
