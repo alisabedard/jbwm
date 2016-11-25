@@ -172,11 +172,12 @@ static void debug_client_message(XClientMessageEvent * restrict e)
 {
 	JBWM_LOG("----CLIENTMESSAGE----");
 	Display * d = e->display;
+	const long * l = e->data.l;
 	jbwm_print_atom(d, e->message_type, __FILE__, __LINE__);
-	jbwm_print_atom(d, e->data.l[0], __FILE__, __LINE__);
-	jbwm_print_atom(d, e->data.l[1], __FILE__, __LINE__);
-	jbwm_print_atom(d, e->data.l[2], __FILE__, __LINE__);
-	jbwm_print_atom(d, e->data.l[3], __FILE__, __LINE__);
+	jbwm_print_atom(d, l[0], __FILE__, __LINE__);
+	jbwm_print_atom(d, l[1], __FILE__, __LINE__);
+	jbwm_print_atom(d, l[2], __FILE__, __LINE__);
+	jbwm_print_atom(d, l[3], __FILE__, __LINE__);
 }
 #else//!JBWM_DEBUG_EWMH_STATE||!DEBUG
 #define debug_client_message(e)
