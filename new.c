@@ -120,13 +120,13 @@ static void init_geometry(struct JBWMClient * c)
 	struct JBWMRectangle * g = &c->size;
 	bool pos = viewable;
 	process_size_hints(d, c->window, g, &pos, a_geo.width, a_geo.height);
-	struct JBWMScreen * s = &jbwm_get_screens()[c->screen];
-	sanitize_dimensions(g, s->size);
+	const struct JBDim scr_sz = jbwm_get_screens()[c->screen].size;
+	sanitize_dimensions(g, scr_sz);
 	if (pos) {
 		g->x = a_geo.x;
 		g->y = a_geo.y;
 	} else
-		center(g, s->size);
+		center(g, scr_sz);
 	JBWM_LOG("init_geometry() win: 0x%x, x: %d, y: %d, w: %d, h: %d",
 		(int)c->window, g->x, g->y, g->width, g->height);
 }
