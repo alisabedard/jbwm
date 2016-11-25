@@ -112,14 +112,13 @@ static bool get_window_attributes(struct JBWMClient * restrict c,
 __attribute__((nonnull))
 static void init_geometry(struct JBWMClient * c)
 {
-	Display * d = c->d;
 	struct JBWMRectangle a_geo;
 	const bool viewable = get_window_attributes(c, &a_geo);
 	// Test if the reparent that is to come would trigger an unmap event.
 	c->ignore_unmap += viewable ? 1 : 0;
 	bool pos = viewable;
 	struct JBWMRectangle * g = &c->size;
-	process_size_hints(d, c->window, g, &pos, a_geo.width, a_geo.height);
+	process_size_hints(c->d, c->window, g, &pos, a_geo.width, a_geo.height);
 	const struct JBDim scr_sz = jbwm_get_screens()[c->screen].size;
 	sanitize_dimensions(g, scr_sz);
 	if (pos) {
