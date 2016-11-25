@@ -170,14 +170,12 @@ static void handle_moveresize(XClientMessageEvent * restrict e)
 #if defined(JBWM_DEBUG_EWMH_STATE) && defined(DEBUG)
 static void debug_client_message(XClientMessageEvent * restrict e)
 {
-	JBWM_LOG("----CLIENTMESSAGE----");
 	Display * d = e->display;
 	const long * l = e->data.l;
+	JBWM_LOG("jbwm_ewmh_client_message()");
 	jbwm_print_atom(d, e->message_type, __FILE__, __LINE__);
-	jbwm_print_atom(d, l[0], __FILE__, __LINE__);
-	jbwm_print_atom(d, l[1], __FILE__, __LINE__);
-	jbwm_print_atom(d, l[2], __FILE__, __LINE__);
-	jbwm_print_atom(d, l[3], __FILE__, __LINE__);
+	JBWM_LOG("\t\tl[0: %ld, 1: %ld, 2: %ld, 3: %ld]",
+		l[0], l[1], l[2], l[3]);
 }
 #else//!JBWM_DEBUG_EWMH_STATE||!DEBUG
 #define debug_client_message(e)
@@ -185,14 +183,19 @@ static void debug_client_message(XClientMessageEvent * restrict e)
 void jbwm_ewmh_handle_client_message(XClientMessageEvent * restrict e,
 	struct JBWMClient * restrict c)
 {
-	const Atom t = e->message_type;
+	const jbwm_atom_t t = e->message_type;
 	debug_client_message(e);
 	if(c && client_specific_message(e, c, t))
 		  return;
-	if (t == jbwm_ewmh_get_atom(JBWM_EWMH_CURRENT_DESKTOP))
-		  jbwm_set_vdesk(&jbwm_get_screens()[c ? c->screen : 0],
-			  e->data.l[0]);
-	else if (t == jbwm_ewmh_get_atom(JBWM_EWMH_MOVERESIZE_WINDOW))
+	enum {
+		DESK = JBWM_EWMH_CURRENT_DESKTOP,
+		MR_WIN = JBWM_EWMH_MOVERESIZE_WINDOW
+	};
+	if (t == jbwm_ewmh_get_atom(DESK)) {
+		const uint8_t i = c ? c->screen : 0;
+		jbwm_set_vdesk(jbwm_get_screens() + i, e->data.l[0]);
+	} else if (t == jbwm_ewmh_get_atom(MR_WIN)) {
 		// If something else moves the window:
 		handle_moveresize(e);
+	}
 }
