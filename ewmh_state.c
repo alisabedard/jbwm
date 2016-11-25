@@ -156,10 +156,19 @@ static bool client_specific_message(XClientMessageEvent * restrict e,
 }
 static void handle_moveresize(XClientMessageEvent * restrict e)
 {
-	enum {SRC_SHIFT = 12, SRC_MASK = 3, VM_SHIFT = 8, VM_MASK = 0xf};
+	/* per wm-spec: fields come from e->data.l
+	   l[0]: gravity and flags, l[1]: x, l[2]: y, l[3]: w, l[4]: h
+		l[0]: bits 0-7 idicate gravity,
+		l[0]: bits 8-11 use x, y, width, height, respectively
+		l[0]: bits 12-15 indicate the source,
+	*/
+	enum {
+		SRC_SHIFT = 12, SRC_MASK = 3, VM_SHIFT = 8, VM_MASK = 0xf,
+		USER_ACTION = 2
+	};
 	const long * restrict l = e->data.l;
 	const uint8_t src = (l[0] >> SRC_SHIFT) & SRC_MASK;
-	if (src != 2)
+	if (src != USER_ACTION)
 		return;
 	const uint32_t vm = (l[0] >> VM_SHIFT) & VM_MASK;
 	XConfigureWindow(e->display, e->window, vm, &(XWindowChanges){
