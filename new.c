@@ -109,7 +109,7 @@ static void reparent(struct JBWMClient * c)
 {
 	JBWM_LOG("reparent()");
 	Display * d = c->d;
-	jbwm_new_shaped_client(d, c);
+	jbwm_new_shaped_client(c);
 	const jbwm_window_t p = c->parent = get_parent(c), w = c->window;
 	XAddToSaveSet(d, w);
 	XReparentWindow(d, w, p, 0, 0);
