@@ -161,8 +161,17 @@ event_loop:
 #endif//JBWM_USE_TITLE_BAR
 #ifdef JBWM_USE_EWMH
 	case CreateNotify:
+		JBWM_LOG("CreateNotify");
+		JBWM_LOG("override_redirect: %d",
+			(int)ev.xcreatewindow.override_redirect);
+		JBWM_LOG("send_event: %d", (int)ev.xcreatewindow.send_event);
+		if (ev.xcreatewindow.override_redirect) // internal
+			jbwm_ewmh_update_client_list(ev.xany.display);
+		break;
 	case DestroyNotify:
-		jbwm_ewmh_update_client_list(ev.xany.display);
+		JBWM_LOG("DestroyNotify");
+		if (!c) // only bother if event was not on a client
+			jbwm_ewmh_update_client_list(ev.xany.display);
 		break;
 #endif//JBWM_USE_EWMH
 	case UnmapNotify:
