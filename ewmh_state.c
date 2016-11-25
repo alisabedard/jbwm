@@ -157,15 +157,13 @@ static bool client_specific_message(XClientMessageEvent * restrict e,
 static void handle_moveresize(XClientMessageEvent * restrict e)
 {
 	enum {SRC_SHIFT = 12, SRC_MASK = 3, VM_SHIFT = 8, VM_MASK = 0xf};
-	const uint8_t src = (e->data.l[0] >> SRC_SHIFT) & SRC_MASK;
+	const long * restrict l = e->data.l;
+	const uint8_t src = (l[0] >> SRC_SHIFT) & SRC_MASK;
 	if (src != 2)
 		return;
-	const uint32_t vm = (e->data.l[0] >> VM_SHIFT) & VM_MASK;
-	XConfigureWindow(e->display, e->window,
-		vm, &(XWindowChanges){
-		.x = e->data.l[1], .y = e->data.l[2],
-		.width = e->data.l[3],
-		.height = e->data.l[4]});
+	const uint32_t vm = (l[0] >> VM_SHIFT) & VM_MASK;
+	XConfigureWindow(e->display, e->window, vm, &(XWindowChanges){
+		.x = l[1], .y = l[2], .width = l[3], .height = l[4]});
 }
 #if defined(JBWM_DEBUG_EWMH_STATE) && defined(DEBUG)
 static void debug_client_message(XClientMessageEvent * restrict e)
@@ -174,8 +172,8 @@ static void debug_client_message(XClientMessageEvent * restrict e)
 	const long * l = e->data.l;
 	JBWM_LOG("jbwm_ewmh_client_message()");
 	jbwm_print_atom(d, e->message_type, __FILE__, __LINE__);
-	JBWM_LOG("\t\tl[0: %ld, 1: %ld, 2: %ld, 3: %ld]",
-		l[0], l[1], l[2], l[3]);
+	JBWM_LOG("\t\tl[0: %ld, 1: %ld, 2: %ld, 3: %ld, 4: %ld]",
+		l[0], l[1], l[2], l[3], l[4]);
 }
 #else//!JBWM_DEBUG_EWMH_STATE||!DEBUG
 #define debug_client_message(e)
