@@ -5,5 +5,5 @@
 #ifndef JBWM_MWM_H
 #define JBWM_MWM_H
 #include "JBWMClient.h"
-void jbwm_handle_mwm_hints(Display * d, struct JBWMClient * c);
+void jbwm_handle_mwm_hints(struct JBWMClient * c);
 #endif//!JBWM_MWM_H

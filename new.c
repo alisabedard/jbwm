@@ -48,7 +48,7 @@ __attribute__((nonnull))
 static void init_properties(struct JBWMClient * c)
 {
 	Display * d = c->d;
-	jbwm_handle_mwm_hints(d, c);
+	jbwm_handle_mwm_hints(c);
 	c->vdesk = jbwm_get_screens()[c->screen].vdesk;
 	c->vdesk = wm_desktop(d, c->window, c->vdesk);
 }
