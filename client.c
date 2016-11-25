@@ -52,9 +52,8 @@ void jbwm_set_client_vdesk(struct JBWMClient * restrict c, const uint8_t d)
 	c->vdesk = d;
 	// use jbwm_set_vdesk to validate d:
 	struct JBWMScreen * s = &jbwm_get_screens()[c->screen];
-	Display * dpy = c->d;
-	c->vdesk = jbwm_set_vdesk(dpy, s, d);
-	jbwm_set_vdesk(dpy, s, p);
+	c->vdesk = jbwm_set_vdesk(s, d);
+	jbwm_set_vdesk(s, p);
 }
 static struct JBWMClient * search(struct JBWMClient * c,
 	const jbwm_window_t w)
@@ -112,15 +111,12 @@ void jbwm_toggle_sticky(struct JBWMClient * c)
 {
 	JBWM_LOG("stick");
 	c->opt.sticky ^= true; // toggle
-	Display * d = c->d;
 	jbwm_select_client(c);
 	jbwm_update_title_bar(c);
 #ifdef JBWM_USE_EWMH
-	const jbwm_atom_t a = jbwm_ewmh_get_atom(JBWM_EWMH_WM_STATE_STICKY);
-	if (c->opt.sticky)
-		jbwm_ewmh_add_state(d, c->window, a);
-	else
-		jbwm_ewmh_remove_state(d, c->window, a);
+	(c->opt.sticky ? jbwm_ewmh_add_state : jbwm_ewmh_remove_state)
+		(c->d, c->window,jbwm_ewmh_get_atom(
+		  JBWM_EWMH_WM_STATE_STICKY));
 #endif//JBWM_USE_EWMH
 }
 // Returns 0 on failure.

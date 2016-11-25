@@ -62,6 +62,6 @@ extern Atom ewmh[];
 #define jbwm_ewmh_set_allowed_actions(d, w)
 #define jbwm_ewmh_init_screen(d, s)
 #define jbwm_ewmh_init(d)
-#define jbwm_set_frame_extents(d, c)
+#define jbwm_set_frame_extents(c)
 #endif//JBWM_USE_EWMH
 #endif//!JBWM_EWMH_H

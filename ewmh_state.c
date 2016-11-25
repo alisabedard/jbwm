@@ -189,8 +189,7 @@ void jbwm_ewmh_handle_client_message(XClientMessageEvent * restrict e,
 	if(c && client_specific_message(e, c, t))
 		  return;
 	if (t == jbwm_ewmh_get_atom(JBWM_EWMH_CURRENT_DESKTOP))
-		  jbwm_set_vdesk(e->display,
-			  &jbwm_get_screens()[c ? c->screen : 0],
+		  jbwm_set_vdesk(&jbwm_get_screens()[c ? c->screen : 0],
 			  e->data.l[0]);
 	else if (t == jbwm_ewmh_get_atom(JBWM_EWMH_MOVERESIZE_WINDOW))
 		// If something else moves the window:

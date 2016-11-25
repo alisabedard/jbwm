@@ -184,6 +184,7 @@ static void setup_screen_elements(const uint8_t i)
 {
 	struct JBWMScreen * restrict s = jbwm_data.screens;
 	s->screen = i;
+	s->d = jbwm_data.display;
 	s->root = RootWindow(jbwm_data.display, i);
 	s->vdesk = 0;
 	s->size.w = DisplayWidth(jbwm_data.display, i);
@@ -213,7 +214,7 @@ static void setup_screen(const uint8_t i)
 	setup_screen_elements(i);
 	setup_gc(s);
 	setup_event_listeners(s->root);
-	jbwm_grab_screen_keys(jbwm_data.display, s);
+	jbwm_grab_screen_keys(s);
 	/* scan all the windows on this screen */
 	setup_clients(s);
 	jbwm_ewmh_init_screen(jbwm_data.display, s);

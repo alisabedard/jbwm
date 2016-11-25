@@ -175,7 +175,7 @@ static void check_visibility(struct JBWMScreen * s,
 	} else
 		hide(c);
 }
-uint8_t jbwm_set_vdesk(Display * restrict d, struct JBWMScreen * s, uint8_t v)
+uint8_t jbwm_set_vdesk(struct JBWMScreen * s, uint8_t v)
 {
 	JBWM_LOG("jbwm_set_vdesk");
 	if (v == s->vdesk || v > JBWM_MAX_DESKTOPS)
@@ -185,7 +185,7 @@ uint8_t jbwm_set_vdesk(Display * restrict d, struct JBWMScreen * s, uint8_t v)
 		check_visibility(s, c, v);
 	s->vdesk = v;
 #ifdef JBWM_USE_EWMH
-	jbwm_set_property(d, s->root,
+	jbwm_set_property(s->d, s->root,
 		jbwm_ewmh_get_atom(JBWM_EWMH_CURRENT_DESKTOP),
 		XA_CARDINAL, &v, 1);
 #endif//JBWM_USE_EWMH

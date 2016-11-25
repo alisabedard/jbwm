@@ -186,12 +186,11 @@ static void next(void)
 	point(c, 0, 0);
 	point(c, c->size.width, c->size.height);
 }
-static void cond_client_to_desk(Display * restrict dpy,
-	struct JBWMClient * c, struct JBWMScreen * s,
-	const uint8_t d, const bool mod)
+static void cond_client_to_desk(struct JBWMClient * c,
+	struct JBWMScreen * s, const uint8_t d, const bool mod)
 {
 	mod && c ? jbwm_set_client_vdesk(c, d)
-		: jbwm_set_vdesk(dpy, s, d);
+		: jbwm_set_vdesk(s, d);
 }
 static void start_terminal(void)
 {
@@ -200,7 +199,7 @@ static void start_terminal(void)
 		execlp(t, t, (char*)NULL);
 	}
 }
-void jbwm_handle_key_event(Display * restrict d, XKeyEvent * restrict e)
+void jbwm_handle_key_event(XKeyEvent * restrict e)
 {
 	JBWM_LOG("jbwm_handle_key_event");
 	const KeySym key = XLookupKeysym(e, 0);
@@ -225,14 +224,14 @@ void jbwm_handle_key_event(Display * restrict d, XKeyEvent * restrict e)
 	case XK_1: case XK_2: case XK_3: case XK_4: case XK_5:
 	case XK_6: case XK_7: case XK_8: case XK_9:
 		// First desktop 0, per wm-spec
-		cond_client_to_desk(d, c, s, opt.zero
+		cond_client_to_desk(c, s, opt.zero
 			? 10 : key - XK_1, opt.mod);
 		break;
 	case JBWM_KEY_PREVDESK:
-		cond_client_to_desk(d, c, s, s->vdesk - 1, opt.mod);
+		cond_client_to_desk(c, s, s->vdesk - 1, opt.mod);
 		break;
 	case JBWM_KEY_NEXTDESK:
-		cond_client_to_desk(d, c, s, s->vdesk + 1, opt.mod);
+		cond_client_to_desk(c, s, s->vdesk + 1, opt.mod);
 		break;
 	default:
 		if (c)
@@ -248,9 +247,9 @@ static void grab(Display * restrict d, struct JBWMScreen * restrict s,
 			 jbwm_keys_data.grab_mask | mask, s->root, true,
 			 GrabModeAsync, GrabModeAsync);
 }
-void jbwm_grab_screen_keys(Display * restrict d,
-	struct JBWMScreen * restrict s)
+void jbwm_grab_screen_keys(struct JBWMScreen * restrict s)
 {
+	Display * restrict d = s->d;
 	grab(d, s, (KeySym[]){JBWM_KEYS_TO_GRAB}, 0);
 	grab(d, s, (KeySym[]){JBWM_ALT_KEYS_TO_GRAB},
 		jbwm_keys_data.mod_mask);

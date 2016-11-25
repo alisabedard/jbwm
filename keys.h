@@ -6,10 +6,9 @@
 #define JBWM_KEYS_H
 #include "JBWMScreen.h"
 #include <X11/keysym.h>
-void jbwm_handle_key_event(Display * restrict d, XKeyEvent * restrict e)
+void jbwm_handle_key_event(XKeyEvent * restrict e)
 	__attribute__((nonnull));
-void jbwm_grab_screen_keys(Display * restrict d,
-	struct JBWMScreen * restrict s)
+void jbwm_grab_screen_keys(struct JBWMScreen * restrict s)
 	__attribute__((nonnull));
 void jbwm_grab_window_keys(Display * restrict d, const jbwm_window_t win);
 void jbwm_set_grab_mask(const uint16_t mask);

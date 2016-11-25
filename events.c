@@ -143,7 +143,7 @@ event_loop:
 		last_window = 0;
 		goto event_loop;
 	case KeyPress:
-		jbwm_handle_key_event(ev.xkey.display, &ev.xkey);
+		jbwm_handle_key_event(&ev.xkey);
 		break;
 	case ButtonPress:
 		if(c)

@@ -45,10 +45,9 @@ static uint8_t wm_desktop(Display * d, const jbwm_window_t w, uint8_t vdesk)
 __attribute__((nonnull))
 static void init_properties(struct JBWMClient * c)
 {
-	Display * d = c->d;
 	jbwm_handle_mwm_hints(c);
 	c->vdesk = jbwm_get_screens()[c->screen].vdesk;
-	c->vdesk = wm_desktop(d, c->window, c->vdesk);
+	c->vdesk = wm_desktop(c->d, c->window, c->vdesk);
 }
 __attribute__((const))
 static uint16_t get_per_min(uint16_t spec, uint16_t min)
