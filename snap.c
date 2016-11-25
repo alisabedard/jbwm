@@ -21,7 +21,7 @@ void jbwm_snap_border(struct JBWMClient * restrict c)
 	/* snap to screen border */
 	const uint8_t b = 2 * c->border;
 	g->x = sborder(g->x, 0 - b);
-	const struct JBWMSize s = jbwm_get_screens()[c->screen].size;
+	const struct JBDim s = jbwm_get_screens()[c->screen].size;
 	g->x = sborder(g->x, g->width - s.width + b);
 	g->y = sborder(g->y, 0 - (c->opt.no_title_bar
 		? 0 : jbwm_get_font_height()));

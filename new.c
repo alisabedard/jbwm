@@ -79,7 +79,7 @@ static void check_max_size(uint16_t * dim, const uint16_t scr_dim)
 	*dim = JB_MIN(*dim, scr_dim);
 }
 static void sanitize_dimensions(struct JBWMRectangle * restrict g,
-	const struct JBWMSize s)
+	const struct JBDim s)
 {
 	check_max_size(&g->width, s.w);
 	check_max_size(&g->height, s.h);
@@ -88,7 +88,7 @@ static int16_t get_center(const uint16_t wh, const uint16_t swh)
 {
 	return (swh >> 1) - (wh >> 1);
 }
-static void center(struct JBWMRectangle * restrict g, const struct JBWMSize s)
+static void center(struct JBWMRectangle * restrict g, const struct JBDim s)
 {
 	g->x = get_center(g->width, s.w);
 	g->y = get_center(g->height, s.h);

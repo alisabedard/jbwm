@@ -6,15 +6,8 @@
 #define SCREENINFO_H
 #include <stdint.h>
 #include <X11/Xlib.h>
+#include "JBDim.h"
 #include "typedef.h"
-struct JBWMSize {
-	union {
-		jbwm_dim_t width, w;
-	};
-	union {
-		jbwm_dim_t height, h;
-	};
-};
 struct JBWMPixels {
 	jbwm_pixel_t fg, bg, fc;
 #ifdef JBWM_USE_TITLE_BAR
@@ -30,7 +23,7 @@ struct JBWMScreen {
 	jbwm_window_t supporting;
 #endif//JBWM_USE_EWMH
 	struct JBWMPixels pixels;
-	struct JBWMSize size;
+	struct JBDim size;
 	uint8_t screen, vdesk;
 } __attribute__((packed));
 #endif /* not SCREENINFO_H */
