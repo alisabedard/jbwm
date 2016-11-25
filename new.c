@@ -78,7 +78,7 @@ static void check_max_size(uint16_t * dim, const uint16_t scr_dim)
 {
 	*dim = JB_MIN(*dim, scr_dim);
 }
-static void sanitize_dimensions(struct JBWMRectangle * restrict g,
+static void check_dimensions(struct JBWMRectangle * restrict g,
 	const struct JBDim s)
 {
 	check_max_size(&g->width, s.w);
@@ -123,7 +123,7 @@ static void init_geometry(struct JBWMClient * c)
 	{ // scr_sz scope
 		const struct JBDim scr_sz
 			= jbwm_get_screens()[c->screen].size;
-		sanitize_dimensions(g, scr_sz);
+		check_dimensions(g, scr_sz);
 		if (pos) {
 			g->x = a_geo.x;
 			g->y = a_geo.y;
