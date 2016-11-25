@@ -57,6 +57,23 @@ static uint16_t get_per_min(uint16_t spec, uint16_t min)
 {
 	return (spec >= min) ? spec : min;
 }
+static void process_size_hints(Display * d, const jbwm_window_t win,
+	struct JBWMRectangle * g, bool * pos, const uint16_t a_w,
+	const uint16_t a_h)
+{
+	XSizeHints h;
+	XGetWMNormalHints(d, win, &h, &(long){0});
+	if (h.flags & USSize) {
+		// if size hints provided, use them
+		g->width = get_per_min(h.width, h.min_width);
+		g->height = get_per_min(h.height, h.min_height);
+	} else { // use existing window attributes
+		g->width = a_w;
+		g->height = a_h;
+	}
+	if (h.flags & USPosition)
+		*pos = true;
+}
 __attribute__((nonnull))
 static void init_geometry(struct JBWMClient * c)
 {
@@ -68,20 +85,7 @@ static void init_geometry(struct JBWMClient * c)
 	c->cmap = a.colormap;
 	bool pos = a.map_state == IsViewable;
 	struct JBWMRectangle * g = &c->size;
-	{ // h scope
-		XSizeHints h;
-		XGetWMNormalHints(d, c->window, &h, &(long){0});
-		if (h.flags & USSize) {
-			// if size hints provided, use them
-			g->width = get_per_min(h.width, h.min_width);
-			g->height = get_per_min(h.height, h.min_height);
-		} else { // use existing window attributes
-			g->width = a.width;
-			g->height = a.height;
-		}
-		if (h.flags & USPosition)
-			pos = true;
-	}
+	process_size_hints(d, c->window, g, &pos, a.width, a.height);
 	struct JBWMScreen * s = &jbwm_get_screens()[c->screen];
 	// sanitize dimensions:
 	g->width = JB_MIN(g->width, s->size.w);
