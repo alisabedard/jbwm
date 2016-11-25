@@ -117,8 +117,8 @@ static void init_geometry(struct JBWMClient * c)
 	const bool viewable = get_window_attributes(c, &a_geo);
 	// Test if the reparent that is to come would trigger an unmap event.
 	c->ignore_unmap += viewable ? 1 : 0;
-	struct JBWMRectangle * g = &c->size;
 	bool pos = viewable;
+	struct JBWMRectangle * g = &c->size;
 	process_size_hints(d, c->window, g, &pos, a_geo.width, a_geo.height);
 	const struct JBDim scr_sz = jbwm_get_screens()[c->screen].size;
 	sanitize_dimensions(g, scr_sz);
@@ -133,13 +133,16 @@ static void init_geometry(struct JBWMClient * c)
 __attribute__((nonnull))
 static Window get_parent(struct JBWMClient * c)
 {
+	enum {
+		CFP = CopyFromParent,
+		CW_VM = CWOverrideRedirect | CWEventMask,
+		WA_EM = SubstructureRedirectMask | SubstructureNotifyMask
+		| ButtonPressMask | EnterWindowMask
+	};
 	return XCreateWindow(c->d, jbwm_get_screens()[c->screen].root,
 		c->size.x, c->size.y, c->size.width, c->size.height,
-		c->border, CopyFromParent, CopyFromParent, CopyFromParent,
-		CWOverrideRedirect | CWEventMask, &(XSetWindowAttributes){
-		.override_redirect=true, .event_mask
-		= SubstructureRedirectMask | SubstructureNotifyMask
-		| ButtonPressMask | EnterWindowMask});
+		c->border, CFP, CFP, CFP, CW_VM, &(XSetWindowAttributes){
+		.override_redirect=true, .event_mask = WA_EM});
 }
 __attribute__((nonnull))
 static void reparent(struct JBWMClient * c)
