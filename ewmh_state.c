@@ -173,6 +173,10 @@ static void handle_moveresize(XClientMessageEvent * restrict e)
 	const uint32_t vm = (l[0] >> VM_SHIFT) & VM_MASK;
 	XConfigureWindow(e->display, e->window, vm, &(XWindowChanges){
 		.x = l[1], .y = l[2], .width = l[3], .height = l[4]});
+	// use bit width truncation to mask for gravity:
+	const uint8_t win_gravity = l[0];
+	XChangeWindowAttributes(e->display, e->window, CWWinGravity,
+		&(XSetWindowAttributes){.win_gravity = win_gravity});
 }
 #if defined(JBWM_DEBUG_EWMH_STATE) && defined(DEBUG)
 static void debug_client_message(XClientMessageEvent * restrict e)
