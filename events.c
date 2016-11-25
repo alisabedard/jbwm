@@ -28,6 +28,7 @@
 #define jbwm_print_atom(...)
 #endif//!DEBUG_ATOMS
 static bool events_need_cleanup;
+static jbwm_window_t last_window;
 __attribute__((pure))
 static struct JBWMScreen * get_screen(const int8_t i,
 	const jbwm_window_t root)
@@ -54,6 +55,8 @@ void jbwm_free_client(struct JBWMClient * restrict c)
 		XDestroyWindow(d, c->parent);
 	jbwm_relink_client_list(c);
 	free(c);
+	// Allow future clients with the same window ID:
+	last_window = 0;
 }
 static void cleanup(void)
 {
@@ -96,9 +99,15 @@ static void handle_configure_request(XConfigureRequestEvent * restrict e)
 }
 static void handle_map_request(XMapRequestEvent * restrict e)
 {
+	/* This check fixes a race condition in old libreoffice and certain
+	   Motif dialogs where an attempt is made to request mapping twice: */
+	const jbwm_window_t w = e->window;
+	if (w == last_window)
+		return;
+	last_window = w;
 	JBWM_LOG("MapRequest, send_event:%d", e->send_event);
 	Display * restrict d = e->display;
-	jbwm_new_client(d, get_screen(ScreenCount(d), e->parent), e->window);
+	jbwm_new_client(d, get_screen(ScreenCount(d), e->parent), w);
 }
 static inline void mark_removal(struct JBWMClient * restrict c)
 {
@@ -118,8 +127,13 @@ event_loop:
 	case MapNotify:
 	case MappingNotify:
 	case MotionNotify:
-	case ReparentNotify:
 		// ignore
+		goto event_loop;
+	case ReparentNotify:
+		JBWM_LOG("ReparentNotify");
+		/* Reset last_window to allow other clients with the same window
+		 * id to be started.  */
+		last_window = 0;
 		goto event_loop;
 	case KeyPress:
 		jbwm_handle_key_event(ev.xkey.display, &ev.xkey);
