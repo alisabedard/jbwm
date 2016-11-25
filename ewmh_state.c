@@ -167,19 +167,25 @@ static void handle_moveresize(XClientMessageEvent * restrict e)
 		.width = e->data.l[3],
 		.height = e->data.l[4]});
 }
-void jbwm_ewmh_handle_client_message(XClientMessageEvent * restrict e,
-	struct JBWMClient * restrict c)
+#if defined(JBWM_DEBUG_EWMH_STATE) && defined(DEBUG)
+static void debug_client_message(XClientMessageEvent * restrict e)
 {
-	const Atom t = e->message_type;
-#ifdef JBWM_DEBUG_EWMH_STATE
 	JBWM_LOG("----CLIENTMESSAGE----");
 	Display * d = e->display;
-	jbwm_print_atom(d, t, __FILE__, __LINE__);
+	jbwm_print_atom(d, e->message_type, __FILE__, __LINE__);
 	jbwm_print_atom(d, e->data.l[0], __FILE__, __LINE__);
 	jbwm_print_atom(d, e->data.l[1], __FILE__, __LINE__);
 	jbwm_print_atom(d, e->data.l[2], __FILE__, __LINE__);
 	jbwm_print_atom(d, e->data.l[3], __FILE__, __LINE__);
-#endif//JBWM_DEBUG_EWMH_STATE
+}
+#else//!JBWM_DEBUG_EWMH_STATE||!DEBUG
+#define debug_client_message(e)
+#endif//JBWM_DEBUG_EWMH_STATE&&DEBUG
+void jbwm_ewmh_handle_client_message(XClientMessageEvent * restrict e,
+	struct JBWMClient * restrict c)
+{
+	const Atom t = e->message_type;
+	debug_client_message(e);
 	if(c && client_specific_message(e, c, t))
 		  return;
 	if (t == jbwm_ewmh_get_atom(JBWM_EWMH_CURRENT_DESKTOP))

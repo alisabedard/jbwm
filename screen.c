@@ -9,7 +9,6 @@
 #include "ewmh.h"
 #include "font.h"
 #include "jbwm.h"
-#include "log.h"
 #include "shape.h"
 #include "snap.h"
 #include "title_bar.h"
