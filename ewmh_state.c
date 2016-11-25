@@ -8,7 +8,7 @@
 #include "screen.h"
 #include "util.h"
 #include <X11/Xatom.h>
-//#define JBWM_DEBUG_EWMH_STATE
+#define JBWM_DEBUG_EWMH_STATE
 #ifndef JBWM_DEBUG_EWMH_STATE
 #undef JBWM_LOG
 #define JBWM_LOG(...)
@@ -172,12 +172,13 @@ void jbwm_ewmh_handle_client_message(XClientMessageEvent * restrict e,
 {
 	const Atom t = e->message_type;
 #ifdef JBWM_DEBUG_EWMH_STATE
-	dprintf(STDERR_FILENO, "----CLIENTMESSAGE----");
-	jbwm_print_atom(t, __FILE__, __LINE__);
-	jbwm_print_atom(e->data.l[0], __FILE__, __LINE__);
-	jbwm_print_atom(e->data.l[1], __FILE__, __LINE__);
-	jbwm_print_atom(e->data.l[2], __FILE__, __LINE__);
-	jbwm_print_atom(e->data.l[3], __FILE__, __LINE__);
+	JBWM_LOG("----CLIENTMESSAGE----");
+	Display * d = e->display;
+	jbwm_print_atom(d, t, __FILE__, __LINE__);
+	jbwm_print_atom(d, e->data.l[0], __FILE__, __LINE__);
+	jbwm_print_atom(d, e->data.l[1], __FILE__, __LINE__);
+	jbwm_print_atom(d, e->data.l[2], __FILE__, __LINE__);
+	jbwm_print_atom(d, e->data.l[3], __FILE__, __LINE__);
 #endif//JBWM_DEBUG_EWMH_STATE
 	if(c && client_specific_message(e, c, t))
 		  return;

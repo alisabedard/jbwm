@@ -12,7 +12,7 @@ jbwm_cflags+=-Wsuggest-attribute=const
 jbwm_cflags+=-Wsuggest-attribute=noreturn
 jbwm_cflags+=-Wsuggest-attribute=format
 jbwm_cflags+=-Wlarger-than=512
-jbwm_cflags+=-Wframe-larger-than=512
+#jbwm_cflags+=-Wframe-larger-than=512
 #jbwm_cflags+=-Wstack-usage=512
 jbwm_cflags+=-Wcast-qual -Wcast-align -Wjump-misses-init
 jbwm_cflags+=-Wlogical-op -Wmissing-prototypes

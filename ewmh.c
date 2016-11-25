@@ -7,9 +7,17 @@
 #include "config.h"
 #include "font.h"
 #include "jbwm.h"
+#include "log.h"
+#include "macros.h"
 #include "util.h"
+#include <string.h>
 #include <unistd.h>
 #include <X11/Xatom.h>
+#define JBWM_DEBUG_EWMH
+#ifndef JBWM_DEBUG_EWMH
+#undef JBWM_LOG
+#define JBWM_LOG(...)
+#endif//!JBWM_DEBUG_EWMH
 static Atom jbwm_ewmh[JBWM_EWMH_ATOMS_COUNT];
 jbwm_atom_t jbwm_ewmh_get_atom(const uint8_t index)
 {
@@ -60,23 +68,40 @@ static void jbwm_ewmh_init(Display * restrict d)
 	};
 	XInternAtoms(d, atom_names, JBWM_EWMH_ATOMS_COUNT, false, jbwm_ewmh);
 }
+static Window * get_mixed_client_list(Display * restrict d)
+{
+	enum {MAX_CLIENTS = 64};
+	static Window l[MAX_CLIENTS];
+	uint8_t n = 0;
+	for (struct JBWMClient * i = jbwm_get_head_client();
+		i && n < MAX_CLIENTS; i = i->next)
+		l[n++] = i->window;
+	jbwm_set_property(d, DefaultRootWindow(d),
+		jbwm_ewmh[JBWM_EWMH_CLIENT_LIST], XA_WINDOW, l, n);
+	return l;
+}
+static Window * get_ordered_client_list(Display * restrict d)
+{
+	enum {MAX_CLIENTS= 64};
+	static Window window_list[MAX_CLIENTS];
+	// get ordered list of all windows on default screen:
+	unsigned int n = 0;
+	const Window r = DefaultRootWindow(d);
+	Window * wl, nil;
+	if (XQueryTree(d, r, &nil, &nil, &wl, &n)) {
+		n = JB_MIN(n, MAX_CLIENTS); // limit to MAX_CLIENTS
+		memcpy(window_list, wl, n * sizeof(Window));
+		XFree(wl);
+	}
+	JBWM_LOG("get_ordered_client_list() n: %d", n);
+	jbwm_set_property(d, r, jbwm_ewmh[JBWM_EWMH_CLIENT_LIST_STACKING],
+		XA_WINDOW, window_list, n);
+	return window_list;
+}
 void jbwm_ewmh_update_client_list(Display * restrict d)
 {
-	struct JBWMScreen * s = jbwm_get_screens();
-	int8_t i = ScreenCount(d);
-	while(i--) {
-		Window r, *wl;
-		unsigned int n;
-		if (XQueryTree(d, s[i].root, &r, &r, &wl, &n) && wl) {
-			jbwm_set_property(d, s[i].root,
-				jbwm_ewmh[JBWM_EWMH_CLIENT_LIST],
-				XA_WINDOW, &wl, n);
-			jbwm_set_property(d, s[i].root,
-				jbwm_ewmh[JBWM_EWMH_CLIENT_LIST_STACKING],
-				XA_WINDOW, &wl, n);
-			XFree(wl);
-		}
-	}
+	get_mixed_client_list(d);
+	get_ordered_client_list(d);
 }
 static void set_root_vdesk(Display * restrict d, jbwm_window_t r)
 {
