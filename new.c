@@ -118,7 +118,8 @@ static void init_geometry(struct JBWMClient * c)
 	c->ignore_unmap += viewable ? 1 : 0;
 	bool pos = viewable;
 	struct JBWMRectangle * g = &c->size;
-	process_size_hints(c->d, c->window, g, &pos, a_geo.width, a_geo.height);
+	process_size_hints(c->d, c->window, g, &pos,
+		a_geo.width, a_geo.height);
 	{ // scr_sz scope
 		const struct JBDim scr_sz
 			= jbwm_get_screens()[c->screen].size;
