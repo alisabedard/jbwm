@@ -6,7 +6,6 @@
 #include "client.h"
 #include "config.h"
 #include "font.h"
-#include "jbwm.h"
 #include "log.h"
 #include "macros.h"
 #include "util.h"
