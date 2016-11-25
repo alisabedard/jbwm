@@ -93,27 +93,40 @@ static void center(struct JBWMRectangle * restrict g, const struct JBDim s)
 	g->x = get_center(g->width, s.w);
 	g->y = get_center(g->height, s.h);
 }
+// returns true if window is viewable
+static bool get_window_attributes(struct JBWMClient * restrict c,
+	struct JBWMRectangle * a_geo)
+{
+	XWindowAttributes a;
+	XGetWindowAttributes(c->d, c->window, &a);
+	JBWM_LOG("XGetWindowAttributes() win: 0x%x,"
+		"x: %d, y: %d, w: %d, h: %d",
+		(int)c->window, a.x, a.y, a.width, a.height);
+	c->cmap = a.colormap;
+	a_geo->x = a.x;
+	a_geo->y = a.y;
+	a_geo->width = a.width;
+	a_geo->height = a.height;
+	return a.map_state == IsViewable;
+}
 __attribute__((nonnull))
 static void init_geometry(struct JBWMClient * c)
 {
-	XWindowAttributes a;
 	Display * d = c->d;
-	XGetWindowAttributes(d, c->window, &a);
-	JBWM_LOG("XGetWindowAttributes() win: 0x%x, x: %d, y: %d, "
-		"w: %d, h: %d", (int)c->window, a.x, a.y, a.width, a.height);
-	c->cmap = a.colormap;
-	bool pos = a.map_state == IsViewable;
+	struct JBWMRectangle a_geo;
+	const bool viewable = get_window_attributes(c, &a_geo);
+	// Test if the reparent that is to come would trigger an unmap event.
+	c->ignore_unmap += viewable ? 1 : 0;
 	struct JBWMRectangle * g = &c->size;
-	process_size_hints(d, c->window, g, &pos, a.width, a.height);
+	bool pos = viewable;
+	process_size_hints(d, c->window, g, &pos, a_geo.width, a_geo.height);
 	struct JBWMScreen * s = &jbwm_get_screens()[c->screen];
 	sanitize_dimensions(g, s->size);
 	if (pos) {
-		g->x = a.x;
-		g->y = a.y;
+		g->x = a_geo.x;
+		g->y = a_geo.y;
 	} else
 		center(g, s->size);
-	// Test if the reparent that is to come would trigger an unmap event.
-	c->ignore_unmap += a.map_state == IsViewable ? 1 : 0;
 	JBWM_LOG("init_geometry() win: 0x%x, x: %d, y: %d, w: %d, h: %d",
 		(int)c->window, g->x, g->y, g->width, g->height);
 }
