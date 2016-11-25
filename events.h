@@ -5,7 +5,6 @@
 #ifndef JBWM_EVENTS_H
 #define JBWM_EVENTS_H
 #include "JBWMClient.h"
-void jbwm_free_client(Display * restrict d,
-	struct JBWMClient * restrict c) __attribute__((nonnull));
+void jbwm_free_client(struct JBWMClient * restrict c) __attribute__((nonnull));
 void jbwm_event_loop(Display * restrict d) __attribute__((noreturn));
 #endif /* ! JBWM_EVENTS_H */

@@ -36,8 +36,9 @@ static struct JBWMScreen * get_screen(const int8_t i,
 	return s[i].root == root ? s + i
 		: get_screen(i - 1, root);
 }
-void jbwm_free_client(Display * restrict d, struct JBWMClient * restrict c)
+void jbwm_free_client(struct JBWMClient * restrict c)
 {
+	Display * d = c->d;
 	{ // w scope
 		const jbwm_window_t w = c->window;
 #ifdef JBWM_USE_EWMH
@@ -54,7 +55,7 @@ void jbwm_free_client(Display * restrict d, struct JBWMClient * restrict c)
 	jbwm_relink_client_list(c);
 	free(c);
 }
-static void cleanup(Display * restrict d)
+static void cleanup(void)
 {
 	JBWM_LOG("cleanup");
 	events_need_cleanup = false;
@@ -64,7 +65,7 @@ static void cleanup(Display * restrict d)
 		i = c->next;
 		if (!c->opt.remove)
 			continue;
-		jbwm_free_client(d, c);
+		jbwm_free_client(c);
 	} while(i && (c = i));
 }
 static void handle_property_change(XPropertyEvent * restrict e,
@@ -177,7 +178,7 @@ event_loop:
 #endif//DEBUG_EVENTS
 	}
 	if (events_need_cleanup)
-		cleanup(ev.xany.display);
+		cleanup();
 	goto event_loop;
 }
 
