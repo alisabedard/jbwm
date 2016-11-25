@@ -15,7 +15,7 @@ static int16_t sborder(const int16_t xy, const int16_t edge)
 		  return - edge;
 	return xy;
 }
-void jbwm_snap_border(struct JBWMClient *restrict c)
+void jbwm_snap_border(struct JBWMClient * restrict c)
 {
 	struct JBWMRectangle * restrict g = &(c->size);
 	/* snap to screen border */
