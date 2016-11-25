@@ -138,8 +138,8 @@ event_loop:
 		goto event_loop;
 	case ReparentNotify:
 		JBWM_LOG("ReparentNotify");
-		/* Reset last_window to allow other clients with the same window
-		 * id to be started.  */
+		/* Reset last_window to allow other clients
+		   with the same window id to be started.  */
 		last_window = 0;
 		goto event_loop;
 	case KeyPress:

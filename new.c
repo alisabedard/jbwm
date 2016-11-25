@@ -99,8 +99,8 @@ static void init_geometry(struct JBWMClient * c)
 	XWindowAttributes a;
 	Display * d = c->d;
 	XGetWindowAttributes(d, c->window, &a);
-	JBWM_LOG("XGetWindowAttributes() win: 0x%x, x: %d, y: %d, w: %d, h: %d",
-		(int)c->window, a.x, a.y, a.width, a.height);
+	JBWM_LOG("XGetWindowAttributes() win: 0x%x, x: %d, y: %d, "
+		"w: %d, h: %d", (int)c->window, a.x, a.y, a.width, a.height);
 	c->cmap = a.colormap;
 	bool pos = a.map_state == IsViewable;
 	struct JBWMRectangle * g = &c->size;
