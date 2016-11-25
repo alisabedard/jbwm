@@ -37,16 +37,23 @@ static struct JBWMScreen * get_screen(const int8_t i,
 	return s[i].root == root ? s + i
 		: get_screen(i - 1, root);
 }
+#ifdef JBWM_USE_EWMH
+static void delete_ewmh_properties(Display * restrict d,
+	const jbwm_window_t w)
+{
+	// Per ICCCM + wm-spec
+	XDeleteProperty(d, w, jbwm_ewmh_get_atom(JBWM_EWMH_WM_STATE));
+	XDeleteProperty(d, w, jbwm_ewmh_get_atom(JBWM_EWMH_WM_DESKTOP));
+}
+#else//!JBWM_USE_EWMH
+#define delete_ewmh_properties(d, w)
+#endif//JBWM_USE_EWMH
 void jbwm_free_client(struct JBWMClient * restrict c)
 {
 	Display * d = c->d;
 	{ // w scope
 		const jbwm_window_t w = c->window;
-#ifdef JBWM_USE_EWMH
-		// Per ICCCM + JBWM_USE_EWMH:
-		XDeleteProperty(d, w, jbwm_ewmh_get_atom(JBWM_EWMH_WM_STATE));
-		XDeleteProperty(d, w, jbwm_ewmh_get_atom(JBWM_EWMH_WM_DESKTOP));
-#endif//JBWM_USE_EWMH
+		delete_ewmh_properties(d, w);
 		XReparentWindow(d, w, jbwm_get_screens()[c->screen].root,
 			c->size.x, c->size.y);
 		XRemoveFromSaveSet(d, w);
