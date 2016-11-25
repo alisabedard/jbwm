@@ -74,6 +74,25 @@ static void process_size_hints(Display * d, const jbwm_window_t win,
 	if (h.flags & USPosition)
 		*pos = true;
 }
+static void check_max_size(uint16_t * dim, const uint16_t scr_dim)
+{
+	*dim = JB_MIN(*dim, scr_dim);
+}
+static void sanitize_dimensions(struct JBWMRectangle * restrict g,
+	const struct JBWMSize s)
+{
+	check_max_size(&g->width, s.w);
+	check_max_size(&g->height, s.h);
+}
+static int16_t get_center(const uint16_t wh, const uint16_t swh)
+{
+	return (swh >> 1) - (wh >> 1);
+}
+static void center(struct JBWMRectangle * restrict g, const struct JBWMSize s)
+{
+	g->x = get_center(g->width, s.w);
+	g->y = get_center(g->height, s.h);
+}
 __attribute__((nonnull))
 static void init_geometry(struct JBWMClient * c)
 {
@@ -87,11 +106,12 @@ static void init_geometry(struct JBWMClient * c)
 	struct JBWMRectangle * g = &c->size;
 	process_size_hints(d, c->window, g, &pos, a.width, a.height);
 	struct JBWMScreen * s = &jbwm_get_screens()[c->screen];
-	// sanitize dimensions:
-	g->width = JB_MIN(g->width, s->size.w);
-	g->height = JB_MIN(g->height, s->size.h);
-	g->x = pos ? a.x : (s->size.w >> 1) - (g->width >> 1);
-	g->y = pos ? a.y : (s->size.h >> 1) - (g->height >> 1);
+	sanitize_dimensions(g, s->size);
+	if (pos) {
+		g->x = a.x;
+		g->y = a.y;
+	} else
+		center(g, s->size);
 	// Test if the reparent that is to come would trigger an unmap event.
 	c->ignore_unmap += a.map_state == IsViewable ? 1 : 0;
 	JBWM_LOG("init_geometry() win: 0x%x, x: %d, y: %d, w: %d, h: %d",
