@@ -35,18 +35,15 @@ static void draw_outline(struct JBWMClient * restrict c)
 	XDrawRectangles(c->d, s->root, s->gc, &r, 1);
 }
 __attribute__((nonnull))
-static void configure(Display * restrict d,
-	struct JBWMRectangle * restrict g,
-	const jbwm_window_t w)
+void jbwm_configure_client(struct JBWMClient * restrict c)
 {
-	XSendEvent(d, w, true, StructureNotifyMask, (XEvent *)
+	const jbwm_window_t w = c->window;
+	struct JBWMRectangle * restrict g = &c->size;
+	XSendEvent(c->d, w, true, StructureNotifyMask, (XEvent *)
 		&(XConfigureEvent){.x = g->x, .y = g->y, .width = g->width,
-		.height = g->height, .type = ConfigureNotify, .event = w });
-}
-__attribute__((nonnull))
-static inline void jbwm_configure_client(struct JBWMClient * restrict c)
-{
-	configure(c->d, &c->size, c->window);
+		.height = g->height, .type = ConfigureNotify, .event = w,
+		.window = w, .above = c->parent, .override_redirect = true,
+		.border_width = c->border});
 }
 static void grab_pointer(Display * restrict d, const jbwm_window_t w)
 {
@@ -129,8 +126,6 @@ void jbwm_drag(struct JBWMClient * restrict c, const bool resize)
 	draw_outline(c);
 	XUngrabPointer(d, CurrentTime);
 	jbwm_move_resize(c);
-	if (!resize && !c->opt.tearoff)
-		jbwm_configure_client(c);
 }
 void jbwm_move_resize(struct JBWMClient * restrict c)
 {
@@ -147,8 +142,10 @@ void jbwm_move_resize(struct JBWMClient * restrict c)
 		jbwm_update_title_bar(c);
 	} // Skip shaped and fullscreen clients.
 	jbwm_set_shape(c);
+	jbwm_set_frame_extents(c);
+	jbwm_configure_client(c);
 }
-static void hide(struct JBWMClient * restrict c)
+void jbwm_hide_client(struct JBWMClient * restrict c)
 {
 	Display * d = c->d;
 	XUnmapWindow(d, c->parent);
@@ -173,7 +170,7 @@ static void check_visibility(struct JBWMScreen * s,
 		c->vdesk = v; // allow moving windows by sticking
 		jbwm_restore_client(c);
 	} else
-		hide(c);
+		jbwm_hide_client(c);
 }
 uint8_t jbwm_set_vdesk(struct JBWMScreen * s, uint8_t v)
 {

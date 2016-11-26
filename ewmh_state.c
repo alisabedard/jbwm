@@ -63,8 +63,11 @@ void jbwm_ewmh_add_state(Display * d, const Window w, Atom state)
   data.l[3] = source indication
   other data.l[] elements = 0 */
 static void set_state(struct JBWMClient * restrict c,
-	const bool add, const enum JBWMAtomIndex t)
+	bool add, const enum JBWMAtomIndex t)
 {
+	JBWM_LOG("set_state(c, add: %s, t: %d)", add ? "true" : "false",
+		(int) t);
+	jbwm_print_atom(c->d, jbwm_ewmh_get_atom(t), __FILE__, __LINE__);
 	if (!c)
 		return;
 	switch(t) {
@@ -75,13 +78,12 @@ static void set_state(struct JBWMClient * restrict c,
 		c->opt.sticky=add;
 		break;
 	case JBWM_EWMH_WM_STATE_ABOVE:
+		add = !add; // fall through
+	case JBWM_EWMH_WM_STATE_BELOW:
 		(add ? XRaiseWindow : XLowerWindow)(c->d, c->parent);
 		break;
-	case JBWM_EWMH_WM_STATE_BELOW:
-		(add ? XLowerWindow : XRaiseWindow)(c->d, c->parent);
-		break;
 	case JBWM_EWMH_WM_STATE_HIDDEN:
-		JBWM_LOG("HIDDEN");
+		(add ? jbwm_hide_client : jbwm_restore_client)(c);
 		break;
 	case JBWM_EWMH_WM_STATE_MAXIMIZED_VERT:
 		(add ? jbwm_set_vert : jbwm_set_not_vert)(c);
@@ -90,6 +92,7 @@ static void set_state(struct JBWMClient * restrict c,
 		(add ? jbwm_set_horz : jbwm_set_not_horz)(c);
 		break;
 	default:
+		JBWM_LOG("\tWARNING:  Unhandled state");
 		break;
 	}
 }
@@ -138,6 +141,7 @@ static void handle_wm_state_changes(XClientMessageEvent * restrict e,
 static bool client_specific_message(XClientMessageEvent * restrict e,
 	struct JBWMClient * restrict c, const Atom t)
 {
+	jbwm_print_atom(c->d, t, __FILE__, __LINE__);
 	if (t == jbwm_ewmh_get_atom(JBWM_EWMH_WM_DESKTOP))
 		jbwm_set_client_vdesk(c, e->data.l[0]);
 	// If user moves window (client-side title bars):

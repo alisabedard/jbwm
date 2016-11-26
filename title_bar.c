@@ -137,7 +137,6 @@ static void remove_title_bar(struct JBWMClient * restrict c)
 	Display * d = c->d;
 	XDestroyWindow(d, c->tb.win);
 	c->tb.win = 0;
-	jbwm_set_frame_extents(c);
 }
 void jbwm_update_title_bar(struct JBWMClient * c)
 {
@@ -163,5 +162,4 @@ void jbwm_update_title_bar(struct JBWMClient * c)
 	draw_title(c);
 	if (c->opt.no_title_bar)
 		remove_title_bar(c);
-	jbwm_set_frame_extents(c);
 }

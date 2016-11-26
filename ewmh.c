@@ -173,6 +173,7 @@ void jbwm_ewmh_init_screen(Display * restrict d,
 }
 void jbwm_set_frame_extents(struct JBWMClient * restrict c)
 {
+	JBWM_LOG("jbwm_set_frame_extents()");
 	// left, right, top, bottom
 	const uint8_t b = c->border;
 #ifdef JBWM_USE_TITLE_BAR

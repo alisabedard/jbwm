@@ -101,7 +101,6 @@ static void handle_configure_request(XConfigureRequestEvent * restrict e)
 	XConfigureWindow(e->display, e->window, e->value_mask,
 		&(XWindowChanges){ .x = e->x, .y = e->y,
 		.width = e->width, .height = e->height,
-		.border_width = e->border_width,
 		.sibling = e->above, .stack_mode = e->detail});
 }
 static void handle_map_request(XMapRequestEvent * restrict e)
@@ -129,12 +128,19 @@ event_loop:
 	struct JBWMClient * restrict c = jbwm_get_client(ev.xany.window);
 	switch (ev.type) {
 	case ButtonRelease:
-	case ConfigureNotify:
 	case KeyRelease:
 	case MapNotify:
 	case MappingNotify:
 	case MotionNotify:
 		// ignore
+		goto event_loop;
+	case ConfigureNotify:
+		JBWM_LOG("ConfigureNotify");
+		/* Failure to do this causes Java Swing applications to first
+		 appear offset within the parent window until they receive
+		 a click.  This is a fix:  */
+		if (c)
+			jbwm_move_resize(c);
 		goto event_loop;
 	case ReparentNotify:
 		JBWM_LOG("ReparentNotify");
@@ -175,9 +181,8 @@ event_loop:
 		break;
 #endif//JBWM_USE_EWMH
 	case UnmapNotify:
-		if(!c)
-			break;
-		mark_removal(c);
+		if (c)
+			mark_removal(c);
 		break;
 	case MapRequest:
 		if (!c)
