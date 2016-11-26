@@ -54,8 +54,8 @@ static uint16_t get_per_min(uint16_t spec, uint16_t min)
 {
 	return (spec >= min) ? spec : min;
 }
-static void process_size_hints(Display * d, const jbwm_window_t win,
-	struct JBWMRectangle * g, bool * pos, const uint16_t a_w,
+static bool process_size_hints(Display * d, const jbwm_window_t win,
+	struct JBWMRectangle * g, const uint16_t a_w,
 	const uint16_t a_h)
 {
 	XSizeHints h;
@@ -68,8 +68,7 @@ static void process_size_hints(Display * d, const jbwm_window_t win,
 		g->width = a_w;
 		g->height = a_h;
 	}
-	if (h.flags & USPosition)
-		*pos = true;
+	return (h.flags & USPosition);
 }
 static void check_max_size(uint16_t * dim, const uint16_t scr_dim)
 {
@@ -111,17 +110,27 @@ static void init_geometry(struct JBWMClient * c)
 {
 	struct JBWMRectangle a_geo;
 	const bool viewable = get_window_attributes(c, &a_geo);
-	// Test if the reparent that is to come would trigger an unmap event.
-	c->ignore_unmap += viewable ? 1 : 0;
-	bool pos = viewable;
 	struct JBWMRectangle * g = &c->size;
-	process_size_hints(c->d, c->window, g, &pos,
+	if (viewable) {
+		/* Test if the reparent that is to come
+		   would trigger an unmap event. */
+		++c->ignore_unmap;
+		/* If the window is already on screen before the window
+		   manager starts, simply save its geometry then return. */
+		*g = a_geo;
+		return;
+	}
+	c->ignore_unmap += viewable ? 1 : 0;
+	//bool pos = viewable;
+	JBWM_LOG("\t\tVIEWABLE: %d", viewable);
+	const bool pos = process_size_hints(c->d, c->window, g,
 		a_geo.width, a_geo.height);
 	{ // scr_sz scope
 		const struct JBDim scr_sz
 			= jbwm_get_screens()[c->screen].size;
 		check_dimensions(g, scr_sz);
-		if (pos) {
+		if (pos && (a_geo.x || a_geo.y)) {
+			JBWM_LOG("\t\tPosition is set by hints.");
 			g->x = a_geo.x;
 			g->y = a_geo.y;
 		} else
