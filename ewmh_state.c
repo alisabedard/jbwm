@@ -1,5 +1,6 @@
 // Copyright 2016, Jeffrey E. Bedard <jefbed@gmail.com>
 #include "ewmh_state.h"
+#include <X11/Xatom.h>
 #include "client.h"
 #include "ewmh.h"
 #include "jbwm.h"
@@ -7,7 +8,6 @@
 #include "max.h"
 #include "screen.h"
 #include "util.h"
-#include <X11/Xatom.h>
 #define JBWM_DEBUG_EWMH_STATE
 #ifndef JBWM_DEBUG_EWMH_STATE
 #undef JBWM_LOG

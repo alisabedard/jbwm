@@ -3,6 +3,8 @@
 // Copyright 1999-2015, Ciaran Anscomb <jbwm@6809.org.uk>
 // See README for license and other details.
 #include "new.h"
+#include <stdlib.h>
+#include <X11/Xatom.h>
 #include "client.h"
 #include "config.h"
 #include "ewmh.h"
@@ -14,8 +16,6 @@
 #include "screen.h"
 #include "shape.h"
 #include "util.h"
-#include <stdlib.h>
-#include <X11/Xatom.h>
 #define DEBUG_NEW
 #ifndef DEBUG_NEW
 #undef JBWM_LOG

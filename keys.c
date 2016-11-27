@@ -3,6 +3,8 @@
 // Copyright 1999-2015, Ciaran Anscomb <jbwm@6809.org.uk>
 // See README for license and other details.
 #include "keys.h"
+#include <stdlib.h>
+#include <unistd.h>
 #include "client.h"
 #include "config.h"
 #include "jbwm.h"
@@ -12,8 +14,6 @@
 #include "snap.h"
 #include "title_bar.h"
 #include "util.h"
-#include <stdlib.h>
-#include <unistd.h>
 //#define DEBUG_KEYS
 #ifndef DEBUG_KEYS
 #undef JBWM_LOG

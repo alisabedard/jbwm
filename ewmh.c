@@ -3,15 +3,15 @@
 // Copyright 1999-2015, Ciaran Anscomb <jbwm@6809.org.uk>
 // See README for license and other details.
 #include "ewmh.h"
+#include <string.h>
+#include <unistd.h>
+#include <X11/Xatom.h>
 #include "client.h"
 #include "config.h"
 #include "font.h"
 #include "log.h"
 #include "macros.h"
 #include "util.h"
-#include <string.h>
-#include <unistd.h>
-#include <X11/Xatom.h>
 #define JBWM_DEBUG_EWMH
 #ifndef JBWM_DEBUG_EWMH
 #undef JBWM_LOG

@@ -3,19 +3,20 @@
 // Copyright 1999-2015, Ciaran Anscomb <jbwm@6809.org.uk>
 // See README for license and other details.
 #include "screen.h"
+#include <stdlib.h>
+#include <X11/cursorfont.h>
+#include <X11/Xatom.h>
 #include "client.h"
 #include "config.h"
 #include "ewmh_state.h"
 #include "ewmh.h"
 #include "font.h"
+#include "JBDim.h"
 #include "jbwm.h"
 #include "shape.h"
 #include "snap.h"
 #include "title_bar.h"
 #include "util.h"
-#include <stdlib.h>
-#include <X11/cursorfont.h>
-#include <X11/Xatom.h>
 //#define DEBUG_SCREEN
 #ifndef DEBUG_SCREEN
 #undef JBWM_LOG
@@ -53,13 +54,13 @@ static void grab_pointer(Display * restrict d, const jbwm_window_t w)
 	XGrabPointer(d, w, false, JBWMMouseMask, GrabModeAsync,
 		GrabModeAsync, None, c, CurrentTime);
 }
-static jbwm_point_t get_mouse_position(Display * restrict d,
+static struct JBDim get_mouse_position(Display * restrict d,
 	const jbwm_window_t w)
 {
 	int x, y;
 	XQueryPointer(d, w, &(Window){0}, &(Window){0},
 		&x, &y, &(int){0}, &(int){0}, &(unsigned int){0});
-	return (jbwm_point_t){x, y};
+	return (struct JBDim){.x = x, .y = y};
 }
 static void warp_corner(struct JBWMClient * restrict c)
 {
@@ -73,7 +74,7 @@ static void set_size(struct JBWMClient * restrict c,
 	c->size.height = abs(c->size.y - y);
 }
 static void set_position(struct JBWMClient * restrict c,
-	jbwm_point_t old, jbwm_point_t start,
+	const struct JBDim old, const struct JBDim start,
 	const int16_t x, const int16_t y)
 {
 	c->size.x = old.x - start.x + x;
@@ -81,7 +82,7 @@ static void set_position(struct JBWMClient * restrict c,
 	jbwm_snap_client(c);
 }
 static void do_changes(struct JBWMClient * restrict c, const bool resize,
-	const jbwm_point_t start, const jbwm_point_t original,
+	const struct JBDim start, const struct JBDim original,
 	const int16_t x, const int16_t y)
 {
 	if (resize)
@@ -92,9 +93,9 @@ static void do_changes(struct JBWMClient * restrict c, const bool resize,
 static void drag_event_loop(struct JBWMClient * restrict c, const bool resize)
 {
 	Display * d = c->d;
-	const jbwm_point_t start = get_mouse_position(d,
+	const struct JBDim start = get_mouse_position(d,
 		jbwm_get_screens()[c->screen].root);
-	const jbwm_point_t original = {c->size.x, c->size.y};
+	const struct JBDim original = {.x = c->size.x, .y = c->size.y};
 	for (;;) {
 		int16_t x, y;
 		{ // e scope

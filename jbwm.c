@@ -3,6 +3,12 @@
 // Copyright 1999-2015, Ciaran Anscomb <jbwm@6809.org.uk>
 // See README for license and other details.
 #include "jbwm.h"
+#include <stdlib.h>
+#include <unistd.h>
+#include <X11/Xproto.h>
+#ifdef JBWM_USE_XFT
+#include <X11/Xft/Xft.h>
+#endif//JBWM_USE_XFT
 #include "client.h"
 #include "config.h"
 #include "events.h"
@@ -12,12 +18,6 @@
 #include "log.h"
 #include "new.h"
 #include "util.h"
-#include <stdlib.h>
-#include <unistd.h>
-#include <X11/Xproto.h>
-#ifdef JBWM_USE_XFT
-#include <X11/Xft/Xft.h>
-#endif//JBWM_USE_XFT
 //#define DEBUG_JBWM
 #ifndef DEBUG_JBWM
 #undef JBWM_LOG

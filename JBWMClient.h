@@ -7,6 +7,7 @@
 #include "JBWMScreen.h"
 #include <stdbool.h>
 #include <X11/Xutil.h>
+#include "typedef.h"
 struct JBWMClientOptions {
 	bool fullscreen : 1;
 	bool max_horz : 1;
@@ -31,8 +32,8 @@ struct JBWMClientTitlebar {
 };
 #endif//JBWM_USE_TITLE_BAR
 struct JBWMRectangle {
-	int16_t x, y;
-	uint16_t width, height;
+	jbwm_axis_t x, y;
+	jbwm_length_t width, height;
 };
 struct JBWMClient {
 	Display * d; // alias to reduce parameter count
@@ -40,7 +41,6 @@ struct JBWMClient {
 #ifdef JBWM_USE_TITLE_BAR
 	struct JBWMClientTitlebar tb;
 #endif//JBWM_USE_TITLE_BAR
-	jbwm_rectangle_t old_size;
 	jbwm_cmap_t cmap;
 	jbwm_window_t window, parent;
 	struct JBWMClientOptions opt;
@@ -48,6 +48,6 @@ struct JBWMClient {
 	uint8_t border:1;
 	uint8_t vdesk:4;
 	uint8_t screen;
-	struct JBWMRectangle size;
+	struct JBWMRectangle size, old_size;
 } __attribute__((packed));
 #endif /* JBWM_CLIENT_STRUCT_H */

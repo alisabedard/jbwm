@@ -3,11 +3,11 @@
 // Copyright 1999-2015, Ciaran Anscomb <jbwm@6809.org.uk>
 // See README for license and other details.
 #include "snap.h"
+#include <stdlib.h>
 #include "client.h"
 #include "config.h"
 #include "font.h"
 #include "jbwm.h"
-#include <stdlib.h>
 __attribute__ ((const, hot, warn_unused_result))
 static int16_t sborder(const int16_t xy, const int16_t edge)
 {

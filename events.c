@@ -3,6 +3,8 @@
 // Copyright 1999-2015, Ciaran Anscomb <jbwm@6809.org.uk>
 // See README for license and other details.
 #include "events.h"
+#include <stdlib.h>
+#include <X11/Xatom.h>
 #include "button_event.h"
 #include "client.h"
 #include "ewmh_state.h"
@@ -15,8 +17,6 @@
 #include "screen.h"
 #include "title_bar.h"
 #include "util.h"
-#include <stdlib.h>
-#include <X11/Xatom.h>
 #define DEBUG_EVENTS
 #ifndef DEBUG_EVENTS
 #undef JBWM_LOG

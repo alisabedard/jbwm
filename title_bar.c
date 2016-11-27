@@ -3,6 +3,11 @@
 // Copyright 1999-2015, Ciaran Anscomb <jbwm@6809.org.uk>
 // See README for license and other details.
 #include "title_bar.h"
+#include <X11/Xatom.h>
+#ifdef JBWM_USE_XFT
+#include "config.h"
+#include <X11/Xft/Xft.h>
+#endif//JBWM_USE_XFT
 #include "client.h"
 #include "ewmh.h"
 #include "ewmh_state.h"
@@ -10,11 +15,6 @@
 #include "jbwm.h"
 #include "screen.h"
 #include "util.h"
-#include <X11/Xatom.h>
-#ifdef JBWM_USE_XFT
-#include "config.h"
-#include <X11/Xft/Xft.h>
-#endif//JBWM_USE_XFT
 static void set_shaded(struct JBWMClient * restrict c)
 {
 	c->old_size.height = c->size.height;

@@ -1,11 +1,11 @@
 // Copyright 2016, Jeffrey E. Bedard
 #include "font.h"
-#include "config.h"
-#include "jbwm.h"
 #include <stdlib.h>
 #ifdef JBWM_USE_XFT
 #include <X11/Xft/Xft.h>
 #endif//JBWM_USE_XFT
+#include "config.h"
+#include "jbwm.h"
 #ifdef JBWM_USE_XFT
 static XftFont * jbwm_font;
 #else//! JBWM_USE_XFT
