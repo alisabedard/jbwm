@@ -2,7 +2,6 @@
 #ifndef LIBJB_XCB_H
 #define LIBJB_XCB_H
 #include <stdbool.h>
-#include <stdint.h>
 #include <xcb/xcb.h>
 typedef uint32_t pixel_t;
 /* Make sure there is no error on the xcb connection.  If there is,

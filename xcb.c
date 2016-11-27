@@ -2,11 +2,11 @@
 #include "xcb.h"
 // Include here to check syntax:
 #include "JBDim.h"
-#include "log.h"
-#include "util.h"
 #include <errno.h>
 #include <string.h>
 #include <sys/select.h>
+#include "log.h"
+#include "util.h"
 bool jb_xcb_cookie_has_error(xcb_connection_t * x, const xcb_void_cookie_t c)
 {
 	xcb_generic_error_t * e = xcb_request_check(x, c);
