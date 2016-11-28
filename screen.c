@@ -68,46 +68,67 @@ static void warp_corner(struct JBWMClient * restrict c)
 		c->size.width, c->size.height);
 }
 static void set_size(struct JBWMClient * restrict c,
-	const int16_t x, const int16_t y)
+	const int16_t * restrict p)
 {
-	c->size.width = abs(c->size.x - x);
-	c->size.height = abs(c->size.y - y);
+	struct JBWMRectangle * restrict g = &c->size;
+	g->width = abs(g->x - p[0]);
+	g->height = abs(g->y - p[1]);
+}
+__attribute__((const))
+static int16_t get_diff_factored(const int16_t a, const int16_t b,
+	const int16_t c)
+{
+	return a - b + c;
+}
+__attribute__((nonnull,pure))
+static int16_t get_diff(const uint8_t i, const int16_t * restrict original,
+	const int16_t * restrict start, const int16_t * restrict p)
+{
+	return get_diff_factored(original[i], start[i], p[i]);
 }
 static void set_position(struct JBWMClient * restrict c,
-	const struct JBDim old, const struct JBDim start,
-	const int16_t x, const int16_t y)
+	const int16_t * restrict original, const int16_t * restrict start,
+	const int16_t * restrict p)
 {
-	c->size.x = old.x - start.x + x;
-	c->size.y = old.y - start.y + y;
+	c->size.x = get_diff(0, original, start, p);
+	c->size.y = get_diff(1, original, start, p);
 	jbwm_snap_client(c);
 }
 static void do_changes(struct JBWMClient * restrict c, const bool resize,
-	const struct JBDim start, const struct JBDim original,
-	const int16_t x, const int16_t y)
+	const int16_t * restrict start, const int16_t * restrict original,
+	const int16_t * restrict p)
 {
 	if (resize)
-		set_size(c, x, y);
+		set_size(c, p);
 	else // drag
-		set_position(c, original, start, x, y);
+		set_position(c, original, start, p);
+}
+static jbwm_window_t get_root(struct JBWMClient * restrict c)
+{
+	return jbwm_get_screens()[c->screen].root;
 }
 static void drag_event_loop(struct JBWMClient * restrict c, const bool resize)
 {
 	Display * d = c->d;
-	const struct JBDim start = get_mouse_position(d,
-		jbwm_get_screens()[c->screen].root);
-	const struct JBDim original = {.x = c->size.x, .y = c->size.y};
+	int16_t start[2];
+	{ // p scope
+		const struct JBDim p = get_mouse_position(d, get_root(c));
+		start[0] = p.x;
+		start[1] = p.y;
+	}
+	const int16_t original[2] = {c->size.x, c->size.y};
 	for (;;) {
-		int16_t x, y;
+		int16_t p[2];
 		{ // e scope
 			XEvent e;
 			XMaskEvent(d, JBWMMouseMask, &e);
 			if (e.type != MotionNotify)
 				return;
-			x = e.xmotion.x;
-			y = e.xmotion.y;
+			p[0] = e.xmotion.x;
+			p[1] = e.xmotion.y;
 		}
 		draw_outline(c);
-		do_changes(c, resize, start, original, x, y);
+		do_changes(c, resize, start, original, p);
 		if (c->border)
 			draw_outline(c);
 		else
