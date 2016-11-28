@@ -1,8 +1,4 @@
 #!/bin/sh
+DIM="1000x700"
 DPY=":1"
-DIM="800x600"
-exec Xephyr -screen $DIM\
-	     -resizeable\
-	     -sw-cursor\
-	     $DPY
-
+exec Xephyr -screen $DIM -listen tcp -resizeable -sw-cursor $DPY
