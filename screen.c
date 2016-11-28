@@ -103,10 +103,10 @@ static void drag_event_loop(struct JBWMClient * restrict c, const bool resize)
 			XMaskEvent(d, JBWMMouseMask, &e);
 			if (e.type != MotionNotify)
 				return;
-			draw_outline(c);
 			x = e.xmotion.x;
 			y = e.xmotion.y;
 		}
+		draw_outline(c);
 		do_changes(c, resize, start, original, x, y);
 		if (c->border)
 			draw_outline(c);
