@@ -103,9 +103,13 @@ static void do_changes(struct JBWMClient * restrict c, const bool resize,
 	else // drag
 		set_position(c, original, start, p);
 }
+struct JBWMScreen * jbwm_get_screen(struct JBWMClient * restrict c)
+{
+	return jbwm_get_screens() + c->screen;
+}
 jbwm_window_t jbwm_get_root(struct JBWMClient * restrict c)
 {
-	return jbwm_get_screens()[c->screen].root;
+	return jbwm_get_screen(c)->root;
 }
 static void drag_event_loop(struct JBWMClient * restrict c, const bool resize)
 {
