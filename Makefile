@@ -2,7 +2,7 @@
 # Copyright 2008-2016, Jeffrey E. Bedard <jefbed@gmail.com> 
 # Copyright 1999-2015, Ciaran Anscomb <jbwm@6809.org.uk>
 # See README for license and other details.
-version=1.51
+version=1.52
 include config.mk
 exe=jbwm
 distname=$(exe)-$(version)
