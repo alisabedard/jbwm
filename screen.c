@@ -29,7 +29,7 @@ static void draw_outline(struct JBWMClient * restrict c)
 	if (!c->border)
 		return;
 	const uint8_t o = c->opt.no_title_bar ? 0 : jbwm_get_font_height();
-	const struct JBWMScreen * s = &jbwm_get_screens()[c->screen];
+	const struct JBWMScreen * s = jbwm_get_screen(c);
 	const struct JBWMRectangle * restrict g = &c->size;
 	const uint8_t b = c->border;
 	XRectangle r = {g->x, g->y - o, g->width + b, g->height + b + o};

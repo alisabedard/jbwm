@@ -204,7 +204,7 @@ void jbwm_handle_key_event(XKeyEvent * restrict e)
 	JBWM_LOG("jbwm_handle_key_event");
 	const KeySym key = XLookupKeysym(e, 0);
 	struct JBWMClient *c = jbwm_get_current_client();
-	struct JBWMScreen *s = &jbwm_get_screens()[c ? c->screen : 0];
+	struct JBWMScreen * s = c ? jbwm_get_screen(c) : jbwm_get_screens();
 	struct {
 		uint8_t vdesk:6;
 		bool mod:1;

@@ -65,7 +65,7 @@ static jbwm_window_t get_win(Display * restrict d, const Window p,
 }
 static jbwm_window_t new_title_bar(struct JBWMClient * restrict c)
 {
-	const struct JBWMPixels * p = &jbwm_get_screens()[c->screen].pixels;
+	const struct JBWMPixels * p = &jbwm_get_screen(c)->pixels;
 	Display * d = c->d;
 	const jbwm_window_t t = c->tb.win = get_win(d, c->parent, p->bg);
 	XSelectInput(d, t, ExposureMask);
@@ -126,8 +126,7 @@ static void draw_title(struct JBWMClient * restrict c)
 #ifdef JBWM_USE_XFT
 	draw_xft(c, &p, name, l);
 #else//!JBWM_USE_XFT
-	XDrawString(d, c->tb.win, jbwm_get_screens()[c->screen].gc,
-		p.x, p.y, name, l);
+	XDrawString(d, c->tb.win, jbwm_get_screen(c)->gc, p.x, p.y, name, l);
 #endif//JBWM_USE_XFT
 	XFree(name);
 }

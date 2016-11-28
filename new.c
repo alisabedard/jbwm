@@ -46,7 +46,7 @@ __attribute__((nonnull))
 static void init_properties(struct JBWMClient * c)
 {
 	jbwm_handle_mwm_hints(c);
-	c->vdesk = jbwm_get_screens()[c->screen].vdesk;
+	c->vdesk = jbwm_get_screen(c)->vdesk;
 	c->vdesk = wm_desktop(c->d, c->window, c->vdesk);
 }
 __attribute__((const))
@@ -126,8 +126,7 @@ static void init_geometry(struct JBWMClient * c)
 	const bool pos = process_size_hints(c->d, c->window, g,
 		a_geo.width, a_geo.height);
 	{ // scr_sz scope
-		const struct JBDim scr_sz
-			= jbwm_get_screens()[c->screen].size;
+		const struct JBDim scr_sz = jbwm_get_screen(c)->size;
 		check_dimensions(g, scr_sz);
 		if (pos && (a_geo.x || a_geo.y)) {
 			JBWM_LOG("\t\tPosition is set by hints.");
