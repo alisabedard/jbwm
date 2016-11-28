@@ -100,7 +100,7 @@ void jbwm_select_client(struct JBWMClient * c)
 	set_border(d, c);
 	jbwm_client_data.current = c;
 #ifdef JBWM_USE_EWMH
-	jbwm_set_property(d, jbwm_get_screens()[c->screen].root,
+	jbwm_set_property(d, jbwm_get_root(c),
 		jbwm_ewmh_get_atom(JBWM_EWMH_ACTIVE_WINDOW),
 		XA_WINDOW, &(c->parent), 1);
 	jbwm_ewmh_add_state(d, c->window,
