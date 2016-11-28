@@ -148,10 +148,11 @@ static Window get_parent(struct JBWMClient * c)
 		WA_EM = SubstructureRedirectMask | SubstructureNotifyMask
 		| ButtonPressMask | EnterWindowMask
 	};
-	return XCreateWindow(c->d, jbwm_get_screens()[c->screen].root,
-		c->size.x, c->size.y, c->size.width, c->size.height,
-		c->border, CFP, CFP, CFP, CW_VM, &(XSetWindowAttributes){
-		.override_redirect=true, .event_mask = WA_EM});
+	struct JBWMRectangle * restrict g = &c->size;
+	return XCreateWindow(c->d, jbwm_get_root(c), g->x, g->y, g->width,
+		g->height, c->border, CFP, CFP, CFP, CW_VM,
+		&(XSetWindowAttributes){.override_redirect=true,
+		.event_mask = WA_EM});
 }
 __attribute__((nonnull))
 static void reparent(struct JBWMClient * c)

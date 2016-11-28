@@ -103,7 +103,7 @@ static void do_changes(struct JBWMClient * restrict c, const bool resize,
 	else // drag
 		set_position(c, original, start, p);
 }
-static jbwm_window_t get_root(struct JBWMClient * restrict c)
+jbwm_window_t jbwm_get_root(struct JBWMClient * restrict c)
 {
 	return jbwm_get_screens()[c->screen].root;
 }
@@ -112,7 +112,7 @@ static void drag_event_loop(struct JBWMClient * restrict c, const bool resize)
 	Display * d = c->d;
 	int16_t start[2];
 	{ // p scope
-		const struct JBDim p = get_mouse_position(d, get_root(c));
+		const struct JBDim p = get_mouse_position(d, jbwm_get_root(c));
 		start[0] = p.x;
 		start[1] = p.y;
 	}
@@ -141,7 +141,7 @@ void jbwm_drag(struct JBWMClient * restrict c, const bool resize)
 	XRaiseWindow(d, c->parent);
 	if (resize && (c->opt.no_resize || c->opt.shaded))
 		return;
-	grab_pointer(d, jbwm_get_screens()[c->screen].root);
+	grab_pointer(d, jbwm_get_root(c));
 	if (resize)
 		warp_corner(c);
 	drag_event_loop(c, resize);
