@@ -133,9 +133,8 @@ static void draw_title(struct JBWMClient * restrict c)
 }
 static void remove_title_bar(struct JBWMClient * restrict c)
 {
-	c->ignore_unmap++;
-	Display * d = c->d;
-	XDestroyWindow(d, c->tb.win);
+	++(c->ignore_unmap);
+	XDestroyWindow(c->d, c->tb.win);
 	c->tb.win = 0;
 }
 void jbwm_update_title_bar(struct JBWMClient * c)
