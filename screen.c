@@ -158,12 +158,13 @@ void jbwm_move_resize(struct JBWMClient * restrict c)
 	JBWM_LOG("jbwm_move_resize");
 	const uint8_t offset = c->opt.no_title_bar || c->opt.fullscreen
 		? 0 : jbwm_get_font_height();
-	Display * d = c->d;
-	XMoveResizeWindow(d, c->parent,
-		c->size.x, c->size.y - offset,
-		c->size.width, c->size.height + offset);
-	XMoveResizeWindow(d, c->window, 0, offset,
-		c->size.width, c->size.height);
+	{ // * d , * g scope
+		Display * restrict d = c->d;
+		struct JBWMRectangle * g = &c->size;
+		XMoveResizeWindow(d, c->parent, g->x, g->y - offset, g->width,
+			g->height + offset);
+		XMoveResizeWindow(d, c->window, 0, offset, g->width, g->height);
+	}
 	if(offset) { // Leave braces in case title bar support was disabled.
 		jbwm_update_title_bar(c);
 	} // Skip shaped and fullscreen clients.
