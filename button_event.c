@@ -7,6 +7,7 @@
 #include "log.h"
 #include "screen.h"
 #include "title_bar.h"
+#include "wm_state.h"
 #ifdef JBWM_USE_TITLE_BAR
 static void handle_title_bar_button(XButtonEvent * restrict e,
 	struct JBWMClient * restrict c)

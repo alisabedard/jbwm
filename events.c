@@ -17,6 +17,7 @@
 #include "screen.h"
 #include "title_bar.h"
 #include "util.h"
+#include "wm_state.h"
 #define DEBUG_EVENTS
 #ifndef DEBUG_EVENTS
 #undef JBWM_LOG

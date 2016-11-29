@@ -12,21 +12,14 @@ struct JBWMClient *jbwm_get_client(jbwm_window_t w)
 struct JBWMClient * jbwm_get_current_client(void);
 // Get the head of the JBWMClient linked list
 struct JBWMClient * jbwm_get_head_client(void);
-// Return WM_STATE atom
-jbwm_atom_t jbwm_get_wm_state(Display * restrict d);
 // Relink c's linked list to exclude c
 void jbwm_relink_client_list(struct JBWMClient * c);
 // Set client as that receiving focus
 void jbwm_select_client(struct JBWMClient * c);
-// Send WM_DELETE message to the client
-void jbwm_send_wm_delete(struct JBWMClient * restrict c)
-	__attribute__((nonnull));
 // Move the client to the specified virtual desktop
 void jbwm_set_client_vdesk(struct JBWMClient * restrict c, const uint8_t d)
 	__attribute((nonnull));
 // Assign c to the head of the JBWMClient linked list.
 void jbwm_set_head_client(struct JBWMClient * restrict c);
-// Set WM_STATE property
-void jbwm_set_wm_state(struct JBWMClient * restrict c, const int8_t state);
 void jbwm_toggle_sticky(struct JBWMClient * c) __attribute__((nonnull));
-#endif /* JBWM_CLIENT_H */
+#endif//!JBWM_CLIENT_H

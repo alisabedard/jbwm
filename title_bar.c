@@ -15,6 +15,7 @@
 #include "jbwm.h"
 #include "screen.h"
 #include "util.h"
+#include "wm_state.h"
 static void set_shaded(struct JBWMClient * restrict c)
 {
 	c->old_size.height = c->size.height;

@@ -13,7 +13,7 @@ dest=$(DESTDIR)$(PREFIX)
 jbwm_ldflags+=-lX11 
 jbwm_cflags+=-DVERSION=\"$(version)\" $(DEBIAN)
 jbwm_cflags+=-D_XOPEN_SOURCE=700 -std=c11
-objects+=client.o events.o jbwm.o new.o screen.o mwm.o
+objects+=client.o events.o jbwm.o new.o screen.o mwm.o wm_state.o
 objects+=button_event.o keys.o util.o max.o snap.o
 
 $(exe): $(objects)

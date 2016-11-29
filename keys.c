@@ -14,6 +14,7 @@
 #include "snap.h"
 #include "title_bar.h"
 #include "util.h"
+#include "wm_state.h"
 //#define DEBUG_KEYS
 #ifndef DEBUG_KEYS
 #undef JBWM_LOG

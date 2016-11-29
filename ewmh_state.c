@@ -8,6 +8,7 @@
 #include "max.h"
 #include "screen.h"
 #include "util.h"
+#include "wm_state.h"
 #define JBWM_DEBUG_EWMH_STATE
 #ifndef JBWM_DEBUG_EWMH_STATE
 #undef JBWM_LOG
