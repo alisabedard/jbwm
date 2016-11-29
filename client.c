@@ -27,6 +27,8 @@ void jbwm_set_head_client(struct JBWMClient * restrict c)
 	if (c)
 		jbwm_client_data.head = c;
 }
+/* Note:  As *c and *i may alias each other, use of 'restrict'
+   in relink_r would be invalid. */
 __attribute__((nonnull(1)))
 static void relink_r(const struct JBWMClient * c, struct JBWMClient * i)
 {
