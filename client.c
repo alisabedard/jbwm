@@ -27,6 +27,16 @@ void jbwm_set_head_client(struct JBWMClient * restrict c)
 	if (c)
 		jbwm_client_data.head = c;
 }
+__attribute__((nonnull(1)))
+static void relink_r(const struct JBWMClient * c, struct JBWMClient * i)
+{
+	if (i && i->next) {
+		if (i->next == c) // skip over c:
+			i->next = c->next;
+		else
+			relink_r(c, i->next);
+	}
+}
 // Relink c's linked list to exclude c
 void jbwm_relink_client_list(struct JBWMClient * c)
 {
@@ -37,13 +47,7 @@ void jbwm_relink_client_list(struct JBWMClient * c)
 		jbwm_client_data.head = c->next;
 		return; // removed first client
 	}
-	for (struct JBWMClient * p = jbwm_client_data.head;
-		p && p->next; p = p->next) {
-		if (p->next == c) { // Close the link
-			p->next = c->next;
-			return;
-		}
-	}
+	relink_r(c, jbwm_client_data.head);
 }
 void jbwm_set_client_vdesk(struct JBWMClient * restrict c, const uint8_t d)
 {
@@ -70,42 +74,46 @@ struct JBWMClient * jbwm_get_client(const jbwm_window_t w)
 {
 	return search(jbwm_client_data.head, w);
 }
-static void unselect_current(Display * restrict d)
+static void set_state_not_focused(struct JBWMClient * restrict c)
 {
-	if(!jbwm_client_data.current)
-		return;
-	XSetWindowBorder(d, jbwm_client_data.current->parent,
-		jbwm_get_screens()[jbwm_client_data.current->screen]
-		.pixels.bg);
-#ifdef JBWM_USE_EWMH
-	jbwm_ewmh_remove_state(d, jbwm_client_data.current->window,
-		jbwm_ewmh_get_atom(JBWM_EWMH_WM_STATE_FOCUSED));
-#endif//JBWM_USE_EWMH
+	XSetWindowBorder(c->d, c->parent, jbwm_get_screen(c)->pixels.bg);
+	jbwm_ewmh_remove_state(c->d, c->window, jbwm_ewmh_get_atom(
+		JBWM_EWMH_WM_STATE_FOCUSED));
 }
-static void set_border(Display * restrict d, struct JBWMClient * restrict c)
+static void unselect_current(void)
 {
-	struct JBWMScreen * restrict s = &jbwm_get_screens()[c->screen];
-	XSetWindowBorder(d, c->parent, c->opt.sticky
-		? s->pixels.fc : s->pixels.fg);
+	if(jbwm_client_data.current)
+		set_state_not_focused(jbwm_client_data.current);
+}
+static void set_border(struct JBWMClient * restrict c)
+{
+	struct JBWMScreen * restrict s = jbwm_get_screen(c);
+	XSetWindowBorder(c->d, c->parent, c->opt.sticky ? s->pixels.fc
+		: s->pixels.fg);
+}
+static void set_focused(struct JBWMClient * c)
+{
+	Display * restrict d = c->d;
+	XInstallColormap(c->d, c->cmap);
+	XSetInputFocus(d, c->window, RevertToPointerRoot, CurrentTime);
+	jbwm_ewmh_add_state(d, c->window, jbwm_ewmh_get_atom(
+		JBWM_EWMH_WM_STATE_FOCUSED));
+}
+static void set_active_window(struct JBWMClient * c)
+{
+	unselect_current(); // depends on jbwm_client_data.current
+	jbwm_set_property(c->d, jbwm_get_root(c),
+		jbwm_ewmh_get_atom(JBWM_EWMH_ACTIVE_WINDOW),
+		XA_WINDOW, &(c->parent), 1);
+	jbwm_client_data.current = c;
 }
 void jbwm_select_client(struct JBWMClient * c)
 {
-	if(!c)
-		return;
-	Display * d = c->d;
-	unselect_current(d);
-	XInstallColormap(d, c->cmap);
-	XSetInputFocus(d, c->window,
-		RevertToPointerRoot, CurrentTime);
-	set_border(d, c);
-	jbwm_client_data.current = c;
-#ifdef JBWM_USE_EWMH
-	jbwm_set_property(d, jbwm_get_root(c),
-		jbwm_ewmh_get_atom(JBWM_EWMH_ACTIVE_WINDOW),
-		XA_WINDOW, &(c->parent), 1);
-	jbwm_ewmh_add_state(d, c->window,
-		jbwm_ewmh_get_atom(JBWM_EWMH_WM_STATE_FOCUSED));
-#endif//JBWM_USE_EWMH
+	if (c) {
+		set_border(c);
+		set_focused(c);
+		set_active_window(c);
+	}
 }
 void jbwm_toggle_sticky(struct JBWMClient * c)
 {
