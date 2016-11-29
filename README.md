@@ -4,12 +4,20 @@
 ## FEATURES of JBWM
 * *Virtual desktops* with Meta-{1-0}
 * Tiny binary size
-* *Titlebar* support if wanted
+* *Title bar* support if wanted
 * *Xft* support if wanted
 * *EWMH* support if wanted
 * *Window shading* with title bar
 * Code cleanups, simpler UI and key bindings
 * Use of C11 features where possible.
+
+## DIRECTION
+Though jbwm features small size, its main design goal is practical usefulness.
+If a change increases binary size but speeds execution, development, or user
+interaction, then the change is more than welcome.  If you want to see a feature
+or contribute code, let me know.  I use jbwm as my primary and sole window
+manager, however I may not see problems that fall outside of my usage patterns,
+so bug reports are also much appreciated.
 
 ## RELEASES
 Releases are made when sufficient changes are made to the code base.  Releases
@@ -24,13 +32,13 @@ Edit configuration options in Makefile and config.h, then build:
 	$ make
 	# make install
 ```
-On OpenBSD (bundled gcc is too old):
+On OpenBSD (bundled GCC is too old):
 ```sh
 	$ make CC=clang
 	# make install
 ```
 
-## ACKNOWLEDGEMENTS
+## ACKNOWLEDGMENTS
 
 evilwm, by Ciaran Anscomb <evilwm@6809.org.uk>.  http://www.6809.org.uk/evilwm/
 
