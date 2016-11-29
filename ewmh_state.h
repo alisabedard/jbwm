@@ -3,8 +3,9 @@
 #ifdef JBWM_USE_EWMH
 #include "JBWMClient.h"
 void jbwm_ewmh_remove_state(Display * restrict d,
-	const Window w, const Atom state);
-void jbwm_ewmh_add_state(Display * d, const Window w, Atom state);
+	const jbwm_window_t w, const jbwm_window_t state);
+void jbwm_ewmh_add_state(Display * restrict d, const jbwm_window_t w,
+	jbwm_atom_t state);
 void jbwm_ewmh_handle_client_message(XClientMessageEvent * restrict e,
 	struct JBWMClient * restrict c)
 	__attribute__((nonnull(1)));

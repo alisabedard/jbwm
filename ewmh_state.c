@@ -15,7 +15,7 @@
 #endif//!JBWM_DEBUG_EWMH_STATE
 // Remove specified atom from WM_STATE
 void jbwm_ewmh_remove_state(Display * restrict d,
-	const Window w, const Atom state)
+	const jbwm_window_t w, const jbwm_atom_t state)
 {
 	uint16_t n;
 	const jbwm_atom_t ws = jbwm_ewmh_get_atom(JBWM_EWMH_WM_STATE);
@@ -30,7 +30,7 @@ void jbwm_ewmh_remove_state(Display * restrict d,
 	XFree(a);
 }
 static bool ewmh_get_state(Display * restrict d,
-	const Window w, const Atom state)
+	const jbwm_window_t w, const jbwm_atom_t state)
 {
 	uint16_t n;
 	Atom *a = jbwm_get_property(d, w,
@@ -44,7 +44,8 @@ static bool ewmh_get_state(Display * restrict d,
 	}
 	return found;
 }
-void jbwm_ewmh_add_state(Display * d, const Window w, Atom state)
+void jbwm_ewmh_add_state(Display * restrict d, const jbwm_window_t w,
+	jbwm_atom_t state)
 {
 	XChangeProperty(d, w, jbwm_ewmh_get_atom(JBWM_EWMH_WM_STATE),
 		XA_ATOM, 32, PropModePrepend,
