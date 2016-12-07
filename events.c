@@ -203,7 +203,8 @@ void jbwm_event_loop(Display * restrict d)
 			if (c && ev.xcolormap.new) {
 				JBWM_LOG("ColormapNotify");
 				c->cmap = ev.xcolormap.colormap;
-				XInstallColormap(ev.xcolormap.display, c->cmap);
+				XInstallColormap(ev.xcolormap.display,
+					c->cmap);
 			}
 			break;
 #ifdef JBWM_USE_EWMH

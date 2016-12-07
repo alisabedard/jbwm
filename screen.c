@@ -164,7 +164,8 @@ void jbwm_move_resize(struct JBWMClient * restrict c)
 		struct JBWMRectangle * g = &c->size;
 		XMoveResizeWindow(d, c->parent, g->x, g->y - offset, g->width,
 			g->height + offset);
-		XMoveResizeWindow(d, c->window, 0, offset, g->width, g->height);
+		XMoveResizeWindow(d, c->window, 0, offset,
+			g->width, g->height);
 	}
 	if(offset) { // Leave braces in case title bar support was disabled.
 		jbwm_update_title_bar(c);
