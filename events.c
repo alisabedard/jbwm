@@ -159,7 +159,11 @@ void jbwm_event_loop(Display * restrict d)
 				jbwm_handle_button_event(&ev.xbutton, c);
 			break;
 		case EnterNotify:
-			if(c && (ev.xcrossing.window == c->parent))
+			/* Sometimes, we were getting a client with a
+			 * NULL display pointer within, check for this
+			 * before going any further.  */
+			if(c && (ev.xcrossing.window == c->parent) &&
+				c->d) 
 				jbwm_select_client(c);
 			break;
 #ifdef JBWM_USE_TITLE_BAR
