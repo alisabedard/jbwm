@@ -123,98 +123,101 @@ static inline void mark_removal(struct JBWMClient * restrict c)
 }
 void jbwm_event_loop(Display * restrict d)
 {
-	XEvent ev;
-event_loop:
-	XNextEvent(d, &ev);
-	struct JBWMClient * restrict c = jbwm_get_client(ev.xany.window);
-	switch (ev.type) {
-	case ButtonRelease:
-	case KeyRelease:
-	case MapNotify:
-	case MappingNotify:
-	case MotionNotify:
-		// ignore
-		goto event_loop;
-	case ConfigureNotify:
-		JBWM_LOG("ConfigureNotify");
-		/* Failure to do this causes Java Swing applications to first
-		 appear offset within the parent window until they receive
-		 a click.  This is a fix:  */
-		if (c)
-			jbwm_move_resize(c);
-		goto event_loop;
-	case ReparentNotify:
-		JBWM_LOG("ReparentNotify");
-		/* Reset last_window to allow other clients
-		   with the same window id to be started.  */
-		last_window = 0;
-		goto event_loop;
-	case KeyPress:
-		jbwm_handle_key_event(&ev.xkey);
-		break;
-	case ButtonPress:
-		if(c)
-			jbwm_handle_button_event(&ev.xbutton, c);
-		break;
-	case EnterNotify:
-		if(c && (ev.xcrossing.window == c->parent))
-			jbwm_select_client(c);
-		goto event_loop;
+	for (;;) {
+		XEvent ev;
+		XNextEvent(d, &ev);
+		struct JBWMClient * restrict c
+			= jbwm_get_client(ev.xany.window);
+		switch (ev.type) {
+		case ButtonRelease:
+		case KeyRelease:
+		case MapNotify:
+		case MappingNotify:
+		case MotionNotify:
+			// ignore
+			break;
+		case ConfigureNotify:
+			JBWM_LOG("ConfigureNotify");
+			/* Failure to do this causes Java Swing
+			 * applications to first appear offset within
+			 * the parent window until they receive a
+			 * click.  This is a fix: */
+			if (c)
+				jbwm_move_resize(c);
+			break;
+		case ReparentNotify:
+			JBWM_LOG("ReparentNotify");
+			/* Reset last_window to allow other clients
+			 * with the same window id to be started.  */
+			last_window = 0;
+			break;
+		case KeyPress:
+			jbwm_handle_key_event(&ev.xkey);
+			break;
+		case ButtonPress:
+			if(c)
+				jbwm_handle_button_event(&ev.xbutton, c);
+			break;
+		case EnterNotify:
+			if(c && (ev.xcrossing.window == c->parent))
+				jbwm_select_client(c);
+			break;
 #ifdef JBWM_USE_TITLE_BAR
-	case Expose:
-		if (c && !ev.xexpose.count)
-			jbwm_update_title_bar(c);
-		goto event_loop;
+		case Expose:
+			if (c && !ev.xexpose.count)
+				jbwm_update_title_bar(c);
+			break;
 #endif//JBWM_USE_TITLE_BAR
 #ifdef JBWM_USE_EWMH
-	case CreateNotify:
-		JBWM_LOG("CreateNotify");
-		JBWM_LOG("override_redirect: %d",
-			(int)ev.xcreatewindow.override_redirect);
-		JBWM_LOG("send_event: %d", (int)ev.xcreatewindow.send_event);
-		if (ev.xcreatewindow.override_redirect) // internal
-			jbwm_ewmh_update_client_list(ev.xany.display);
-		break;
-	case DestroyNotify:
-		JBWM_LOG("DestroyNotify");
-		if (!c) // only bother if event was not on a client
-			jbwm_ewmh_update_client_list(ev.xany.display);
-		break;
+		case CreateNotify:
+			JBWM_LOG("CreateNotify");
+			JBWM_LOG("override_redirect: %d",
+				(int)ev.xcreatewindow.override_redirect);
+			JBWM_LOG("send_event: %d",
+				(int)ev.xcreatewindow.send_event);
+			if (ev.xcreatewindow.override_redirect) // internal
+				jbwm_ewmh_update_client_list(ev.xany.display);
+			break;
+		case DestroyNotify:
+			JBWM_LOG("DestroyNotify");
+			if (!c) // only bother if event was not on a client
+				jbwm_ewmh_update_client_list(ev.xany.display);
+			break;
 #endif//JBWM_USE_EWMH
-	case UnmapNotify:
-		if (c)
-			mark_removal(c);
-		break;
-	case MapRequest:
-		if (!c)
-			handle_map_request(&ev.xmaprequest);
-		break;
-	case ConfigureRequest:
-		handle_configure_request(&ev.xconfigurerequest);
-		goto event_loop;
-	case PropertyNotify:
-		if (c)
-			handle_property_change(&ev.xproperty, c);
-		goto event_loop;
-	case ColormapNotify:
-		if (c && ev.xcolormap.new) {
-			JBWM_LOG("ColormapNotify");
-			c->cmap = ev.xcolormap.colormap;
-			XInstallColormap(ev.xcolormap.display, c->cmap);
-		}
-		goto event_loop;
+		case UnmapNotify:
+			if (c)
+				mark_removal(c);
+			break;
+		case MapRequest:
+			if (!c)
+				handle_map_request(&ev.xmaprequest);
+			break;
+		case ConfigureRequest:
+			handle_configure_request(&ev.xconfigurerequest);
+			break;
+		case PropertyNotify:
+			if (c)
+				handle_property_change(&ev.xproperty, c);
+			break;
+		case ColormapNotify:
+			if (c && ev.xcolormap.new) {
+				JBWM_LOG("ColormapNotify");
+				c->cmap = ev.xcolormap.colormap;
+				XInstallColormap(ev.xcolormap.display, c->cmap);
+			}
+			break;
 #ifdef JBWM_USE_EWMH
-	case ClientMessage:
-		jbwm_ewmh_handle_client_message(&ev.xclient, c);
-		break;
+		case ClientMessage:
+			jbwm_ewmh_handle_client_message(&ev.xclient, c);
+			break;
 #endif//JBWM_USE_EWMH
 #ifdef DEBUG_EVENTS
-	default:
-		JBWM_LOG("Unhandled event (%d)", ev.type);
+		default:
+			JBWM_LOG("Unhandled event (%d)", ev.type);
 #endif//DEBUG_EVENTS
+		}
+		if (events_need_cleanup)
+			cleanup();
 	}
-	if (events_need_cleanup)
-		cleanup();
-	goto event_loop;
 }
 
