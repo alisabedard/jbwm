@@ -82,9 +82,20 @@ static void set_state_not_focused(struct JBWMClient * restrict c)
 	jbwm_ewmh_remove_state(c->d, c->window, jbwm_ewmh_get_atom(
 		JBWM_EWMH_WM_STATE_FOCUSED));
 }
+static bool check_current(void)
+{
+	if (jbwm_client_data.current) {
+		if (!jbwm_client_data.current->d) {
+			jbwm_client_data.current = NULL;
+			return false;
+		}
+		return true;
+	}
+	return false;
+}
 static void unselect_current(void)
 {
-	if(jbwm_client_data.current)
+	if (check_current())
 		set_state_not_focused(jbwm_client_data.current);
 }
 static void set_border(struct JBWMClient * restrict c)
@@ -104,9 +115,14 @@ static void set_focused(struct JBWMClient * c)
 static void set_active_window(struct JBWMClient * c)
 {
 	unselect_current(); // depends on jbwm_client_data.current
+	/* Store the window id as a static variable here in case
+	 * client c is freed.  If the property is read after the
+	 * client is freed, it will cause a segmentation fault.  */
+	static jbwm_window_t w;
+	w = c->window;
 	jbwm_set_property(c->d, jbwm_get_root(c),
 		jbwm_ewmh_get_atom(JBWM_EWMH_ACTIVE_WINDOW),
-		XA_WINDOW, &(c->parent), 1);
+		XA_WINDOW, &w, 1);
 	jbwm_client_data.current = c;
 }
 void jbwm_select_client(struct JBWMClient * c)

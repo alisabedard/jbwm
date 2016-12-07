@@ -135,7 +135,7 @@ void jbwm_event_loop(Display * restrict d)
 		case MappingNotify:
 		case MotionNotify:
 			// ignore
-			break;
+			continue;
 		case ConfigureNotify:
 			JBWM_LOG("ConfigureNotify");
 			/* Failure to do this causes Java Swing
@@ -162,15 +162,16 @@ void jbwm_event_loop(Display * restrict d)
 			/* Sometimes, we were getting a client with a
 			 * NULL display pointer within, check for this
 			 * before going any further.  */
-			if(c && (ev.xcrossing.window == c->parent) &&
-				c->d) 
+			JBWM_LOG("\t\t\tEnterNotify: xc.detail: %d",
+				ev.xcrossing.detail);
+			if (c && c->d && ev.xcrossing.window == c->parent)
 				jbwm_select_client(c);
-			break;
+			continue;
 #ifdef JBWM_USE_TITLE_BAR
 		case Expose:
 			if (c && !ev.xexpose.count)
 				jbwm_update_title_bar(c);
-			break;
+			continue;
 #endif//JBWM_USE_TITLE_BAR
 #ifdef JBWM_USE_EWMH
 		case CreateNotify:
@@ -210,7 +211,7 @@ void jbwm_event_loop(Display * restrict d)
 				XInstallColormap(ev.xcolormap.display,
 					c->cmap);
 			}
-			break;
+			continue;
 #ifdef JBWM_USE_EWMH
 		case ClientMessage:
 			jbwm_ewmh_handle_client_message(&ev.xclient, c);

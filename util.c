@@ -7,11 +7,13 @@
 #include <stdbool.h>
 void jbwm_set_property(Display * restrict d, const jbwm_window_t win,
 	const jbwm_atom_t property, const jbwm_atom_t type,
-	void * restrict data, int16_t size)
+	void * restrict data, uint16_t size)
 {
-	if (d)
-		XChangeProperty(d, win, property, type,
-			32, PropModeReplace, data, size);
+	if (!d)
+		return;
+	XChangeProperty(d, win, property, type, 32, PropModeReplace,
+		data, size);
+	XFlush(d);
 }
 jbwm_pixel_t jbwm_get_pixel(Display * restrict dpy,
 	const uint8_t screen, const char * restrict name)
