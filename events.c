@@ -119,6 +119,13 @@ static inline void mark_removal(struct JBWMClient * restrict c)
 	JBWM_LOG("mark_removal(): ignore_unmap is %d", c->ignore_unmap);
 	c->opt.remove = events_need_cleanup = (c->ignore_unmap--<1);
 }
+static void handle_colormap_notify(struct JBWMClient * restrict c,
+	XColormapEvent * restrict e)
+{
+	JBWM_LOG("ColormapNotify");
+	if (c && e->new)
+		XInstallColormap(e->display, c->cmap = e->colormap);
+}
 void jbwm_event_loop(Display * restrict d)
 {
 	for (;;) {
@@ -203,12 +210,7 @@ void jbwm_event_loop(Display * restrict d)
 				handle_property_change(&ev.xproperty, c);
 			break;
 		case ColormapNotify:
-			if (c && ev.xcolormap.new) {
-				JBWM_LOG("ColormapNotify");
-				c->cmap = ev.xcolormap.colormap;
-				XInstallColormap(ev.xcolormap.display,
-					c->cmap);
-			}
+			handle_colormap_notify(c, &ev.xcolormap);
 			continue;
 #ifdef JBWM_USE_EWMH
 		case ClientMessage:
