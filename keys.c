@@ -11,6 +11,7 @@
 #include "log.h"
 #include "max.h"
 #include "screen.h"
+#include "select.h"
 #include "snap.h"
 #include "title_bar.h"
 #include "util.h"

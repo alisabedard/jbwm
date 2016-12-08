@@ -14,6 +14,7 @@
 #include "log.h"
 #include "new.h"
 #include "screen.h"
+#include "select.h"
 #include "title_bar.h"
 #include "wm_state.h"
 #define DEBUG_EVENTS

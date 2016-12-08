@@ -8,12 +8,12 @@
 #include "config.h"
 #include <X11/Xft/Xft.h>
 #endif//JBWM_USE_XFT
-#include "client.h"
 #include "ewmh.h"
 #include "ewmh_state.h"
 #include "font.h"
 #include "jbwm.h"
 #include "screen.h"
+#include "select.h"
 #include "util.h"
 #include "wm_state.h"
 static void set_shaded(struct JBWMClient * restrict c)

@@ -7,6 +7,7 @@
 #include "log.h"
 #include "max.h"
 #include "screen.h"
+#include "select.h"
 #include "util.h"
 #include "wm_state.h"
 #define JBWM_DEBUG_EWMH_STATE
