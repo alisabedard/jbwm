@@ -181,10 +181,6 @@ void jbwm_event_loop(Display * restrict d)
 #ifdef JBWM_USE_EWMH
 		case CreateNotify:
 			JBWM_LOG("CreateNotify");
-			JBWM_LOG("override_redirect: %d",
-				(int)ev.xcreatewindow.override_redirect);
-			JBWM_LOG("send_event: %d",
-				(int)ev.xcreatewindow.send_event);
 			if (ev.xcreatewindow.override_redirect) // internal
 				jbwm_ewmh_update_client_list(ev.xany.display);
 			break;
@@ -219,7 +215,7 @@ void jbwm_event_loop(Display * restrict d)
 #endif//JBWM_USE_EWMH
 #ifdef DEBUG_EVENTS
 		default:
-			JBWM_LOG("Unhandled event (%d)", ev.type);
+			JBWM_LOG("Unhandled event %d", ev.type);
 #endif//DEBUG_EVENTS
 		}
 		if (events_need_cleanup)
