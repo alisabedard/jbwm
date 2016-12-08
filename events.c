@@ -73,7 +73,7 @@ static void cleanup(void)
 	do {
 		i = c->next;
 		if (!c->opt.remove)
-			continue;
+			break;
 		jbwm_free_client(c);
 	} while(i && (c = i));
 }
@@ -140,7 +140,7 @@ void jbwm_event_loop(Display * restrict d)
 		case MappingNotify:
 		case MotionNotify:
 			// ignore
-			continue;
+			break;
 		case ConfigureNotify:
 			JBWM_LOG("ConfigureNotify");
 			/* Failure to do this causes Java Swing
@@ -171,12 +171,12 @@ void jbwm_event_loop(Display * restrict d)
 				ev.xcrossing.detail);
 			if (c && c->d && ev.xcrossing.window == c->parent)
 				jbwm_select_client(c);
-			continue;
+			break;
 #ifdef JBWM_USE_TITLE_BAR
 		case Expose:
 			if (c && !ev.xexpose.count)
 				jbwm_update_title_bar(c);
-			continue;
+			break;
 #endif//JBWM_USE_TITLE_BAR
 #ifdef JBWM_USE_EWMH
 		case CreateNotify:
@@ -191,6 +191,7 @@ void jbwm_event_loop(Display * restrict d)
 			break;
 #endif//JBWM_USE_EWMH
 		case UnmapNotify:
+			JBWM_LOG("UnmapNotify");
 			if (c)
 				mark_removal(c);
 			break;
@@ -207,7 +208,7 @@ void jbwm_event_loop(Display * restrict d)
 			break;
 		case ColormapNotify:
 			handle_colormap_notify(c, &ev.xcolormap);
-			continue;
+			break;
 #ifdef JBWM_USE_EWMH
 		case ClientMessage:
 			jbwm_ewmh_handle_client_message(&ev.xclient, c);

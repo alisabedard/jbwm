@@ -182,8 +182,7 @@ static void do_grabs(Display * restrict d, const jbwm_window_t w)
 	jbwm_grab_window_keys(d, w);
 	jbwm_ewmh_set_allowed_actions(d, w);
 }
-void jbwm_new_client(Display * restrict d, struct JBWMScreen * restrict s,
-	const jbwm_window_t w)
+void jbwm_new_client(Display * d, struct JBWMScreen * s, const jbwm_window_t w)
 {
 	JBWM_LOG("jbwm_new_client(..., w: %d)", (int)w);
 	struct JBWMClient * c = get_JBWMClient(w, s);

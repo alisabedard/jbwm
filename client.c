@@ -3,6 +3,7 @@
 // Copyright 1999-2015, Ciaran Anscomb <jbwm@6809.org.uk>
 // See README for license and other details.
 #include "client.h"
+#include <X11/Xatom.h>
 #include "ewmh.h"
 #include "ewmh_state.h"
 #include "jbwm.h"
@@ -10,7 +11,6 @@
 #include "screen.h"
 #include "title_bar.h"
 #include "util.h"
-#include <X11/Xatom.h>
 static struct {
 	struct JBWMClient * current, * head;
 } jbwm_client_data;
@@ -29,7 +29,6 @@ void jbwm_set_head_client(struct JBWMClient * restrict c)
 }
 /* Note:  As *c and *i may alias each other, use of 'restrict'
    in relink_r would be invalid. */
-__attribute__((nonnull(1)))
 static void relink_r(const struct JBWMClient * c, struct JBWMClient * i)
 {
 	if (i && i->next) {
@@ -61,15 +60,19 @@ void jbwm_set_client_vdesk(struct JBWMClient * restrict c, const uint8_t d)
 	c->vdesk = jbwm_set_vdesk(s, d);
 	jbwm_set_vdesk(s, p);
 }
-static struct JBWMClient * search(struct JBWMClient * c,
+static inline bool matches(struct JBWMClient * restrict i,
 	const jbwm_window_t w)
 {
 #ifdef JBWM_USE_TITLE_BAR
-	return (!c || c->parent == w || c->window == w || c->tb.win == w)
+	return i->parent == w || i->window == w || i->tb.win == w;
 #else//!JBWM_USE_TITLE_BAR
-	return (!c || c->parent == w || c->window == w)
+	return i->parent == w || i->window == w;
 #endif//JBWM_USE_TITLE_BAR
-		? c : search(c->next, w);
+}
+static struct JBWMClient * search(struct JBWMClient * c,
+	const jbwm_window_t w)
+{
+	return (!c || matches(c, w)) ? c : search(c->next, w);
 }
 // Return the client that has specified window as either window or parent
 struct JBWMClient * jbwm_get_client(const jbwm_window_t w)
@@ -116,11 +119,28 @@ static void set_active_window(struct JBWMClient * c)
 {
 	unselect_current(); // depends on jbwm_client_data.current
 	/* Store the window id as a static variable here in case
-	 * client c is freed.  If the property is read after the
-	 * client is freed, it will cause a segmentation fault.  */
-	static jbwm_window_t w;
+	 * client c is freed before the X server handles the event.
+	 * If the property is read after the client is freed, it will
+	 * cause a segmentation fault.  */
+	static Window w;
 	w = c->window;
-	jbwm_set_property(c->d, jbwm_get_root(c),
+	/* Store a static version of the display pointer here to
+	 * verify the client's version.  */
+	static Display * d;
+	if (!d)
+		d = c->d;
+	if (d != c->d) {
+		/* If this is reached, the display pointer within c
+		 * has become corrupt.  This is due to an event loop
+		 * race condition on window unmap.  In this case,
+		 * cease processing setting of the active window to c.
+		 * Then, set the current client to the head client.
+		 * Finally, return.  */
+		JBWM_LOG("Unmap race caught, safely handled.");
+		jbwm_client_data.current = jbwm_client_data.head;
+		return;
+	}
+	jbwm_set_property(d, jbwm_get_root(c),
 		jbwm_ewmh_get_atom(JBWM_EWMH_ACTIVE_WINDOW),
 		XA_WINDOW, &w, 1);
 	jbwm_client_data.current = c;
