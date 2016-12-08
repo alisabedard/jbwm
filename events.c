@@ -34,8 +34,7 @@ static struct JBWMScreen * get_screen(const int8_t i,
 	const jbwm_window_t root)
 {
 	struct JBWMScreen * s = jbwm_get_screens();
-	return s[i].root == root ? s + i
-		: get_screen(i - 1, root);
+	return s[i].root == root ? s + i : get_screen(i - 1, root);
 }
 #ifdef JBWM_USE_EWMH
 static void delete_ewmh_properties(Display * restrict d,
@@ -61,6 +60,7 @@ void jbwm_free_client(struct JBWMClient * restrict c)
 	if(c->parent)
 		XDestroyWindow(d, c->parent);
 	jbwm_relink_client_list(c);
+	XFlush(d); // prevent future events involving c
 	free(c);
 	// Allow future clients with the same window ID:
 	last_window = 0;
@@ -126,6 +126,10 @@ static void handle_colormap_notify(struct JBWMClient * restrict c,
 	if (c && e->new)
 		XInstallColormap(e->display, c->cmap = e->colormap);
 }
+static inline bool client_is_valid(struct JBWMClient * c, Display * d)
+{
+	return c && c->d == d;
+}
 void jbwm_event_loop(Display * restrict d)
 {
 	for (;;) {
@@ -133,6 +137,11 @@ void jbwm_event_loop(Display * restrict d)
 		XNextEvent(d, &ev);
 		struct JBWMClient * restrict c
 			= jbwm_get_client(ev.xany.window);
+		/* Verify the client display versus the real display
+		 * here in order to ensure no removed clients continue
+		 * into the event loop.  */
+		if (!client_is_valid(c, d))
+			c = NULL;
 		switch (ev.type) {
 		case ButtonRelease:
 		case KeyRelease:
@@ -164,12 +173,7 @@ void jbwm_event_loop(Display * restrict d)
 				jbwm_handle_button_event(&ev.xbutton, c);
 			break;
 		case EnterNotify:
-			/* Sometimes, we were getting a client with a
-			 * NULL display pointer within, check for this
-			 * before going any further.  */
-			JBWM_LOG("\t\t\tEnterNotify: xc.detail: %d",
-				ev.xcrossing.detail);
-			if (c && c->d && ev.xcrossing.window == c->parent)
+			if (c && ev.xcrossing.window == c->parent)
 				jbwm_select_client(c);
 			break;
 #ifdef JBWM_USE_TITLE_BAR
