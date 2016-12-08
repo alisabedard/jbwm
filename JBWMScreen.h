@@ -2,8 +2,8 @@
 // Copyright 2008-2016, Jeffrey E. Bedard <jefbed@gmail.com>
 // Copyright 1999-2015, Ciaran Anscomb <jbwm@6809.org.uk>
 // See README for license and other details.
-#ifndef SCREENINFO_H
-#define SCREENINFO_H
+#ifndef JBWM_JBWMSCREEN_H
+#define JBWM_JBWMSCREEN_H
 #include <stdint.h>
 #include <X11/Xlib.h>
 #include "JBDim.h"
@@ -27,4 +27,4 @@ struct JBWMScreen {
 	struct JBDim size;
 	uint8_t screen, vdesk;
 } __attribute__((packed));
-#endif /* not SCREENINFO_H */
+#endif//!JBWM_JBWMSCREEN_H
