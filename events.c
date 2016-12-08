@@ -12,11 +12,9 @@
 #include "jbwm.h"
 #include "keys.h"
 #include "log.h"
-#include "macros.h"
 #include "new.h"
 #include "screen.h"
 #include "title_bar.h"
-#include "util.h"
 #include "wm_state.h"
 #define DEBUG_EVENTS
 #ifndef DEBUG_EVENTS
