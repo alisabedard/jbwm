@@ -112,8 +112,7 @@ static void handle_map_request(XMapRequestEvent * restrict e)
 		return;
 	last_window = w;
 	JBWM_LOG("MapRequest, send_event:%d", e->send_event);
-	Display * restrict d = e->display;
-	jbwm_new_client(d, get_screen(ScreenCount(d), e->parent), w);
+	jbwm_new_client(get_screen(ScreenCount(e->display), e->parent), w);
 }
 static inline void mark_removal(struct JBWMClient * restrict c)
 {
