@@ -16,11 +16,11 @@
 #include "screen.h"
 #include "shape.h"
 #include "util.h"
-#define DEBUG_NEW
-#ifndef DEBUG_NEW
+//#define JBWM_DEBUG_NEW
+#ifndef JBWM_DEBUG_NEW
 #undef JBWM_LOG
 #define JBWM_LOG(...)
-#endif//!DEBUG_NEW
+#endif//!JBWM_DEBUG_NEW
 #ifdef JBWM_USE_EWMH
 static uint8_t wm_desktop(Display * d, const jbwm_window_t w, uint8_t vdesk)
 {

@@ -12,7 +12,7 @@
 #include "log.h"
 #include "macros.h"
 #include "util.h"
-#define JBWM_DEBUG_EWMH
+//#define JBWM_DEBUG_EWMH
 #ifndef JBWM_DEBUG_EWMH
 #undef JBWM_LOG
 #define JBWM_LOG(...)

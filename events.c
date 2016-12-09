@@ -2,6 +2,7 @@
 // Copyright 2008-2016, Jeffrey E. Bedard <jefbed@gmail.com>
 // Copyright 1999-2015, Ciaran Anscomb <jbwm@6809.org.uk>
 // See README for license and other details.
+#undef DEBUG
 #include "events.h"
 #include <stdlib.h>
 #include <X11/Xatom.h>
@@ -16,17 +17,8 @@
 #include "screen.h"
 #include "select.h"
 #include "title_bar.h"
+#include "util.h"
 #include "wm_state.h"
-#define DEBUG_EVENTS
-#ifndef DEBUG_EVENTS
-#undef JBWM_LOG
-#define JBWM_LOG(...)
-#endif//!DEBUG_EVENTS
-//#define DEBUG_ATOMS
-#ifndef DEBUG_ATOMS
-#undef jbwm_print_atom
-#define jbwm_print_atom(...)
-#endif//!DEBUG_ATOMS
 static bool events_need_cleanup;
 static jbwm_window_t last_window;
 __attribute__((pure))
@@ -53,8 +45,10 @@ void jbwm_free_client(struct JBWMClient * restrict c)
 	{ // w scope
 		const jbwm_window_t w = c->window;
 		delete_ewmh_properties(d, w);
-		XReparentWindow(d, w, jbwm_get_screens()[c->screen].root,
-			c->size.x, c->size.y);
+		{ // * p scope
+			struct JBWMRectangle * p = &c->size;
+			XReparentWindow(d, w, jbwm_get_root(c), p->x, p->y);
+		}
 		XRemoveFromSaveSet(d, w);
 	}
 	if(c->parent)
@@ -81,16 +75,14 @@ static void cleanup(void)
 static void handle_property_change(XPropertyEvent * restrict e,
 	struct JBWMClient * restrict c)
 {
-	jbwm_print_atom(e->display, e->atom, __FILE__, __LINE__);
 	if(e->state != PropertyNewValue)
 		return;
 	if (e->atom == XA_WM_NAME)
 		jbwm_update_title_bar(c);
 	else {
+		jbwm_print_atom(e->display, e->atom, __FILE__, __LINE__);
 		if (e->atom == jbwm_get_wm_state(e->display))
 			jbwm_move_resize(c);
-		jbwm_print_atom(e->display, e->atom,
-			__FILE__, __LINE__);
 	}
 }
 static void handle_configure_request(XConfigureRequestEvent * restrict e)
@@ -218,10 +210,10 @@ void jbwm_event_loop(Display * restrict d)
 			jbwm_ewmh_handle_client_message(&ev.xclient, c);
 			break;
 #endif//JBWM_USE_EWMH
-#ifdef DEBUG_EVENTS
+#ifdef DEBUG
 		default:
 			JBWM_LOG("Unhandled event %d", ev.type);
-#endif//DEBUG_EVENTS
+#endif//DEBUG
 		}
 		if (events_need_cleanup)
 			cleanup();

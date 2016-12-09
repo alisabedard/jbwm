@@ -2,12 +2,14 @@
 // Copyright 2008-2016, Jeffrey E. Bedard <jefbed@gmail.com>
 // Copyright 1999-2015, Ciaran Anscomb <jbwm@6809.org.uk>
 // See README for license and other details.
+//#undef DEBUG
 #include "snap.h"
 #include <stdlib.h>
 #include "client.h"
 #include "config.h"
 #include "font.h"
 #include "jbwm.h"
+#include "log.h"
 #include "screen.h"
 __attribute__ ((const, hot, warn_unused_result))
 static int16_t sborder(const int16_t xy, const int16_t edge)
@@ -24,8 +26,8 @@ void jbwm_snap_border(struct JBWMClient * restrict c)
 	g->x = sborder(g->x, 0 - b);
 	const struct JBDim s = jbwm_get_screen(c)->size;
 	g->x = sborder(g->x, g->width - s.width + b);
-	g->y = sborder(g->y, 0 - (c->opt.no_title_bar
-		? 0 : jbwm_get_font_height()));
+	g->y = sborder(g->y, 0 - (c->opt.no_title_bar ? 0
+		: jbwm_get_font_height()));
 	g->y = sborder(g->y, g->height + b - s.height);
 }
 __attribute__ ((const, hot, warn_unused_result))
@@ -38,7 +40,7 @@ static int16_t
 jbwm_snap_dim(const int16_t cxy, const uint16_t cwh, const int16_t cixy,
 	 const uint16_t ciwh, const uint8_t border, int16_t d)
 {
-	int s = cixy + ciwh;
+	int_fast16_t s = cixy + ciwh;
 	d = absmin(d, s - cxy + border);
 	d = absmin(d, s - cxy - cwh);
 	s = cixy - cxy;
