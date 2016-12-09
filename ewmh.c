@@ -67,6 +67,17 @@ static void jbwm_ewmh_init(Display * restrict d)
 	};
 	XInternAtoms(d, atom_names, JBWM_EWMH_ATOMS_COUNT, false, jbwm_ewmh);
 }
+static inline void wprop(Display * d, const jbwm_window_t win,
+	const enum JBWMAtomIndex i, const jbwm_atom_t type,
+	void * data, const uint16_t size)
+{
+	jbwm_set_property(d, win, jbwm_ewmh[i], type, data, size);
+}
+static inline void rprop(Display * d, const enum JBWMAtomIndex a,
+	const jbwm_atom_t type, void * data, const uint16_t size)
+{
+	wprop(d, DefaultRootWindow(d), a, type, data, size);
+}
 static Window * get_mixed_client_list(Display * restrict d)
 {
 	enum {MAX_CLIENTS = 64};
@@ -75,8 +86,7 @@ static Window * get_mixed_client_list(Display * restrict d)
 	for (struct JBWMClient * i = jbwm_get_head_client();
 		i && n < MAX_CLIENTS; i = i->next)
 		l[n++] = i->window;
-	jbwm_set_property(d, DefaultRootWindow(d),
-		jbwm_ewmh[JBWM_EWMH_CLIENT_LIST], XA_WINDOW, l, n);
+	rprop(d, JBWM_EWMH_CLIENT_LIST, XA_WINDOW, l, n);
 	return l;
 }
 static Window * get_ordered_client_list(Display * restrict d)
