@@ -171,8 +171,10 @@ void jbwm_ewmh_init_screen(struct JBWMScreen * restrict s)
 	wprop(d, r, JBWM_EWMH_SUPPORTED, XA_ATOM, jbwm_ewmh,
 		JBWM_EWMH_ATOMS_COUNT);
 	set_name(d, r);
-	// Set this to the root window until we have some clients.
-	wprop(d, r, JBWM_EWMH_CLIENT_LIST, XA_WINDOW, &r, 1);
+	/* Set this to the root window until we have some clients.
+	 * Use the address of the r field within s, not &r, so we
+	 * don't lose scope.  */
+	wprop(d, r, JBWM_EWMH_CLIENT_LIST, XA_WINDOW, &s->r, 1);
 	init_desktops(s);
 	s->supporting = init_supporting(d, r);
 }
