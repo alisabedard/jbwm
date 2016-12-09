@@ -131,16 +131,15 @@ static void init_desktops(struct JBWMScreen * restrict s)
 {
 	Display * restrict d = s->d;
 	const jbwm_window_t r = s->r;
-	wprop(d, r, JBWM_EWMH_DESKTOP_GEOMETRY, XA_CARDINAL,
-		&s->size, 2);
-	wprop(d, r, JBWM_EWMH_CURRENT_DESKTOP, XA_CARDINAL,
-		&s->vdesk, 1);
-	wprop(d, r, JBWM_EWMH_NUMBER_OF_DESKTOPS, XA_CARDINAL,
+	enum {INT=XA_CARDINAL, WIN=XA_WINDOW};
+	wprop(d, r, JBWM_EWMH_DESKTOP_GEOMETRY, INT, &s->size, 2);
+	wprop(d, r, JBWM_EWMH_CURRENT_DESKTOP, INT, &s->vdesk, 1);
+	wprop(d, r, JBWM_EWMH_NUMBER_OF_DESKTOPS, INT,
 		&(long){JBWM_MAX_DESKTOPS}, 1);
-	wprop(d, r, JBWM_EWMH_DESKTOP_VIEWPORT, XA_CARDINAL,
-		(&(long[]){0, 0}), 2);
+	wprop(d, r, JBWM_EWMH_DESKTOP_VIEWPORT, INT,
+		&(long[]){0, 0}, 2);
 	/* Pass the address of the field within s to keep scope.  */
-	wprop(d, r, JBWM_EWMH_VIRTUAL_ROOTS, XA_WINDOW, &s->r, 1);
+	wprop(d, r, JBWM_EWMH_VIRTUAL_ROOTS, WIN, &s->r, 1);
 }
 static void set_name(Display * d, const jbwm_window_t w)
 {
