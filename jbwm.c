@@ -128,9 +128,10 @@ void jbwm_error(const char * restrict msg)
 static void setup_event_listeners(const jbwm_window_t root)
 {
 	XChangeWindowAttributes(jbwm_data.display, root, CWEventMask,
-		&(XSetWindowAttributes){.event_mask = SubstructureRedirectMask
-		| SubstructureNotifyMask | EnterWindowMask | PropertyChangeMask
-		| ColormapChangeMask});
+		&(XSetWindowAttributes){.event_mask =
+		SubstructureRedirectMask | SubstructureNotifyMask |
+		EnterWindowMask | PropertyChangeMask |
+		ColormapChangeMask});
 }
 static void allocate_colors(struct JBWMScreen * restrict s)
 {
