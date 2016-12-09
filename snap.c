@@ -12,7 +12,7 @@
 __attribute__ ((const, hot, warn_unused_result))
 static int16_t sborder(const int16_t xy, const int16_t edge)
 {
-	if(abs(xy+edge) < JBWM_SNAP)
+	if (abs(xy + edge) < JBWM_SNAP)
 		  return - edge;
 	return xy;
 }
