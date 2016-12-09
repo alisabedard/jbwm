@@ -73,11 +73,6 @@ static inline void wprop(Display * d, const jbwm_window_t win,
 {
 	jbwm_set_property(d, win, jbwm_ewmh[i], type, data, size);
 }
-static inline void rprop(Display * d, const enum JBWMAtomIndex a,
-	const jbwm_atom_t type, void * data, const uint16_t size)
-{
-	wprop(d, DefaultRootWindow(d), a, type, data, size);
-}
 static Window * get_mixed_client_list(Display * restrict d)
 {
 	enum {MAX_CLIENTS = 64};
@@ -86,7 +81,8 @@ static Window * get_mixed_client_list(Display * restrict d)
 	for (struct JBWMClient * i = jbwm_get_head_client();
 		i && n < MAX_CLIENTS; i = i->next)
 		l[n++] = i->window;
-	rprop(d, JBWM_EWMH_CLIENT_LIST, XA_WINDOW, l, n);
+	wprop(d, DefaultRootWindow(d), JBWM_EWMH_CLIENT_LIST,
+		XA_WINDOW, l, n);
 	return l;
 }
 static Window * get_ordered_client_list(Display * restrict d)
@@ -104,8 +100,8 @@ static Window * get_ordered_client_list(Display * restrict d)
 		}
 	}
 	JBWM_LOG("get_ordered_client_list() n: %d", n);
-	rprop(d, JBWM_EWMH_CLIENT_LIST_STACKING, XA_WINDOW,
-		window_list, n);
+	wprop(d, DefaultRootWindow(d), JBWM_EWMH_CLIENT_LIST_STACKING,
+		XA_WINDOW, window_list, n);
 	return window_list;
 }
 void jbwm_ewmh_update_client_list(Display * restrict d)
@@ -149,16 +145,13 @@ static void init_desktops(struct JBWMScreen * restrict s)
 static jbwm_window_t init_supporting(Display * restrict d,
 	const jbwm_window_t r)
 {
-	jbwm_window_t w = XCreateSimpleWindow(d, r,
-		0, 0, 1, 1, 0, 0, 0);
-	jbwm_set_property(d, r, jbwm_ewmh[JBWM_EWMH_SUPPORTING_WM_CHECK],
-		XA_WINDOW, &w, 1);
-	jbwm_set_property(d, w, jbwm_ewmh[JBWM_EWMH_SUPPORTING_WM_CHECK],
-		XA_WINDOW, &w, 1);
-	jbwm_set_property(d, w, jbwm_ewmh[JBWM_EWMH_WM_NAME],
-		XA_STRING, JBWM_NAME, sizeof(JBWM_NAME));
-	jbwm_set_property(d, w, jbwm_ewmh[JBWM_EWMH_WM_PID],
-		XA_CARDINAL, &(pid_t){getpid()}, 1);
+	jbwm_window_t w = XCreateSimpleWindow(d, r, 0, 0, 1, 1, 0, 0, 0);
+	wprop(d, r, JBWM_EWMH_SUPPORTING_WM_CHECK, XA_WINDOW, &w, 1);
+	wprop(d, w, JBWM_EWMH_SUPPORTING_WM_CHECK, XA_WINDOW, &w, 1);
+	wprop(d, w, JBWM_EWMH_WM_NAME, XA_STRING, JBWM_NAME,
+		sizeof(JBWM_NAME));
+	wprop(d, w, JBWM_EWMH_WM_PID, XA_CARDINAL,
+		&(pid_t){getpid()}, 1);
 	return w;
 }
 void jbwm_ewmh_init_screen(struct JBWMScreen * restrict s)
