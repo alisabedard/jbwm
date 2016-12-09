@@ -56,7 +56,6 @@ static struct JBDim search(struct JBWMClient * c)
 	struct JBDim d = { .x = JBWM_SNAP, .y = JBWM_SNAP };
 	for (struct JBWMClient * ci = jbwm_get_head_client();
 		ci; ci = ci->next) {
-		// This test qualifies 'restrict'
 		if ((ci == c) || (ci->screen != c->screen)
 		    || (ci->vdesk != c->vdesk))
 			continue;
