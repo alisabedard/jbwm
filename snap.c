@@ -8,11 +8,13 @@
 #include "client.h"
 #include "config.h"
 #include "font.h"
+#include "JBDim.h"
 #include "jbwm.h"
 #include "log.h"
 #include "screen.h"
 __attribute__ ((const, hot, warn_unused_result))
-static int16_t sborder(const int16_t xy, const int16_t edge)
+static int_fast16_t sborder(const int_fast16_t xy, const int_fast16_t
+	edge)
 {
 	if (abs(xy + edge) < JBWM_SNAP)
 		  return - edge;
@@ -31,14 +33,15 @@ void jbwm_snap_border(struct JBWMClient * restrict c)
 	g->y = sborder(g->y, g->height + b - s.height);
 }
 __attribute__ ((const, hot, warn_unused_result))
-static inline int16_t absmin(const int16_t a, const int16_t b)
+static inline int_fast16_t absmin(const int_fast16_t a, const
+	int_fast16_t b)
 {
 	return abs(a) < abs(b) ? a : b;
 }
 __attribute__ ((const))
-static int16_t
-jbwm_snap_dim(const int16_t cxy, const uint16_t cwh, const int16_t cixy,
-	 const uint16_t ciwh, const uint8_t border, int16_t d)
+static int_fast16_t jbwm_snap_dim(const int_fast16_t cxy, const
+	uint_fast16_t cwh, const int_fast16_t cixy, const
+	uint_fast16_t ciwh, const uint8_t border, int_fast16_t d)
 {
 	int_fast16_t s = cixy + ciwh;
 	d = absmin(d, s - cxy + border);
@@ -48,9 +51,9 @@ jbwm_snap_dim(const int16_t cxy, const uint16_t cwh, const int16_t cixy,
 	d = absmin(d, s);
 	return d;
 }
-static XPoint search(struct JBWMClient * c)
+static struct JBDim search(struct JBWMClient * c)
 {
-	XPoint d = { JBWM_SNAP, JBWM_SNAP };
+	struct JBDim d = { .x = JBWM_SNAP, .y = JBWM_SNAP };
 	for (struct JBWMClient * ci = jbwm_get_head_client();
 		ci; ci = ci->next) {
 		// This test qualifies 'restrict'
@@ -74,7 +77,7 @@ void jbwm_snap_client(struct JBWMClient * c)
 {
 	jbwm_snap_border(c);
 	// Snap to other windows:
-	const XPoint d = search(c);
+	const struct JBDim d = search(c);
 	if (abs(d.x) < JBWM_SNAP)
 		c->size.x += d.x;
 	if (abs(d.y) < JBWM_SNAP)
