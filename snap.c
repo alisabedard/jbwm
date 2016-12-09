@@ -9,8 +9,6 @@
 #include "config.h"
 #include "font.h"
 #include "JBDim.h"
-#include "jbwm.h"
-#include "log.h"
 #include "screen.h"
 __attribute__ ((const, hot, warn_unused_result))
 static int_fast16_t sborder(const int_fast16_t xy, const int_fast16_t
@@ -38,7 +36,7 @@ static inline int_fast16_t absmin(const int_fast16_t a, const
 {
 	return abs(a) < abs(b) ? a : b;
 }
-__attribute__ ((const))
+__attribute__ ((const, hot, warn_unused_result))
 static int_fast16_t jbwm_snap_dim(const int_fast16_t cxy, const
 	uint_fast16_t cwh, const int_fast16_t cixy, const
 	uint_fast16_t ciwh, const uint8_t border, int_fast16_t d)
