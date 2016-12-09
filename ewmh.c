@@ -2,6 +2,7 @@
 // Copyright 2008-2016, Jeffrey E. Bedard <jefbed@gmail.com>
 // Copyright 1999-2015, Ciaran Anscomb <jbwm@6809.org.uk>
 // See README for license and other details.
+#undef DEBUG
 #include "ewmh.h"
 #include <string.h>
 #include <unistd.h>
@@ -12,11 +13,6 @@
 #include "log.h"
 #include "macros.h"
 #include "util.h"
-//#define JBWM_DEBUG_EWMH
-#ifndef JBWM_DEBUG_EWMH
-#undef JBWM_LOG
-#define JBWM_LOG(...)
-#endif//!JBWM_DEBUG_EWMH
 static Atom jbwm_ewmh[JBWM_EWMH_ATOMS_COUNT];
 jbwm_atom_t jbwm_ewmh_get_atom(const uint8_t index)
 {

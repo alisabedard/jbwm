@@ -1,4 +1,5 @@
 // Copyright 2016, Jeffrey E. Bedard <jefbed@gmail.com>
+#undef DEBUG
 #include "ewmh_state.h"
 #include <X11/Xatom.h>
 #include "client.h"
@@ -10,11 +11,6 @@
 #include "select.h"
 #include "util.h"
 #include "wm_state.h"
-#define JBWM_DEBUG_EWMH_STATE
-#ifndef JBWM_DEBUG_EWMH_STATE
-#undef JBWM_LOG
-#define JBWM_LOG(...)
-#endif//!JBWM_DEBUG_EWMH_STATE
 // Remove specified atom from WM_STATE
 void jbwm_ewmh_remove_state(Display * restrict d,
 	const jbwm_window_t w, const jbwm_atom_t state)
