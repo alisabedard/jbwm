@@ -26,6 +26,8 @@ void jbwm_snap_border(struct JBWMClient * restrict c)
 	g->x = sborder(g->x, 0 - b);
 	const struct JBDim s = jbwm_get_screen(c)->size;
 	g->x = sborder(g->x, g->width - s.width + b);
+	/* Store the font height statically here in order to reduce
+	 * the function call overhead.  */
 	static uint8_t fh;
 	if (!fh)
 		fh = jbwm_get_font_height();
@@ -43,12 +45,16 @@ static int_fast16_t jbwm_snap_dim(const int_fast16_t cxy, const
 	uint_fast16_t cwh, const int_fast16_t cixy, const
 	uint_fast16_t ciwh, const uint8_t border, int_fast16_t d)
 {
-	int_fast16_t s = cixy + ciwh;
-	d = absmin(d, s - cxy + border);
-	d = absmin(d, s - cxy - cwh);
-	s = cixy - cxy;
-	d = absmin(d, s - cwh - border);
-	d = absmin(d, s);
+	{ // s scope
+		const int_fast16_t s = cixy + ciwh;
+		d = absmin(d, s - cxy + border);
+		d = absmin(d, s - cxy - cwh);
+	}
+	{ // s scope
+		const int_fast16_t s = cixy - cxy;
+		d = absmin(d, s - cwh - border);
+		d = absmin(d, s);
+	}
 	return d;
 }
 static struct JBDim search(struct JBWMClient * c)
