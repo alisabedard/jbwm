@@ -142,16 +142,24 @@ static void init_desktops(struct JBWMScreen * restrict s)
 	/* Pass the address of the field within s to keep scope.  */
 	wprop(d, r, JBWM_EWMH_VIRTUAL_ROOTS, XA_WINDOW, &s->r, 1);
 }
+static void set_name(Display * d, const jbwm_window_t w)
+{
+	wprop(d, w, JBWM_EWMH_WM_NAME, XA_STRING, JBWM_NAME,
+		sizeof(JBWM_NAME));
+}
+static void set_supporting(Display * d, const jbwm_window_t w,
+	jbwm_window_t * s)
+{
+	wprop(d, w, JBWM_EWMH_SUPPORTING_WM_CHECK, XA_WINDOW, s, 1);
+}
 static jbwm_window_t init_supporting(Display * restrict d,
 	const jbwm_window_t r)
 {
 	jbwm_window_t w = XCreateSimpleWindow(d, r, 0, 0, 1, 1, 0, 0, 0);
-	wprop(d, r, JBWM_EWMH_SUPPORTING_WM_CHECK, XA_WINDOW, &w, 1);
-	wprop(d, w, JBWM_EWMH_SUPPORTING_WM_CHECK, XA_WINDOW, &w, 1);
-	wprop(d, w, JBWM_EWMH_WM_NAME, XA_STRING, JBWM_NAME,
-		sizeof(JBWM_NAME));
-	wprop(d, w, JBWM_EWMH_WM_PID, XA_CARDINAL,
-		&(pid_t){getpid()}, 1);
+	set_supporting(d, r, &w);
+	set_supporting(d, w, &w);
+	wprop(d, w, JBWM_EWMH_WM_PID, XA_CARDINAL, &(pid_t){getpid()}, 1);
+	set_name(d, w);
 	return w;
 }
 void jbwm_ewmh_init_screen(struct JBWMScreen * restrict s)
@@ -160,10 +168,9 @@ void jbwm_ewmh_init_screen(struct JBWMScreen * restrict s)
 	if (!jbwm_ewmh[0])
 		jbwm_ewmh_init(d);
 	jbwm_window_t r = s->root;
-	jbwm_set_property(d, r, jbwm_ewmh[JBWM_EWMH_SUPPORTED],
-		XA_ATOM, jbwm_ewmh, JBWM_EWMH_ATOMS_COUNT);
-	jbwm_set_property(d, r, jbwm_ewmh[JBWM_EWMH_WM_NAME],
-		XA_STRING, "jbwm", 4);
+	wprop(d, r, JBWM_EWMH_SUPPORTED, XA_ATOM, jbwm_ewmh,
+		JBWM_EWMH_ATOMS_COUNT);
+	set_name(d, r);
 	// Set this to the root window until we have some clients.
 	jbwm_set_property(d, r, jbwm_ewmh[JBWM_EWMH_CLIENT_LIST],
 		XA_WINDOW, &r, 1);
