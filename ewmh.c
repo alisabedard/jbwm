@@ -104,24 +104,14 @@ static Window * get_ordered_client_list(Display * restrict d)
 		}
 	}
 	JBWM_LOG("get_ordered_client_list() n: %d", n);
-	jbwm_set_property(d, DefaultRootWindow(d),
-		jbwm_ewmh[JBWM_EWMH_CLIENT_LIST_STACKING],
-		XA_WINDOW, window_list, n);
+	rprop(d, JBWM_EWMH_CLIENT_LIST_STACKING, XA_WINDOW,
+		window_list, n);
 	return window_list;
 }
 void jbwm_ewmh_update_client_list(Display * restrict d)
 {
 	get_mixed_client_list(d);
 	get_ordered_client_list(d);
-}
-static void set_root_vdesk(Display * restrict d, jbwm_window_t r)
-{
-	jbwm_set_property(d, r, jbwm_ewmh[JBWM_EWMH_NUMBER_OF_DESKTOPS],
-		XA_CARDINAL, &(long){JBWM_MAX_DESKTOPS}, 1);
-	jbwm_set_property(d, r, jbwm_ewmh[JBWM_EWMH_DESKTOP_VIEWPORT],
-		XA_CARDINAL, (&(long[]){0, 0}), 2);
-	jbwm_set_property(d, r, jbwm_ewmh[JBWM_EWMH_VIRTUAL_ROOTS],
-		XA_WINDOW, &r, 1);
 }
 void jbwm_ewmh_set_allowed_actions(Display * restrict d,
 	const jbwm_window_t w)
@@ -143,12 +133,18 @@ void jbwm_ewmh_set_allowed_actions(Display * restrict d,
 }
 static void init_desktops(struct JBWMScreen * restrict s)
 {
-	Display * d = s->d;
-	jbwm_set_property(d, s->r, jbwm_ewmh[JBWM_EWMH_DESKTOP_GEOMETRY],
-		XA_CARDINAL, &s->size, 2);
-	jbwm_set_property(d, s->r, jbwm_ewmh[JBWM_EWMH_CURRENT_DESKTOP],
-		XA_CARDINAL, &s->vdesk, 1);
-	set_root_vdesk(d, s->r);
+	Display * restrict d = s->d;
+	const jbwm_window_t r = s->r;
+	wprop(d, r, JBWM_EWMH_DESKTOP_GEOMETRY, XA_CARDINAL,
+		&s->size, 2);
+	wprop(d, r, JBWM_EWMH_CURRENT_DESKTOP, XA_CARDINAL,
+		&s->vdesk, 1);
+	wprop(d, r, JBWM_EWMH_NUMBER_OF_DESKTOPS, XA_CARDINAL,
+		&(long){JBWM_MAX_DESKTOPS}, 1);
+	wprop(d, r, JBWM_EWMH_DESKTOP_VIEWPORT, XA_CARDINAL,
+		(&(long[]){0, 0}), 2);
+	/* Pass the address of the field within s to keep scope.  */
+	wprop(d, r, JBWM_EWMH_VIRTUAL_ROOTS, XA_WINDOW, &s->r, 1);
 }
 static jbwm_window_t init_supporting(Display * restrict d,
 	const jbwm_window_t r)
