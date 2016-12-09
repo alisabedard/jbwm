@@ -172,24 +172,15 @@ void jbwm_ewmh_init_screen(struct JBWMScreen * restrict s)
 		JBWM_EWMH_ATOMS_COUNT);
 	set_name(d, r);
 	// Set this to the root window until we have some clients.
-	jbwm_set_property(d, r, jbwm_ewmh[JBWM_EWMH_CLIENT_LIST],
-		XA_WINDOW, &r, 1);
+	wprop(d, r, JBWM_EWMH_CLIENT_LIST, XA_WINDOW, &r, 1);
 	init_desktops(s);
 	s->supporting = init_supporting(d, r);
 }
 void jbwm_set_frame_extents(struct JBWMClient * restrict c)
 {
 	JBWM_LOG("jbwm_set_frame_extents()");
-	// left, right, top, bottom
-	const uint8_t b = c->border;
-#ifdef JBWM_USE_TITLE_BAR
-	const uint8_t t = c->tb.win ? jbwm_get_font_height() : b;
-	Atom f[] = {b, b, t, b};
-#else//!JBWM_USE_TITLE_BAR
-	Atom f[] = {b, b, b, b};
-#endif//JBWM_USE_TITLE_BAR
-	Display * d = c->d;
-	jbwm_set_property(d, c->window, jbwm_ewmh[JBWM_EWMH_FRAME_EXTENTS],
-		XA_CARDINAL, &f, 4);
-	XFlush(d);
+	// Fields: left, right, top, bottom
+	Atom f[4] = {1, 1, 1, 1};
+	wprop(c->d, c->window, JBWM_EWMH_FRAME_EXTENTS,
+		XA_CARDINAL, &f, sizeof(f));
 }
