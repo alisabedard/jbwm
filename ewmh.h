@@ -10,8 +10,8 @@ jbwm_atom_t jbwm_ewmh_get_atom(const uint8_t index);
 void jbwm_ewmh_update_client_list(Display * restrict d);
 void jbwm_ewmh_set_allowed_actions(Display * restrict d,
 	const jbwm_window_t w);
-void jbwm_ewmh_init_screen(Display * restrict d,
-	struct JBWMScreen * restrict s) __attribute__((nonnull));
+void jbwm_ewmh_init_screen(struct JBWMScreen * restrict s)
+	__attribute__((nonnull));
 void jbwm_set_frame_extents(struct JBWMClient * restrict c);
 enum JBWMAtomIndex {
 	JBWM_EWMH_SUPPORTED,

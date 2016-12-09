@@ -131,9 +131,9 @@ void jbwm_ewmh_set_allowed_actions(Display * restrict d,
 	};
 	jbwm_set_property(d, w, a[0], XA_ATOM, &a, sizeof(a) / sizeof(Atom));
 }
-static void init_desktops(Display * restrict d,
-	struct JBWMScreen * restrict s)
+static void init_desktops(struct JBWMScreen * restrict s)
 {
+	Display * d = s->d;
 	jbwm_set_property(d, s->r, jbwm_ewmh[JBWM_EWMH_DESKTOP_GEOMETRY],
 		XA_CARDINAL, &s->size, 2);
 	jbwm_set_property(d, s->r, jbwm_ewmh[JBWM_EWMH_CURRENT_DESKTOP],
@@ -155,9 +155,9 @@ static jbwm_window_t init_supporting(Display * restrict d,
 		XA_CARDINAL, &(pid_t){getpid()}, 1);
 	return w;
 }
-void jbwm_ewmh_init_screen(Display * restrict d,
-	struct JBWMScreen * restrict s)
+void jbwm_ewmh_init_screen(struct JBWMScreen * restrict s)
 {
+	Display * d = s->d;
 	if (!jbwm_ewmh[0])
 		jbwm_ewmh_init(d);
 	jbwm_window_t r = s->root;
@@ -168,7 +168,7 @@ void jbwm_ewmh_init_screen(Display * restrict d,
 	// Set this to the root window until we have some clients.
 	jbwm_set_property(d, r, jbwm_ewmh[JBWM_EWMH_CLIENT_LIST],
 		XA_WINDOW, &r, 1);
-	init_desktops(d, s);
+	init_desktops(s);
 	s->supporting = init_supporting(d, r);
 }
 void jbwm_set_frame_extents(struct JBWMClient * restrict c)
