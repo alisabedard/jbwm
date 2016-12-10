@@ -10,13 +10,13 @@
 #include "log.h"
 #include "screen.h"
 #include "util.h"
-static void set_state_not_focused(struct JBWMClient * restrict c)
+static void set_state_not_focused(struct JBWMClient * c)
 {
 	XSetWindowBorder(c->d, c->parent, jbwm_get_screen(c)->pixels.bg);
 	jbwm_ewmh_remove_state(c->d, c->window, jbwm_ewmh_get_atom(
 		JBWM_EWMH_WM_STATE_FOCUSED));
 }
-static bool check_current(void)
+static bool check_current(struct JBWMClient * c)
 {
 	struct JBWMClientManager * m = jbwm_get_client_manager();
 	if (m->current) {
@@ -24,24 +24,26 @@ static bool check_current(void)
 			m->current = NULL;
 			return false;
 		}
+		if (m->current == c)
+			return false;
 		return true;
 	}
 	return false;
 }
-static void unselect_current(void)
+static void unselect_current(struct JBWMClient * c)
 {
-	if (check_current())
+	if (check_current(c))
 		set_state_not_focused(jbwm_get_current_client());
 }
-static void set_border(struct JBWMClient * restrict c)
+static void set_border(struct JBWMClient * c)
 {
 	struct JBWMScreen * restrict s = jbwm_get_screen(c);
 	XSetWindowBorder(c->d, c->parent, c->opt.sticky ? s->pixels.fc
 		: s->pixels.fg);
 }
-static void set_focused(struct JBWMClient * c)
+static void set_focused(struct JBWMClient * restrict c)
 {
-	Display * restrict d = c->d;
+	Display * d = c->d;
 	XInstallColormap(c->d, c->cmap);
 	XSetInputFocus(d, c->window, RevertToPointerRoot, CurrentTime);
 	jbwm_ewmh_add_state(d, c->window, jbwm_ewmh_get_atom(
@@ -49,7 +51,6 @@ static void set_focused(struct JBWMClient * c)
 }
 static void set_active_window(struct JBWMClient * c)
 {
-	unselect_current(); // depends on m->current
 	/* Store the window id as a static variable here in case
 	 * client c is freed before the X server handles the event.
 	 * If the property is read after the client is freed, it will
@@ -81,6 +82,7 @@ static void set_active_window(struct JBWMClient * c)
 void jbwm_select_client(struct JBWMClient * c)
 {
 	if (c) {
+		unselect_current(c);
 		set_border(c);
 		set_focused(c);
 		set_active_window(c);

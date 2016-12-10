@@ -14,6 +14,7 @@
 #include "macros.h"
 #include "mwm.h"
 #include "screen.h"
+#include "select.h"
 #include "shape.h"
 #include "util.h"
 //#define JBWM_DEBUG_NEW
@@ -196,4 +197,5 @@ void jbwm_new_client(struct JBWMScreen * s, const jbwm_window_t w)
 	init_properties(c);
 	reparent(c);
 	jbwm_restore_client(c);
+	jbwm_select_client(c);
 }
