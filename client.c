@@ -24,7 +24,7 @@ struct JBWMClient * jbwm_get_head_client(void)
 {
 	return jbwm_client_data.head;
 }
-void jbwm_set_head_client(struct JBWMClient * restrict c)
+void jbwm_set_head_client(struct JBWMClient * c)
 {
 	if (c)
 		jbwm_client_data.head = c;
@@ -52,7 +52,7 @@ void jbwm_relink_client_list(struct JBWMClient * c)
 	}
 	relink_r(c, jbwm_client_data.head);
 }
-void jbwm_set_client_vdesk(struct JBWMClient * restrict c, const uint8_t d)
+void jbwm_set_client_vdesk(struct JBWMClient * c, const uint8_t d)
 {
 	JBWM_LOG("jbwm_set_client_vdesk");
 	const uint8_t p = c->vdesk; // save previous
@@ -62,7 +62,7 @@ void jbwm_set_client_vdesk(struct JBWMClient * restrict c, const uint8_t d)
 	c->vdesk = jbwm_set_vdesk(s, d);
 	jbwm_set_vdesk(s, p);
 }
-static inline bool matches(struct JBWMClient * restrict i,
+static inline bool matches(struct JBWMClient * i,
 	const jbwm_window_t w)
 {
 #ifdef JBWM_USE_TITLE_BAR

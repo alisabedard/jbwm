@@ -10,8 +10,8 @@
 #include "title_bar.h"
 #include "wm_state.h"
 #ifdef JBWM_USE_TITLE_BAR
-static void handle_title_bar_button(XButtonEvent * restrict e,
-	struct JBWMClient * restrict c)
+static void handle_title_bar_button(XButtonEvent * e,
+	struct JBWMClient * c)
 {
 	JBWM_LOG("e->window: %d, c->title_bar: %d, e->subwindow: %d",
 		(int)e->window, (int)c->tb.win, (int)e->subwindow);
@@ -33,8 +33,8 @@ static void handle_title_bar_button(XButtonEvent * restrict e,
 #define handle_title_bar_button(e, c) jbwm_drag(c, false)
 #endif//JBWM_USE_TITLE_BAR
 __attribute__((nonnull))
-void jbwm_handle_button_event(XButtonEvent * restrict e,
-	struct JBWMClient * restrict c)
+void jbwm_handle_button_event(XButtonEvent * e,
+	struct JBWMClient * c)
 {
 	JBWM_LOG("jbwm_handle_button_event");
 	const bool fs = c->opt.fullscreen;

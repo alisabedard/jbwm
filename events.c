@@ -29,7 +29,7 @@ static struct JBWMScreen * get_screen(const int8_t i,
 	return s[i].root == root ? s + i : get_screen(i - 1, root);
 }
 #ifdef JBWM_USE_EWMH
-static void delete_ewmh_properties(Display * restrict d,
+static void delete_ewmh_properties(Display * d,
 	const jbwm_window_t w)
 {
 	// Per ICCCM + wm-spec
@@ -39,7 +39,7 @@ static void delete_ewmh_properties(Display * restrict d,
 #else//!JBWM_USE_EWMH
 #define delete_ewmh_properties(d, w)
 #endif//JBWM_USE_EWMH
-void jbwm_free_client(struct JBWMClient * restrict c)
+void jbwm_free_client(struct JBWMClient * c)
 {
 	Display * d = c->d;
 	{ // w scope
@@ -72,8 +72,8 @@ static void cleanup(void)
 		jbwm_free_client(c);
 	} while(i && (c = i));
 }
-static void handle_property_change(XPropertyEvent * restrict e,
-	struct JBWMClient * restrict c)
+static void handle_property_change(XPropertyEvent * e,
+	struct JBWMClient * c)
 {
 	if(e->state != PropertyNewValue)
 		return;
@@ -85,7 +85,7 @@ static void handle_property_change(XPropertyEvent * restrict e,
 			jbwm_move_resize(c);
 	}
 }
-static void handle_configure_request(XConfigureRequestEvent * restrict e)
+static void handle_configure_request(XConfigureRequestEvent * e)
 {
 	JBWM_LOG("handle_configure_request():"
 		"x: %d, y: %d, w: %d, h: %d",
@@ -95,7 +95,7 @@ static void handle_configure_request(XConfigureRequestEvent * restrict e)
 		.width = e->width, .height = e->height,
 		.sibling = e->above, .stack_mode = e->detail});
 }
-static void handle_map_request(XMapRequestEvent * restrict e)
+static void handle_map_request(XMapRequestEvent * e)
 {
 	/* This check fixes a race condition in old libreoffice and certain
 	   Motif dialogs where an attempt is made to request mapping twice: */
@@ -106,13 +106,13 @@ static void handle_map_request(XMapRequestEvent * restrict e)
 	JBWM_LOG("MapRequest, send_event:%d", e->send_event);
 	jbwm_new_client(get_screen(ScreenCount(e->display), e->parent), w);
 }
-static inline void mark_removal(struct JBWMClient * restrict c)
+static inline void mark_removal(struct JBWMClient * c)
 {
 	JBWM_LOG("mark_removal(): ignore_unmap is %d", c->ignore_unmap);
 	c->opt.remove = events_need_cleanup = (c->ignore_unmap--<1);
 }
-static void handle_colormap_notify(struct JBWMClient * restrict c,
-	XColormapEvent * restrict e)
+static void handle_colormap_notify(struct JBWMClient * c,
+	XColormapEvent * e)
 {
 	JBWM_LOG("ColormapNotify");
 	if (c && e->new)
@@ -120,15 +120,14 @@ static void handle_colormap_notify(struct JBWMClient * restrict c,
 }
 static inline bool client_is_valid(struct JBWMClient * c, Display * d)
 {
-	return c && c->d == d;
+	return c && c->d && c->d == d;
 }
-void jbwm_event_loop(Display * restrict d)
+void jbwm_event_loop(Display * d)
 {
 	for (;;) {
 		XEvent ev;
 		XNextEvent(d, &ev);
-		struct JBWMClient * restrict c
-			= jbwm_get_client(ev.xany.window);
+		struct JBWMClient * c = jbwm_get_client(ev.xany.window);
 		/* Verify the client display versus the real display
 		 * here in order to ensure no removed clients continue
 		 * into the event loop.  */
@@ -207,10 +206,7 @@ void jbwm_event_loop(Display * restrict d)
 			break;
 #ifdef JBWM_USE_EWMH
 		case ClientMessage:
-			if (c && c->d) /* Prevent segfault with gtk3
-					  demo 'Benchmark' closing.
-					*/
-				jbwm_ewmh_handle_client_message(&ev.xclient, c);
+			jbwm_ewmh_handle_client_message(&ev.xclient, c);
 			break;
 #endif//JBWM_USE_EWMH
 #ifdef DEBUG

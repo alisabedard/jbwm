@@ -5,17 +5,17 @@
 #include "util.h"
 #include "jbwm.h"
 #include <stdbool.h>
-void jbwm_set_property(Display * restrict d, const jbwm_window_t win,
+void jbwm_set_property(Display * d, const jbwm_window_t win,
 	const jbwm_atom_t property, const jbwm_atom_t type,
-	void * restrict data, uint16_t size)
+	void * data, uint16_t size)
 {
 	if (!d || !data)
 		return;
 	XChangeProperty(d, win, property, type, 32, PropModeReplace,
 		data, size);
 }
-jbwm_pixel_t jbwm_get_pixel(Display * restrict dpy,
-	const uint8_t screen, const char * restrict name)
+jbwm_pixel_t jbwm_get_pixel(Display * dpy,
+	const uint8_t screen, const char * name)
 {
 	if (!name) // sanitize input to avoid segfault
 		return 0;
@@ -25,7 +25,7 @@ jbwm_pixel_t jbwm_get_pixel(Display * restrict dpy,
 	return c.pixel;
 }
 __attribute__((warn_unused_result))
-void *jbwm_get_property(Display * restrict dpy, jbwm_window_t w,
+void *jbwm_get_property(Display * dpy, jbwm_window_t w,
 	Atom property, uint16_t * num_items)
 {
 	unsigned char * prop;
@@ -39,7 +39,7 @@ void *jbwm_get_property(Display * restrict dpy, jbwm_window_t w,
 	*num_items = n;
 	return prop;
 }
-void jbwm_grab_button(Display * restrict d, const jbwm_window_t w,
+void jbwm_grab_button(Display * d, const jbwm_window_t w,
 	const unsigned int mask, const unsigned int btn)
 {
 	XGrabButton(d, btn, mask, w, false,

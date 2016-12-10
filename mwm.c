@@ -40,7 +40,7 @@ static void process_flags(struct JBWMClient * c)
 	}
 	c->border = o->no_border ? 0 : 1;
 }
-static void do_functions(struct JBWMClientOptions * restrict o,
+static void do_functions(struct JBWMClientOptions * o,
 	const enum MwmFunctions f)
 {
 	/* Qt 4 and 5 exhibit bad behavior if these three checks are
@@ -63,7 +63,7 @@ static void do_functions(struct JBWMClientOptions * restrict o,
 		o->no_resize, o->no_close, o->no_min, o->no_max,
 		o->no_move);
 }
-static void do_decorations(struct JBWMClientOptions * restrict o,
+static void do_decorations(struct JBWMClientOptions * o,
 	const enum MwmDecor f)
 {
 	o->no_border=!(f & MWM_DECOR_BORDER);
@@ -76,7 +76,7 @@ static void do_decorations(struct JBWMClientOptions * restrict o,
 	if (!(f & MWM_DECOR_TITLE))
 		o->no_title_bar = true;
 }
-static Atom get_mwm_hints_atom(Display * restrict d)
+static Atom get_mwm_hints_atom(Display * d)
 {
 	static Atom a;
 	return a ? a : (a = XInternAtom(d, "_MOTIF_WM_HINTS", false));

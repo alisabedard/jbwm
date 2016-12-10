@@ -2,12 +2,12 @@
 #define JBWM_EWMH_STATE_H
 #ifdef JBWM_USE_EWMH
 #include "JBWMClient.h"
-void jbwm_ewmh_remove_state(Display * restrict d,
+void jbwm_ewmh_remove_state(Display * d,
 	const jbwm_window_t w, const jbwm_window_t state);
-void jbwm_ewmh_add_state(Display * restrict d, const jbwm_window_t w,
+void jbwm_ewmh_add_state(Display * d, const jbwm_window_t w,
 	jbwm_atom_t state);
-void jbwm_ewmh_handle_client_message(XClientMessageEvent * restrict e,
-	struct JBWMClient * restrict c)
+void jbwm_ewmh_handle_client_message(XClientMessageEvent * e,
+	struct JBWMClient * c)
 	__attribute__((nonnull(1)));
 #else//!JBWM_USE_EWMH
 #define jbwm_ewmh_remove_state(d, w, s)

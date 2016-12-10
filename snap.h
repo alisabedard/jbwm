@@ -5,7 +5,7 @@
 #ifndef JBWM_SNAP_H
 #define JBWM_SNAP_H
 #include "JBWMClient.h"
-void jbwm_snap_border(struct JBWMClient * restrict c)
+void jbwm_snap_border(struct JBWMClient * c)
 	__attribute__((nonnull));
 void jbwm_snap_client(struct JBWMClient * c)
 	__attribute__((nonnull));

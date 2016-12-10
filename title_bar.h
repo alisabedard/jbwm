@@ -6,7 +6,7 @@
 #define JBWM_TITLE_BAR_H
 #ifdef JBWM_USE_TITLE_BAR
 #include "JBWMClient.h"
-void jbwm_toggle_shade(struct JBWMClient * restrict c)
+void jbwm_toggle_shade(struct JBWMClient * c)
 	__attribute__((nonnull));
 void jbwm_update_title_bar(struct JBWMClient * c) __attribute__((nonnull));
 #else//!JBWM_USE_TITLE_BAR

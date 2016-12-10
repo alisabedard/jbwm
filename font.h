@@ -7,7 +7,7 @@
 void * jbwm_get_font(void);
 uint8_t jbwm_get_font_ascent(void);
 uint8_t jbwm_get_font_height(void);
-void jbwm_open_font(Display * restrict d);
+void jbwm_open_font(Display * d);
 #else//!JBWM_USE_TITLE_BAR
 #define jbwm_get_font_height() 0
 #define jbwm_open_font(d)

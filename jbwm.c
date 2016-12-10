@@ -40,7 +40,7 @@ static void print(const size_t sz, const char * buf)
 }
 /* Used for overriding the default WM modifiers */
 __attribute__((warn_unused_result))
-static uint16_t parse_modifiers(char * restrict arg)
+static uint16_t parse_modifiers(char * arg)
 {
 	JBWM_LOG("parse_modifiers()");
 	size_t s = 0; // strlen
@@ -117,7 +117,7 @@ version:
 	exit(0);
 }
 __attribute__((noreturn))
-void jbwm_error(const char * restrict msg)
+void jbwm_error(const char * msg)
 {
 	size_t count = 0;
 	while (msg[++count]);
@@ -133,10 +133,10 @@ static void setup_event_listeners(const jbwm_window_t root)
 		EnterWindowMask | PropertyChangeMask |
 		ColormapChangeMask});
 }
-static void allocate_colors(struct JBWMScreen * restrict s)
+static void allocate_colors(struct JBWMScreen * s)
 {
 	const uint8_t n = s->screen;
-	Display * restrict d = jbwm_data.display;
+	Display * d = jbwm_data.display;
 	s->pixels.fg=jbwm_get_pixel(d, n, getenv(JBWM_ENV_FG));
 	s->pixels.bg=jbwm_get_pixel(d, n, getenv(JBWM_ENV_BG));
 	s->pixels.fc=jbwm_get_pixel(d, n, getenv(JBWM_ENV_FC));
@@ -160,7 +160,7 @@ static bool check_redirect(const jbwm_window_t w)
 }
 // Free returned data with XFree()
 static jbwm_window_t * get_windows(const jbwm_window_t root,
-	uint16_t * restrict win_count)
+	uint16_t * win_count)
 {
 	Window * w, d;
 	unsigned int n;
@@ -168,10 +168,10 @@ static jbwm_window_t * get_windows(const jbwm_window_t root,
 	*win_count = n;
 	return (jbwm_window_t *)w;
 }
-static void setup_clients(struct JBWMScreen * restrict s)
+static void setup_clients(struct JBWMScreen * s)
 {
 	uint16_t n;
-	jbwm_window_t * restrict w = get_windows(s->root, &n);
+	jbwm_window_t * w = get_windows(s->root, &n);
 	JBWM_LOG("Started with %d clients", n);
 	while (n--)
 		if (check_redirect(w[n])) {
@@ -183,7 +183,7 @@ static void setup_clients(struct JBWMScreen * restrict s)
 }
 static void setup_screen_elements(const uint8_t i)
 {
-	struct JBWMScreen * restrict s = jbwm_data.screens;
+	struct JBWMScreen * s = jbwm_data.screens;
 	s->screen = i;
 	s->d = jbwm_data.display;
 	s->root = RootWindow(jbwm_data.display, i);
@@ -191,7 +191,7 @@ static void setup_screen_elements(const uint8_t i)
 	s->size.w = DisplayWidth(jbwm_data.display, i);
 	s->size.h = DisplayHeight(jbwm_data.display, i);
 }
-static void setup_gc(struct JBWMScreen * restrict s)
+static void setup_gc(struct JBWMScreen * s)
 {
 	allocate_colors(s);
 	unsigned long vm = GCFunction | GCSubwindowMode
@@ -221,8 +221,8 @@ static void setup_screen(const uint8_t i)
 	jbwm_ewmh_init_screen(s);
 }
 __attribute__((pure))
-static int handle_xerror(Display * restrict dpy __attribute__ ((unused)),
-	XErrorEvent * restrict e)
+static int handle_xerror(Display * dpy __attribute__ ((unused)),
+	XErrorEvent * e)
 {
 	if ((e->error_code == BadAccess)
 	    && (e->request_code == X_ChangeWindowAttributes))

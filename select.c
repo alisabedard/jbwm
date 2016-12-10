@@ -37,11 +37,11 @@ static void unselect_current(struct JBWMClient * c)
 }
 static void set_border(struct JBWMClient * c)
 {
-	struct JBWMScreen * restrict s = jbwm_get_screen(c);
+	struct JBWMScreen * s = jbwm_get_screen(c);
 	XSetWindowBorder(c->d, c->parent, c->opt.sticky ? s->pixels.fc
 		: s->pixels.fg);
 }
-static void set_focused(struct JBWMClient * restrict c)
+static void set_focused(struct JBWMClient * c)
 {
 	Display * d = c->d;
 	XInstallColormap(c->d, c->cmap);

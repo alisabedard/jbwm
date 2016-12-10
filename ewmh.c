@@ -18,7 +18,7 @@ jbwm_atom_t jbwm_ewmh_get_atom(const uint8_t index)
 {
 	return jbwm_ewmh[index];
 }
-static void jbwm_ewmh_init(Display * restrict d)
+static void jbwm_ewmh_init(Display * d)
 {
 	static char * atom_names [] = { // This list must match 1:1 with enum
 		"_NET_SUPPORTED",
@@ -69,7 +69,7 @@ static inline void wprop(Display * d, const jbwm_window_t win,
 {
 	jbwm_set_property(d, win, jbwm_ewmh[i], type, data, size);
 }
-static Window * get_mixed_client_list(Display * restrict d)
+static Window * get_mixed_client_list(Display * d)
 {
 	enum {MAX_CLIENTS = 64};
 	static Window l[MAX_CLIENTS];
@@ -81,7 +81,7 @@ static Window * get_mixed_client_list(Display * restrict d)
 		XA_WINDOW, l, n);
 	return l;
 }
-static Window * get_ordered_client_list(Display * restrict d)
+static Window * get_ordered_client_list(Display * d)
 {
 	enum {MAX_CLIENTS= 64};
 	static Window window_list[MAX_CLIENTS];
@@ -100,12 +100,12 @@ static Window * get_ordered_client_list(Display * restrict d)
 		XA_WINDOW, window_list, n);
 	return window_list;
 }
-void jbwm_ewmh_update_client_list(Display * restrict d)
+void jbwm_ewmh_update_client_list(Display * d)
 {
 	get_mixed_client_list(d);
 	get_ordered_client_list(d);
 }
-void jbwm_ewmh_set_allowed_actions(Display * restrict d,
+void jbwm_ewmh_set_allowed_actions(Display * d,
 	const jbwm_window_t w)
 {
 	Atom a[] = {
@@ -123,9 +123,9 @@ void jbwm_ewmh_set_allowed_actions(Display * restrict d,
 	};
 	jbwm_set_property(d, w, a[0], XA_ATOM, &a, sizeof(a) / sizeof(Atom));
 }
-static void init_desktops(struct JBWMScreen * restrict s)
+static void init_desktops(struct JBWMScreen * s)
 {
-	Display * restrict d = s->d;
+	Display * d = s->d;
 	const jbwm_window_t r = s->r;
 	enum {INT=XA_CARDINAL, WIN=XA_WINDOW};
 	wprop(d, r, JBWM_EWMH_DESKTOP_GEOMETRY, INT, &s->size, 2);
@@ -147,7 +147,7 @@ static void set_supporting(Display * d, const jbwm_window_t w,
 {
 	wprop(d, w, JBWM_EWMH_SUPPORTING_WM_CHECK, XA_WINDOW, s, 1);
 }
-static jbwm_window_t init_supporting(Display * restrict d,
+static jbwm_window_t init_supporting(Display * d,
 	const jbwm_window_t r)
 {
 	jbwm_window_t w = XCreateSimpleWindow(d, r, 0, 0, 1, 1, 0, 0, 0);
@@ -157,7 +157,7 @@ static jbwm_window_t init_supporting(Display * restrict d,
 	set_name(d, w);
 	return w;
 }
-void jbwm_ewmh_init_screen(struct JBWMScreen * restrict s)
+void jbwm_ewmh_init_screen(struct JBWMScreen * s)
 {
 	Display * d = s->d;
 	if (!jbwm_ewmh[0])
@@ -173,7 +173,7 @@ void jbwm_ewmh_init_screen(struct JBWMScreen * restrict s)
 	init_desktops(s);
 	s->supporting = init_supporting(d, r);
 }
-void jbwm_set_frame_extents(struct JBWMClient * restrict c)
+void jbwm_set_frame_extents(struct JBWMClient * c)
 {
 	JBWM_LOG("jbwm_set_frame_extents()");
 	// Fields: left, right, top, bottom

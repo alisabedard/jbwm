@@ -25,29 +25,29 @@
 #endif//!DEBUG_SCREEN
 enum {JBWMMouseMask=(ButtonPressMask|ButtonReleaseMask|PointerMotionMask)};
 __attribute__ ((hot,nonnull))
-static void draw_outline(struct JBWMClient * restrict c)
+static void draw_outline(struct JBWMClient * c)
 {
 	if (!c->border)
 		return;
 	const uint8_t o = c->opt.no_title_bar ? 0 : jbwm_get_font_height();
 	const struct JBWMScreen * s = jbwm_get_screen(c);
-	const struct JBWMRectangle * restrict g = &c->size;
+	const struct JBWMRectangle * g = &c->size;
 	const uint8_t b = c->border;
 	XRectangle r = {g->x, g->y - o, g->width + b, g->height + b + o};
 	XDrawRectangles(c->d, s->root, s->gc, &r, 1);
 }
 __attribute__((nonnull))
-void jbwm_configure_client(struct JBWMClient * restrict c)
+void jbwm_configure_client(struct JBWMClient * c)
 {
 	const jbwm_window_t w = c->window;
-	struct JBWMRectangle * restrict g = &c->size;
+	struct JBWMRectangle * g = &c->size;
 	XSendEvent(c->d, w, true, StructureNotifyMask, (XEvent *)
 		&(XConfigureEvent){.x = g->x, .y = g->y, .width = g->width,
 		.height = g->height, .type = ConfigureNotify, .event = w,
 		.window = w, .above = c->parent, .override_redirect = true,
 		.border_width = c->border});
 }
-static void grab_pointer(Display * restrict d, const jbwm_window_t w)
+static void grab_pointer(Display * d, const jbwm_window_t w)
 {
 	static Cursor c;
 	if (!c)
@@ -55,7 +55,7 @@ static void grab_pointer(Display * restrict d, const jbwm_window_t w)
 	XGrabPointer(d, w, false, JBWMMouseMask, GrabModeAsync,
 		GrabModeAsync, None, c, CurrentTime);
 }
-static struct JBDim get_mouse_position(Display * restrict d,
+static struct JBDim get_mouse_position(Display * d,
 	const jbwm_window_t w)
 {
 	int x, y;
@@ -63,15 +63,15 @@ static struct JBDim get_mouse_position(Display * restrict d,
 		&x, &y, &(int){0}, &(int){0}, &(unsigned int){0});
 	return (struct JBDim){.x = x, .y = y};
 }
-static void warp_corner(struct JBWMClient * restrict c)
+static void warp_corner(struct JBWMClient * c)
 {
 	XWarpPointer(c->d, None, c->window, 0, 0, 0, 0,
 		c->size.width, c->size.height);
 }
-static void set_size(struct JBWMClient * restrict c,
-	const int16_t * restrict p)
+static void set_size(struct JBWMClient * c,
+	const int16_t * p)
 {
-	struct JBWMRectangle * restrict g = &c->size;
+	struct JBWMRectangle * g = &c->size;
 	g->width = abs(g->x - p[0]);
 	g->height = abs(g->y - p[1]);
 }
@@ -82,37 +82,37 @@ static int16_t get_diff_factored(const int16_t a, const int16_t b,
 	return a - b + c;
 }
 __attribute__((nonnull,pure))
-static int16_t get_diff(const uint8_t i, const int16_t * restrict original,
-	const int16_t * restrict start, const int16_t * restrict p)
+static int16_t get_diff(const uint8_t i, const int16_t * original,
+	const int16_t * start, const int16_t * p)
 {
 	return get_diff_factored(original[i], start[i], p[i]);
 }
-static void set_position(struct JBWMClient * restrict c,
-	const int16_t * restrict original, const int16_t * restrict start,
-	const int16_t * restrict p)
+static void set_position(struct JBWMClient * c,
+	const int16_t * original, const int16_t * start,
+	const int16_t * p)
 {
 	c->size.x = get_diff(0, original, start, p);
 	c->size.y = get_diff(1, original, start, p);
 	jbwm_snap_client(c);
 }
-static void do_changes(struct JBWMClient * restrict c, const bool resize,
-	const int16_t * restrict start, const int16_t * restrict original,
-	const int16_t * restrict p)
+static void do_changes(struct JBWMClient * c, const bool resize,
+	const int16_t * start, const int16_t * original,
+	const int16_t * p)
 {
 	if (resize)
 		set_size(c, p);
 	else // drag
 		set_position(c, original, start, p);
 }
-struct JBWMScreen * jbwm_get_screen(struct JBWMClient * restrict c)
+struct JBWMScreen * jbwm_get_screen(struct JBWMClient * c)
 {
 	return jbwm_get_screens() + c->screen;
 }
-jbwm_window_t jbwm_get_root(struct JBWMClient * restrict c)
+jbwm_window_t jbwm_get_root(struct JBWMClient * c)
 {
 	return jbwm_get_screen(c)->root;
 }
-static void drag_event_loop(struct JBWMClient * restrict c, const bool resize)
+static void drag_event_loop(struct JBWMClient * c, const bool resize)
 {
 	Display * d = c->d;
 	int16_t start[2];
@@ -140,7 +140,7 @@ static void drag_event_loop(struct JBWMClient * restrict c, const bool resize)
 			jbwm_move_resize(c);
 	}
 }
-void jbwm_drag(struct JBWMClient * restrict c, const bool resize)
+void jbwm_drag(struct JBWMClient * c, const bool resize)
 {
 	Display * d = c->d;
 	XRaiseWindow(d, c->parent);
@@ -154,13 +154,13 @@ void jbwm_drag(struct JBWMClient * restrict c, const bool resize)
 	XUngrabPointer(d, CurrentTime);
 	jbwm_move_resize(c);
 }
-void jbwm_move_resize(struct JBWMClient * restrict c)
+void jbwm_move_resize(struct JBWMClient * c)
 {
 	JBWM_LOG("jbwm_move_resize");
 	const uint8_t offset = c->opt.no_title_bar || c->opt.fullscreen
 		? 0 : jbwm_get_font_height();
 	{ // * d , * g scope
-		Display * restrict d = c->d;
+		Display * d = c->d;
 		struct JBWMRectangle * g = &c->size;
 		XMoveResizeWindow(d, c->parent, g->x, g->y - offset, g->width,
 			g->height + offset);
@@ -174,27 +174,27 @@ void jbwm_move_resize(struct JBWMClient * restrict c)
 	jbwm_set_frame_extents(c);
 	jbwm_configure_client(c);
 }
-static void showing(struct JBWMClient * restrict c,
+static void showing(struct JBWMClient * c,
 	int (* mapping)(Display *, Window),
 	void (* ewmh_add_remove_state)(Display * restrict, jbwm_window_t,
 	jbwm_atom_t), const int8_t wm_state)
 {
-	Display * restrict d = c->d;
+	Display * d = c->d;
 	mapping(d, c->parent);
 	jbwm_set_wm_state(c, wm_state);
 	ewmh_add_remove_state(d, c->window,
 		jbwm_ewmh_get_atom(JBWM_EWMH_WM_STATE_HIDDEN));
 }
-void jbwm_hide_client(struct JBWMClient * restrict c)
+void jbwm_hide_client(struct JBWMClient * c)
 {
 	showing(c, XUnmapWindow, jbwm_ewmh_add_state, IconicState);
 }
-void jbwm_restore_client(struct JBWMClient * restrict c)
+void jbwm_restore_client(struct JBWMClient * c)
 {
 	showing(c, XMapWindow, jbwm_ewmh_remove_state, NormalState);
 }
 static void check_visibility(struct JBWMScreen * s,
-	struct JBWMClient * restrict c, const uint8_t v)
+	struct JBWMClient * c, const uint8_t v)
 {
 	if (c->screen != s->screen)
 		return;

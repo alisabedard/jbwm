@@ -11,7 +11,7 @@ static XftFont * jbwm_font;
 #else//! JBWM_USE_XFT
 static XFontStruct * jbwm_font;
 #endif//JBWM_USE_XFT
-void jbwm_open_font(Display * restrict d)
+void jbwm_open_font(Display * d)
 {
 	if (jbwm_font)
 		return; // already created

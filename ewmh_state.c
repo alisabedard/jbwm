@@ -12,7 +12,7 @@
 #include "util.h"
 #include "wm_state.h"
 // Remove specified atom from WM_STATE
-void jbwm_ewmh_remove_state(Display * restrict d,
+void jbwm_ewmh_remove_state(Display * d,
 	const jbwm_window_t w, const jbwm_atom_t state)
 {
 	uint16_t n;
@@ -27,7 +27,7 @@ void jbwm_ewmh_remove_state(Display * restrict d,
 	jbwm_set_property(d, w, ws, XA_ATOM, a, nitems);
 	XFree(a);
 }
-static bool ewmh_get_state(Display * restrict d,
+static bool ewmh_get_state(Display * d,
 	const jbwm_window_t w, const jbwm_atom_t state)
 {
 	uint16_t n;
@@ -42,7 +42,7 @@ static bool ewmh_get_state(Display * restrict d,
 	}
 	return found;
 }
-void jbwm_ewmh_add_state(Display * restrict d, const jbwm_window_t w,
+void jbwm_ewmh_add_state(Display * d, const jbwm_window_t w,
 	jbwm_atom_t state)
 {
 	XChangeProperty(d, w, jbwm_ewmh_get_atom(JBWM_EWMH_WM_STATE),
@@ -61,7 +61,7 @@ void jbwm_ewmh_add_state(Display * restrict d, const jbwm_window_t w,
   data.l[2] = second property to alter
   data.l[3] = source indication
   other data.l[] elements = 0 */
-static void set_state(struct JBWMClient * restrict c,
+static void set_state(struct JBWMClient * c,
 	bool add, const enum JBWMAtomIndex t)
 {
 	JBWM_LOG("set_state(c, add: %s, t: %d)", add ? "true" : "false",
@@ -106,7 +106,7 @@ static void check_state(XClientMessageEvent * e,	// event data
 	const bool set = l[1] == (long)state || l[2] == (long)state;
 	if(!set)
 		return;
-	Display * restrict d = e->display;
+	Display * d = e->display;
 	switch (e->data.l[0]) {
 	default:
 	case 0:	// remove
@@ -127,8 +127,8 @@ static void check_state(XClientMessageEvent * e,	// event data
 	}
 }
 __attribute__((nonnull))
-static void handle_wm_state_changes(XClientMessageEvent * restrict e,
-	struct JBWMClient * restrict c)
+static void handle_wm_state_changes(XClientMessageEvent * e,
+	struct JBWMClient * c)
 {
 	check_state(e, JBWM_EWMH_WM_STATE_ABOVE, c);
 	check_state(e, JBWM_EWMH_WM_STATE_BELOW, c);
@@ -137,15 +137,19 @@ static void handle_wm_state_changes(XClientMessageEvent * restrict e,
 	check_state(e, JBWM_EWMH_WM_STATE_MAXIMIZED_VERT, c);
 	check_state(e, JBWM_EWMH_WM_STATE_STICKY, c);
 }
-static bool client_specific_message(XClientMessageEvent * restrict e,
-	struct JBWMClient * restrict c, const Atom t)
+// returns true if handled, false if not
+static bool client_specific_message(XClientMessageEvent * e,
+	struct JBWMClient * c, const Atom t)
 {
-	jbwm_print_atom(c->d, t, __FILE__, __LINE__);
+	if (!c->d) // client has been removed!
+		return true; // handled
+	Display * d = c->d = e->display; // make sure all are the same
+	jbwm_print_atom(d, t, __FILE__, __LINE__);
 	if (t == jbwm_ewmh_get_atom(JBWM_EWMH_WM_DESKTOP))
 		jbwm_set_client_vdesk(c, e->data.l[0]);
 	// If user moves window (client-side title bars):
 	else if (t == jbwm_ewmh_get_atom(JBWM_EWMH_WM_MOVERESIZE)) {
-		XRaiseWindow(c->d, c->parent);
+		XRaiseWindow(d, c->parent);
 		jbwm_drag(c, false);
 	} else if (t == jbwm_ewmh_get_atom(JBWM_EWMH_WM_STATE))
 		handle_wm_state_changes(e, c);
@@ -157,7 +161,7 @@ static bool client_specific_message(XClientMessageEvent * restrict e,
 		  return false;
 	return true;
 }
-static void handle_moveresize(XClientMessageEvent * restrict e)
+static void handle_moveresize(XClientMessageEvent * e)
 {
 	/* per wm-spec: fields come from e->data.l
 	   l[0]: gravity and flags, l[1]: x, l[2]: y, l[3]: w, l[4]: h
@@ -169,7 +173,7 @@ static void handle_moveresize(XClientMessageEvent * restrict e)
 		SRC_SHIFT = 12, SRC_MASK = 3, VM_SHIFT = 8, VM_MASK = 0xf,
 		USER_ACTION = 2
 	};
-	const long * restrict l = e->data.l;
+	const long * l = e->data.l;
 	const uint8_t src = (l[0] >> SRC_SHIFT) & SRC_MASK;
 	if (src != USER_ACTION)
 		return;
@@ -182,7 +186,7 @@ static void handle_moveresize(XClientMessageEvent * restrict e)
 		&(XSetWindowAttributes){.win_gravity = win_gravity});
 }
 #if defined(JBWM_DEBUG_EWMH_STATE) && defined(DEBUG)
-static void debug_client_message(XClientMessageEvent * restrict e)
+static void debug_client_message(XClientMessageEvent * e)
 {
 	Display * d = e->display;
 	const long * l = e->data.l;
@@ -194,8 +198,8 @@ static void debug_client_message(XClientMessageEvent * restrict e)
 #else//!JBWM_DEBUG_EWMH_STATE||!DEBUG
 #define debug_client_message(e)
 #endif//JBWM_DEBUG_EWMH_STATE&&DEBUG
-void jbwm_ewmh_handle_client_message(XClientMessageEvent * restrict e,
-	struct JBWMClient * restrict c)
+void jbwm_ewmh_handle_client_message(XClientMessageEvent * e,
+	struct JBWMClient * c)
 {
 	const jbwm_atom_t t = e->message_type;
 	debug_client_message(e);

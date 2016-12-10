@@ -18,9 +18,9 @@ static int_fast16_t sborder(const int_fast16_t xy, const int_fast16_t
 		  return - edge;
 	return xy;
 }
-void jbwm_snap_border(struct JBWMClient * restrict c)
+void jbwm_snap_border(struct JBWMClient * c)
 {
-	struct JBWMRectangle * restrict g = &(c->size);
+	struct JBWMRectangle * g = &(c->size);
 	/* snap to screen border */
 	const uint8_t b = 2 * c->border;
 	g->x = sborder(g->x, 0 - b);
@@ -65,7 +65,7 @@ static struct JBDim search(struct JBWMClient * c)
 		if ((ci == c) || (ci->screen != c->screen)
 		    || (ci->vdesk != c->vdesk))
 			continue;
-		struct JBWMRectangle * restrict gi = &(ci->size);
+		struct JBWMRectangle * gi = &(ci->size);
 		const uint8_t b = c->border;
 		if ((gi->y - c->size.height - c->size.y <= d.x)
 		    && (c->size.y - gi->height - gi->y <= d.x))

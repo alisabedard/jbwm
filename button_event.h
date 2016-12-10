@@ -5,6 +5,6 @@
 #ifndef JBWM_BUTTON_EVENT_H
 #define JBWM_BUTTON_EVENT_H
 #include "JBWMClient.h"
-void jbwm_handle_button_event(XButtonEvent * restrict e,
-	struct JBWMClient * restrict c) __attribute__((nonnull));
+void jbwm_handle_button_event(XButtonEvent * e,
+	struct JBWMClient * c) __attribute__((nonnull));
 #endif /* JBWM_BUTTON_EVENT_H */

@@ -6,6 +6,6 @@
 #define JBWM_JBWM_H
 #include "JBWMScreen.h"
 __attribute__((noreturn))
-void jbwm_error(const char * restrict msg);
+void jbwm_error(const char * msg);
 struct JBWMScreen * jbwm_get_screens(void);
 #endif /* not JBWM_JBWM_H */

@@ -19,9 +19,9 @@ struct JBWMClient * jbwm_get_head_client(void);
 // Relink c's linked list to exclude c
 void jbwm_relink_client_list(struct JBWMClient * c);
 // Move the client to the specified virtual desktop
-void jbwm_set_client_vdesk(struct JBWMClient * restrict c, const uint8_t d)
+void jbwm_set_client_vdesk(struct JBWMClient * c, const uint8_t d)
 	__attribute((nonnull));
 // Assign c to the head of the JBWMClient linked list.
-void jbwm_set_head_client(struct JBWMClient * restrict c);
+void jbwm_set_head_client(struct JBWMClient * c);
 void jbwm_toggle_sticky(struct JBWMClient * c) __attribute__((nonnull));
 #endif//!JBWM_CLIENT_H

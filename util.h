@@ -5,15 +5,15 @@
 #ifndef JBWM_UTIL_H
 #define JBWM_UTIL_H
 #include "typedef.h"
-void jbwm_set_property(Display * restrict d, const jbwm_window_t win,
+void jbwm_set_property(Display * d, const jbwm_window_t win,
 	const jbwm_atom_t property, const jbwm_atom_t type,
-	void * restrict data, uint16_t size);
-jbwm_pixel_t jbwm_get_pixel(Display * restrict d, const uint8_t screen,
-	const char * restrict name);
+	void * data, uint16_t size);
+jbwm_pixel_t jbwm_get_pixel(Display * d, const uint8_t screen,
+	const char * name);
 // Free the result with XFree
-void * jbwm_get_property(Display * restrict dpy, const jbwm_window_t w,
+void * jbwm_get_property(Display * dpy, const jbwm_window_t w,
 	Atom property, uint16_t * num_items);
-void jbwm_grab_button(Display * restrict d, const jbwm_window_t w,
+void jbwm_grab_button(Display * d, const jbwm_window_t w,
 	const unsigned int mask, const unsigned int btn);
 #ifdef DEBUG
 void jbwm_print_atom(Display * d, const Atom a, const char * src,

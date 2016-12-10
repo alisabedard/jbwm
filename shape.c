@@ -7,7 +7,7 @@
 #include "log.h"
 // Declared with pure attribute, as value may not change between calls.
 __attribute__((pure))
-static bool is_shaped(Display * restrict dpy, const Window win)
+static bool is_shaped(Display * dpy, const Window win)
 {
 	int s, d;
 	unsigned int u;
@@ -22,7 +22,7 @@ void jbwm_set_shape(struct JBWMClient * c)
 			1, 1, c->window, ShapeBounding, ShapeSet);
 	}
 }
-void jbwm_new_shaped_client(struct JBWMClient * restrict c)
+void jbwm_new_shaped_client(struct JBWMClient * c)
 {
 	if (is_shaped(c->d, c->window)) {
 		JBWM_LOG("Window %d is shaped", (int)c->window);

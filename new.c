@@ -75,7 +75,7 @@ static void check_max_size(uint16_t * dim, const uint16_t scr_dim)
 {
 	*dim = JB_MIN(*dim, scr_dim);
 }
-static void check_dimensions(struct JBWMRectangle * restrict g,
+static void check_dimensions(struct JBWMRectangle * g,
 	const struct JBDim s)
 {
 	check_max_size(&g->width, s.w);
@@ -85,13 +85,13 @@ static int16_t get_center(const uint16_t wh, const uint16_t swh)
 {
 	return (swh >> 1) - (wh >> 1);
 }
-static void center(struct JBWMRectangle * restrict g, const struct JBDim s)
+static void center(struct JBWMRectangle * g, const struct JBDim s)
 {
 	g->x = get_center(g->width, s.w);
 	g->y = get_center(g->height, s.h);
 }
 // returns true if window is viewable
-static bool get_window_attributes(struct JBWMClient * restrict c,
+static bool get_window_attributes(struct JBWMClient * c,
 	struct JBWMRectangle * a_geo)
 {
 	XWindowAttributes a;
@@ -148,7 +148,7 @@ static Window get_parent(struct JBWMClient * c)
 		WA_EM = SubstructureRedirectMask | SubstructureNotifyMask
 		| ButtonPressMask | EnterWindowMask
 	};
-	struct JBWMRectangle * restrict g = &c->size;
+	struct JBWMRectangle * g = &c->size;
 	return XCreateWindow(c->d, jbwm_get_root(c), g->x, g->y, g->width,
 		g->height, c->border, CFP, CFP, CFP, CW_VM,
 		&(XSetWindowAttributes){.override_redirect=true,
@@ -176,7 +176,7 @@ static struct JBWMClient * get_JBWMClient(const jbwm_window_t w,
 	return c;
 }
 // Grab input and setup JBWM_USE_EWMH for client window
-static void do_grabs(Display * restrict d, const jbwm_window_t w)
+static void do_grabs(Display * d, const jbwm_window_t w)
 {
 	XSelectInput(d, w, EnterWindowMask
 		| PropertyChangeMask | ColormapChangeMask);

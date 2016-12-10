@@ -33,20 +33,20 @@ void jbwm_set_mod_mask(const uint16_t mask)
 {
 	jbwm_keys_data.mod_mask = mask;
 }
-void jbwm_grab_window_keys(Display * restrict d, const jbwm_window_t win)
+void jbwm_grab_window_keys(Display * d, const jbwm_window_t win)
 {
 	jbwm_grab_button(d, win, jbwm_keys_data.grab_mask, AnyButton);
 }
 __attribute__((nonnull))
-static void point(struct JBWMClient * restrict c,
+static void point(struct JBWMClient * c,
 	const int16_t x, const int16_t y)
 {
-	Display * restrict d = c->d;
+	Display * d = c->d;
 	XRaiseWindow(d, c->parent);
 	XWarpPointer(d, None, c->window, 0, 0, 0, 0, x, y);
 }
 __attribute__((nonnull))
-static void commit_key_move(struct JBWMClient * restrict c)
+static void commit_key_move(struct JBWMClient * c)
 {
 	jbwm_snap_border(c);
 	jbwm_move_resize(c);
@@ -57,12 +57,12 @@ struct KeyMoveFlags {
 	uint8_t pad:5;
 };
 __attribute__((nonnull))
-static void key_move(struct JBWMClient * restrict c,
+static void key_move(struct JBWMClient * c,
 	const struct KeyMoveFlags f)
 {
 	const int8_t d = f.pos ? JBWM_RESIZE_INCREMENT
 		: -JBWM_RESIZE_INCREMENT;
-	struct JBWMRectangle * restrict s = &c->size;
+	struct JBWMRectangle * s = &c->size;
 	uint16_t * wh = f.horz ? &s->width : &s->height;
 	int16_t * xy = f.horz ? &s->x : &s->y;
 	if(f.mod && (*wh > JBWM_RESIZE_INCREMENT << 1)
@@ -72,7 +72,7 @@ static void key_move(struct JBWMClient * restrict c,
 		*xy += d;
 	commit_key_move(c);
 }
-static void handle_key_move(struct JBWMClient * restrict c,
+static void handle_key_move(struct JBWMClient * c,
 	const KeySym k, const bool mod)
 {
 	/* These operations invalid when fullscreen.  */
@@ -90,17 +90,17 @@ static void handle_key_move(struct JBWMClient * restrict c,
 	}
 	key_move(c, f);
 }
-static void set_maximized(struct JBWMClient * restrict c)
+static void set_maximized(struct JBWMClient * c)
 {
 	jbwm_set_horz(c);
 	jbwm_set_vert(c);
 }
-static void set_not_maximized(struct JBWMClient * restrict c)
+static void set_not_maximized(struct JBWMClient * c)
 {
 	jbwm_set_not_horz(c);
 	jbwm_set_not_vert(c);
 }
-static void toggle_maximize(struct JBWMClient * restrict c)
+static void toggle_maximize(struct JBWMClient * c)
 {
 	const struct JBWMClientOptions o = c->opt;
 	// Honor !MWM_FUNC_MAXIMIZE
@@ -111,7 +111,7 @@ static void toggle_maximize(struct JBWMClient * restrict c)
 	 ? set_not_maximized : set_maximized)(c);
 }
 __attribute__((nonnull))
-static void handle_client_key_event(struct JBWMClient * restrict c,
+static void handle_client_key_event(struct JBWMClient * c,
 	const bool mod, const KeySym key)
 {
 	Display * d = c->d;
@@ -165,7 +165,7 @@ static void handle_client_key_event(struct JBWMClient * restrict c,
 static struct JBWMClient * get_next_on_vdesk(void)
 {
 	struct JBWMClient *c = jbwm_get_current_client();
-	struct JBWMScreen * restrict s = jbwm_get_screens();
+	struct JBWMScreen * s = jbwm_get_screens();
 	do {
 		if (c) {
 			c = c->next;
@@ -201,7 +201,7 @@ static void start_terminal(void)
 		execlp(t, t, (char*)NULL);
 	}
 }
-void jbwm_handle_key_event(XKeyEvent * restrict e)
+void jbwm_handle_key_event(XKeyEvent * e)
 {
 	JBWM_LOG("jbwm_handle_key_event");
 	const KeySym key = XLookupKeysym(e, 0);
@@ -241,17 +241,17 @@ void jbwm_handle_key_event(XKeyEvent * restrict e)
 	}
 }
 __attribute__((nonnull))
-static void grab(Display * restrict d, struct JBWMScreen * restrict s,
-	KeySym * restrict ks, const uint32_t mask)
+static void grab(Display * d, struct JBWMScreen * s,
+	KeySym * ks, const uint32_t mask)
 {
 	for (; *ks; ++ks)
 		XGrabKey(d, XKeysymToKeycode(d, *ks),
 			 jbwm_keys_data.grab_mask | mask, s->root, true,
 			 GrabModeAsync, GrabModeAsync);
 }
-void jbwm_grab_screen_keys(struct JBWMScreen * restrict s)
+void jbwm_grab_screen_keys(struct JBWMScreen * s)
 {
-	Display * restrict d = s->d;
+	Display * d = s->d;
 	grab(d, s, (KeySym[]){JBWM_KEYS_TO_GRAB}, 0);
 	grab(d, s, (KeySym[]){JBWM_ALT_KEYS_TO_GRAB},
 		jbwm_keys_data.mod_mask);
