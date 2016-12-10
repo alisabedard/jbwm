@@ -32,8 +32,8 @@ struct JBWMClientTitlebar {
 };
 #endif//JBWM_USE_TITLE_BAR
 struct JBWMRectangle {
-	jbwm_axis_t x, y;
-	jbwm_length_t width, height;
+	int16_t x, y;
+	uint16_t width, height;
 };
 struct JBWMClient {
 	Display * d; // alias to reduce parameter count

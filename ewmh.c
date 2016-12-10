@@ -177,7 +177,8 @@ void jbwm_set_frame_extents(struct JBWMClient * restrict c)
 {
 	JBWM_LOG("jbwm_set_frame_extents()");
 	// Fields: left, right, top, bottom
-	Atom f[4] = {1, 1, 1, 1};
+	const uint8_t b = c->border, t = c->opt.no_title_bar ? b :
+		jbwm_get_font_height();
 	wprop(c->d, c->window, JBWM_EWMH_FRAME_EXTENTS,
-		XA_CARDINAL, &f, sizeof(f));
+		XA_CARDINAL, (uint32_t[]){b, b, t, b}, 4);
 }
