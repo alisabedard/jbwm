@@ -207,7 +207,10 @@ void jbwm_event_loop(Display * restrict d)
 			break;
 #ifdef JBWM_USE_EWMH
 		case ClientMessage:
-			jbwm_ewmh_handle_client_message(&ev.xclient, c);
+			if (c && c->d) /* Prevent segfault with gtk3
+					  demo 'Benchmark' closing.
+					*/
+				jbwm_ewmh_handle_client_message(&ev.xclient, c);
 			break;
 #endif//JBWM_USE_EWMH
 #ifdef DEBUG
