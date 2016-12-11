@@ -56,13 +56,13 @@ static void grab_pointer(Display * d, const jbwm_window_t w)
 	XGrabPointer(d, w, false, JBWMMouseMask, GrabModeAsync,
 		GrabModeAsync, None, c, CurrentTime);
 }
-static struct JBDim get_mouse_position(Display * d,
-	const jbwm_window_t w)
+static int * get_mouse_position(Display * restrict d, Window w)
 {
-	int x, y;
-	XQueryPointer(d, w, &(Window){0}, &(Window){0},
-		&x, &y, &(int){0}, &(int){0}, &(unsigned int){0});
-	return (struct JBDim){.x = x, .y = y};
+	static int p[2];
+	int nil;
+	unsigned int unil;
+	XQueryPointer(d, w, &w, &w, p, p + 1, &nil, &nil, &unil);
+	return p;
 }
 static void warp_corner(struct JBWMClient * restrict c)
 {
@@ -116,13 +116,8 @@ jbwm_window_t jbwm_get_root(struct JBWMClient * restrict c)
 static void drag_event_loop(struct JBWMClient * restrict c, const bool resize)
 {
 	Display * d = jbwm_get_display();
-	int start[2];
-	{ // p scope
-		const struct JBDim p = get_mouse_position(d, jbwm_get_root(c));
-		start[0] = p.x;
-		start[1] = p.y;
-	}
-	const int original[2] = {c->size.x, c->size.y};
+	const int original[] = {c->size.x, c->size.y};
+	int * start = get_mouse_position(d, jbwm_get_root(c));
 	for (;;) {
 		int p[2];
 		{ // e scope
