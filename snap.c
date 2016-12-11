@@ -43,7 +43,7 @@ static inline int_fast16_t absmin(const int_fast16_t a, const
 __attribute__ ((const, hot, warn_unused_result))
 static int_fast16_t jbwm_snap_dim(const int_fast16_t cxy, const
 	uint_fast16_t cwh, const int_fast16_t cixy, const
-	uint_fast16_t ciwh, const uint8_t border, int_fast16_t d)
+	uint_fast16_t ciwh, const uint8_t border, const int_fast16_t d)
 {
 	const int_fast16_t s = cixy + ciwh - cxy, t = cixy - cxy;
 	return  absmin(absmin(absmin(absmin(d, s + border),
