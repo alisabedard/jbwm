@@ -54,7 +54,6 @@ void jbwm_free_client(struct JBWMClient * c)
 	if(c->parent)
 		XDestroyWindow(d, c->parent);
 	jbwm_relink_client_list(c);
-	XFlush(d); // prevent future events involving c
 	free(c);
 	// Allow future clients with the same window ID:
 	last_window = 0;
