@@ -12,14 +12,16 @@ EWMH=true
 SHAPE=true
 TBAR=true
 XFT=true
-while getopts 'destx' opt; do
+while getopts 'adestx' opt; do
 	case $opt in
+	a) EWMH=false SHAPE=false TBAR=false XFT=false ;;
 	d) DEBUG=true ;;
 	e) EWMH=false ;;
 	s) SHAPE=false ;;
 	t) TBAR=false ;;
 	x) XFT=false ;;
-	?) for line in '-d enable debugging' '-e disable EWMH' \
+	?) for line in '-a disable all' \
+		'-d enable debugging' '-e disable EWMH' \
 		'-s disable SHAPE' '-t disable title bars' \
 		'-x disable XFT'; do echo $line; done ;;
 	esac
