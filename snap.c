@@ -45,17 +45,9 @@ static int_fast16_t jbwm_snap_dim(const int_fast16_t cxy, const
 	uint_fast16_t cwh, const int_fast16_t cixy, const
 	uint_fast16_t ciwh, const uint8_t border, int_fast16_t d)
 {
-	{ // s scope
-		const int_fast16_t s = cixy + ciwh;
-		d = absmin(d, s - cxy + border);
-		d = absmin(d, s - cxy - cwh);
-	}
-	{ // s scope
-		const int_fast16_t s = cixy - cxy;
-		d = absmin(d, s - cwh - border);
-		d = absmin(d, s);
-	}
-	return d;
+	const int_fast16_t s = cixy + ciwh - cxy, t = cixy - cxy;
+	return  absmin(absmin(absmin(absmin(d, s + border),
+		s - cwh), t - cwh - border), t);
 }
 static struct JBDim search(struct JBWMClient * restrict c)
 {
