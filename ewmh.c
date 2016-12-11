@@ -9,6 +9,7 @@
 #include <X11/Xatom.h>
 #include "client.h"
 #include "config.h"
+#include "display.h"
 #include "font.h"
 #include "log.h"
 #include "macros.h"
@@ -125,7 +126,7 @@ void jbwm_ewmh_set_allowed_actions(Display * d,
 }
 static void init_desktops(struct JBWMScreen * s)
 {
-	Display * d = s->d;
+	Display * d = jbwm_get_display();
 	const jbwm_window_t r = s->r;
 	enum {INT=XA_CARDINAL, WIN=XA_WINDOW};
 	wprop(d, r, JBWM_EWMH_DESKTOP_GEOMETRY, INT, &s->size, 2);
@@ -159,7 +160,7 @@ static jbwm_window_t init_supporting(Display * d,
 }
 void jbwm_ewmh_init_screen(struct JBWMScreen * s)
 {
-	Display * d = s->d;
+	Display * d = jbwm_get_display();
 	if (!jbwm_ewmh[0])
 		jbwm_ewmh_init(d);
 	jbwm_window_t r = s->root;
@@ -179,6 +180,6 @@ void jbwm_set_frame_extents(struct JBWMClient * c)
 	// Fields: left, right, top, bottom
 	const uint8_t b = c->border, t = c->opt.no_title_bar ? b :
 		jbwm_get_font_height();
-	wprop(c->d, c->window, JBWM_EWMH_FRAME_EXTENTS,
+	wprop(jbwm_get_display(), c->window, JBWM_EWMH_FRAME_EXTENTS,
 		XA_CARDINAL, (uint32_t[]){b, b, t, b}, 4);
 }

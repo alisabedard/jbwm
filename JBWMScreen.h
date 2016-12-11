@@ -16,7 +16,6 @@ struct JBWMPixels {
 };
 struct JBWMScreen {
 	GC gc;
-	Display * d;
 	union {
 		jbwm_window_t root, r;
 	};

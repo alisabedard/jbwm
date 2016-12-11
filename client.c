@@ -3,6 +3,7 @@
 // Copyright 1999-2015, Ciaran Anscomb <jbwm@6809.org.uk>
 // See README for license and other details.
 #include "client.h"
+#include "display.h"
 #include "ewmh.h"
 #include "ewmh_state.h"
 #include "jbwm.h"
@@ -89,7 +90,7 @@ void jbwm_toggle_sticky(struct JBWMClient * c)
 	jbwm_update_title_bar(c);
 #ifdef JBWM_USE_EWMH
 	(c->opt.sticky ? jbwm_ewmh_add_state : jbwm_ewmh_remove_state)
-		(c->d, c->window,jbwm_ewmh_get_atom(
+		(jbwm_get_display(), c->window,jbwm_ewmh_get_atom(
 		  JBWM_EWMH_WM_STATE_STICKY));
 #endif//JBWM_USE_EWMH
 }

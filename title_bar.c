@@ -8,6 +8,7 @@
 #include "config.h"
 #include <X11/Xft/Xft.h>
 #endif//JBWM_USE_XFT
+#include "display.h"
 #include "ewmh.h"
 #include "ewmh_state.h"
 #include "font.h"
@@ -22,7 +23,7 @@ static void set_shaded(struct JBWMClient * c)
 	c->size.height = -1;
 	c->opt.shaded = true;
 	jbwm_set_wm_state(c, IconicState);
-	jbwm_ewmh_add_state(c->d, c->window,
+	jbwm_ewmh_add_state(jbwm_get_display(), c->window,
 		jbwm_ewmh_get_atom(JBWM_EWMH_WM_STATE_SHADED));
 	jbwm_select_client(c);
 }
@@ -32,7 +33,7 @@ static void set_not_shaded(struct JBWMClient * c)
 	c->opt.shaded = false;
 	jbwm_move_resize(c);
 	jbwm_set_wm_state(c, NormalState);
-	jbwm_ewmh_remove_state(c->d, c->window,
+	jbwm_ewmh_remove_state(jbwm_get_display(), c->window,
 		jbwm_ewmh_get_atom(JBWM_EWMH_WM_STATE_SHADED));
 }
 void jbwm_toggle_shade(struct JBWMClient * c)
@@ -67,7 +68,7 @@ static jbwm_window_t get_win(Display * d, const Window p,
 static jbwm_window_t new_title_bar(struct JBWMClient * c)
 {
 	const struct JBWMPixels * p = &jbwm_get_screen(c)->pixels;
-	Display * d = c->d;
+	Display * d = jbwm_get_display();
 	const jbwm_window_t t = c->tb.win = get_win(d, c->parent, p->bg);
 	XSelectInput(d, t, ExposureMask);
 	struct JBWMClientOptions * o = &c->opt;
@@ -87,7 +88,7 @@ draw_xft(struct JBWMClient * c, const XPoint * p,
 {
 	XftFont * f = jbwm_get_font();
 	XGlyphInfo e;
-	Display * d = c->d;
+	Display * d = jbwm_get_display();
 	XftTextExtentsUtf8(d, f, (XftChar8 *) name, l, &e);
 	const uint8_t s = c->screen;
 	Visual *v = DefaultVisual(d, s);
@@ -115,7 +116,7 @@ static char * jbwm_get_title(Display * d, const jbwm_window_t w)
 }
 static void draw_title(struct JBWMClient * c)
 {
-	Display * d = c->d;
+	Display * d = jbwm_get_display();
 	char * name = jbwm_get_title(d, c->window);
 	if(!name)
 		return; // No title could be loaded, abort
@@ -134,7 +135,7 @@ static void draw_title(struct JBWMClient * c)
 static void remove_title_bar(struct JBWMClient * c)
 {
 	++(c->ignore_unmap);
-	XDestroyWindow(c->d, c->tb.win);
+	XDestroyWindow(jbwm_get_display(), c->tb.win);
 	c->tb.win = 0;
 }
 void jbwm_update_title_bar(struct JBWMClient * c)
@@ -149,7 +150,7 @@ void jbwm_update_title_bar(struct JBWMClient * c)
 	if (!w)
 		w = new_title_bar(c);
 	{ // * d scope
-		Display * d = c->d;
+		Display * d = jbwm_get_display();
 		/* Expand/Contract the title bar width as necessary:  */
 		{ // width scope
 			const uint16_t width = c->size.width;

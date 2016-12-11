@@ -3,6 +3,7 @@
 // Copyright 1999-2015, Ciaran Anscomb <jbwm@6809.org.uk>
 // See README for license and other details.
 #include "mwm.h"
+#include "display.h"
 #include "log.h"
 #include "util.h"
 // These are MWM-specific hints
@@ -83,7 +84,7 @@ static Atom get_mwm_hints_atom(Display * d)
 }
 void jbwm_handle_mwm_hints(struct JBWMClient * c)
 {
-	Display * d = c->d;
+	Display * d = jbwm_get_display();
 	const Atom mwm_hints = get_mwm_hints_atom(d);
 	struct JBWMMwm * m = jbwm_get_property(d, c->window,
 		mwm_hints, &(uint16_t){0});

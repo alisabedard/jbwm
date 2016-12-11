@@ -4,6 +4,7 @@
 // See README for license and other details.
 #include "shape.h"
 #include <X11/extensions/shape.h>
+#include "display.h"
 #include "log.h"
 // Declared with pure attribute, as value may not change between calls.
 __attribute__((pure))
@@ -18,13 +19,14 @@ void jbwm_set_shape(struct JBWMClient * c)
 {
 	if(c->opt.shaped) {
 		JBWM_LOG("XShapeCombineShape: %d", (int)c->window);
-		XShapeCombineShape(c->d, c->parent, ShapeBounding,
-			1, 1, c->window, ShapeBounding, ShapeSet);
+		XShapeCombineShape(jbwm_get_display(), c->parent,
+			ShapeBounding, 1, 1, c->window, ShapeBounding,
+			ShapeSet);
 	}
 }
 void jbwm_new_shaped_client(struct JBWMClient * c)
 {
-	if (is_shaped(c->d, c->window)) {
+	if (is_shaped(jbwm_get_display(), c->window)) {
 		JBWM_LOG("Window %d is shaped", (int)c->window);
 		c->border = 0;
 		c->opt.no_title_bar=c->opt.shaped=true;

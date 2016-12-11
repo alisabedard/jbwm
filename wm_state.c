@@ -1,6 +1,7 @@
 // Copyright 2016, Jeffrey E. Bedard
 #include "wm_state.h"
 #include <X11/Xatom.h>
+#include "display.h"
 #include "log.h"
 #include "util.h"
 // Returns 0 on failure.
@@ -36,7 +37,7 @@ jbwm_atom_t jbwm_get_wm_state(Display * d)
 }
 void jbwm_set_wm_state(struct JBWMClient * c, const int8_t state)
 {
-	Display * d = c->d;
+	Display * d = jbwm_get_display();
 	jbwm_set_property(d, c->window, jbwm_get_wm_state(d),
 		XA_CARDINAL, &(uint32_t){state}, 1);
 }
@@ -54,7 +55,7 @@ static bool has_delete_proto(Display * d, const jbwm_window_t w)
 }
 void jbwm_send_wm_delete(struct JBWMClient * c)
 {
-	Display * d = c->d;
+	Display * d = jbwm_get_display();
 	const jbwm_window_t w = c->window;
 	if (c->opt.remove) { // this allows a second click to force a kill
 		XKillClient(d, w);
@@ -63,4 +64,5 @@ void jbwm_send_wm_delete(struct JBWMClient * c)
 	c->opt.remove = true;
 	has_delete_proto(d, w) ? xmsg(d, w, get_wm_protocols(d),
 		get_wm_delete_window(d)) : XKillClient(d, w);
+	XFlush(d); // do it now
 }

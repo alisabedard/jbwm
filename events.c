@@ -8,6 +8,7 @@
 #include <X11/Xatom.h>
 #include "button_event.h"
 #include "client.h"
+#include "display.h"
 #include "ewmh_state.h"
 #include "ewmh.h"
 #include "jbwm.h"
@@ -41,7 +42,7 @@ static void delete_ewmh_properties(Display * d,
 #endif//JBWM_USE_EWMH
 void jbwm_free_client(struct JBWMClient * c)
 {
-	Display * d = c->d;
+	Display * d = jbwm_get_display();
 	{ // w scope
 		const jbwm_window_t w = c->window;
 		delete_ewmh_properties(d, w);
@@ -117,21 +118,12 @@ static void handle_colormap_notify(struct JBWMClient * c,
 	if (c && e->new)
 		XInstallColormap(e->display, c->cmap = e->colormap);
 }
-static inline bool client_is_valid(struct JBWMClient * c, Display * d)
-{
-	return c && c->d && c->d == d;
-}
 void jbwm_event_loop(Display * d)
 {
 	for (;;) {
 		XEvent ev;
 		XNextEvent(d, &ev);
 		struct JBWMClient * c = jbwm_get_client(ev.xany.window);
-		/* Verify the client display versus the real display
-		 * here in order to ensure no removed clients continue
-		 * into the event loop.  */
-		if (!client_is_valid(c, d))
-			c = NULL;
 		switch (ev.type) {
 		case ButtonRelease:
 		case KeyRelease:
@@ -176,12 +168,12 @@ void jbwm_event_loop(Display * d)
 		case CreateNotify:
 			JBWM_LOG("CreateNotify");
 			if (ev.xcreatewindow.override_redirect) // internal
-				jbwm_ewmh_update_client_list(ev.xany.display);
+				jbwm_ewmh_update_client_list(d);
 			break;
 		case DestroyNotify:
 			JBWM_LOG("DestroyNotify");
 			if (!c) // only bother if event was not on a client
-				jbwm_ewmh_update_client_list(ev.xany.display);
+				jbwm_ewmh_update_client_list(d);
 			break;
 #endif//JBWM_USE_EWMH
 		case UnmapNotify:

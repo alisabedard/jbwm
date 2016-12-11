@@ -3,6 +3,7 @@
 #include "ewmh_state.h"
 #include <X11/Xatom.h>
 #include "client.h"
+#include "display.h"
 #include "ewmh.h"
 #include "jbwm.h"
 #include "log.h"
@@ -79,7 +80,8 @@ static void set_state(struct JBWMClient * c,
 	case JBWM_EWMH_WM_STATE_ABOVE:
 		add = !add; // fall through
 	case JBWM_EWMH_WM_STATE_BELOW:
-		(add ? XRaiseWindow : XLowerWindow)(c->d, c->parent);
+		(add ? XRaiseWindow : XLowerWindow)(jbwm_get_display(),
+			c->parent);
 		break;
 	case JBWM_EWMH_WM_STATE_HIDDEN:
 		(add ? jbwm_hide_client : jbwm_restore_client)(c);
@@ -141,15 +143,12 @@ static void handle_wm_state_changes(XClientMessageEvent * e,
 static bool client_specific_message(XClientMessageEvent * e,
 	struct JBWMClient * c, const Atom t)
 {
-	if (!c->d) // client has been removed!
-		return true; // handled
-	Display * d = c->d = e->display; // make sure all are the same
-	jbwm_print_atom(d, t, __FILE__, __LINE__);
+	jbwm_print_atom(e->display, t, __FILE__, __LINE__);
 	if (t == jbwm_ewmh_get_atom(JBWM_EWMH_WM_DESKTOP))
 		jbwm_set_client_vdesk(c, e->data.l[0]);
 	// If user moves window (client-side title bars):
 	else if (t == jbwm_ewmh_get_atom(JBWM_EWMH_WM_MOVERESIZE)) {
-		XRaiseWindow(d, c->parent);
+		XRaiseWindow(e->display, c->parent);
 		jbwm_drag(c, false);
 	} else if (t == jbwm_ewmh_get_atom(JBWM_EWMH_WM_STATE))
 		handle_wm_state_changes(e, c);

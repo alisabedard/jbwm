@@ -7,6 +7,7 @@
 #include <X11/Xatom.h>
 #include "client.h"
 #include "config.h"
+#include "display.h"
 #include "ewmh.h"
 #include "jbwm.h"
 #include "keys.h"
@@ -48,7 +49,7 @@ static void init_properties(struct JBWMClient * c)
 {
 	jbwm_handle_mwm_hints(c);
 	c->vdesk = jbwm_get_screen(c)->vdesk;
-	c->vdesk = wm_desktop(c->d, c->window, c->vdesk);
+	c->vdesk = wm_desktop(jbwm_get_display(), c->window, c->vdesk);
 }
 __attribute__((const))
 static uint16_t get_per_min(uint16_t spec, uint16_t min)
@@ -95,7 +96,7 @@ static bool get_window_attributes(struct JBWMClient * c,
 	struct JBWMRectangle * a_geo)
 {
 	XWindowAttributes a;
-	XGetWindowAttributes(c->d, c->window, &a);
+	XGetWindowAttributes(jbwm_get_display(), c->window, &a);
 	JBWM_LOG("XGetWindowAttributes() win: 0x%x,"
 		"x: %d, y: %d, w: %d, h: %d",
 		(int)c->window, a.x, a.y, a.width, a.height);
@@ -124,7 +125,7 @@ static void init_geometry(struct JBWMClient * c)
 	c->ignore_unmap += viewable ? 1 : 0;
 	//bool pos = viewable;
 	JBWM_LOG("\t\tVIEWABLE: %d", viewable);
-	const bool pos = process_size_hints(c->d, c->window, g,
+	const bool pos = process_size_hints(jbwm_get_display(), c->window, g,
 		a_geo.width, a_geo.height);
 	{ // scr_sz scope
 		const struct JBDim scr_sz = jbwm_get_screen(c)->size;
@@ -149,7 +150,7 @@ static Window get_parent(struct JBWMClient * c)
 		| ButtonPressMask | EnterWindowMask
 	};
 	struct JBWMRectangle * g = &c->size;
-	return XCreateWindow(c->d, jbwm_get_root(c), g->x, g->y, g->width,
+	return XCreateWindow(jbwm_get_display(), jbwm_get_root(c), g->x, g->y, g->width,
 		g->height, c->border, CFP, CFP, CFP, CW_VM,
 		&(XSetWindowAttributes){.override_redirect=true,
 		.event_mask = WA_EM});
@@ -158,7 +159,7 @@ __attribute__((nonnull))
 static void reparent(struct JBWMClient * c)
 {
 	JBWM_LOG("reparent()");
-	Display * d = c->d;
+	Display * d = jbwm_get_display();
 	jbwm_new_shaped_client(c);
 	const jbwm_window_t p = c->parent = get_parent(c), w = c->window;
 	XAddToSaveSet(d, w);
@@ -187,12 +188,8 @@ void jbwm_new_client(struct JBWMScreen * s, const jbwm_window_t w)
 {
 	JBWM_LOG("jbwm_new_client(..., w: %d)", (int)w);
 	struct JBWMClient * c = get_JBWMClient(w, s);
-	{ // * d scope
-		Display * d = s->d;
-		c->d = d;
-		jbwm_set_head_client(c);
-		do_grabs(d, w);
-	}
+	jbwm_set_head_client(c);
+	do_grabs(jbwm_get_display(), w);
 	init_geometry(c);
 	init_properties(c);
 	reparent(c);

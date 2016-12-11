@@ -9,7 +9,7 @@ struct JBWMClientManager {
 	struct JBWMClient * current, * head;
 };
 // Search for the JBWMClient matching the specified window
-struct JBWMClient *jbwm_get_client(jbwm_window_t w)
+struct JBWMClient * jbwm_get_client(jbwm_window_t w)
 	__attribute__((hot,pure));
 struct JBWMClientManager * jbwm_get_client_manager(void);
 // Get the client with input focus.

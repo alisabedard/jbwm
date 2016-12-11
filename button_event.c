@@ -42,7 +42,7 @@ void jbwm_handle_button_event(XButtonEvent * e,
 	switch (e->button) {
 	case Button1:
 		if (fs)
-			XRaiseWindow(c->d, c->parent);
+			XRaiseWindow(d, c->parent);
 		else
 			handle_title_bar_button(e, c);
 		break;
@@ -56,7 +56,7 @@ void jbwm_handle_button_event(XButtonEvent * e,
 		   to register a middle button press, even
 		   with X Emulate3Buttons enabled.  */
 		if (fs)
-			XLowerWindow(c->d, c->parent);
+			XLowerWindow(d, c->parent);
 		else
 			jbwm_drag(c, !c->opt.shaded);
 		break;

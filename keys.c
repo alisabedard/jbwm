@@ -7,6 +7,7 @@
 #include <unistd.h>
 #include "client.h"
 #include "config.h"
+#include "display.h"
 #include "jbwm.h"
 #include "log.h"
 #include "max.h"
@@ -41,7 +42,7 @@ __attribute__((nonnull))
 static void point(struct JBWMClient * c,
 	const int16_t x, const int16_t y)
 {
-	Display * d = c->d;
+	Display * d = jbwm_get_display();
 	XRaiseWindow(d, c->parent);
 	XWarpPointer(d, None, c->window, 0, 0, 0, 0, x, y);
 }
@@ -114,7 +115,7 @@ __attribute__((nonnull))
 static void handle_client_key_event(struct JBWMClient * c,
 	const bool mod, const KeySym key)
 {
-	Display * d = c->d;
+	Display * d = jbwm_get_display();
 	JBWM_LOG("handle_client_key_event: %d", (int)key);
 	if (c->opt.fullscreen) {
 		// only allow exiting from fullscreen
@@ -164,7 +165,7 @@ static void handle_client_key_event(struct JBWMClient * c,
 }
 static struct JBWMClient * get_next_on_vdesk(void)
 {
-	struct JBWMClient *c = jbwm_get_current_client();
+	struct JBWMClient * c = jbwm_get_current_client();
 	struct JBWMScreen * s = jbwm_get_screens();
 	do {
 		if (c) {
@@ -205,7 +206,7 @@ void jbwm_handle_key_event(XKeyEvent * e)
 {
 	JBWM_LOG("jbwm_handle_key_event");
 	const KeySym key = XLookupKeysym(e, 0);
-	struct JBWMClient *c = jbwm_get_current_client();
+	struct JBWMClient * c = jbwm_get_current_client();
 	struct JBWMScreen * s = c ? jbwm_get_screen(c) : jbwm_get_screens();
 	struct {
 		uint8_t vdesk:6;
@@ -251,7 +252,7 @@ static void grab(Display * d, struct JBWMScreen * s,
 }
 void jbwm_grab_screen_keys(struct JBWMScreen * s)
 {
-	Display * d = s->d;
+	Display * d = jbwm_get_display();
 	grab(d, s, (KeySym[]){JBWM_KEYS_TO_GRAB}, 0);
 	grab(d, s, (KeySym[]){JBWM_ALT_KEYS_TO_GRAB},
 		jbwm_keys_data.mod_mask);

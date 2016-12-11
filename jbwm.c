@@ -11,6 +11,7 @@
 #endif//JBWM_USE_XFT
 #include "client.h"
 #include "config.h"
+#include "display.h"
 #include "events.h"
 #include "ewmh.h"
 #include "font.h"
@@ -23,15 +24,10 @@
 #undef JBWM_LOG
 #define JBWM_LOG(...)
 #endif//!DEBUG_JBWM
-// Main application data structure.
-//struct jbwm jbwm;
-static struct {
-	Display * display;
-	struct JBWMScreen * screens;
-} jbwm_data;
+static struct JBWMScreen * screens;
 struct JBWMScreen * jbwm_get_screens(void)
 {
-	return jbwm_data.screens;
+	return screens;
 }
 static void print(const size_t sz, const char * buf)
 {
@@ -127,7 +123,7 @@ void jbwm_error(const char * msg)
 }
 static void setup_event_listeners(const jbwm_window_t root)
 {
-	XChangeWindowAttributes(jbwm_data.display, root, CWEventMask,
+	XChangeWindowAttributes(jbwm_get_display(), root, CWEventMask,
 		&(XSetWindowAttributes){.event_mask =
 		SubstructureRedirectMask | SubstructureNotifyMask |
 		EnterWindowMask | PropertyChangeMask |
@@ -136,7 +132,7 @@ static void setup_event_listeners(const jbwm_window_t root)
 static void allocate_colors(struct JBWMScreen * s)
 {
 	const uint8_t n = s->screen;
-	Display * d = jbwm_data.display;
+	Display * d = jbwm_get_display();
 	s->pixels.fg=jbwm_get_pixel(d, n, getenv(JBWM_ENV_FG));
 	s->pixels.bg=jbwm_get_pixel(d, n, getenv(JBWM_ENV_BG));
 	s->pixels.fc=jbwm_get_pixel(d, n, getenv(JBWM_ENV_FC));
@@ -150,7 +146,7 @@ static void allocate_colors(struct JBWMScreen * s)
 static bool check_redirect(const jbwm_window_t w)
 {
 	XWindowAttributes a;
-	XGetWindowAttributes(jbwm_data.display, w, &a);
+	XGetWindowAttributes(jbwm_get_display(), w, &a);
 	JBWM_LOG("check_redirect(0x%x): override_redirect: %s, "
 		"map_state: %s", (int)w,
 		a.override_redirect ? "true" : "false",
@@ -164,7 +160,7 @@ static jbwm_window_t * get_windows(const jbwm_window_t root,
 {
 	Window * w, d;
 	unsigned int n;
-	XQueryTree(jbwm_data.display, root, &d, &d, &w, &n);
+	XQueryTree(jbwm_get_display(), root, &d, &d, &w, &n);
 	*win_count = n;
 	return (jbwm_window_t *)w;
 }
@@ -183,13 +179,13 @@ static void setup_clients(struct JBWMScreen * s)
 }
 static void setup_screen_elements(const uint8_t i)
 {
-	struct JBWMScreen * s = jbwm_data.screens;
+	struct JBWMScreen * s = screens;
 	s->screen = i;
-	s->d = jbwm_data.display;
-	s->root = RootWindow(jbwm_data.display, i);
 	s->vdesk = 0;
-	s->size.w = DisplayWidth(jbwm_data.display, i);
-	s->size.h = DisplayHeight(jbwm_data.display, i);
+	Display * d = jbwm_get_display();
+	s->root = RootWindow(d, i);
+	s->size.w = DisplayWidth(d, i);
+	s->size.h = DisplayHeight(d, i);
 }
 static void setup_gc(struct JBWMScreen * s)
 {
@@ -207,11 +203,11 @@ static void setup_gc(struct JBWMScreen * s)
 	gv.font = font->fid;
 	vm |= GCFont;
 #endif//JBWM_USE_TITLE_BAR&&!JBWM_USE_XFT
-	s->gc = XCreateGC(jbwm_data.display, s->root, vm, &gv);
+	s->gc = XCreateGC(jbwm_get_display(), s->root, vm, &gv);
 }
 static void setup_screen(const uint8_t i)
 {
-	struct JBWMScreen *s = &jbwm_data.screens[i];
+	struct JBWMScreen *s = &screens[i];
 	setup_screen_elements(i);
 	setup_gc(s);
 	setup_event_listeners(s->root);
@@ -219,21 +215,6 @@ static void setup_screen(const uint8_t i)
 	/* scan all the windows on this screen */
 	setup_clients(s);
 	jbwm_ewmh_init_screen(s);
-}
-__attribute__((pure))
-static int handle_xerror(Display * dpy __attribute__ ((unused)),
-	XErrorEvent * e)
-{
-	if ((e->error_code == BadAccess)
-	    && (e->request_code == X_ChangeWindowAttributes))
-		jbwm_error("ROOT");
-	if (e->error_code == BadWindow) { // cleanup zombie windows
-		struct JBWMClient * c = jbwm_get_client(e->resourceid);
-		if (c) // match found
-			jbwm_free_client(c);
-	}
-	JBWM_LOG("xerror: %d, %d\n", e->error_code, e->request_code);
-	return 0; // Ignore everything else.
 }
 static void jbwm_set_defaults(void)
 {
@@ -253,15 +234,13 @@ int main(int argc, char **argv)
 {
 	jbwm_set_defaults();
 	parse_argv(argc, argv);
-	if (!(jbwm_data.display = XOpenDisplay(NULL)))
-		jbwm_error(JBWM_ENV_DISPLAY);
-	XSetErrorHandler(handle_xerror);
-	jbwm_open_font(jbwm_data.display);
-	uint8_t i = ScreenCount(jbwm_data.display);
+	jbwm_open_display();
+	uint8_t i = ScreenCount(jbwm_get_display());
+	// allocate using dynamically sized array on stack
 	struct JBWMScreen s[i]; // remains in scope till exit.
-	jbwm_data.screens = s;
+	screens = s;
 	while (i--)
 		setup_screen(i);
-	jbwm_event_loop(jbwm_data.display);
+	jbwm_event_loop(jbwm_get_display());
 	return 0;
 }
