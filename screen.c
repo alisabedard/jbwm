@@ -25,7 +25,7 @@
 #endif//!DEBUG_SCREEN
 enum {JBWMMouseMask=(ButtonPressMask|ButtonReleaseMask|PointerMotionMask)};
 __attribute__ ((hot,nonnull))
-static void draw_outline(struct JBWMClient * c)
+static void draw_outline(struct JBWMClient * restrict c)
 {
 	if (!c->border)
 		return;
@@ -40,14 +40,14 @@ __attribute__((nonnull))
 void jbwm_configure_client(struct JBWMClient * c)
 {
 	const jbwm_window_t w = c->window;
-	struct JBWMRectangle * g = &c->size;
+	struct JBWMRectangle * restrict g = &c->size;
 	XSendEvent(c->d, w, true, StructureNotifyMask, (XEvent *)
 		&(XConfigureEvent){.x = g->x, .y = g->y, .width = g->width,
 		.height = g->height, .type = ConfigureNotify, .event = w,
 		.window = w, .above = c->parent, .override_redirect = true,
 		.border_width = c->border});
 }
-static void grab_pointer(Display * d, const jbwm_window_t w)
+static void grab_pointer(Display * restrict d, const jbwm_window_t w)
 {
 	static Cursor c;
 	if (!c)
@@ -55,7 +55,7 @@ static void grab_pointer(Display * d, const jbwm_window_t w)
 	XGrabPointer(d, w, false, JBWMMouseMask, GrabModeAsync,
 		GrabModeAsync, None, c, CurrentTime);
 }
-static struct JBDim get_mouse_position(Display * d,
+static struct JBDim get_mouse_position(Display * restrict d,
 	const jbwm_window_t w)
 {
 	int x, y;
@@ -63,15 +63,15 @@ static struct JBDim get_mouse_position(Display * d,
 		&x, &y, &(int){0}, &(int){0}, &(unsigned int){0});
 	return (struct JBDim){.x = x, .y = y};
 }
-static void warp_corner(struct JBWMClient * c)
+static void warp_corner(struct JBWMClient * restrict c)
 {
 	XWarpPointer(c->d, None, c->window, 0, 0, 0, 0,
 		c->size.width, c->size.height);
 }
-static void set_size(struct JBWMClient * c,
-	const int16_t * p)
+static void set_size(struct JBWMClient * restrict c,
+	const int16_t * restrict p)
 {
-	struct JBWMRectangle * g = &c->size;
+	struct JBWMRectangle * restrict g = &c->size;
 	g->width = abs(g->x - p[0]);
 	g->height = abs(g->y - p[1]);
 }
@@ -82,22 +82,22 @@ static int16_t get_diff_factored(const int16_t a, const int16_t b,
 	return a - b + c;
 }
 __attribute__((nonnull,pure))
-static int16_t get_diff(const uint8_t i, const int16_t * original,
-	const int16_t * start, const int16_t * p)
+static int16_t get_diff(const uint8_t i, const int16_t * restrict original,
+	const int16_t * restrict start, const int16_t * restrict p)
 {
 	return get_diff_factored(original[i], start[i], p[i]);
 }
-static void set_position(struct JBWMClient * c,
-	const int16_t * original, const int16_t * start,
-	const int16_t * p)
+static void set_position(struct JBWMClient * restrict c,
+	const int16_t * restrict original, const int16_t * restrict start,
+	const int16_t * restrict p)
 {
 	c->size.x = get_diff(0, original, start, p);
 	c->size.y = get_diff(1, original, start, p);
 	jbwm_snap_client(c);
 }
-static void do_changes(struct JBWMClient * c, const bool resize,
-	const int16_t * start, const int16_t * original,
-	const int16_t * p)
+static void do_changes(struct JBWMClient * restrict c, const bool resize,
+	const int16_t * restrict start, const int16_t * restrict original,
+	const int16_t * restrict p)
 {
 	if (resize)
 		set_size(c, p);
@@ -112,7 +112,7 @@ jbwm_window_t jbwm_get_root(struct JBWMClient * c)
 {
 	return jbwm_get_screen(c)->root;
 }
-static void drag_event_loop(struct JBWMClient * c, const bool resize)
+static void drag_event_loop(struct JBWMClient * restrict c, const bool resize)
 {
 	Display * d = c->d;
 	int16_t start[2];
@@ -161,7 +161,7 @@ void jbwm_move_resize(struct JBWMClient * c)
 		? 0 : jbwm_get_font_height();
 	{ // * d , * g scope
 		Display * d = c->d;
-		struct JBWMRectangle * g = &c->size;
+		struct JBWMRectangle * restrict g = &c->size;
 		XMoveResizeWindow(d, c->parent, g->x, g->y - offset, g->width,
 			g->height + offset);
 		XMoveResizeWindow(d, c->window, 0, offset,
@@ -174,9 +174,9 @@ void jbwm_move_resize(struct JBWMClient * c)
 	jbwm_set_frame_extents(c);
 	jbwm_configure_client(c);
 }
-static void showing(struct JBWMClient * c,
+static void showing(struct JBWMClient * restrict c,
 	int (* mapping)(Display *, Window),
-	void (* ewmh_add_remove_state)(Display * restrict, jbwm_window_t,
+	void (* ewmh_add_remove_state)(Display * , jbwm_window_t,
 	jbwm_atom_t), const int8_t wm_state)
 {
 	Display * d = c->d;
@@ -193,8 +193,8 @@ void jbwm_restore_client(struct JBWMClient * c)
 {
 	showing(c, XMapWindow, jbwm_ewmh_remove_state, NormalState);
 }
-static void check_visibility(struct JBWMScreen * s,
-	struct JBWMClient * c, const uint8_t v)
+static void check_visibility(struct JBWMScreen * restrict s,
+	struct JBWMClient * restrict c, const uint8_t v)
 {
 	if (c->screen != s->screen)
 		return;
