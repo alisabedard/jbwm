@@ -5,6 +5,7 @@
 #include <errno.h>
 #include <string.h>
 #include <sys/select.h>
+#include <xcb/xcb_cursor.h>
 #include "log.h"
 #include "util.h"
 bool jb_xcb_cookie_has_error(xcb_connection_t * x, const xcb_void_cookie_t c)
@@ -174,7 +175,8 @@ bool jb_next_event_timed(xcb_connection_t * x,
 	*e = xcb_poll_for_event(x);
 	return true;
 }
-// Open font specified by name.  initialized fid must be supplied
+/* Open font specified by name.  Initialized fid must be supplied.
+ * If font cannot be opened, try 'fixed' before failing.  */
 bool jb_open_font(xcb_connection_t * xc, xcb_font_t fid,
 	const char * name)
 {
@@ -200,3 +202,13 @@ void jb_set_icon_name(xcb_connection_t * xc, const xcb_window_t win,
 		XCB_ATOM_WM_ICON_NAME, XCB_ATOM_STRING, 8,
 		strlen(name), name);
 }
+xcb_cursor_t jb_get_cursor(xcb_connection_t * xc,
+	const char * restrict name)
+{
+	xcb_cursor_context_t * ctx;
+	xcb_cursor_context_new(xc, jb_get_xcb_screen(xc), &ctx);
+	const xcb_cursor_t c = xcb_cursor_load_cursor(ctx, name);
+	xcb_cursor_context_free(ctx);
+	return c;
+}
+
