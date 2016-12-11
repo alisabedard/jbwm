@@ -35,7 +35,7 @@ jbwm_atom_t jbwm_get_wm_state(Display * d)
 	static jbwm_atom_t a;
 	return get_atom(d, &a, "WM_STATE");
 }
-void jbwm_set_wm_state(struct JBWMClient * c, const int8_t state)
+void jbwm_set_wm_state(struct JBWMClient * restrict c, const int8_t state)
 {
 	Display * d = jbwm_get_display();
 	jbwm_set_property(d, c->window, jbwm_get_wm_state(d),
@@ -53,7 +53,7 @@ static bool has_delete_proto(Display * d, const jbwm_window_t w)
 	}
 	return found;
 }
-void jbwm_send_wm_delete(struct JBWMClient * c)
+void jbwm_send_wm_delete(struct JBWMClient * restrict c)
 {
 	Display * d = jbwm_get_display();
 	const jbwm_window_t w = c->window;

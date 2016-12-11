@@ -25,7 +25,7 @@ struct JBWMClient * jbwm_get_head_client(void)
 {
 	return jbwm_client_data.head;
 }
-void jbwm_set_head_client(struct JBWMClient * c)
+void jbwm_set_head_client(struct JBWMClient * restrict c)
 {
 	if (c)
 		jbwm_client_data.head = c;
@@ -42,7 +42,7 @@ static void relink_r(const struct JBWMClient * c, struct JBWMClient * i)
 	}
 }
 // Relink c's linked list to exclude c
-void jbwm_relink_client_list(struct JBWMClient * c)
+void jbwm_relink_client_list(struct JBWMClient * restrict c)
 {
 	JBWM_LOG("relink_window_list");
 	if (jbwm_client_data.current == c) // Remove selection target
@@ -53,7 +53,7 @@ void jbwm_relink_client_list(struct JBWMClient * c)
 	}
 	relink_r(c, jbwm_client_data.head);
 }
-void jbwm_set_client_vdesk(struct JBWMClient * c, const uint8_t d)
+void jbwm_set_client_vdesk(struct JBWMClient * restrict c, const uint8_t d)
 {
 	JBWM_LOG("jbwm_set_client_vdesk");
 	const uint8_t p = c->vdesk; // save previous
@@ -72,7 +72,7 @@ static inline bool matches(struct JBWMClient * i,
 	return i->parent == w || i->window == w;
 #endif//JBWM_USE_TITLE_BAR
 }
-static struct JBWMClient * search(struct JBWMClient * c,
+static struct JBWMClient * search(struct JBWMClient * restrict c,
 	const jbwm_window_t w)
 {
 	return (!c || matches(c, w)) ? c : search(c->next, w);
@@ -82,7 +82,7 @@ struct JBWMClient * jbwm_get_client(const jbwm_window_t w)
 {
 	return search(jbwm_client_data.head, w);
 }
-void jbwm_toggle_sticky(struct JBWMClient * c)
+void jbwm_toggle_sticky(struct JBWMClient * restrict c)
 {
 	JBWM_LOG("stick");
 	c->opt.sticky ^= true; // toggle

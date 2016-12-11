@@ -7,7 +7,7 @@ void jbwm_ewmh_remove_state(Display * d,
 void jbwm_ewmh_add_state(Display * d, const jbwm_window_t w,
 	jbwm_atom_t state);
 void jbwm_ewmh_handle_client_message(XClientMessageEvent * e,
-	struct JBWMClient * c)
+	struct JBWMClient * restrict c)
 	__attribute__((nonnull(1)));
 #else//!JBWM_USE_EWMH
 #define jbwm_ewmh_remove_state(d, w, s)

@@ -15,7 +15,7 @@ static bool is_shaped(Display * dpy, const Window win)
 	return XShapeQueryExtents(dpy, win, &s, &d, &d,
 		&u, &u, &d, &d, &d, &u, &u) && s;
 }
-void jbwm_set_shape(struct JBWMClient * c)
+void jbwm_set_shape(struct JBWMClient * restrict c)
 {
 	if(c->opt.shaped) {
 		JBWM_LOG("XShapeCombineShape: %d", (int)c->window);
@@ -24,7 +24,7 @@ void jbwm_set_shape(struct JBWMClient * c)
 			ShapeSet);
 	}
 }
-void jbwm_new_shaped_client(struct JBWMClient * c)
+void jbwm_new_shaped_client(struct JBWMClient * restrict c)
 {
 	if (is_shaped(jbwm_get_display(), c->window)) {
 		JBWM_LOG("Window %d is shaped", (int)c->window);

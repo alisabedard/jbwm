@@ -6,7 +6,7 @@
 #define JBWM_CLIENT_H
 #include "JBWMClient.h"
 struct JBWMClientManager {
-	struct JBWMClient * current, * head;
+	struct JBWMClient * restrict current, * head;
 };
 // Search for the JBWMClient matching the specified window
 struct JBWMClient * jbwm_get_client(jbwm_window_t w)
@@ -17,11 +17,11 @@ struct JBWMClient * jbwm_get_current_client(void);
 // Get the head of the JBWMClient linked list
 struct JBWMClient * jbwm_get_head_client(void);
 // Relink c's linked list to exclude c
-void jbwm_relink_client_list(struct JBWMClient * c);
+void jbwm_relink_client_list(struct JBWMClient * restrict c);
 // Move the client to the specified virtual desktop
-void jbwm_set_client_vdesk(struct JBWMClient * c, const uint8_t d)
+void jbwm_set_client_vdesk(struct JBWMClient * restrict c, const uint8_t d)
 	__attribute((nonnull));
 // Assign c to the head of the JBWMClient linked list.
-void jbwm_set_head_client(struct JBWMClient * c);
-void jbwm_toggle_sticky(struct JBWMClient * c) __attribute__((nonnull));
+void jbwm_set_head_client(struct JBWMClient * restrict c);
+void jbwm_toggle_sticky(struct JBWMClient * restrict c) __attribute__((nonnull));
 #endif//!JBWM_CLIENT_H

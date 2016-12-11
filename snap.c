@@ -18,7 +18,7 @@ static int_fast16_t sborder(const int_fast16_t xy, const int_fast16_t
 		  return - edge;
 	return xy;
 }
-void jbwm_snap_border(struct JBWMClient * c)
+void jbwm_snap_border(struct JBWMClient * restrict c)
 {
 	struct JBWMRectangle * g = &(c->size);
 	/* snap to screen border */
@@ -57,10 +57,10 @@ static int_fast16_t jbwm_snap_dim(const int_fast16_t cxy, const
 	}
 	return d;
 }
-static struct JBDim search(struct JBWMClient * c)
+static struct JBDim search(struct JBWMClient * restrict c)
 {
 	struct JBDim d = { .x = JBWM_SNAP, .y = JBWM_SNAP };
-	for (struct JBWMClient * ci = jbwm_get_head_client();
+	for (struct JBWMClient * restrict ci = jbwm_get_head_client();
 		ci; ci = ci->next) {
 		if ((ci == c) || (ci->screen != c->screen)
 		    || (ci->vdesk != c->vdesk))
@@ -78,7 +78,7 @@ static struct JBDim search(struct JBWMClient * c)
 	}
 	return d;
 }
-void jbwm_snap_client(struct JBWMClient * c)
+void jbwm_snap_client(struct JBWMClient * restrict c)
 {
 	jbwm_snap_border(c);
 	// Snap to other windows:

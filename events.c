@@ -40,7 +40,7 @@ static void delete_ewmh_properties(Display * d,
 #else//!JBWM_USE_EWMH
 #define delete_ewmh_properties(d, w)
 #endif//JBWM_USE_EWMH
-void jbwm_free_client(struct JBWMClient * c)
+void jbwm_free_client(struct JBWMClient * restrict c)
 {
 	Display * d = jbwm_get_display();
 	{ // w scope
@@ -63,7 +63,7 @@ static void cleanup(void)
 {
 	JBWM_LOG("cleanup");
 	events_need_cleanup = false;
-	struct JBWMClient * c = jbwm_get_head_client();
+	struct JBWMClient * restrict c = jbwm_get_head_client();
 	struct JBWMClient * i;
 	do {
 		i = c->next;
@@ -73,7 +73,7 @@ static void cleanup(void)
 	} while(i && (c = i));
 }
 static void handle_property_change(XPropertyEvent * e,
-	struct JBWMClient * c)
+	struct JBWMClient * restrict c)
 {
 	if(e->state != PropertyNewValue)
 		return;
@@ -106,12 +106,12 @@ static void handle_map_request(XMapRequestEvent * e)
 	JBWM_LOG("MapRequest, send_event:%d", e->send_event);
 	jbwm_new_client(get_screen(ScreenCount(e->display), e->parent), w);
 }
-static inline void mark_removal(struct JBWMClient * c)
+static inline void mark_removal(struct JBWMClient * restrict c)
 {
 	JBWM_LOG("mark_removal(): ignore_unmap is %d", c->ignore_unmap);
 	c->opt.remove = events_need_cleanup = (c->ignore_unmap--<1);
 }
-static void handle_colormap_notify(struct JBWMClient * c,
+static void handle_colormap_notify(struct JBWMClient * restrict c,
 	XColormapEvent * e)
 {
 	JBWM_LOG("ColormapNotify");
@@ -123,7 +123,7 @@ void jbwm_event_loop(Display * d)
 	for (;;) {
 		XEvent ev;
 		XNextEvent(d, &ev);
-		struct JBWMClient * c = jbwm_get_client(ev.xany.window);
+		struct JBWMClient * restrict c = jbwm_get_client(ev.xany.window);
 		switch (ev.type) {
 		case ButtonRelease:
 		case KeyRelease:

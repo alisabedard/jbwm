@@ -62,7 +62,7 @@ void jbwm_ewmh_add_state(Display * d, const jbwm_window_t w,
   data.l[2] = second property to alter
   data.l[3] = source indication
   other data.l[] elements = 0 */
-static void set_state(struct JBWMClient * c,
+static void set_state(struct JBWMClient * restrict c,
 	bool add, const enum JBWMAtomIndex t)
 {
 	JBWM_LOG("set_state(c, add: %s, t: %d)", add ? "true" : "false",
@@ -100,7 +100,7 @@ static void set_state(struct JBWMClient * c,
 __attribute__((nonnull))
 static void check_state(XClientMessageEvent * e,	// event data
 			const enum JBWMAtomIndex t,	// state to test
-			struct JBWMClient * c)
+			struct JBWMClient * restrict c)
 {
 	const Atom state = jbwm_ewmh_get_atom(t);
 	// 2 atoms can be set at once
@@ -130,7 +130,7 @@ static void check_state(XClientMessageEvent * e,	// event data
 }
 __attribute__((nonnull))
 static void handle_wm_state_changes(XClientMessageEvent * e,
-	struct JBWMClient * c)
+	struct JBWMClient * restrict c)
 {
 	check_state(e, JBWM_EWMH_WM_STATE_ABOVE, c);
 	check_state(e, JBWM_EWMH_WM_STATE_BELOW, c);
@@ -141,7 +141,7 @@ static void handle_wm_state_changes(XClientMessageEvent * e,
 }
 // returns true if handled, false if not
 static bool client_specific_message(XClientMessageEvent * e,
-	struct JBWMClient * c, const Atom t)
+	struct JBWMClient * restrict c, const Atom t)
 {
 	jbwm_print_atom(e->display, t, __FILE__, __LINE__);
 	if (t == jbwm_ewmh_get_atom(JBWM_EWMH_WM_DESKTOP))
@@ -198,7 +198,7 @@ static void debug_client_message(XClientMessageEvent * e)
 #define debug_client_message(e)
 #endif//JBWM_DEBUG_EWMH_STATE&&DEBUG
 void jbwm_ewmh_handle_client_message(XClientMessageEvent * e,
-	struct JBWMClient * c)
+	struct JBWMClient * restrict c)
 {
 	const jbwm_atom_t t = e->message_type;
 	debug_client_message(e);

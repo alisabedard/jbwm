@@ -15,7 +15,7 @@ Display * jbwm_get_display(void)
 }
 static void cleanup(const jbwm_window_t w)
 {
-	struct JBWMClient * c = jbwm_get_client(w);
+	struct JBWMClient * restrict c = jbwm_get_client(w);
 	if (c) // match found
 		jbwm_free_client(c);
 }

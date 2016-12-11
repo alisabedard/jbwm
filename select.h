@@ -6,5 +6,5 @@
 #define JBWM_SELECT_H
 #include "JBWMClient.h"
 // Set client as that receiving focus
-void jbwm_select_client(struct JBWMClient * c);
+void jbwm_select_client(struct JBWMClient * restrict c);
 #endif//!JBWM_SELECT_H

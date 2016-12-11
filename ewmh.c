@@ -174,7 +174,7 @@ void jbwm_ewmh_init_screen(struct JBWMScreen * s)
 	init_desktops(s);
 	s->supporting = init_supporting(d, r);
 }
-void jbwm_set_frame_extents(struct JBWMClient * c)
+void jbwm_set_frame_extents(struct JBWMClient * restrict c)
 {
 	JBWM_LOG("jbwm_set_frame_extents()");
 	// Fields: left, right, top, bottom

@@ -12,7 +12,7 @@ void jbwm_ewmh_set_allowed_actions(Display * d,
 	const jbwm_window_t w);
 void jbwm_ewmh_init_screen(struct JBWMScreen * s)
 	__attribute__((nonnull));
-void jbwm_set_frame_extents(struct JBWMClient * c);
+void jbwm_set_frame_extents(struct JBWMClient * restrict c);
 enum JBWMAtomIndex {
 	JBWM_EWMH_SUPPORTED,
 	JBWM_EWMH_CURRENT_DESKTOP,

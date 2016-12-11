@@ -32,7 +32,7 @@ enum MwmStatus {
 struct JBWMMwm { // paraphrased from MwmUtil.h
 	uint32_t flags, functions, decor, input_mode, status;
 };
-static void process_flags(struct JBWMClient * c)
+static void process_flags(struct JBWMClient * restrict c)
 {
 	struct JBWMClientOptions * o = &c->opt;
 	if (o->tearoff) {
@@ -82,7 +82,7 @@ static Atom get_mwm_hints_atom(Display * d)
 	static Atom a;
 	return a ? a : (a = XInternAtom(d, "_MOTIF_WM_HINTS", false));
 }
-void jbwm_handle_mwm_hints(struct JBWMClient * c)
+void jbwm_handle_mwm_hints(struct JBWMClient * restrict c)
 {
 	Display * d = jbwm_get_display();
 	const Atom mwm_hints = get_mwm_hints_atom(d);
