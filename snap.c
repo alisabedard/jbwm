@@ -30,6 +30,9 @@ void jbwm_snap_border(struct JBWMClient * restrict c)
 		-jbwm_get_font_height());
 	g->y = sborder(g->y, g->height - s.height);
 }
+/* Definition of this as an inline function guarantees no side-effects
+ * and minimizes over-expansion (the full expansion of jbwm_snap_dim
+ * is approximately a dozen lines).  */
 __attribute__ ((const, hot, warn_unused_result))
 static inline int absmin(const int a, const int b)
 {
@@ -40,18 +43,20 @@ static int jbwm_snap_dim(const int cxy, const int cwh, const int cixy,
 	const int ciwh, const int d)
 {
 	const int s = cixy + ciwh - cxy, t = cixy - cxy;
-	return absmin(absmin(absmin(absmin(d, s),
-		s - cwh), t - cwh), t);
+	return absmin(absmin(absmin(absmin(d, s), s - cwh), t - cwh), t);
 }
-static struct JBDim search(struct JBWMClient * restrict c)
+/* Don't use restrict for struct JBWMClient withing this function, as
+ * c and ci may alias each other.  It is fine for struct
+ * JBWMRectangle.  */
+static struct JBDim search(struct JBWMClient * c)
 {
 	struct JBDim d = { .x = JBWM_SNAP, .y = JBWM_SNAP };
-	for (struct JBWMClient * restrict ci = jbwm_get_head_client();
+	for (struct JBWMClient * ci = jbwm_get_head_client();
 		ci; ci = ci->next) {
 		if ((ci == c) || (ci->screen != c->screen)
 			|| (ci->vdesk != c->vdesk))
 			continue;
-		struct JBWMRectangle * gi = &(ci->size);
+		struct JBWMRectangle * restrict gi = &(ci->size);
 		if ((gi->y - c->size.height - c->size.y <= d.x) &&
 			(c->size.y - gi->height - gi->y <= d.x))
 			d.x = jbwm_snap_dim(c->size.x, c->size.width,
