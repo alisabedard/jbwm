@@ -20,15 +20,11 @@ static void set_state_not_focused(struct JBWMClient * restrict c)
 		jbwm_get_screen(c)->pixels.bg);
 	jbwm_ewmh_remove_state(d, c->window, WM_STATE(FOCUSED));
 }
-static bool check_current(struct JBWMClient * restrict c)
-{
-	struct JBWMClient * current = jbwm_get_current_client();
-	return current && current != c;
-}
 static void unselect_current(struct JBWMClient * restrict c)
 {
-	if (check_current(c))
-		set_state_not_focused(jbwm_get_current_client());
+	struct JBWMClient * current = jbwm_get_current_client();
+	if (current && current != c)
+		set_state_not_focused(current);
 }
 static void set_border(struct JBWMClient * restrict c)
 {
