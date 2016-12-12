@@ -4,6 +4,7 @@
 // See README for license and other details.
 #include "jbwm.h"
 #include <stdlib.h>
+#include <stdbool.h>
 #include <unistd.h>
 #include <X11/Xproto.h>
 #ifdef JBWM_USE_XFT

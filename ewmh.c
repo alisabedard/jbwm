@@ -7,6 +7,7 @@
 #include <string.h>
 #include <unistd.h>
 #include <X11/Xatom.h>
+#include "JBWMClient.h"
 #include "JBWMScreen.h"
 #include "client.h"
 #include "config.h"

@@ -4,7 +4,8 @@
 // See README for license and other details.
 #ifndef JBWM_CLIENT_H
 #define JBWM_CLIENT_H
-#include "JBWMClient.h"
+#include "typedef.h"
+struct JBWMClient;
 // Search for the JBWMClient matching the specified window
 struct JBWMClient * jbwm_get_client(jbwm_window_t w)
 	__attribute__((hot,pure));
