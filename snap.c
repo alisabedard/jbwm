@@ -5,10 +5,12 @@
 //#undef DEBUG
 #include "snap.h"
 #include <stdlib.h>
+#include "JBDim.h"
+#include "JBWMClient.h"
+#include "JBWMScreen.h"
 #include "client.h"
 #include "config.h"
 #include "font.h"
-#include "JBDim.h"
 #include "screen.h"
 __attribute__ ((const, hot, warn_unused_result))
 static int sborder(const int xy, const int edge)
