@@ -11,11 +11,10 @@
 #include "JBDim.h"
 #include "screen.h"
 __attribute__ ((const, hot, warn_unused_result))
-static int_fast16_t sborder(const int_fast16_t xy, const int_fast16_t
-	edge)
+static int sborder(const int xy, const int edge)
 {
 	if (abs(xy + edge) < JBWM_SNAP)
-		  return - edge;
+		return - edge;
 	return xy;
 }
 void jbwm_snap_border(struct JBWMClient * restrict c)
@@ -30,17 +29,15 @@ void jbwm_snap_border(struct JBWMClient * restrict c)
 	g->y = sborder(g->y, g->height - s.height);
 }
 __attribute__ ((const, hot, warn_unused_result))
-static inline int_fast16_t absmin(const int_fast16_t a, const
-	int_fast16_t b)
+static inline int absmin(const int a, const int b)
 {
 	return abs(a) < abs(b) ? a : b;
 }
 __attribute__ ((const, hot, warn_unused_result))
-static int_fast16_t jbwm_snap_dim(const int_fast16_t cxy, const
-	uint_fast16_t cwh, const int_fast16_t cixy, const
-	uint_fast16_t ciwh, const int_fast16_t d)
+static int jbwm_snap_dim(const int cxy, const int cwh, const int cixy,
+	const int ciwh, const int d)
 {
-	const int_fast16_t s = cixy + ciwh - cxy, t = cixy - cxy;
+	const int s = cixy + ciwh - cxy, t = cixy - cxy;
 	return absmin(absmin(absmin(absmin(d, s),
 		s - cwh), t - cwh), t);
 }
@@ -50,15 +47,15 @@ static struct JBDim search(struct JBWMClient * restrict c)
 	for (struct JBWMClient * restrict ci = jbwm_get_head_client();
 		ci; ci = ci->next) {
 		if ((ci == c) || (ci->screen != c->screen)
-		    || (ci->vdesk != c->vdesk))
+			|| (ci->vdesk != c->vdesk))
 			continue;
 		struct JBWMRectangle * gi = &(ci->size);
-		if ((gi->y - c->size.height - c->size.y <= d.x)
-		    && (c->size.y - gi->height - gi->y <= d.x))
+		if ((gi->y - c->size.height - c->size.y <= d.x) &&
+			(c->size.y - gi->height - gi->y <= d.x))
 			d.x = jbwm_snap_dim(c->size.x, c->size.width,
 				gi->x, gi->width, d.x);
-		if ((gi->x - c->size.width - c->size.x <= d.y)
-		    && (c->size.x - gi->width - gi->x <= d.y))
+		if ((gi->x - c->size.width - c->size.x <= d.y) &&
+			(c->size.x - gi->width - gi->x <= d.y))
 			d.y = jbwm_snap_dim(c->size.y, c->size.height,
 				gi->y, gi->height, d.y);
 	}
