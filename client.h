@@ -5,9 +5,7 @@
 #ifndef JBWM_CLIENT_H
 #define JBWM_CLIENT_H
 #include "JBWMClient.h"
-struct JBWMClientManager {
-	struct JBWMClient * current, * head;
-};
+struct JBWMClientManager;
 // Search for the JBWMClient matching the specified window
 struct JBWMClient * jbwm_get_client(jbwm_window_t w)
 	__attribute__((hot,pure));

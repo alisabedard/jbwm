@@ -4,11 +4,11 @@
 // See README for license and other details.
 #include "select.h"
 #include <X11/Xatom.h>
+#include "JBWMClientManager.h"
 #include "client.h"
 #include "display.h"
-#include "ewmh_state.h"
 #include "ewmh.h"
-#include "log.h"
+#include "ewmh_state.h"
 #include "screen.h"
 #include "util.h"
 #define EWMH_ATOM(a) jbwm_ewmh_get_atom(JBWM_EWMH_##a)

@@ -3,6 +3,7 @@
 // Copyright 1999-2015, Ciaran Anscomb <jbwm@6809.org.uk>
 // See README for license and other details.
 #include "client.h"
+#include "JBWMClientManager.h"
 #include "display.h"
 #include "ewmh.h"
 #include "ewmh_state.h"
@@ -72,12 +73,14 @@ static inline bool matches(struct JBWMClient * i,
 	return i->parent == w || i->window == w;
 #endif//JBWM_USE_TITLE_BAR
 }
+__attribute__((hot,pure))
 static struct JBWMClient * search(struct JBWMClient * restrict c,
 	const jbwm_window_t w)
 {
 	return (!c || matches(c, w)) ? c : search(c->next, w);
 }
 // Return the client that has specified window as either window or parent
+__attribute__((hot,pure))
 struct JBWMClient * jbwm_get_client(const jbwm_window_t w)
 {
 	return search(jbwm_client_data.head, w);
