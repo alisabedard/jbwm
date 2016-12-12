@@ -6,6 +6,8 @@
 #include <stdlib.h>
 #include <X11/cursorfont.h>
 #include <X11/Xatom.h>
+#include "JBWMDefaults.h"
+#include "JBWMScreen.h"
 #include "client.h"
 #include "config.h"
 #include "display.h"

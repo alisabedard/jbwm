@@ -6,6 +6,7 @@
 #include "events.h"
 #include <stdlib.h>
 #include <X11/Xatom.h>
+#include "JBWMScreen.h"
 #include "button_event.h"
 #include "client.h"
 #include "display.h"

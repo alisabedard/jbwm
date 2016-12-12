@@ -10,6 +10,7 @@
 #ifdef JBWM_USE_XFT
 #include <X11/Xft/Xft.h>
 #endif//JBWM_USE_XFT
+#include "JBWMScreen.h"
 #include "client.h"
 #include "config.h"
 #include "display.h"

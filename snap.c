@@ -7,9 +7,9 @@
 #include <stdlib.h>
 #include "JBDim.h"
 #include "JBWMClient.h"
+#include "JBWMDefaults.h"
 #include "JBWMScreen.h"
 #include "client.h"
-#include "config.h"
 #include "font.h"
 #include "screen.h"
 __attribute__ ((const, hot, warn_unused_result))

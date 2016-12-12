@@ -1,9 +1,10 @@
 // jbwm - Minimalist Window Manager for X
-// Copyright 2008-2016, Jeffrey E. Bedard <jefbed@gmail.com>
+// Copyright 2008-2017, Jeffrey E. Bedard <jefbed@gmail.com>
 // Copyright 1999-2015, Ciaran Anscomb <jbwm@6809.org.uk>
 // See README for license and other details.
 #ifndef JBWM_CONFIG_H
 #define JBWM_CONFIG_H
+/* Note:  Also, adjust the values in JBWMDefaults.h as necessary.  */
 #define JBWM_DEF_TERM "xterm"
 /* Default fonts */
 #ifdef JBWM_USE_XFT
@@ -31,12 +32,5 @@
 #define JBWM_ENV_RESIZE "JBWM_RESIZE"
 #define JBWM_ENV_FONT "JBWM_FONT"
 #define JBWM_ENV_TERM "JBWM_TERM"
-enum JBWMDefaults {
-	JBWM_KEYMASK_GRAB = Mod4Mask,
-	JBWM_KEYMASK_MOD = ControlMask,
-	JBWM_SNAP = 12,
-	JBWM_RESIZE_INCREMENT = 20,
-	JBWM_MAX_DESKTOPS = 10
-};
 #define JBWM_NAME "jbwm"
 #endif//JBWM_CONFIG_H

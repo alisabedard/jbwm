@@ -8,6 +8,7 @@
 #include "config.h"
 #include <X11/Xft/Xft.h>
 #endif//JBWM_USE_XFT
+#include "JBWMScreen.h"
 #include "display.h"
 #include "ewmh.h"
 #include "ewmh_state.h"

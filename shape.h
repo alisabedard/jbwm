@@ -5,7 +5,7 @@
 #ifndef JBWM_SHAPE_H
 #define JBWM_SHAPE_H
 #ifdef JBWM_USE_SHAPE
-#include "JBWMClient.h"
+struct JBWMClient;
 void jbwm_new_shaped_client(struct JBWMClient * restrict c)
 	__attribute__((nonnull));
 void jbwm_set_shape(struct JBWMClient * restrict c)

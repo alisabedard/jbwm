@@ -4,6 +4,6 @@
 // See README for license and other details.
 #ifndef JBWM_MWM_H
 #define JBWM_MWM_H
-#include "JBWMClient.h"
+struct JBWMClient;
 void jbwm_handle_mwm_hints(struct JBWMClient * restrict c);
 #endif//!JBWM_MWM_H

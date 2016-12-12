@@ -4,6 +4,7 @@
 // See README for license and other details.
 #include "shape.h"
 #include <X11/extensions/shape.h>
+#include "JBWMClient.h"
 #include "display.h"
 #include "log.h"
 // Declared with pure attribute, as value may not change between calls.

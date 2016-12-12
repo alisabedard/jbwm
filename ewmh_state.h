@@ -1,7 +1,8 @@
 #ifndef JBWM_EWMH_STATE_H
 #define JBWM_EWMH_STATE_H
 #ifdef JBWM_USE_EWMH
-#include "JBWMClient.h"
+#include "typedef.h"
+struct JBWMClient;
 void jbwm_ewmh_remove_state(Display * d,
 	const jbwm_window_t w, const jbwm_window_t state);
 void jbwm_ewmh_add_state(Display * d, const jbwm_window_t w,
