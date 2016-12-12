@@ -24,7 +24,7 @@ max.o: max.c max.h JBWMClient.h JBWMScreen.h JBDim.h typedef.h display.h \
  ewmh.h ewmh_state.h font.h jbwm.h log.h screen.h title_bar.h
 mwm.o: mwm.c mwm.h JBWMClient.h JBWMScreen.h JBDim.h typedef.h display.h \
  log.h util.h
-new.o: new.c new.h JBWMScreen.h JBDim.h typedef.h client.h JBWMClient.h \
+new.o: new.c new.h typedef.h client.h JBWMClient.h JBWMScreen.h JBDim.h \
  config.h display.h ewmh.h jbwm.h keys.h log.h macros.h mwm.h screen.h \
  select.h shape.h util.h
 screen.o: screen.c screen.h typedef.h client.h JBWMClient.h JBWMScreen.h \
