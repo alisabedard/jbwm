@@ -4,7 +4,6 @@
 // See README for license and other details.
 #include "select.h"
 #include <X11/Xatom.h>
-#include "JBWMClientManager.h"
 #include "client.h"
 #include "display.h"
 #include "ewmh.h"
@@ -53,7 +52,7 @@ static void set_active_window(struct JBWMClient * restrict c)
 	jbwm_set_property(jbwm_get_display(), jbwm_get_root(c),
 		EWMH_ATOM(ACTIVE_WINDOW), XA_WINDOW, &w, 1);
 #endif//JBWM_USE_EWMH
-	jbwm_get_client_manager()->current = c;
+	jbwm_set_current_client(c);
 }
 void jbwm_select_client(struct JBWMClient * restrict c)
 {

@@ -28,8 +28,6 @@ enum {JBWMMouseMask=(ButtonPressMask|ButtonReleaseMask|PointerMotionMask)};
 __attribute__ ((hot,nonnull))
 static void draw_outline(struct JBWMClient * restrict c)
 {
-	if (!c->border)
-		return;
 	const uint8_t o = c->opt.no_title_bar ? 0 : jbwm_get_font_height();
 	const struct JBWMScreen * s = jbwm_get_screen(c);
 	const struct JBWMRectangle * g = &c->size;
@@ -63,11 +61,6 @@ static int * get_mouse_position(Display * restrict d, Window w)
 	unsigned int unil;
 	XQueryPointer(d, w, &w, &w, p, p + 1, &nil, &nil, &unil);
 	return p;
-}
-static void warp_corner(struct JBWMClient * restrict c)
-{
-	XWarpPointer(jbwm_get_display(), None, c->window, 0, 0, 0, 0,
-		c->size.width, c->size.height);
 }
 static void set_size(struct JBWMClient * restrict c,
 	const int * p)
@@ -129,24 +122,29 @@ static void drag_event_loop(struct JBWMClient * restrict c, const bool resize)
 			p[0] = (int)e.xmotion.x;
 			p[1] = (int)e.xmotion.y;
 		}
-		draw_outline(c);
+		if (b)
+			draw_outline(c);
 		do_changes(c, resize, start, original, p);
 		(b ? draw_outline : jbwm_move_resize)(c);
 	}
 }
+static void warp_corner(Display * d, struct JBWMClient * restrict c)
+{
+	XWarpPointer(d, None, c->window, 0, 0, 0, 0,
+		c->size.width, c->size.height);
+}
 void jbwm_drag(struct JBWMClient * restrict c, const bool resize)
 {
 	Display * d = jbwm_get_display();
-	if (!d) // client is in the process of being deleted (race)
-		return;
 	XRaiseWindow(d, c->parent);
 	if (resize && (c->opt.no_resize || c->opt.shaded))
 		return;
 	grab_pointer(d, jbwm_get_root(c));
 	if (resize)
-		warp_corner(c);
+		warp_corner(d, c);
 	drag_event_loop(c, resize);
-	draw_outline(c);
+	if (c->border)
+		draw_outline(c);
 	XUngrabPointer(d, CurrentTime);
 	jbwm_move_resize(c);
 }

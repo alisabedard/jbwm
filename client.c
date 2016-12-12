@@ -3,7 +3,6 @@
 // Copyright 1999-2015, Ciaran Anscomb <jbwm@6809.org.uk>
 // See README for license and other details.
 #include "client.h"
-#include "JBWMClientManager.h"
 #include "display.h"
 #include "ewmh.h"
 #include "ewmh_state.h"
@@ -13,23 +12,24 @@
 #include "select.h"
 #include "title_bar.h"
 #include "util.h"
-static struct JBWMClientManager jbwm_client_data;
-struct JBWMClientManager * jbwm_get_client_manager(void)
-{
-	return &jbwm_client_data;
-}
+static struct JBWMClient * current, * head;
 struct JBWMClient * jbwm_get_current_client(void)
 {
-	return jbwm_client_data.current;
+	return current;
+}
+void jbwm_set_current_client(struct JBWMClient * restrict c)
+{
+	if (c)
+		current = c;
 }
 struct JBWMClient * jbwm_get_head_client(void)
 {
-	return jbwm_client_data.head;
+	return head;
 }
 void jbwm_set_head_client(struct JBWMClient * restrict c)
 {
 	if (c)
-		jbwm_client_data.head = c;
+		head = c;
 }
 /* Note:  As *c and *i may alias each other, use of 'restrict'
    in relink_r would be invalid. */
@@ -46,13 +46,13 @@ static void relink_r(const struct JBWMClient * c, struct JBWMClient * i)
 void jbwm_relink_client_list(struct JBWMClient * restrict c)
 {
 	JBWM_LOG("relink_window_list");
-	if (jbwm_client_data.current == c) // Remove selection target
-		jbwm_client_data.current = NULL;
-	if (jbwm_client_data.head == c) {
-		jbwm_client_data.head = c->next;
+	if (current == c) // Remove selection target
+		current = NULL;
+	if (head == c) {
+		head = c->next;
 		return; // removed first client
 	}
-	relink_r(c, jbwm_client_data.head);
+	relink_r(c, head);
 }
 void jbwm_set_client_vdesk(struct JBWMClient * restrict c, const uint8_t d)
 {
@@ -83,7 +83,7 @@ static struct JBWMClient * search(struct JBWMClient * restrict c,
 __attribute__((hot,pure))
 struct JBWMClient * jbwm_get_client(const jbwm_window_t w)
 {
-	return search(jbwm_client_data.head, w);
+	return search(head, w);
 }
 void jbwm_toggle_sticky(struct JBWMClient * restrict c)
 {

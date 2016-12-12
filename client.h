@@ -5,11 +5,9 @@
 #ifndef JBWM_CLIENT_H
 #define JBWM_CLIENT_H
 #include "JBWMClient.h"
-struct JBWMClientManager;
 // Search for the JBWMClient matching the specified window
 struct JBWMClient * jbwm_get_client(jbwm_window_t w)
 	__attribute__((hot,pure));
-struct JBWMClientManager * jbwm_get_client_manager(void);
 // Get the client with input focus.
 struct JBWMClient * jbwm_get_current_client(void);
 // Get the head of the JBWMClient linked list
@@ -19,6 +17,8 @@ void jbwm_relink_client_list(struct JBWMClient * restrict c);
 // Move the client to the specified virtual desktop
 void jbwm_set_client_vdesk(struct JBWMClient * restrict c, const uint8_t d)
 	__attribute((nonnull));
+// Assign c as the current client
+void jbwm_set_current_client(struct JBWMClient * restrict c);
 // Assign c to the head of the JBWMClient linked list.
 void jbwm_set_head_client(struct JBWMClient * restrict c);
 void jbwm_toggle_sticky(struct JBWMClient * restrict c) __attribute__((nonnull));
