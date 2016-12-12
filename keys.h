@@ -42,7 +42,7 @@ enum JBWMKeys {
 /* Mixtures of Ctrl, Alt an Escape are used for things like VMWare and
  * XFree86/Cygwin, so the KILL key is an option in the Makefile */
 #ifndef JBWM_KEY_KILL
-#define JBWM_KEY_KILL        XK_q
+enum { JBWM_KEY_KILL = XK_q };
 #endif
 #define JBWM_NUM_KEYS XK_0, XK_1, XK_2, XK_3, XK_4, XK_5, XK_6, XK_7,\
 	XK_8, XK_9
