@@ -116,8 +116,8 @@ jbwm_window_t jbwm_get_root(struct JBWMClient * restrict c)
 static void drag_event_loop(struct JBWMClient * restrict c, const bool resize)
 {
 	Display * d = jbwm_get_display();
-	const int original[] = {c->size.x, c->size.y};
-	int * start = get_mouse_position(d, jbwm_get_root(c));
+	const int * start = get_mouse_position(d, jbwm_get_root(c)),
+		original[] = {c->size.x, c->size.y};
 	const uint8_t b = c->border;
 	for (;;) {
 		int p[2];
