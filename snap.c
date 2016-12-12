@@ -20,19 +20,14 @@ static int_fast16_t sborder(const int_fast16_t xy, const int_fast16_t
 }
 void jbwm_snap_border(struct JBWMClient * restrict c)
 {
-	struct JBWMRectangle * g = &(c->size);
-	/* snap to screen border */
-	const uint8_t b = 2 * c->border;
-	g->x = sborder(g->x, 0 - b);
+	struct JBWMRectangle * restrict g = &(c->size);
+	// snap to screen border
+	g->x = sborder(g->x, 0);
 	const struct JBDim s = jbwm_get_screen(c)->size;
-	g->x = sborder(g->x, g->width - s.width + b);
-	/* Store the font height statically here in order to reduce
-	 * the function call overhead.  */
-	static uint8_t fh;
-	if (!fh)
-		fh = jbwm_get_font_height();
-	g->y = sborder(g->y, 0 - (c->opt.no_title_bar ? 0 : fh));
-	g->y = sborder(g->y, g->height + b - s.height);
+	g->x = sborder(g->x, g->width - s.width);
+	g->y = sborder(g->y, c->opt.no_title_bar ? 0 :
+		-jbwm_get_font_height());
+	g->y = sborder(g->y, g->height - s.height);
 }
 __attribute__ ((const, hot, warn_unused_result))
 static inline int_fast16_t absmin(const int_fast16_t a, const
@@ -43,11 +38,11 @@ static inline int_fast16_t absmin(const int_fast16_t a, const
 __attribute__ ((const, hot, warn_unused_result))
 static int_fast16_t jbwm_snap_dim(const int_fast16_t cxy, const
 	uint_fast16_t cwh, const int_fast16_t cixy, const
-	uint_fast16_t ciwh, const uint8_t border, const int_fast16_t d)
+	uint_fast16_t ciwh, const int_fast16_t d)
 {
 	const int_fast16_t s = cixy + ciwh - cxy, t = cixy - cxy;
-	return  absmin(absmin(absmin(absmin(d, s + border),
-		s - cwh), t - cwh - border), t);
+	return absmin(absmin(absmin(absmin(d, s),
+		s - cwh), t - cwh), t);
 }
 static struct JBDim search(struct JBWMClient * restrict c)
 {
@@ -58,15 +53,14 @@ static struct JBDim search(struct JBWMClient * restrict c)
 		    || (ci->vdesk != c->vdesk))
 			continue;
 		struct JBWMRectangle * gi = &(ci->size);
-		const uint8_t b = c->border;
 		if ((gi->y - c->size.height - c->size.y <= d.x)
 		    && (c->size.y - gi->height - gi->y <= d.x))
 			d.x = jbwm_snap_dim(c->size.x, c->size.width,
-				gi->x, gi->width, b, d.x);
+				gi->x, gi->width, d.x);
 		if ((gi->x - c->size.width - c->size.x <= d.y)
 		    && (c->size.x - gi->width - gi->x <= d.y))
 			d.y = jbwm_snap_dim(c->size.y, c->size.height,
-				gi->y, gi->height, b, d.y);
+				gi->y, gi->height, d.y);
 	}
 	return d;
 }
