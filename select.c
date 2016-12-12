@@ -22,8 +22,7 @@ static void set_state_not_focused(struct JBWMClient * restrict c)
 }
 static bool check_current(struct JBWMClient * restrict c)
 {
-	struct JBWMClient * current =
-		jbwm_get_client_manager()->current;
+	struct JBWMClient * current = jbwm_get_current_client();
 	return current && current != c;
 }
 static void unselect_current(struct JBWMClient * restrict c)
@@ -33,16 +32,18 @@ static void unselect_current(struct JBWMClient * restrict c)
 }
 static void set_border(struct JBWMClient * restrict c)
 {
-	struct JBWMScreen * s = jbwm_get_screen(c);
-	XSetWindowBorder(jbwm_get_display(), c->parent, c->opt.sticky
-		? s->pixels.fc : s->pixels.fg);
+#define PIX(f) jbwm_get_screen(c)->pixels.f
+	XSetWindowBorder(jbwm_get_display(), c->parent,
+		c->opt.sticky ? PIX(fc) : PIX(fg));
+#undef PIX
 }
 static void set_focused(struct JBWMClient * restrict c)
 {
 	Display * d = jbwm_get_display();
 	XInstallColormap(d, c->cmap);
-	XSetInputFocus(d, c->window, RevertToPointerRoot, CurrentTime);
-	jbwm_ewmh_add_state(d, c->window, WM_STATE(FOCUSED));
+	const jbwm_window_t w = c->window;
+	XSetInputFocus(d, w, RevertToPointerRoot, CurrentTime);
+	jbwm_ewmh_add_state(d, w, WM_STATE(FOCUSED));
 }
 static void set_active_window(struct JBWMClient * restrict c)
 {
