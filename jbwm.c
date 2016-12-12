@@ -6,17 +6,14 @@
 #include <stdlib.h>
 #include <stdbool.h>
 #include <unistd.h>
-#include <X11/Xproto.h>
 #ifdef JBWM_USE_XFT
 #include <X11/Xft/Xft.h>
 #endif//JBWM_USE_XFT
 #include "JBWMScreen.h"
-#include "client.h"
 #include "config.h"
 #include "display.h"
 #include "events.h"
 #include "ewmh.h"
-#include "font.h"
 #include "keys.h"
 #include "log.h"
 #include "new.h"
