@@ -22,13 +22,9 @@ static void set_state_not_focused(struct JBWMClient * restrict c)
 }
 static bool check_current(struct JBWMClient * restrict c)
 {
-	struct JBWMClientManager * m = jbwm_get_client_manager();
-	if (m->current) {
-		if (m->current == c)
-			return false;
-		return true;
-	}
-	return false;
+	struct JBWMClient * current =
+		jbwm_get_client_manager()->current;
+	return current && current != c;
 }
 static void unselect_current(struct JBWMClient * restrict c)
 {
@@ -56,12 +52,11 @@ static void set_active_window(struct JBWMClient * restrict c)
 	 * cause a segmentation fault.  */
 	static Window w;
 	w = c->window;
-	struct JBWMClientManager * m = jbwm_get_client_manager();
 #ifdef JBWM_USE_EWMH
 	jbwm_set_property(jbwm_get_display(), jbwm_get_root(c),
 		EWMH_ATOM(ACTIVE_WINDOW), XA_WINDOW, &w, 1);
 #endif//JBWM_USE_EWMH
-	m->current = c;
+	jbwm_get_client_manager()->current = c;
 }
 void jbwm_select_client(struct JBWMClient * restrict c)
 {
