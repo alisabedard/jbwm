@@ -33,7 +33,7 @@ screen.o: screen.c screen.h JBWMClient.h JBWMScreen.h JBDim.h typedef.h \
 select.o: select.c select.h JBWMClient.h JBWMScreen.h JBDim.h typedef.h \
  client.h display.h ewmh_state.h ewmh.h log.h screen.h util.h
 shape.o: shape.c shape.h display.h log.h
-snap.o: snap.c snap.h JBWMClient.h JBWMScreen.h JBDim.h typedef.h \
+snap.o: snap.c snap.h JBDim.h JBWMClient.h JBWMScreen.h typedef.h \
  client.h config.h font.h screen.h
 title_bar.o: title_bar.c title_bar.h display.h ewmh.h ewmh_state.h font.h \
  jbwm.h JBWMScreen.h JBDim.h typedef.h screen.h JBWMClient.h select.h \
