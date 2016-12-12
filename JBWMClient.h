@@ -4,10 +4,10 @@
 // See README for license and other details.
 #ifndef JBWM_CLIENT_STRUCT_H
 #define JBWM_CLIENT_STRUCT_H
-#include "JBWMScreen.h"
 #include <stdbool.h>
 #include <X11/Xutil.h>
 #include "typedef.h"
+struct JBWMScreen;
 struct JBWMClientOptions {
 	bool fullscreen : 1;
 	bool max_horz : 1;

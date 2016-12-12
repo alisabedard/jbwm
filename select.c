@@ -4,6 +4,7 @@
 // See README for license and other details.
 #include "select.h"
 #include <X11/Xatom.h>
+#include "JBWMScreen.h"
 #include "client.h"
 #include "display.h"
 #include "ewmh.h"
