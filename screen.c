@@ -118,6 +118,7 @@ static void drag_event_loop(struct JBWMClient * restrict c, const bool resize)
 	Display * d = jbwm_get_display();
 	const int original[] = {c->size.x, c->size.y};
 	int * start = get_mouse_position(d, jbwm_get_root(c));
+	const uint8_t b = c->border;
 	for (;;) {
 		int p[2];
 		{ // e scope
@@ -130,10 +131,7 @@ static void drag_event_loop(struct JBWMClient * restrict c, const bool resize)
 		}
 		draw_outline(c);
 		do_changes(c, resize, start, original, p);
-		if (c->border)
-			draw_outline(c);
-		else
-			jbwm_move_resize(c);
+		(b ? draw_outline : jbwm_move_resize)(c);
 	}
 }
 void jbwm_drag(struct JBWMClient * restrict c, const bool resize)
