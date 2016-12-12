@@ -4,7 +4,10 @@
 // See README for license and other details.
 #ifndef JBWM_SCREEN_H
 #define JBWM_SCREEN_H
-#include "JBWMClient.h"
+#include <stdbool.h>
+#include "typedef.h"
+struct JBWMClient;
+struct JBWMScreen;
 void jbwm_configure_client(struct JBWMClient * restrict c)
 	__attribute__((nonnull));
 void jbwm_drag(struct JBWMClient * restrict c, const bool resize)
