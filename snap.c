@@ -25,10 +25,11 @@ void jbwm_snap_border(struct JBWMClient * restrict c)
 	// snap to screen border
 	g->x = sborder(g->x, 0);
 	const struct JBDim s = jbwm_get_screen(c)->size;
-	g->x = sborder(g->x, g->width - s.width);
+	const uint8_t b = c->border * 2;
+	g->x = sborder(g->x, g->width - s.width + b);
 	g->y = sborder(g->y, c->opt.no_title_bar ? 0 :
-		-jbwm_get_font_height());
-	g->y = sborder(g->y, g->height - s.height);
+		- jbwm_get_font_height());
+	g->y = sborder(g->y, g->height - s.height + b);
 }
 /* Definition of this as an inline function guarantees no side-effects
  * and minimizes over-expansion (the full expansion of jbwm_snap_dim
