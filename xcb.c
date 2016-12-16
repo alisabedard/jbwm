@@ -79,28 +79,28 @@ pixel_t jb_get_rgb_pixel(xcb_connection_t * x, const xcb_colormap_t cm,
 	free(rpl);
 	return p;
 }
-pixel_t jb_set_fg(xcb_connection_t * x, const xcb_gc_t gc, const pixel_t p)
+pixel_t jb_set_fg(xcb_connection_t * x, const xcb_gcontext_t gc, const pixel_t p)
 {
 	xcb_change_gc(x, gc, XCB_GC_FOREGROUND, &(uint32_t){p});
 	return p;
 }
-pixel_t jb_set_bg(xcb_connection_t * x, const xcb_gc_t gc, const pixel_t p)
+pixel_t jb_set_bg(xcb_connection_t * x, const xcb_gcontext_t gc, const pixel_t p)
 {
 	xcb_change_gc(x, gc, XCB_GC_BACKGROUND, &(uint32_t){p});
 	return p;
 }
-static pixel_t jb_set_named_color(xcb_connection_t * xc, const xcb_gc_t gc,
+static pixel_t jb_set_named_color(xcb_connection_t * xc, const xcb_gcontext_t gc,
 	const char * color, const bool is_fg)
 {
 	return (is_fg ? jb_set_fg : jb_set_bg)(xc, gc,
 		jb_get_pixel(xc, jb_get_default_colormap(xc), color));
 }
-pixel_t jb_set_named_fg(xcb_connection_t * xc, const xcb_gc_t gc,
+pixel_t jb_set_named_fg(xcb_connection_t * xc, const xcb_gcontext_t gc,
 	const char * color)
 {
 	return jb_set_named_color(xc, gc, color, true);
 }
-pixel_t jb_set_named_bg(xcb_connection_t * xc, const xcb_gc_t gc,
+pixel_t jb_set_named_bg(xcb_connection_t * xc, const xcb_gcontext_t gc,
 	const char * color)
 {
 	return jb_set_named_color(xc, gc, color, false);
@@ -135,7 +135,7 @@ xcb_colormap_t jb_get_default_colormap(xcb_connection_t * xc)
 }
 /* Create a gc with foreground and background as specified.
    If gc is passed as 0, a new gc value is generated and returned.  */
-xcb_gc_t jb_create_gc(xcb_connection_t * xc, xcb_gc_t gc,
+xcb_gcontext_t jb_create_gc(xcb_connection_t * xc, xcb_gcontext_t gc,
 	const xcb_window_t win, const char * restrict fg,
 	const char * restrict bg)
 {

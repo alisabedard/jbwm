@@ -9,7 +9,7 @@ typedef uint32_t pixel_t;
 void jb_check_x(xcb_connection_t * x);
 /* Create a gc with foreground and background as specified.
    If gc is passed as 0, a new gc value is generated and returned.  */
-xcb_gc_t jb_create_gc(xcb_connection_t * xc, xcb_gc_t gc,
+xcb_gcontext_t jb_create_gc(xcb_connection_t * xc, xcb_gcontext_t gc,
 	const xcb_window_t win, const char * restrict fg,
 	const char * restrict bg);
 xcb_atom_t jb_get_atom(xcb_connection_t * x, const char * name);
@@ -29,13 +29,13 @@ bool jb_next_event_timed(xcb_connection_t * x,
 // Open font specified by name.  initialized fid must be supplied
 bool jb_open_font(xcb_connection_t * xc, xcb_font_t fid,
 	const char * name);
-pixel_t jb_set_bg(xcb_connection_t * x, const xcb_gc_t gc, const pixel_t p);
-pixel_t jb_set_fg(xcb_connection_t * x, const xcb_gc_t gc, const pixel_t p);
+pixel_t jb_set_bg(xcb_connection_t * x, const xcb_gcontext_t gc, const pixel_t p);
+pixel_t jb_set_fg(xcb_connection_t * x, const xcb_gcontext_t gc, const pixel_t p);
 void jb_set_icon_name(xcb_connection_t * xc, const xcb_window_t win,
 	char * name);
-pixel_t jb_set_named_bg(xcb_connection_t * xc, const xcb_gc_t gc,
+pixel_t jb_set_named_bg(xcb_connection_t * xc, const xcb_gcontext_t gc,
 	const char * color);
-pixel_t jb_set_named_fg(xcb_connection_t * xc, const xcb_gc_t gc,
+pixel_t jb_set_named_fg(xcb_connection_t * xc, const xcb_gcontext_t gc,
 	const char * color);
 void jb_set_window_name(xcb_connection_t * xc, const xcb_window_t win,
 	char * name);
