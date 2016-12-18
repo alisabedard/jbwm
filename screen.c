@@ -28,14 +28,14 @@
 #endif//!DEBUG_SCREEN
 enum {JBWMMouseMask=(ButtonPressMask|ButtonReleaseMask|PointerMotionMask)};
 __attribute__ ((hot,nonnull))
-static void draw_outline(struct JBWMClient * restrict c)
+static void draw_outline(Display * d, struct JBWMClient * restrict c)
 {
 	const uint8_t o = c->opt.no_title_bar ? 0 : jbwm_get_font_height();
 	const struct JBWMScreen * s = jbwm_get_screen(c);
 	const struct JBWMRectangle * g = &c->size;
 	const uint8_t b = c->border;
 	XRectangle r = {g->x, g->y - o, g->width + b, g->height + b + o};
-	XDrawRectangles(jbwm_get_display(), s->root, s->gc, &r, 1);
+	XDrawRectangles(d, s->root, s->gc, &r, 1);
 }
 __attribute__((nonnull))
 void jbwm_configure_client(struct JBWMClient * restrict c)
@@ -125,9 +125,12 @@ static void drag_event_loop(struct JBWMClient * restrict c, const bool resize)
 			p[1] = (int)e.xmotion.y;
 		}
 		if (b)
-			draw_outline(c);
+			draw_outline(d, c);
 		do_changes(c, resize, start, original, p);
-		(b ? draw_outline : jbwm_move_resize)(c);
+		if (b)
+			draw_outline(d, c);
+		else
+			jbwm_move_resize(c);
 	}
 }
 static void warp_corner(Display * d, struct JBWMClient * restrict c)
@@ -146,7 +149,7 @@ void jbwm_drag(struct JBWMClient * restrict c, const bool resize)
 		warp_corner(d, c);
 	drag_event_loop(c, resize);
 	if (c->border)
-		draw_outline(c);
+		draw_outline(d, c);
 	XUngrabPointer(d, CurrentTime);
 	jbwm_move_resize(c);
 }
