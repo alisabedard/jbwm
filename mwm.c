@@ -7,6 +7,7 @@
 #include "display.h"
 #include "log.h"
 #include "util.h"
+//#define ENABLE_NO_RESIZE
 // These are MWM-specific hints
 enum MwmFlags {
 // flags:
@@ -50,8 +51,10 @@ static void do_functions(struct JBWMClientOptions * o,
 	   common than Motif applications today, defer to behavior
 	   which works with both.  */
 #ifdef JBWM_NO_QT_FIX
+#ifdef ENABLE_NO_RESIZE
 	if (!(f & MWM_FUNC_RESIZE))
 		o->no_resize = true;
+#endif//ENABLE_NO_RESIZE
 	if (!(f & MWM_FUNC_MINIMIZE))
 		o->no_min = true;
 	if (!(f & MWM_FUNC_CLOSE))
@@ -69,8 +72,10 @@ static void do_decorations(struct JBWMClientOptions * o,
 	const enum MwmDecor f)
 {
 	o->no_border=!(f & MWM_DECOR_BORDER);
+#ifdef ENABLE_NO_RESIZE
 	if (!(f & MWM_DECOR_RESIZEH))
 		o->no_resize = true;
+#endif//ENABLE_NO_RESIZE
 	if (!(f & MWM_DECOR_MENU))
 		o->no_close = true;
 	if (!(f & MWM_DECOR_MINIMIZE))
