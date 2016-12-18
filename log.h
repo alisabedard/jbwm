@@ -14,4 +14,4 @@
 #else//!DEBUG
 #define JBWM_LOG(...)
 #endif//DEBUG
-#endif /* JBWM_LOG_H */
+#endif//!JBWM_LOG_H

@@ -2,7 +2,10 @@
 // Copyright 2008-2016, Jeffrey E. Bedard <jefbed@gmail.com>
 // Copyright 1999-2015, Ciaran Anscomb <jbwm@6809.org.uk>
 // See README for license and other details.
+#define LOG_LEVEL 5
+#if LOG_LEVEL == 0
 #undef DEBUG
+#endif//LOG_LEVEL
 #include "events.h"
 #include <stdlib.h>
 #include <X11/Xatom.h>
@@ -21,6 +24,11 @@
 #include "title_bar.h"
 #include "util.h"
 #include "wm_state.h"
+#if LOG_LEVEL > 7
+#define ELOG(...) JBWM_LOG(__VA_ARGS__)
+#else//LOG_LEVEL<=6
+#define ELOG(...)
+#endif//LOG_LEVEL>7
 static bool events_need_cleanup;
 static Window last_window;
 __attribute__((pure))
@@ -88,12 +96,15 @@ static void handle_property_change(XPropertyEvent * e,
 }
 static void handle_configure_request(XConfigureRequestEvent * e)
 {
+#if LOG_LEVEL > 4
 	JBWM_LOG("handle_configure_request():"
 		"x: %d, y: %d, w: %d, h: %d",
 		e->x, e->y, e->width, e->height);
+#endif//LOG_LEVEL
 	XConfigureWindow(e->display, e->window, e->value_mask,
 		&(XWindowChanges){ .x = e->x, .y = e->y,
 		.width = e->width, .height = e->height,
+		.border_width = e->border_width,
 		.sibling = e->above, .stack_mode = e->detail});
 }
 static void handle_map_request(XMapRequestEvent * e)
@@ -109,7 +120,9 @@ static void handle_map_request(XMapRequestEvent * e)
 }
 static inline void mark_removal(struct JBWMClient * restrict c)
 {
+#if LOG_LEVEL > 4
 	JBWM_LOG("mark_removal(): ignore_unmap is %d", c->ignore_unmap);
+#endif//LOG_LEVEL
 	c->opt.remove = events_need_cleanup = (c->ignore_unmap--<1);
 }
 static void handle_colormap_notify(struct JBWMClient * restrict c,
@@ -124,7 +137,7 @@ void jbwm_event_loop(Display * d)
 	for (;;) {
 		XEvent ev;
 		XNextEvent(d, &ev);
-		struct JBWMClient * restrict c = jbwm_get_client(ev.xany.window);
+		struct JBWMClient * c = jbwm_get_client(ev.xany.window);
 		switch (ev.type) {
 		case ButtonRelease:
 		case KeyRelease:
@@ -134,7 +147,7 @@ void jbwm_event_loop(Display * d)
 			// ignore
 			break;
 		case ConfigureNotify:
-			JBWM_LOG("ConfigureNotify");
+			ELOG("ConfigureNotify");
 			/* Failure to do this causes Java Swing
 			 * applications to first appear offset within
 			 * the parent window until they receive a
@@ -143,15 +156,17 @@ void jbwm_event_loop(Display * d)
 				jbwm_move_resize(c);
 			break;
 		case ReparentNotify:
-			JBWM_LOG("ReparentNotify");
+			ELOG("ReparentNotify");
 			/* Reset last_window to allow other clients
 			 * with the same window id to be started.  */
 			last_window = 0;
 			break;
 		case KeyPress:
+			ELOG("KeyPress");
 			jbwm_handle_key_event(&ev.xkey);
 			break;
 		case ButtonPress:
+			ELOG("ButtonPress");
 			if(c)
 				jbwm_handle_button_event(&ev.xbutton, c);
 			break;
@@ -167,18 +182,18 @@ void jbwm_event_loop(Display * d)
 #endif//JBWM_USE_TITLE_BAR
 #ifdef JBWM_USE_EWMH
 		case CreateNotify:
-			JBWM_LOG("CreateNotify");
+			ELOG("CreateNotify");
 			if (ev.xcreatewindow.override_redirect) // internal
 				jbwm_ewmh_update_client_list(d);
 			break;
 		case DestroyNotify:
-			JBWM_LOG("DestroyNotify");
+			ELOG("DestroyNotify");
 			if (!c) // only bother if event was not on a client
 				jbwm_ewmh_update_client_list(d);
 			break;
 #endif//JBWM_USE_EWMH
 		case UnmapNotify:
-			JBWM_LOG("UnmapNotify");
+			ELOG("UnmapNotify");
 			if (c)
 				mark_removal(c);
 			break;
@@ -201,10 +216,10 @@ void jbwm_event_loop(Display * d)
 			jbwm_ewmh_handle_client_message(&ev.xclient, c);
 			break;
 #endif//JBWM_USE_EWMH
-#ifdef DEBUG
+#if LOG_LEVEL > 3
 		default:
 			JBWM_LOG("Unhandled event %d", ev.type);
-#endif//DEBUG
+#endif//LOG_LEVEL
 		}
 		if (events_need_cleanup)
 			cleanup();
