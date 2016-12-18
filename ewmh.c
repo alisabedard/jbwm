@@ -2,7 +2,7 @@
 // Copyright 2008-2016, Jeffrey E. Bedard <jefbed@gmail.com>
 // Copyright 1999-2015, Ciaran Anscomb <jbwm@6809.org.uk>
 // See README for license and other details.
-#undef DEBUG
+//#undef DEBUG
 #include "ewmh.h"
 #include <string.h>
 #include <unistd.h>
@@ -177,12 +177,16 @@ void jbwm_ewmh_init_screen(struct JBWMScreen * s)
 	init_desktops(s);
 	s->supporting = init_supporting(d, r);
 }
+// Required by wm-spec:
 void jbwm_set_frame_extents(struct JBWMClient * restrict c)
 {
 	JBWM_LOG("jbwm_set_frame_extents()");
 	// Fields: left, right, top, bottom
-	const uint8_t b = c->border, t = c->opt.no_title_bar ? b :
-		jbwm_get_font_height();
-	wprop(jbwm_get_display(), c->window, JBWM_EWMH_FRAME_EXTENTS,
-		XA_CARDINAL, (uint32_t[]){b, b, t, b}, 4);
+	static uint32_t f[4];
+	const uint8_t b = c->border;
+	f[0] = f[1] = f[2] = f[3] = b;
+	if (!c->opt.no_title_bar)
+		f[2] += jbwm_get_font_height();
+	wprop(jbwm_get_display(), c->parent,
+		JBWM_EWMH_FRAME_EXTENTS, XA_CARDINAL, f, 4);
 }

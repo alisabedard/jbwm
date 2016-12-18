@@ -156,13 +156,14 @@ void jbwm_drag(struct JBWMClient * restrict c, const bool resize)
 void jbwm_move_resize(struct JBWMClient * restrict c)
 {
 	JBWM_LOG("jbwm_move_resize");
-	const uint8_t offset = c->opt.no_title_bar || c->opt.fullscreen
+	struct JBWMClientOptions * restrict o = &c->opt;
+	const uint8_t offset = o->no_title_bar || o->fullscreen
 		? 0 : jbwm_get_font_height();
-	{ // * d , * g scope
-		Display * d = jbwm_get_display();
+	Display * d = jbwm_get_display();
+	{ //* g scope
 		struct JBWMRectangle * g = &c->size;
-		XMoveResizeWindow(d, c->parent, g->x, g->y - offset, g->width,
-			g->height + offset);
+		XMoveResizeWindow(d, c->parent, g->x, g->y - offset,
+			g->width, g->height + offset);
 		XMoveResizeWindow(d, c->window, 0, offset,
 			g->width, g->height);
 	}
@@ -170,7 +171,12 @@ void jbwm_move_resize(struct JBWMClient * restrict c)
 		jbwm_update_title_bar(c);
 	} // Skip shaped and fullscreen clients.
 	jbwm_set_shape(c);
-	jbwm_set_frame_extents(c);
+#if 0
+	if (!o->frame_extents_set) {
+		jbwm_set_frame_extents(c);
+		o->frame_extents_set = true;
+	}
+#endif
 	jbwm_configure_client(c);
 }
 #ifdef JBWM_USE_EWMH

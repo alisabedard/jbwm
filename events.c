@@ -2,7 +2,7 @@
 // Copyright 2008-2016, Jeffrey E. Bedard <jefbed@gmail.com>
 // Copyright 1999-2015, Ciaran Anscomb <jbwm@6809.org.uk>
 // See README for license and other details.
-#define LOG_LEVEL 5
+#define LOG_LEVEL 8
 #if LOG_LEVEL == 0
 #undef DEBUG
 #endif//LOG_LEVEL
@@ -98,8 +98,8 @@ static void handle_configure_request(XConfigureRequestEvent * e)
 {
 #if LOG_LEVEL > 4
 	JBWM_LOG("handle_configure_request():"
-		"x: %d, y: %d, w: %d, h: %d",
-		e->x, e->y, e->width, e->height);
+		"x: %d, y: %d, w: %d, h: %d, b: %d",
+		e->x, e->y, e->width, e->height, e->border_width);
 #endif//LOG_LEVEL
 	XConfigureWindow(e->display, e->window, e->value_mask,
 		&(XWindowChanges){ .x = e->x, .y = e->y,
@@ -147,13 +147,13 @@ void jbwm_event_loop(Display * d)
 			// ignore
 			break;
 		case ConfigureNotify:
-			ELOG("ConfigureNotify");
-			/* Failure to do this causes Java Swing
-			 * applications to first appear offset within
-			 * the parent window until they receive a
-			 * click.  This is a fix: */
-			if (c)
+			if (c && !ev.xconfigure.override_redirect)
 				jbwm_move_resize(c);
+			break;
+		case ConfigureRequest:
+			handle_configure_request(&ev.xconfigurerequest);
+			XSync(d, false);
+			if (c) jbwm_move_resize(c);
 			break;
 		case ReparentNotify:
 			ELOG("ReparentNotify");
@@ -200,9 +200,6 @@ void jbwm_event_loop(Display * d)
 		case MapRequest:
 			if (!c)
 				handle_map_request(&ev.xmaprequest);
-			break;
-		case ConfigureRequest:
-			handle_configure_request(&ev.xconfigurerequest);
 			break;
 		case PropertyNotify:
 			if (c)

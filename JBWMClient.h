@@ -24,7 +24,7 @@ struct JBWMClientOptions {
 	bool shaped : 1;
 	bool sticky : 1;
 	bool tearoff : 1;
-	bool pad : 1;
+	bool pad0 : 1;
 } __attribute__((packed));
 #ifdef JBWM_USE_TITLE_BAR
 struct JBWMClientTitlebar {

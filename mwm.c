@@ -60,8 +60,10 @@ static void do_functions(struct JBWMClientOptions * o,
 	if (!(f & MWM_FUNC_CLOSE))
 		o->no_close = true;
 #endif//JBWM_NO_QT_FIX
+#ifdef ENABLE_NO_MAX
 	if (!(f & MWM_FUNC_MAXIMIZE))
 		o->no_max = true;
+#endif//ENABLE_NO_MAX
 	if (!(f & MWM_FUNC_MOVE))
 		o->no_move = true;
 	JBWM_LOG("MWM_HINTS_FUNCTIONS\topts: %d, %d, %d, %d, %d",

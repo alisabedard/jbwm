@@ -170,6 +170,8 @@ static void reparent(struct JBWMClient * restrict c)
 	XAddToSaveSet(d, w);
 	XReparentWindow(d, w, p, 0, 0);
 	XMapWindow(d, w);
+	// Required by wm-spec:
+	jbwm_set_frame_extents(c);
 }
 // Allocate the client structure with some defaults set
 static struct JBWMClient * get_JBWMClient(const Window w,
