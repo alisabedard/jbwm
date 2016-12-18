@@ -22,17 +22,17 @@
 #include "util.h"
 #include "wm_state.h"
 static bool events_need_cleanup;
-static jbwm_window_t last_window;
+static Window last_window;
 __attribute__((pure))
 static struct JBWMScreen * get_screen(const int8_t i,
-	const jbwm_window_t root)
+	const Window root)
 {
 	struct JBWMScreen * s = jbwm_get_screens();
 	return s[i].root == root ? s + i : get_screen(i - 1, root);
 }
 #ifdef JBWM_USE_EWMH
 static void delete_ewmh_properties(Display * d,
-	const jbwm_window_t w)
+	const Window w)
 {
 	// Per ICCCM + wm-spec
 	XDeleteProperty(d, w, jbwm_ewmh_get_atom(JBWM_EWMH_WM_STATE));
@@ -45,7 +45,7 @@ void jbwm_free_client(struct JBWMClient * restrict c)
 {
 	Display * d = jbwm_get_display();
 	{ // w scope
-		const jbwm_window_t w = c->window;
+		const Window w = c->window;
 		delete_ewmh_properties(d, w);
 		{ // * p scope
 			struct JBWMRectangle * p = &c->size;
@@ -100,7 +100,7 @@ static void handle_map_request(XMapRequestEvent * e)
 {
 	/* This check fixes a race condition in old libreoffice and certain
 	   Motif dialogs where an attempt is made to request mapping twice: */
-	const jbwm_window_t w = e->window;
+	const Window w = e->window;
 	if (w == last_window)
 		return;
 	last_window = w;

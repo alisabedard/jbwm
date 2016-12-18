@@ -15,10 +15,10 @@
 #include "wm_state.h"
 // Remove specified atom from WM_STATE
 void jbwm_ewmh_remove_state(Display * d,
-	const jbwm_window_t w, const jbwm_atom_t state)
+	const Window w, const Atom state)
 {
 	uint16_t n;
-	const jbwm_atom_t ws = jbwm_ewmh_get_atom(JBWM_EWMH_WM_STATE);
+	const Atom ws = jbwm_ewmh_get_atom(JBWM_EWMH_WM_STATE);
 	Atom *a = jbwm_get_property(d, w, ws, &n);
 	if (!a)
 		return;
@@ -30,7 +30,7 @@ void jbwm_ewmh_remove_state(Display * d,
 	XFree(a);
 }
 static bool ewmh_get_state(Display * d,
-	const jbwm_window_t w, const jbwm_atom_t state)
+	const Window w, const Atom state)
 {
 	uint16_t n;
 	Atom *a = jbwm_get_property(d, w,
@@ -44,8 +44,8 @@ static bool ewmh_get_state(Display * d,
 	}
 	return found;
 }
-void jbwm_ewmh_add_state(Display * d, const jbwm_window_t w,
-	jbwm_atom_t state)
+void jbwm_ewmh_add_state(Display * d, const Window w,
+	Atom state)
 {
 	XChangeProperty(d, w, jbwm_ewmh_get_atom(JBWM_EWMH_WM_STATE),
 		XA_ATOM, 32, PropModePrepend,
@@ -201,7 +201,7 @@ static void debug_client_message(XClientMessageEvent * e)
 void jbwm_ewmh_handle_client_message(XClientMessageEvent * e,
 	struct JBWMClient * restrict c)
 {
-	const jbwm_atom_t t = e->message_type;
+	const Atom t = e->message_type;
 	debug_client_message(e);
 	if(c && client_specific_message(e, c, t))
 		  return;

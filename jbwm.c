@@ -120,7 +120,7 @@ void jbwm_error(const char * msg)
 	print(1, "\n");
 	exit(1);
 }
-static void setup_event_listeners(const jbwm_window_t root)
+static void setup_event_listeners(const Window root)
 {
 	XChangeWindowAttributes(jbwm_get_display(), root, CWEventMask,
 		&(XSetWindowAttributes){.event_mask =
@@ -142,7 +142,7 @@ static void allocate_colors(struct JBWMScreen * s)
 	s->pixels.stick = jbwm_get_pixel(d, n, getenv(JBWM_ENV_STICK));
 #endif//JBWM_USE_TITLE_BAR
 }
-static bool check_redirect(const jbwm_window_t w)
+static bool check_redirect(const Window w)
 {
 	XWindowAttributes a;
 	XGetWindowAttributes(jbwm_get_display(), w, &a);
@@ -154,19 +154,19 @@ static bool check_redirect(const jbwm_window_t w)
 	return (!a.override_redirect && (a.map_state == IsViewable));
 }
 // Free returned data with XFree()
-static jbwm_window_t * get_windows(const jbwm_window_t root,
+static Window * get_windows(const Window root,
 	uint16_t * win_count)
 {
 	Window * w, d;
 	unsigned int n;
 	XQueryTree(jbwm_get_display(), root, &d, &d, &w, &n);
 	*win_count = n;
-	return (jbwm_window_t *)w;
+	return (Window *)w;
 }
 static void setup_clients(struct JBWMScreen * s)
 {
 	uint16_t n;
-	jbwm_window_t * w = get_windows(s->root, &n);
+	Window * w = get_windows(s->root, &n);
 	JBWM_LOG("Started with %d clients", n);
 	while (n--)
 		if (check_redirect(w[n])) {

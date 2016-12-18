@@ -67,7 +67,7 @@ void jbwm_set_client_vdesk(struct JBWMClient * restrict c, const uint8_t d)
 	jbwm_set_vdesk(s, p);
 }
 static inline bool matches(struct JBWMClient * i,
-	const jbwm_window_t w)
+	const Window w)
 {
 #ifdef JBWM_USE_TITLE_BAR
 	return i->parent == w || i->window == w || i->tb.win == w;
@@ -77,13 +77,13 @@ static inline bool matches(struct JBWMClient * i,
 }
 __attribute__((hot,pure))
 static struct JBWMClient * search(struct JBWMClient * restrict c,
-	const jbwm_window_t w)
+	const Window w)
 {
 	return (!c || matches(c, w)) ? c : search(c->next, w);
 }
 // Return the client that has specified window as either window or parent
 __attribute__((hot,pure))
-struct JBWMClient * jbwm_get_client(const jbwm_window_t w)
+struct JBWMClient * jbwm_get_client(const Window w)
 {
 	return search(head, w);
 }

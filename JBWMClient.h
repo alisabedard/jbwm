@@ -5,8 +5,8 @@
 #ifndef JBWM_CLIENT_STRUCT_H
 #define JBWM_CLIENT_STRUCT_H
 #include <stdbool.h>
+#include <stdint.h>
 #include <X11/Xutil.h>
-#include "typedef.h"
 struct JBWMScreen;
 struct JBWMClientOptions {
 	bool fullscreen : 1;
@@ -28,7 +28,7 @@ struct JBWMClientOptions {
 } __attribute__((packed));
 #ifdef JBWM_USE_TITLE_BAR
 struct JBWMClientTitlebar {
-	jbwm_window_t win, close, resize, shade, stick;
+	Window win, close, resize, shade, stick;
 };
 #endif//JBWM_USE_TITLE_BAR
 struct JBWMRectangle {
@@ -40,8 +40,8 @@ struct JBWMClient {
 #ifdef JBWM_USE_TITLE_BAR
 	struct JBWMClientTitlebar tb;
 #endif//JBWM_USE_TITLE_BAR
-	jbwm_cmap_t cmap;
-	jbwm_window_t window, parent;
+	Colormap cmap;
+	Window window, parent;
 	struct JBWMClientOptions opt;
 	int8_t ignore_unmap:3;
 	uint8_t border:1;

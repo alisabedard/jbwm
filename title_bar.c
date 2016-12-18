@@ -46,7 +46,7 @@ void jbwm_toggle_shade(struct JBWMClient * restrict c)
 	(c->opt.shaded ? set_not_shaded : set_shaded)(c);
 	jbwm_update_title_bar(c);
 }
-static uint16_t mv(Display * d, const jbwm_window_t w, uint16_t x)
+static uint16_t mv(Display * d, const Window w, uint16_t x)
 {
 	if (w) {
 		x -= jbwm_get_font_height();
@@ -60,17 +60,17 @@ static void move_buttons(Display * d,
 {
 	mv(d, t->stick, mv(d, t->shade, mv(d, t->resize, width)));
 }
-static jbwm_window_t get_win(Display * d, const Window p,
+static Window get_win(Display * d, const Window p,
 	const jbwm_pixel_t bg)
 {
 	uint8_t h = jbwm_get_font_height();
 	return XCreateSimpleWindow(d, p, 0, 0, h, h, 0, 0, bg);
 }
-static jbwm_window_t new_title_bar(struct JBWMClient * restrict c)
+static Window new_title_bar(struct JBWMClient * restrict c)
 {
 	const struct JBWMPixels * p = &jbwm_get_screen(c)->pixels;
 	Display * d = jbwm_get_display();
-	const jbwm_window_t t = c->tb.win = get_win(d, c->parent, p->bg);
+	const Window t = c->tb.win = get_win(d, c->parent, p->bg);
 	XSelectInput(d, t, ExposureMask);
 	struct JBWMClientOptions * o = &c->opt;
 	c->tb.close = o->no_close ? 0 : get_win(d, t, p->close);
@@ -108,7 +108,7 @@ draw_xft(struct JBWMClient * restrict c, const XPoint * p,
 #endif//JBWM_USE_XFT
 // Free result with XFree if not NULL
 __attribute__((pure))
-static char * jbwm_get_title(Display * d, const jbwm_window_t w)
+static char * jbwm_get_title(Display * d, const Window w)
 {
 	XTextProperty tp;
 	if (!XGetWMName(d, w, &tp))
@@ -143,7 +143,7 @@ void jbwm_update_title_bar(struct JBWMClient * restrict c)
 {
 	if (c->opt.shaped)
 		return;
-	jbwm_window_t w = c->tb.win;
+	Window w = c->tb.win;
 	if (c->opt.fullscreen && w) {
 		remove_title_bar(c);
 		return;

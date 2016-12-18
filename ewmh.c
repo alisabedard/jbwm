@@ -18,7 +18,7 @@
 #include "macros.h"
 #include "util.h"
 static Atom jbwm_ewmh[JBWM_EWMH_ATOMS_COUNT];
-jbwm_atom_t jbwm_ewmh_get_atom(const uint8_t index)
+Atom jbwm_ewmh_get_atom(const uint8_t index)
 {
 	return jbwm_ewmh[index];
 }
@@ -67,8 +67,8 @@ static void jbwm_ewmh_init(Display * d)
 	};
 	XInternAtoms(d, atom_names, JBWM_EWMH_ATOMS_COUNT, false, jbwm_ewmh);
 }
-static inline void wprop(Display * d, const jbwm_window_t win,
-	const enum JBWMAtomIndex i, const jbwm_atom_t type,
+static inline void wprop(Display * d, const Window win,
+	const enum JBWMAtomIndex i, const Atom type,
 	void * data, const uint16_t size)
 {
 	jbwm_set_property(d, win, jbwm_ewmh[i], type, data, size);
@@ -110,7 +110,7 @@ void jbwm_ewmh_update_client_list(Display * d)
 	get_ordered_client_list(d);
 }
 void jbwm_ewmh_set_allowed_actions(Display * d,
-	const jbwm_window_t w)
+	const Window w)
 {
 	Atom a[] = {
 		jbwm_ewmh[JBWM_EWMH_WM_ALLOWED_ACTIONS],
@@ -130,7 +130,7 @@ void jbwm_ewmh_set_allowed_actions(Display * d,
 static void init_desktops(struct JBWMScreen * s)
 {
 	Display * d = jbwm_get_display();
-	const jbwm_window_t r = s->r;
+	const Window r = s->r;
 	enum {INT=XA_CARDINAL, WIN=XA_WINDOW};
 	wprop(d, r, JBWM_EWMH_DESKTOP_GEOMETRY, INT, &s->size, 2);
 	wprop(d, r, JBWM_EWMH_CURRENT_DESKTOP, INT, &s->vdesk, 1);
@@ -141,20 +141,20 @@ static void init_desktops(struct JBWMScreen * s)
 	/* Pass the address of the field within s to keep scope.  */
 	wprop(d, r, JBWM_EWMH_VIRTUAL_ROOTS, WIN, &s->r, 1);
 }
-static void set_name(Display * d, const jbwm_window_t w)
+static void set_name(Display * d, const Window w)
 {
 	wprop(d, w, JBWM_EWMH_WM_NAME, XA_STRING, JBWM_NAME,
 		sizeof(JBWM_NAME));
 }
-static void set_supporting(Display * d, const jbwm_window_t w,
-	jbwm_window_t * s)
+static void set_supporting(Display * d, const Window w,
+	Window * s)
 {
 	wprop(d, w, JBWM_EWMH_SUPPORTING_WM_CHECK, XA_WINDOW, s, 1);
 }
-static jbwm_window_t init_supporting(Display * d,
-	const jbwm_window_t r)
+static Window init_supporting(Display * d,
+	const Window r)
 {
-	jbwm_window_t w = XCreateSimpleWindow(d, r, 0, 0, 1, 1, 0, 0, 0);
+	Window w = XCreateSimpleWindow(d, r, 0, 0, 1, 1, 0, 0, 0);
 	set_supporting(d, r, &w);
 	set_supporting(d, w, &w);
 	wprop(d, w, JBWM_EWMH_WM_PID, XA_CARDINAL, &(pid_t){getpid()}, 1);
@@ -166,7 +166,7 @@ void jbwm_ewmh_init_screen(struct JBWMScreen * s)
 	Display * d = jbwm_get_display();
 	if (!jbwm_ewmh[0])
 		jbwm_ewmh_init(d);
-	jbwm_window_t r = s->root;
+	Window r = s->root;
 	wprop(d, r, JBWM_EWMH_SUPPORTED, XA_ATOM, jbwm_ewmh,
 		JBWM_EWMH_ATOMS_COUNT);
 	set_name(d, r);

@@ -27,7 +27,7 @@
 #define JBWM_LOG(...)
 #endif//!JBWM_DEBUG_NEW
 #ifdef JBWM_USE_EWMH
-static uint8_t wm_desktop(Display * d, const jbwm_window_t w, uint8_t vdesk)
+static uint8_t wm_desktop(Display * d, const Window w, uint8_t vdesk)
 {
 	uint16_t n;
 	unsigned long *lprop = jbwm_get_property(d, w,
@@ -59,7 +59,7 @@ static uint16_t get_per_min(uint16_t spec, uint16_t min)
 {
 	return (spec >= min) ? spec : min;
 }
-static bool process_size_hints(Display * d, const jbwm_window_t win,
+static bool process_size_hints(Display * d, const Window win,
 	struct JBWMRectangle * g, const uint16_t a_w,
 	const uint16_t a_h)
 {
@@ -166,13 +166,13 @@ static void reparent(struct JBWMClient * restrict c)
 	JBWM_LOG("reparent()");
 	Display * d = jbwm_get_display();
 	jbwm_new_shaped_client(c);
-	const jbwm_window_t p = c->parent = get_parent(c), w = c->window;
+	const Window p = c->parent = get_parent(c), w = c->window;
 	XAddToSaveSet(d, w);
 	XReparentWindow(d, w, p, 0, 0);
 	XMapWindow(d, w);
 }
 // Allocate the client structure with some defaults set
-static struct JBWMClient * get_JBWMClient(const jbwm_window_t w,
+static struct JBWMClient * get_JBWMClient(const Window w,
 	struct JBWMScreen * s)
 {
 	struct JBWMClient * restrict c = malloc(sizeof(struct JBWMClient));
@@ -182,14 +182,14 @@ static struct JBWMClient * get_JBWMClient(const jbwm_window_t w,
 	return c;
 }
 // Grab input and setup JBWM_USE_EWMH for client window
-static void do_grabs(Display * d, const jbwm_window_t w)
+static void do_grabs(Display * d, const Window w)
 {
 	XSelectInput(d, w, EnterWindowMask
 		| PropertyChangeMask | ColormapChangeMask);
 	jbwm_grab_window_keys(d, w);
 	jbwm_ewmh_set_allowed_actions(d, w);
 }
-void jbwm_new_client(struct JBWMScreen * s, const jbwm_window_t w)
+void jbwm_new_client(struct JBWMScreen * s, const Window w)
 {
 	JBWM_LOG("jbwm_new_client(..., w: %d)", (int)w);
 	struct JBWMClient * restrict c = get_JBWMClient(w, s);

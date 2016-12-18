@@ -3,7 +3,7 @@
 #define JBWM_WM_STATE_H
 #include "JBWMClient.h"
 // Return WM_STATE atom
-jbwm_atom_t jbwm_get_wm_state(Display * d);
+Atom jbwm_get_wm_state(Display * d);
 // Send WM_DELETE message to the client
 void jbwm_send_wm_delete(struct JBWMClient * restrict c)
 	__attribute__((nonnull));

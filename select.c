@@ -38,7 +38,7 @@ static void set_focused(struct JBWMClient * restrict c)
 {
 	Display * d = jbwm_get_display();
 	XInstallColormap(d, c->cmap);
-	const jbwm_window_t w = c->window;
+	const Window w = c->window;
 	XSetInputFocus(d, w, RevertToPointerRoot, CurrentTime);
 	jbwm_ewmh_add_state(d, w, WM_STATE(FOCUSED));
 }

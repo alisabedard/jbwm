@@ -5,8 +5,8 @@
 #include "util.h"
 #include "jbwm.h"
 #include <stdbool.h>
-void jbwm_set_property(Display * d, const jbwm_window_t win,
-	const jbwm_atom_t property, const jbwm_atom_t type,
+void jbwm_set_property(Display * d, const Window win,
+	const Atom property, const Atom type,
 	void * data, uint16_t size)
 {
 	if (!d || !data)
@@ -25,7 +25,7 @@ jbwm_pixel_t jbwm_get_pixel(Display * dpy,
 	return c.pixel;
 }
 __attribute__((warn_unused_result))
-void *jbwm_get_property(Display * dpy, jbwm_window_t w,
+void *jbwm_get_property(Display * dpy, Window w,
 	Atom property, uint16_t * num_items)
 {
 	unsigned char * prop;
@@ -39,7 +39,7 @@ void *jbwm_get_property(Display * dpy, jbwm_window_t w,
 	*num_items = n;
 	return prop;
 }
-void jbwm_grab_button(Display * d, const jbwm_window_t w,
+void jbwm_grab_button(Display * d, const Window w,
 	const unsigned int mask, const unsigned int btn)
 {
 	XGrabButton(d, btn, mask, w, false,

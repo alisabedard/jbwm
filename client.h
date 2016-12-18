@@ -4,10 +4,11 @@
 // See README for license and other details.
 #ifndef JBWM_CLIENT_H
 #define JBWM_CLIENT_H
-#include "typedef.h"
+#include <stdint.h>
+#include <X11/Xlib.h>
 struct JBWMClient;
 // Search for the JBWMClient matching the specified window
-struct JBWMClient * jbwm_get_client(jbwm_window_t w)
+struct JBWMClient * jbwm_get_client(Window w)
 	__attribute__((hot,pure));
 // Get the client with input focus.
 struct JBWMClient * jbwm_get_current_client(void);

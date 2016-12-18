@@ -40,7 +40,7 @@ static void draw_outline(struct JBWMClient * restrict c)
 __attribute__((nonnull))
 void jbwm_configure_client(struct JBWMClient * restrict c)
 {
-	const jbwm_window_t w = c->window;
+	const Window w = c->window;
 	struct JBWMRectangle * g = &c->size;
 	XSendEvent(jbwm_get_display(), w, true, StructureNotifyMask, (XEvent *)
 		&(XConfigureEvent){.x = g->x, .y = g->y, .width = g->width,
@@ -48,7 +48,7 @@ void jbwm_configure_client(struct JBWMClient * restrict c)
 		.window = w, .above = c->parent, .override_redirect = true,
 		.border_width = c->border});
 }
-static void grab_pointer(Display * d, const jbwm_window_t w)
+static void grab_pointer(Display * d, const Window w)
 {
 	static Cursor c;
 	if (!c)
@@ -104,7 +104,7 @@ struct JBWMScreen * jbwm_get_screen(struct JBWMClient * restrict c)
 {
 	return jbwm_get_screens() + c->screen;
 }
-jbwm_window_t jbwm_get_root(struct JBWMClient * restrict c)
+Window jbwm_get_root(struct JBWMClient * restrict c)
 {
 	return jbwm_get_screen(c)->root;
 }
@@ -173,8 +173,8 @@ void jbwm_move_resize(struct JBWMClient * restrict c)
 #ifdef JBWM_USE_EWMH
 static void showing(struct JBWMClient * restrict c,
 	int (* mapping)(Display *, Window),
-	void (* ewmh_add_remove_state)(Display * , jbwm_window_t,
-	jbwm_atom_t), const int8_t wm_state)
+	void (* ewmh_add_remove_state)(Display * , Window,
+	Atom), const int8_t wm_state)
 {
 	Display * d = jbwm_get_display();
 	mapping(d, c->parent);

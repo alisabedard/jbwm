@@ -13,7 +13,7 @@ Display * jbwm_get_display(void)
 {
 	return display;
 }
-static void cleanup(const jbwm_window_t w)
+static void cleanup(const Window w)
 {
 	struct JBWMClient * restrict c = jbwm_get_client(w);
 	if (c) // match found

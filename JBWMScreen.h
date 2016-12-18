@@ -7,7 +7,7 @@
 #include <stdint.h>
 #include <X11/Xlib.h>
 #include "JBDim.h"
-#include "typedef.h"
+#include "pixel_t.h"
 struct JBWMPixels {
 	jbwm_pixel_t fg, bg, fc;
 #ifdef JBWM_USE_TITLE_BAR
@@ -17,10 +17,10 @@ struct JBWMPixels {
 struct JBWMScreen {
 	GC gc;
 	union {
-		jbwm_window_t root, r;
+		Window root, r;
 	};
 #ifdef JBWM_USE_EWMH
-	jbwm_window_t supporting;
+	Window supporting;
 #endif//JBWM_USE_EWMH
 	struct JBWMPixels pixels;
 	struct JBDim size;
