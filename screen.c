@@ -171,12 +171,6 @@ void jbwm_move_resize(struct JBWMClient * restrict c)
 		jbwm_update_title_bar(c);
 	} // Skip shaped and fullscreen clients.
 	jbwm_set_shape(c);
-#if 0
-	if (!o->frame_extents_set) {
-		jbwm_set_frame_extents(c);
-		o->frame_extents_set = true;
-	}
-#endif
 	jbwm_configure_client(c);
 }
 #ifdef JBWM_USE_EWMH
