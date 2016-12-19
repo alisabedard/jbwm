@@ -157,7 +157,7 @@ void jbwm_move_resize(struct JBWMClient * restrict c)
 		? 0 : jbwm_get_font_height();
 	Display * d = jbwm_get_display();
 	{ //* g scope
-		struct JBWMRectangle * g = &c->size;
+		struct JBWMRectangle * restrict g = &c->size;
 		XMoveResizeWindow(d, c->parent, g->x, g->y - offset,
 			g->width, g->height + offset);
 		XMoveResizeWindow(d, c->window, 0, offset,
