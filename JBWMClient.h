@@ -7,34 +7,14 @@
 #include <stdbool.h>
 #include <stdint.h>
 #include <X11/Xutil.h>
+#include "JBWMClientOptions.h"
+#include "JBWMRectangle.h"
 struct JBWMScreen;
-struct JBWMClientOptions {
-	bool fullscreen : 1;
-	bool max_horz : 1;
-	bool max_vert : 1;
-	bool no_border : 1;
-	bool no_close : 1;
-	bool no_max : 1;
-	bool no_min : 1;
-	bool no_move : 1;
-	bool no_resize : 1;
-	bool no_title_bar : 1;
-	bool remove : 1;
-	bool shaded : 1;
-	bool shaped : 1;
-	bool sticky : 1;
-	bool tearoff : 1;
-	bool pad0 : 1;
-} __attribute__((packed));
 #ifdef JBWM_USE_TITLE_BAR
 struct JBWMClientTitlebar {
 	Window win, close, resize, shade, stick;
 };
 #endif//JBWM_USE_TITLE_BAR
-struct JBWMRectangle {
-	int16_t x, y;
-	uint16_t width, height;
-};
 struct JBWMClient {
 	struct JBWMClient * next;
 #ifdef JBWM_USE_TITLE_BAR
