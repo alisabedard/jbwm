@@ -2,6 +2,7 @@
 // Copyright 2008-2016, Jeffrey E. Bedard <jefbed@gmail.com>
 // Copyright 1999-2015, Ciaran Anscomb <jbwm@6809.org.uk>
 // See README for license and other details.
+//#undef DEBUG
 #include "screen.h"
 #include <stdlib.h>
 #include <X11/cursorfont.h>
@@ -16,16 +17,12 @@
 #include "font.h"
 #include "JBDim.h"
 #include "jbwm.h"
+#include "log.h"
 #include "shape.h"
 #include "snap.h"
 #include "title_bar.h"
 #include "util.h"
 #include "wm_state.h"
-//#define DEBUG_SCREEN
-#ifndef DEBUG_SCREEN
-#undef JBWM_LOG
-#define JBWM_LOG(...)
-#endif//!DEBUG_SCREEN
 enum {JBWMMouseMask=(ButtonPressMask|ButtonReleaseMask|PointerMotionMask)};
 __attribute__ ((hot,nonnull))
 static void draw_outline(Display * d, struct JBWMClient * restrict c)
