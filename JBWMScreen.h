@@ -6,7 +6,7 @@
 #define JBWM_JBWMSCREEN_H
 #include <stdint.h>
 #include <X11/Xlib.h>
-#include "JBDim.h"
+#include "JBWMSize.h"
 #include "pixel_t.h"
 struct JBWMPixels {
 	jbwm_pixel_t fg, bg, fc;
@@ -23,7 +23,7 @@ struct JBWMScreen {
 	Window supporting;
 #endif//JBWM_USE_EWMH
 	struct JBWMPixels pixels;
-	struct JBDim size;
+	struct JBWMSize size;
 	uint8_t screen, vdesk;
 } __attribute__((packed));
 #endif//!JBWM_JBWMSCREEN_H

@@ -80,19 +80,19 @@ static void check_max_size(uint16_t * dim, const uint16_t scr_dim)
 	*dim = JB_MIN(*dim, scr_dim);
 }
 static void check_dimensions(struct JBWMRectangle * g,
-	const struct JBDim s)
+	const struct JBWMSize s)
 {
-	check_max_size(&g->width, s.w);
-	check_max_size(&g->height, s.h);
+	check_max_size(&g->width,s.width);
+	check_max_size(&g->height,s.height);
 }
 static int16_t get_center(const uint16_t wh, const uint16_t swh)
 {
 	return (swh >> 1) - (wh >> 1);
 }
-static void center(struct JBWMRectangle * g, const struct JBDim s)
+static void center(struct JBWMRectangle * g, const struct JBWMSize s)
 {
-	g->x = get_center(g->width, s.w);
-	g->y = get_center(g->height, s.h);
+	g->x = get_center(g->width,s.width);
+	g->y = get_center(g->height,s.height);
 }
 // returns true if window is viewable
 static bool get_window_attributes(struct JBWMClient * restrict c,
@@ -131,7 +131,7 @@ static void init_geometry(struct JBWMClient * restrict c)
 	const bool pos = process_size_hints(jbwm_get_display(), c->window, g,
 		a_geo.width, a_geo.height);
 	{ // scr_sz scope
-		const struct JBDim scr_sz = jbwm_get_screen(c)->size;
+		const struct JBWMSize scr_sz = jbwm_get_screen(c)->size;
 		check_dimensions(g, scr_sz);
 		if (pos && (a_geo.x || a_geo.y)) {
 			JBWM_LOG("\t\tPosition is set by hints.");

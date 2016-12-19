@@ -15,7 +15,6 @@
 #include "ewmh_state.h"
 #include "ewmh.h"
 #include "font.h"
-#include "JBDim.h"
 #include "jbwm.h"
 #include "log.h"
 #include "shape.h"

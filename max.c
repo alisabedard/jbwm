@@ -33,7 +33,7 @@ static void set_horz(struct JBWMClient * restrict c)
 	c->old_size.x = c->size.x;
 	c->old_size.width = c->size.width;
 	c->size.x = 0;
-	c->size.width = jbwm_get_screen(c)->size.w;
+	c->size.width = jbwm_get_screen(c)->size.width;
 }
 void jbwm_set_horz(struct JBWMClient * restrict c)
 {
@@ -66,7 +66,7 @@ static void set_vert(struct JBWMClient * restrict c)
 	c->old_size.y = c->size.y;
 	c->old_size.height = c->size.height;
 	c->size.y = 0;
-	c->size.height = jbwm_get_screen(c)->size.h;
+	c->size.height = jbwm_get_screen(c)->size.height;
 	jbwm_ewmh_add_state(jbwm_get_display(), c->window,
 		jbwm_ewmh_get_atom(JBWM_EWMH_WM_STATE_MAXIMIZED_VERT));
 }

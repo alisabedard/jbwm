@@ -183,8 +183,8 @@ static void setup_screen_elements(const uint8_t i)
 	s->vdesk = 0;
 	Display * d = jbwm_get_display();
 	s->root = RootWindow(d, i);
-	s->size.w = DisplayWidth(d, i);
-	s->size.h = DisplayHeight(d, i);
+	s->size.width = DisplayWidth(d, i);
+	s->size.height = DisplayHeight(d, i);
 }
 static void setup_gc(struct JBWMScreen * s)
 {

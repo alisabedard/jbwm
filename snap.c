@@ -5,9 +5,10 @@
 //#undef DEBUG
 #include "snap.h"
 #include <stdlib.h>
-#include "JBDim.h"
+#include "JBWMSize.h"
 #include "JBWMClient.h"
 #include "JBWMDefaults.h"
+#include "JBWMPoint.h"
 #include "JBWMScreen.h"
 #include "client.h"
 #include "font.h"
@@ -24,7 +25,7 @@ void jbwm_snap_border(struct JBWMClient * restrict c)
 	struct JBWMRectangle * restrict g = &(c->size);
 	// snap to screen border
 	g->x = sborder(g->x, 0);
-	const struct JBDim s = jbwm_get_screen(c)->size;
+	const struct JBWMSize s = jbwm_get_screen(c)->size;
 	const uint8_t b = c->border * 2;
 	g->x = sborder(g->x, g->width - s.width + b);
 	g->y = sborder(g->y, c->opt.no_title_bar ? 0 :
@@ -49,9 +50,9 @@ static int jbwm_snap_dim(const int cxy, const int cwh, const int cixy,
 /* Don't use restrict for struct JBWMClient withing this function, as
  * c and ci may alias each other.  It is fine for struct
  * JBWMRectangle.  */
-static struct JBDim search(struct JBWMClient * c)
+static struct JBWMPoint search(struct JBWMClient * c)
 {
-	struct JBDim d = { .x = JBWM_SNAP, .y = JBWM_SNAP };
+	struct JBWMPoint d = {JBWM_SNAP, JBWM_SNAP};
 	for (struct JBWMClient * ci = jbwm_get_head_client();
 		ci; ci = ci->next) {
 		if ((ci == c) || (ci->screen != c->screen)
@@ -73,7 +74,7 @@ void jbwm_snap_client(struct JBWMClient * restrict c)
 {
 	jbwm_snap_border(c);
 	// Snap to other windows:
-	const struct JBDim d = search(c);
+	const struct JBWMPoint d = search(c);
 	if (abs(d.x) < JBWM_SNAP)
 		c->size.x += d.x;
 	if (abs(d.y) < JBWM_SNAP)
