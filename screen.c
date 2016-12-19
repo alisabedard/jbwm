@@ -27,8 +27,8 @@ __attribute__ ((hot,nonnull))
 static void draw_outline(Display * d, struct JBWMClient * restrict c)
 {
 	const uint8_t o = c->opt.no_title_bar ? 0 : jbwm_get_font_height();
-	const struct JBWMScreen * s = jbwm_get_screen(c);
-	const struct JBWMRectangle * g = &c->size;
+	const struct JBWMScreen * restrict s = jbwm_get_screen(c);
+	const struct JBWMRectangle * restrict g = &c->size;
 	const uint8_t b = c->border;
 	XRectangle r = {g->x, g->y - o, g->width + b, g->height + b + o};
 	XDrawRectangles(d, s->root, s->gc, &r, 1);
@@ -38,8 +38,8 @@ void jbwm_configure_client(struct JBWMClient * restrict c)
 {
 	const Window w = c->window;
 	struct JBWMRectangle * g = &c->size;
-	XSendEvent(jbwm_get_display(), w, true, StructureNotifyMask, (XEvent *)
-		&(XConfigureEvent){.x = g->x, .y = g->y, .width = g->width,
+	XSendEvent(jbwm_get_display(), w, true, StructureNotifyMask, (XEvent
+		*) &(XConfigureEvent){.x = g->x, .y = g->y, .width = g->width,
 		.height = g->height, .type = ConfigureNotify, .event = w,
 		.window = w, .above = c->parent, .override_redirect = true,
 		.border_width = c->border});
@@ -155,9 +155,9 @@ void jbwm_move_resize(struct JBWMClient * restrict c)
 	struct JBWMClientOptions * restrict o = &c->opt;
 	const uint8_t offset = o->no_title_bar || o->fullscreen
 		? 0 : jbwm_get_font_height();
-	Display * d = jbwm_get_display();
-	{ //* g scope
+	{ // * d, * g scope
 		struct JBWMRectangle * restrict g = &c->size;
+		Display * d = jbwm_get_display();
 		XMoveResizeWindow(d, c->parent, g->x, g->y - offset,
 			g->width, g->height + offset);
 		XMoveResizeWindow(d, c->window, 0, offset,
