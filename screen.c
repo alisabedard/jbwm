@@ -52,44 +52,41 @@ static void grab_pointer(Display * d, const Window w)
 	XGrabPointer(d, w, false, JBWMMouseMask, GrabModeAsync,
 		GrabModeAsync, None, c, CurrentTime);
 }
-static int * get_mouse_position(Display * restrict d, Window w)
+static int16_t * get_mouse_position(Display * restrict d, Window w)
 {
-	static int p[2];
+	static int16_t q[2];
+	int p[2];
 	int nil;
 	unsigned int unil;
 	XQueryPointer(d, w, &w, &w, p, p + 1, &nil, &nil, &unil);
-	return p;
+	q[0] = p[0];
+	q[1] = p[1];
+	return q;
 }
 static void set_size(struct JBWMClient * restrict c,
-	const int * p)
+	const int16_t * p)
 {
 	struct JBWMRectangle * g = &c->size;
 	g->width = abs(g->x - p[0]);
 	g->height = abs(g->y - p[1]);
 }
-__attribute__((const))
-static int get_diff_factored(const int a, const int b,
-	const int c)
+__attribute__((nonnull,pure,warn_unused_result))
+static int get_diff(const uint8_t i, const int16_t * original,
+	const int16_t * start, const int16_t * p)
 {
-	return a - b + c;
-}
-__attribute__((nonnull,pure))
-static int get_diff(const uint8_t i, const int * original,
-	const int * start, const int * p)
-{
-	return get_diff_factored(original[i], start[i], p[i]);
+	return original[i] - start[i] + p[i];
 }
 static void set_position(struct JBWMClient * restrict c,
-	const int * original, const int * start,
-	const int * p)
+	const int16_t * original, const int16_t * start,
+	const int16_t * p)
 {
 	c->size.x = get_diff(0, original, start, p);
 	c->size.y = get_diff(1, original, start, p);
 	jbwm_snap_client(c);
 }
 static void do_changes(struct JBWMClient * restrict c, const bool resize,
-	const int * start, const int * original,
-	const int * p)
+	const int16_t * start, const int16_t * original,
+	const int16_t * p)
 {
 	if (resize)
 		set_size(c, p);
@@ -107,18 +104,18 @@ Window jbwm_get_root(struct JBWMClient * restrict c)
 static void drag_event_loop(struct JBWMClient * restrict c, const bool resize)
 {
 	Display * d = jbwm_get_display();
-	const int * start = get_mouse_position(d, jbwm_get_root(c)),
+	const int16_t * start = get_mouse_position(d, jbwm_get_root(c)),
 		original[] = {c->size.x, c->size.y};
 	const uint8_t b = c->border;
 	for (;;) {
-		int p[2];
+		int16_t p[2];
 		{ // e scope
 			XEvent e;
 			XMaskEvent(d, JBWMMouseMask, &e);
 			if (e.type != MotionNotify)
 				return;
-			p[0] = (int)e.xmotion.x;
-			p[1] = (int)e.xmotion.y;
+			p[0] = e.xmotion.x;
+			p[1] = e.xmotion.y;
 		}
 		if (b)
 			draw_outline(d, c);
