@@ -48,9 +48,9 @@ static void set_active_window(struct JBWMClient * restrict c)
 	 * client c is freed before the X server handles the event.
 	 * If the property is read after the client is freed, it will
 	 * cause a segmentation fault.  */
+#ifdef JBWM_USE_EWMH
 	static Window w;
 	w = c->window;
-#ifdef JBWM_USE_EWMH
 	jbwm_set_property(jbwm_get_display(), jbwm_get_root(c),
 		EWMH_ATOM(ACTIVE_WINDOW), XA_WINDOW, &w, 1);
 #endif//JBWM_USE_EWMH
