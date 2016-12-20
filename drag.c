@@ -4,9 +4,14 @@
 #include <X11/Xlib.h>
 #include <X11/Xlibint.h>
 #include <X11/Xproto.h>
+#include <X11/Xprotostr.h>
 #include <X11/cursorfont.h>
 #include <stdint.h>
+#include <stdlib.h>
+#include <sys/types.h>
 #include "JBWMClient.h"
+#include "JBWMClientOptions.h"
+#include "JBWMRectangle.h"
 #include "JBWMScreen.h"
 #include "display.h"
 #include "font.h"

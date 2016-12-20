@@ -4,23 +4,25 @@
 // See README for license and other details.
 //#undef DEBUG
 #include "screen.h"
-#include <stdlib.h>
-#include <X11/Xatom.h>
-#include <X11/Xlibint.h>
+#include <X11/Xlib.h>
+#include <X11/Xutil.h>
+#include <stdbool.h>
+#include <X11/Xatom.h> // keep
+#include "JBWMClient.h"
+#include "JBWMClientOptions.h"
 #include "JBWMDefaults.h"
+#include "JBWMRectangle.h"
 #include "JBWMScreen.h"
 #include "client.h"
-#include "config.h"
 #include "display.h"
-#include "ewmh_state.h"
-#include "ewmh.h"
+#include "ewmh_state.h" // keep
+#include "ewmh.h" // keep
 #include "font.h"
 #include "jbwm.h"
 #include "log.h"
 #include "shape.h"
-#include "snap.h"
 #include "title_bar.h"
-#include "util.h"
+#include "util.h" // keep
 #include "wm_state.h"
 __attribute__((nonnull))
 void jbwm_configure_client(struct JBWMClient * restrict c)

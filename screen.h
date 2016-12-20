@@ -4,9 +4,8 @@
 // See README for license and other details.
 #ifndef JBWM_SCREEN_H
 #define JBWM_SCREEN_H
-#include <stdbool.h>
+#include <X11/X.h>
 #include <stdint.h>
-#include <X11/Xlib.h>
 struct JBWMClient;
 struct JBWMScreen;
 void jbwm_configure_client(struct JBWMClient * restrict c)
