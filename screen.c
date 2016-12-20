@@ -25,14 +25,18 @@
 #include "wm_state.h"
 enum {JBWMMouseMask=(ButtonPressMask|ButtonReleaseMask|PointerMotionMask)};
 __attribute__ ((hot,nonnull))
-static void draw_outline(Display * d, struct JBWMClient * restrict c)
+static void draw_outline(Display * dpy, struct JBWMClient * restrict c)
 {
 	const uint8_t o = c->opt.no_title_bar ? 0 : jbwm_get_font_height();
 	const struct JBWMScreen * restrict s = jbwm_get_screen(c);
 	const struct JBWMRectangle * restrict g = &c->size;
 	const uint8_t b = c->border;
-	XRectangle r = {g->x, g->y - o, g->width + b, g->height + b + o};
-	XDrawRectangles(d, s->root, s->gc, &r, 1);
+	xPolyRectangleReq * req;
+	GetReqExtra(PolyRectangle, sizeof(xRectangle), req);
+	req->drawable = s->root;
+	req->gc = s->gc->gid;
+	xRectangle * rect = (xRectangle *) (req + 1);
+	*rect = (xRectangle) {g->x, g->y - o, g->width + b, g->height + b + o};
 }
 __attribute__((nonnull))
 void jbwm_configure_client(struct JBWMClient * restrict c)
@@ -96,7 +100,7 @@ static void query_pointer(Display * dpy, Window w, int16_t * restrict p)
 	xQueryPointerReply rep;
 	xResourceReq * req;
 	GetResReq(QueryPointer, w, req);
-	_XReply(dpy, (xReply *)&rep, 0, xTrue);
+	_XReply(dpy, (xReply *)&rep, 0, true);
 	p[0] = rep.winX;
 	p[1] = rep.winY;
 }
