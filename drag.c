@@ -59,8 +59,9 @@ static void do_changes(struct JBWMClient * restrict c, const bool resize,
 	else // drag
 		set_position(c, original, start, p);
 }
-
-static void query_pointer(Display * dpy, Window w, int16_t * restrict p)
+__attribute__((hot,nonnull))
+static void query_pointer(Display * dpy, const Window w,
+	int16_t * restrict p)
 {
 	xQueryPointerReply rep;
 	xResourceReq * req;
@@ -69,19 +70,20 @@ static void query_pointer(Display * dpy, Window w, int16_t * restrict p)
 	p[0] = rep.winX;
 	p[1] = rep.winY;
 }
-__attribute__ ((hot,nonnull))
+__attribute__((hot,nonnull))
 static void draw_outline(Display * dpy, struct JBWMClient * restrict c)
 {
 	const uint8_t o = c->opt.no_title_bar ? 0 : jbwm_get_font_height();
 	const struct JBWMScreen * restrict s = jbwm_get_screen(c);
 	const struct JBWMRectangle * restrict g = &c->size;
-	const uint8_t b = c->border;
 	xPolyRectangleReq * req;
 	GetReqExtra(PolyRectangle, sizeof(xRectangle), req);
 	req->drawable = s->root;
 	req->gc = s->gc->gid;
 	xRectangle * rect = (xRectangle *) (req + 1);
-	*rect = (xRectangle) {g->x, g->y - o, g->width + b, g->height + b + o};
+	enum { BORDER = 1 };
+	*rect = (xRectangle) {g->x, g->y - o,
+		g->width + BORDER, g->height + BORDER + o};
 }
 static void drag_event_loop(struct JBWMClient * restrict c, const bool resize)
 {
