@@ -51,4 +51,4 @@ title_bar.o: title_bar.c title_bar.h JBWMScreen.h JBWMSize.h pixel_t.h \
  wm_state.h JBWMClient.h JBWMClientOptions.h JBWMRectangle.h
 util.o: util.c util.h pixel_t.h jbwm.h
 wm_state.o: wm_state.c wm_state.h JBWMClient.h JBWMClientOptions.h \
- JBWMRectangle.h display.h log.h util.h pixel_t.h
+ JBWMRectangle.h display.h ewmh.h ewmh_state.h log.h util.h pixel_t.h

@@ -2,6 +2,8 @@
 #include "wm_state.h"
 #include <X11/Xatom.h>
 #include "display.h"
+#include "ewmh.h"
+#include "ewmh_state.h"
 #include "log.h"
 #include "util.h"
 // Returns 0 on failure.
@@ -38,8 +40,18 @@ Atom jbwm_get_wm_state(Display * d)
 void jbwm_set_wm_state(struct JBWMClient * restrict c, const int8_t state)
 {
 	Display * d = jbwm_get_display();
-	jbwm_set_property(d, c->window, jbwm_get_wm_state(d),
-		XA_CARDINAL, &(uint32_t){state}, 1);
+	const Window w = c->window;
+	jbwm_set_property(d, w, jbwm_get_wm_state(d), XA_CARDINAL,
+		&(uint32_t){state}, 1);
+#ifdef JBWM_USE_EWMH
+	static Atom a;
+	if (!a)
+		a = jbwm_ewmh_get_atom(JBWM_EWMH_WM_STATE_HIDDEN);
+	if (state == IconicState)
+		jbwm_ewmh_add_state(d, w, a);
+	else
+		jbwm_ewmh_remove_state(d, w, a);
+#endif//JBWM_USE_EWMH
 }
 static bool has_delete_proto(Display * d, const Window w)
 {

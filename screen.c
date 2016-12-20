@@ -63,27 +63,6 @@ void jbwm_move_resize(struct JBWMClient * restrict c)
 	jbwm_set_shape(c);
 	jbwm_configure_client(c);
 }
-#ifdef JBWM_USE_EWMH
-static void showing(struct JBWMClient * restrict c,
-	int (* mapping)(Display *, Window),
-	void (* ewmh_add_remove_state)(Display * , Window,
-	Atom), const int8_t wm_state)
-{
-	Display * d = jbwm_get_display();
-	mapping(d, c->parent);
-	jbwm_set_wm_state(c, wm_state);
-	ewmh_add_remove_state(d, c->window,
-		jbwm_ewmh_get_atom(JBWM_EWMH_WM_STATE_HIDDEN));
-}
-void jbwm_hide_client(struct JBWMClient * restrict c)
-{
-	showing(c, XUnmapWindow, jbwm_ewmh_add_state, IconicState);
-}
-void jbwm_restore_client(struct JBWMClient * restrict c)
-{
-	showing(c, XMapWindow, jbwm_ewmh_remove_state, NormalState);
-}
-#else//!JBWM_USE_EWMH
 static void showing(struct JBWMClient * restrict c,
 	int (* mapping)(Display *, Window),
 	const int8_t wm_state)
@@ -100,7 +79,6 @@ void jbwm_restore_client(struct JBWMClient * restrict c)
 {
 	showing(c, XMapWindow, NormalState);
 }
-#endif//JBWM_USE_EWMH
 static void check_visibility(struct JBWMScreen * s,
 	struct JBWMClient * restrict c, const uint8_t v)
 {
