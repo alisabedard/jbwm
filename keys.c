@@ -10,6 +10,7 @@
 #include "client.h"
 #include "config.h"
 #include "display.h"
+#include "drag.h"
 #include "jbwm.h"
 #include "log.h"
 #include "max.h"

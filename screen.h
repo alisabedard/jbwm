@@ -11,8 +11,6 @@ struct JBWMClient;
 struct JBWMScreen;
 void jbwm_configure_client(struct JBWMClient * restrict c)
 	__attribute__((nonnull));
-void jbwm_drag(struct JBWMClient * restrict c, const bool resize)
-	__attribute__((nonnull));
 Window jbwm_get_root(struct JBWMClient * restrict c);
 struct JBWMScreen * jbwm_get_screen(struct JBWMClient * restrict c);
 void jbwm_hide_client(struct JBWMClient * restrict c) __attribute__((nonnull));

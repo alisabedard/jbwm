@@ -5,6 +5,7 @@
 #include "JBWMScreen.h"
 #include "client.h"
 #include "display.h"
+#include "drag.h"
 #include "ewmh.h"
 #include "jbwm.h"
 #include "log.h"

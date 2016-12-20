@@ -6,6 +6,7 @@
 #include "button_event.h"
 #include "JBWMClient.h"
 #include "client.h"
+#include "drag.h"
 #include "log.h"
 #include "screen.h"
 #include "title_bar.h"
