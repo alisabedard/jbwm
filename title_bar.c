@@ -8,6 +8,7 @@
 #include "config.h"
 #include <X11/Xft/Xft.h>
 #endif//JBWM_USE_XFT
+#include <string.h>
 #include "JBWMScreen.h"
 #include "display.h"
 #include "ewmh.h"
@@ -123,9 +124,7 @@ static void draw_title(struct JBWMClient * restrict c)
 		return; // No title could be loaded, abort
 	const XPoint p = { jbwm_get_font_height() + 4,
 		jbwm_get_font_ascent()};
-	size_t l = 0; // strlen
-	while(name[++l])
-		  ;
+	const size_t l = strlen(name);
 #ifdef JBWM_USE_XFT
 	draw_xft(c, &p, name, l);
 #else//!JBWM_USE_XFT

@@ -5,6 +5,7 @@
 #include "jbwm.h"
 #include <stdlib.h>
 #include <stdbool.h>
+#include <string.h>
 #include <unistd.h>
 #ifdef JBWM_USE_XFT
 #include <X11/Xft/Xft.h>
@@ -38,9 +39,7 @@ __attribute__((warn_unused_result))
 static uint16_t parse_modifiers(char * arg)
 {
 	JBWM_LOG("parse_modifiers()");
-	size_t s = 0; // strlen
-	while(arg[++s])
-		  ;
+	const size_t s = strlen(arg);
 	if (s > 3) { // switch based on the 4th character
 		switch(arg[3]) {
 		case 'f': // shift
