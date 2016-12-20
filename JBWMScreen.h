@@ -16,9 +16,7 @@ struct JBWMPixels {
 };
 struct JBWMScreen {
 	GC gc;
-	union {
-		Window root, r;
-	};
+	Window root;
 #ifdef JBWM_USE_EWMH
 	Window supporting;
 #endif//JBWM_USE_EWMH
