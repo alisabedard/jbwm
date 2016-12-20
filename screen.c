@@ -7,6 +7,7 @@
 #include <stdlib.h>
 #include <X11/cursorfont.h>
 #include <X11/Xatom.h>
+#include <X11/Xlibint.h>
 #include "JBWMDefaults.h"
 #include "JBWMScreen.h"
 #include "client.h"
@@ -52,17 +53,6 @@ static void grab_pointer(Display * d, const Window w)
 	XGrabPointer(d, w, false, JBWMMouseMask, GrabModeAsync,
 		GrabModeAsync, None, c, CurrentTime);
 }
-static int16_t * get_mouse_position(Display * restrict d, Window w)
-{
-	static int16_t q[2];
-	int p[2];
-	int nil;
-	unsigned int unil;
-	XQueryPointer(d, w, &w, &w, p, p + 1, &nil, &nil, &unil);
-	q[0] = p[0];
-	q[1] = p[1];
-	return q;
-}
 static void set_size(struct JBWMClient * restrict c,
 	const int16_t * p)
 {
@@ -101,12 +91,22 @@ Window jbwm_get_root(struct JBWMClient * restrict c)
 {
 	return jbwm_get_screen(c)->root;
 }
+static void query_pointer(Display * dpy, Window w, int16_t * restrict p)
+{
+	xQueryPointerReply rep;
+	xResourceReq * req;
+	GetResReq(QueryPointer, w, req);
+	_XReply(dpy, (xReply *)&rep, 0, xTrue);
+	p[0] = rep.winX;
+	p[1] = rep.winY;
+}
 static void drag_event_loop(struct JBWMClient * restrict c, const bool resize)
 {
 	Display * d = jbwm_get_display();
-	const int16_t * start = get_mouse_position(d, jbwm_get_root(c)),
-		original[] = {c->size.x, c->size.y};
 	const uint8_t b = c->border;
+	const int16_t original[] = {c->size.x, c->size.y};
+	int16_t start[2];
+	query_pointer(d, jbwm_get_root(c), start);
 	for (;;) {
 		int16_t p[2];
 		{ // e scope
