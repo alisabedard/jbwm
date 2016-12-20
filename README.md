@@ -9,7 +9,7 @@
 * *EWMH* support if wanted
 * *Window shading* with title bar
 * Code cleanups, simpler UI and key bindings
-* Use of C11 features where possible.
+* Use of C99 features where possible.
 
 ## DIRECTION
 Though jbwm features small size, its main design goal is practical usefulness.
