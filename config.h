@@ -7,12 +7,7 @@
 /* Note:  Also, adjust the values in JBWMDefaults.h as necessary.  */
 #define JBWM_DEF_TERM "xterm"
 /* Default fonts */
-#ifdef JBWM_USE_XFT
-//#define JBWM_DEF_FONT "Sans:size=10:aspect=1.25:weight=medium"
 #define JBWM_DEF_FONT "Sans:size=10:aspect=1.2"
-#else /* ! JBWM_USE_XFT */
-#define JBWM_DEF_FONT "variable"
-#endif /* JBWM_USE_XFT */
 /* Default colors */
 #define JBWM_DEF_FG "#ddd"
 #define JBWM_DEF_FC "#8f8"

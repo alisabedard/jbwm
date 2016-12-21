@@ -2,15 +2,18 @@
 // Copyright 2008-2016, Jeffrey E. Bedard <jefbed@gmail.com>
 // Copyright 1999-2015, Ciaran Anscomb <jbwm@6809.org.uk>
 // See README for license and other details.
+//#undef DEBUG
 #include "jbwm.h"
-#include <stdlib.h>
+#include <X11/X.h>
+#include <X11/Xlib.h>
 #include <stdbool.h>
+#include <stdint.h>
+#include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
-#ifdef JBWM_USE_XFT
-#include <X11/Xft/Xft.h>
-#endif//JBWM_USE_XFT
 #include "JBWMScreen.h"
+#include "JBWMSize.h"
 #include "config.h"
 #include "display.h"
 #include "events.h"
@@ -19,22 +22,12 @@
 #include "log.h"
 #include "new.h"
 #include "util.h"
-//#define DEBUG_JBWM
-#ifndef DEBUG_JBWM
-#undef JBWM_LOG
-#define JBWM_LOG(...)
-#endif//!DEBUG_JBWM
 // Macros:
 #define ENV(e) JBWM_ENV_##e
 static struct JBWMScreen * screens;
 struct JBWMScreen * jbwm_get_screens(void)
 {
 	return screens;
-}
-static void print(const size_t sz, const char * buf)
-{
-	if (write(1, buf, sz) == -1)
-		abort();
 }
 /* Used for overriding the default WM modifiers */
 __attribute__((warn_unused_result))
@@ -69,6 +62,7 @@ static void parse_argv(uint8_t argc, char **argv)
 	JBWM_LOG("parse_argv(%d,%s...)", argc, argv[0]);
 	static const char optstring[] = "1:2:b:d:F:f:hs:Vv";
 	int8_t opt;
+#define OVERRIDE(x) setenv(ENV(x), optarg, 1);
 	while((opt=getopt(argc, argv, optstring)) != -1)
 		switch (opt) {
 		case '1':
@@ -78,47 +72,33 @@ static void parse_argv(uint8_t argc, char **argv)
 			jbwm_set_mod_mask(parse_modifiers(optarg));
 			break;
 		case 'b':
-			setenv(JBWM_ENV_BG, optarg, 1);
+			OVERRIDE(BG);
 			break;
 		case 'd':
-			setenv(JBWM_ENV_DISPLAY, optarg, 1);
+			OVERRIDE(DISPLAY);
 			break;
 		case 'F':
-			setenv(JBWM_ENV_FONT, optarg, 1);
+			OVERRIDE(FONT);
 			break;
 		case 'f':
-			setenv(JBWM_ENV_FG, optarg, 1);
+			OVERRIDE(FG);
 			break;
 		case 's':
-			setenv(JBWM_ENV_FC, optarg, 1);
+			OVERRIDE(FC);
 			break;
 		case 'V':
 		case 'v':
-			goto version;
+			printf("%s version %s\n", argv[0], VERSION);
+			exit(0);
 		default:
-			goto usage;
+			printf("%s -[%s]\n", argv[0], optstring);
+			exit(1);
 		}
-	return;
-usage: {
-		size_t l = 0;
-		while (argv[0][++l]);
-		print(l, *argv);
-		print(4, " -[");
-		print(sizeof(optstring), optstring);
-		print(2, "]\n");
-       }
-version:
-	print(sizeof(VERSION), VERSION);
-	print(1, "\n");
-	exit(0);
 }
 __attribute__((noreturn))
 void jbwm_error(const char * msg)
 {
-	size_t count = 0;
-	while (msg[++count]);
-	print(count, msg);
-	print(1, "\n");
+	perror(msg);
 	exit(1);
 }
 static void allocate_colors(Display * d, struct JBWMScreen * restrict s)

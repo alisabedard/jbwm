@@ -11,19 +11,17 @@ DEBUG=false
 EWMH=true
 SHAPE=true
 TBAR=true
-XFT=true
 while getopts 'adestx' opt; do
 	case $opt in
-	a) EWMH=false SHAPE=false TBAR=false XFT=false ;;
+	a) EWMH=false SHAPE=false TBAR=false ;;
 	d) DEBUG=true ;;
 	e) EWMH=false ;;
 	s) SHAPE=false ;;
 	t) TBAR=false ;;
-	x) XFT=false ;;
 	?) for line in '-a disable all' \
 		'-d enable debugging' '-e disable EWMH' \
-		'-s disable SHAPE' '-t disable title bars' \
-		'-x disable XFT'; do echo $line; done ;;
+		'-s disable SHAPE' '-t disable title bars'; \
+	do echo $line; done ;;
 	esac
 done
 case $OS in
@@ -67,7 +65,4 @@ if $SHAPE; then
 fi
 if $TBAR; then
 	echo 'include title_bar.mk' >> $CF
-fi
-if $XFT; then
-	echo 'include xft.mk' >> $CF
 fi

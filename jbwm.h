@@ -4,7 +4,6 @@
 // See README for license and other details.
 #ifndef JBWM_JBWM_H
 #define JBWM_JBWM_H
-struct JBWMScreen;
 __attribute__((noreturn))
 void jbwm_error(const char * msg);
 struct JBWMScreen * jbwm_get_screens(void);

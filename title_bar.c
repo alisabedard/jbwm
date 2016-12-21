@@ -4,12 +4,10 @@
 // See README for license and other details.
 #include "title_bar.h"
 #include <X11/Xatom.h>
-#ifdef JBWM_USE_XFT
-#include "config.h"
 #include <X11/Xft/Xft.h>
-#endif//JBWM_USE_XFT
 #include <string.h>
 #include "JBWMScreen.h"
+#include "config.h"
 #include "display.h"
 #include "ewmh.h"
 #include "ewmh_state.h"
@@ -83,9 +81,8 @@ static Window new_title_bar(struct JBWMClient * restrict c)
 	jbwm_grab_button(d, t, 0, AnyButton);
 	return t;
 }
-#ifdef JBWM_USE_XFT
 static void
-draw_xft(struct JBWMClient * restrict c, const XPoint * p,
+draw_xft(struct JBWMClient * restrict c, const int16_t * restrict p,
 	char * name, const size_t l)
 {
 	XftFont * f = jbwm_get_font();
@@ -100,13 +97,12 @@ draw_xft(struct JBWMClient * restrict c, const XPoint * p,
 	/* Prevent the text from going over the resize button.  */
 	const uint16_t max_width = c->size.width
 		- 3 * jbwm_get_font_height();
-	XftDrawStringUtf8(xd, &color, f, p->x, p->y,
+	XftDrawStringUtf8(xd, &color, f, p[0], p[1],
 		(XftChar8 *) name, e.width > max_width
 		&& e.width > 0 ? l * max_width / e.width : l);
 	XftDrawDestroy(xd);
 	XftColorFree(d, v, c->cmap, &color);
 }
-#endif//JBWM_USE_XFT
 // Free result with XFree if not NULL
 __attribute__((pure))
 static char * jbwm_get_title(Display * d, const Window w)
@@ -122,14 +118,10 @@ static void draw_title(struct JBWMClient * restrict c)
 	char * name = jbwm_get_title(d, c->window);
 	if(!name)
 		return; // No title could be loaded, abort
-	const XPoint p = { jbwm_get_font_height() + 4,
+	const int16_t p[] = {jbwm_get_font_height() + 4,
 		jbwm_get_font_ascent()};
 	const size_t l = strlen(name);
-#ifdef JBWM_USE_XFT
-	draw_xft(c, &p, name, l);
-#else//!JBWM_USE_XFT
-	XDrawString(d, c->tb.win, jbwm_get_screen(c)->gc, p.x, p.y, name, l);
-#endif//JBWM_USE_XFT
+	draw_xft(c, p, name, l);
 	XFree(name);
 }
 static void remove_title_bar(struct JBWMClient * restrict c)
