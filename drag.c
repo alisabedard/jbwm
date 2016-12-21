@@ -59,6 +59,16 @@ static void do_changes(struct JBWMClient * restrict c, const bool resize,
 	else // drag
 		set_position(c, original, start, p);
 }
+void jbwm_warp(Display * dpy, const Window w, const int16_t x,
+	const int16_t y)
+{
+	xWarpPointerReq * req;
+	GetReq(WarpPointer, req);
+	req->srcWid = None;
+	req->dstWid = w;
+	req->dstX = x;
+	req->dstY = y;
+}
 __attribute__((nonnull))
 static void query_pointer(Display * dpy, const Window w,
 	int16_t * restrict p)
@@ -111,11 +121,6 @@ static void drag_event_loop(struct JBWMClient * restrict c, const bool resize)
 			jbwm_move_resize(c);
 	}
 }
-static void warp_corner(Display * d, struct JBWMClient * restrict c)
-{
-	XWarpPointer(d, None, c->window, 0, 0, 0, 0,
-		c->size.width, c->size.height);
-}
 /* Drag the specified client.  Resize the client if resize is true.  */
 void jbwm_drag(struct JBWMClient * restrict c, const bool resize)
 {
@@ -124,8 +129,10 @@ void jbwm_drag(struct JBWMClient * restrict c, const bool resize)
 	if (resize && (c->opt.no_resize || c->opt.shaded))
 		return;
 	grab_pointer(d, jbwm_get_root(c));
-	if (resize)
-		warp_corner(d, c);
+	if (resize) {
+		struct JBWMRectangle * restrict g = &c->size;
+		jbwm_warp(d, c->window, g->width, g->height);
+	}
 	drag_event_loop(c, resize);
 	if (c->border)
 		draw_outline(d, c);

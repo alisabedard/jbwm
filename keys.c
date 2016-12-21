@@ -47,7 +47,7 @@ static void point(struct JBWMClient * restrict c,
 {
 	Display * d = jbwm_get_display();
 	XRaiseWindow(d, c->parent);
-	XWarpPointer(d, None, c->window, 0, 0, 0, 0, x, y);
+	jbwm_warp(d, c->window, x, y);
 }
 __attribute__((nonnull))
 static void commit_key_move(struct JBWMClient * restrict c)
@@ -64,13 +64,13 @@ __attribute__((nonnull))
 static void key_move(struct JBWMClient * restrict c,
 	const struct KeyMoveFlags f)
 {
-	const int8_t d = f.pos ? JBWM_RESIZE_INCREMENT
-		: -JBWM_RESIZE_INCREMENT;
+	enum { I = JBWM_RESIZE_INCREMENT };
+	const int8_t d = f.pos ? I : - I;
 	struct JBWMRectangle * s = &c->size;
 	uint16_t * wh = f.horz ? &s->width : &s->height;
 	int16_t * xy = f.horz ? &s->x : &s->y;
-	if(f.mod && (*wh > JBWM_RESIZE_INCREMENT << 1)
-		&& !c->opt.shaped && !c->opt.no_resize)
+	struct JBWMClientOptions * restrict o = &c->opt;
+	if(f.mod && (*wh > I << 1) && !o->shaped && !o->no_resize)
 		*wh += d;
 	else
 		*xy += d;
