@@ -29,12 +29,8 @@ bug is reported.
 ## INSTALLATION
 Edit configuration options in Makefile and config.h, then build:
 ```sh
+	$ ./configure
 	$ make
-	# make install
-```
-On OpenBSD (bundled GCC is too old):
-```sh
-	$ make CC=clang
 	# make install
 ```
 
