@@ -7,19 +7,20 @@
 #include "log.h"
 #include "util.h"
 // Returns 0 on failure.
-static Status xmsg(Display * d, const Window w,
+static Status xmsg(Display * restrict d, const Window w,
 	const Atom a, const long x)
 {
 	JBWM_LOG("xmsg");
 	XClientMessageEvent e = { .type = ClientMessage, .window = w,
 		.message_type = a, .format = 32 };
+	// Split initialization to avoid old gcc warnings.
 	long * restrict l = e.data.l;
 	l[0] = x;
 	l[1] = CurrentTime;
 	return XSendEvent(d, w, false, NoEventMask, (XEvent *)&e);
 }
-static Atom get_atom(Display * d,
-	Atom * a, const char * name)
+static Atom get_atom(Display * restrict d,
+	Atom * restrict a, const char * restrict name)
 {
 	return *a ? *a : (*a = XInternAtom(d, name, false));
 }
@@ -77,5 +78,5 @@ void jbwm_send_wm_delete(struct JBWMClient * restrict c)
 	c->opt.remove = true;
 	has_delete_proto(d, w) ? xmsg(d, w, get_wm_protocols(d),
 		get_wm_delete_window(d)) : XKillClient(d, w);
-	XFlush(d); // do it now
+	XSync(d, false); // Process everything now.
 }
