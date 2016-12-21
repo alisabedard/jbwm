@@ -14,9 +14,11 @@ static Status xmsg(Display * restrict d, const Window w,
 	XClientMessageEvent e = { .type = ClientMessage, .window = w,
 		.message_type = a, .format = 32 };
 	// Split initialization to avoid old gcc warnings.
-	long * restrict l = e.data.l;
-	l[0] = x;
-	l[1] = CurrentTime;
+	{ // * l scope
+		long * restrict l = e.data.l;
+		l[0] = x;
+		l[1] = CurrentTime;
+	}
 	return XSendEvent(d, w, false, NoEventMask, (XEvent *)&e);
 }
 static Atom get_atom(Display * restrict d,
