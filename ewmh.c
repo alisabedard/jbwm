@@ -112,18 +112,13 @@ void jbwm_ewmh_update_client_list(Display * d)
 void jbwm_ewmh_set_allowed_actions(Display * d,
 	const Window w)
 {
+#define EWMHWM(a) jbwm_ewmh[JBWM_EWMH_WM_##a]
+#define ACTION(a) EWMHWM(ACTION_##a)
 	Atom a[] = {
-		jbwm_ewmh[JBWM_EWMH_WM_ALLOWED_ACTIONS],
-		jbwm_ewmh[JBWM_EWMH_WM_ACTION_MOVE],
-		jbwm_ewmh[JBWM_EWMH_WM_ACTION_RESIZE],
-		jbwm_ewmh[JBWM_EWMH_WM_ACTION_CLOSE],
-		jbwm_ewmh[JBWM_EWMH_WM_ACTION_SHADE],
-		jbwm_ewmh[JBWM_EWMH_WM_ACTION_FULLSCREEN],
-		jbwm_ewmh[JBWM_EWMH_WM_ACTION_CHANGE_DESKTOP],
-		jbwm_ewmh[JBWM_EWMH_WM_ACTION_ABOVE],
-		jbwm_ewmh[JBWM_EWMH_WM_ACTION_BELOW],
-		jbwm_ewmh[JBWM_EWMH_WM_ACTION_MAXIMIZE_HORZ],
-		jbwm_ewmh[JBWM_EWMH_WM_ACTION_MAXIMIZE_VERT]
+		EWMHWM(ALLOWED_ACTIONS),
+		ACTION(MOVE), ACTION(RESIZE), ACTION(CLOSE), ACTION(SHADE),
+		ACTION(FULLSCREEN), ACTION(CHANGE_DESKTOP), ACTION(ABOVE),
+		ACTION(BELOW), ACTION(MAXIMIZE_HORZ), ACTION(MAXIMIZE_VERT)
 	};
 	jbwm_set_property(d, w, a[0], XA_ATOM, &a, sizeof(a) / sizeof(Atom));
 }
