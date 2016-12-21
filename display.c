@@ -40,10 +40,11 @@ static int handle_xerror(Display * dpy __attribute__((unused)),
 		e->request_code, e->minor_code);
 	return 0; // Ignore everything else.
 }
-void jbwm_open_display(void)
+Display * jbwm_open_display(void)
 {
 	if (!(display = XOpenDisplay(NULL)))
 		jbwm_error(JBWM_ENV_DISPLAY);
 	XSetErrorHandler(handle_xerror);
 	jbwm_open_font(display);
+	return display;
 }

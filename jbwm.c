@@ -24,6 +24,8 @@
 #undef JBWM_LOG
 #define JBWM_LOG(...)
 #endif//!DEBUG_JBWM
+// Macros:
+#define ENV(e) JBWM_ENV_##e
 static struct JBWMScreen * screens;
 struct JBWMScreen * jbwm_get_screens(void)
 {
@@ -119,32 +121,25 @@ void jbwm_error(const char * msg)
 	print(1, "\n");
 	exit(1);
 }
-static void setup_event_listeners(const Window root)
-{
-	XChangeWindowAttributes(jbwm_get_display(), root, CWEventMask,
-		&(XSetWindowAttributes){.event_mask =
-		SubstructureRedirectMask | SubstructureNotifyMask |
-		EnterWindowMask | PropertyChangeMask |
-		ColormapChangeMask});
-}
-static void allocate_colors(struct JBWMScreen * s)
+static void allocate_colors(Display * d, struct JBWMScreen * restrict s)
 {
 	const uint8_t n = s->screen;
-	Display * d = jbwm_get_display();
-	s->pixels.fg=jbwm_get_pixel(d, n, getenv(JBWM_ENV_FG));
-	s->pixels.bg=jbwm_get_pixel(d, n, getenv(JBWM_ENV_BG));
-	s->pixels.fc=jbwm_get_pixel(d, n, getenv(JBWM_ENV_FC));
+#define PIX(field, env) s->pixels.field = jbwm_get_pixel(d, n, getenv(env));
+	PIX(bg, ENV(BG));
+	PIX(fc, ENV(FC));
+	PIX(fg, ENV(FG));
 #ifdef JBWM_USE_TITLE_BAR
-	s->pixels.close = jbwm_get_pixel(d, n, getenv(JBWM_ENV_CLOSE));
-	s->pixels.resize = jbwm_get_pixel(d, n, getenv(JBWM_ENV_RESIZE));
-	s->pixels.shade = jbwm_get_pixel(d, n, getenv(JBWM_ENV_SHADE));
-	s->pixels.stick = jbwm_get_pixel(d, n, getenv(JBWM_ENV_STICK));
+	PIX(close, ENV(CLOSE));
+	PIX(resize, ENV(RESIZE));
+	PIX(shade, ENV(SHADE));
+	PIX(stick, ENV(STICK));
 #endif//JBWM_USE_TITLE_BAR
+#undef PIX
 }
-static bool check_redirect(const Window w)
+static bool check_redirect(Display * d, const Window w)
 {
 	XWindowAttributes a;
-	XGetWindowAttributes(jbwm_get_display(), w, &a);
+	XGetWindowAttributes(d, w, &a);
 	JBWM_LOG("check_redirect(0x%x): override_redirect: %s, "
 		"map_state: %s", (int)w,
 		a.override_redirect ? "true" : "false",
@@ -153,70 +148,76 @@ static bool check_redirect(const Window w)
 	return (!a.override_redirect && (a.map_state == IsViewable));
 }
 // Free returned data with XFree()
-static Window * get_windows(const Window root,
+static Window * get_windows(Display * dpy, const Window root,
 	uint16_t * win_count)
 {
 	Window * w, d;
 	unsigned int n;
-	XQueryTree(jbwm_get_display(), root, &d, &d, &w, &n);
+	XQueryTree(dpy, root, &d, &d, &w, &n);
 	*win_count = n;
 	return (Window *)w;
 }
-static void setup_clients(struct JBWMScreen * s)
+static void setup_clients(Display * d, struct JBWMScreen * s)
 {
 	uint16_t n;
-	Window * w = get_windows(s->root, &n);
+	Window * w = get_windows(d, s->root, &n);
 	JBWM_LOG("Started with %d clients", n);
 	while (n--)
-		if (check_redirect(w[n])) {
+		if (check_redirect(d, w[n])) {
 			JBWM_LOG("Starting client %d, window 0x%x",
 				n, (int)w[n]);
 			jbwm_new_client(s, w[n]);
 		}
 	XFree(w);
 }
-static void setup_screen_elements(const uint8_t i)
+static void setup_screen_elements(Display * d, const uint8_t i)
 {
 	struct JBWMScreen * s = screens;
 	s->screen = i;
 	s->vdesk = 0;
-	Display * d = jbwm_get_display();
 	s->root = RootWindow(d, i);
 	s->size.width = DisplayWidth(d, i);
 	s->size.height = DisplayHeight(d, i);
 }
-static void setup_gc(struct JBWMScreen * s)
+static void setup_gc(Display * d, struct JBWMScreen * s)
 {
-	allocate_colors(s);
-	unsigned long vm = GCFunction | GCSubwindowMode
-		| GCLineWidth | GCForeground | GCBackground;
+	allocate_colors(d, s);
+	enum {
+		VM = GCFunction | GCSubwindowMode | GCLineWidth
+			| GCForeground | GCBackground
+	};
 	XGCValues gv = {.foreground = s->pixels.fg,
 		.background = s->pixels.bg,
 		.function = GXxor,
 		.subwindow_mode = IncludeInferiors,
 		.line_width = 1
 	};
-#if defined(JBWM_USE_TITLE_BAR) && !defined(JBWM_USE_XFT)
-	XFontStruct * font = jbwm_get_font();
-	gv.font = font->fid;
-	vm |= GCFont;
-#endif//JBWM_USE_TITLE_BAR&&!JBWM_USE_XFT
-	s->gc = XCreateGC(jbwm_get_display(), s->root, vm, &gv);
+	s->gc = XCreateGC(d, s->root, VM, &gv);
 }
-static void setup_screen(const uint8_t i)
+static void setup_event_listeners(Display * d, const Window root)
 {
-	struct JBWMScreen *s = &screens[i];
-	setup_screen_elements(i);
-	setup_gc(s);
-	setup_event_listeners(s->root);
+	enum {
+		EMASK = SubstructureRedirectMask | SubstructureNotifyMask |
+			EnterWindowMask | PropertyChangeMask
+			| ColormapChangeMask
+	};
+	XChangeWindowAttributes(d, root, CWEventMask,
+		&(XSetWindowAttributes){.event_mask = EMASK });
+}
+static void setup_screen(Display * d, const uint8_t i)
+{
+	struct JBWMScreen * s = &screens[i];
+	setup_screen_elements(d, i);
+	setup_gc(d, s);
+	setup_event_listeners(d, s->root);
 	jbwm_grab_screen_keys(s);
 	/* scan all the windows on this screen */
-	setup_clients(s);
+	setup_clients(d, s);
 	jbwm_ewmh_init_screen(s);
 }
 static void jbwm_set_defaults(void)
 {
-#define SETENV(i) setenv(JBWM_ENV_##i, JBWM_DEF_##i, 0)
+#define SETENV(i) setenv(ENV(i), JBWM_DEF_##i, 0)
 	SETENV(FG); SETENV(FC); SETENV(BG); SETENV(TERM);
 #ifdef JBWM_USE_TITLE_BAR
 	SETENV(CLOSE); SETENV(RESIZE); SETENV(SHADE);
@@ -228,13 +229,13 @@ int main(int argc, char **argv)
 {
 	jbwm_set_defaults();
 	parse_argv(argc, argv);
-	jbwm_open_display();
-	uint8_t i = ScreenCount(jbwm_get_display());
+	Display * d = jbwm_open_display();
+	uint8_t i = ScreenCount(d);
 	// allocate using dynamically sized array on stack
 	struct JBWMScreen s[i]; // remains in scope till exit.
 	screens = s;
 	while (i--)
-		setup_screen(i);
-	jbwm_event_loop(jbwm_get_display());
+		setup_screen(d, i);
+	jbwm_event_loop(d);
 	return 0;
 }
