@@ -37,12 +37,8 @@ void jbwm_set_head_client(struct JBWMClient * restrict c)
    in relink_r would be invalid. */
 static void relink_r(const struct JBWMClient * c, struct JBWMClient * i)
 {
-	if (i && i->next) {
-		if (i->next == c) // skip over c:
-			i->next = c->next;
-		else
-			relink_r(c, i->next);
-	}
+	if (i && i->next)
+		relink_r(c, i->next != c ? i->next : (i->next = c->next));
 }
 // Relink c's linked list to exclude c
 void jbwm_relink_client_list(struct JBWMClient * restrict c)
