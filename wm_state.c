@@ -86,5 +86,7 @@ void jbwm_send_wm_delete(struct JBWMClient * restrict c)
 		else // client does not support protocol, force kill:
 			XKillClient(d, w);
 	}
-	XSync(d, false); // Process everything now.
+	// Unmap early in case window does not disappear immediately.
+	XUnmapWindow(d, c->parent);
+	XFlush(d); // Do everything now.
 }
