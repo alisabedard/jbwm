@@ -59,7 +59,7 @@ static void do_changes(struct JBWMClient * restrict c, const bool resize,
 	else // drag
 		set_position(c, original, start, p);
 }
-__attribute__((hot,nonnull))
+__attribute__((nonnull))
 static void query_pointer(Display * dpy, const Window w,
 	int16_t * restrict p)
 {
@@ -70,7 +70,7 @@ static void query_pointer(Display * dpy, const Window w,
 	p[0] = rep.winX;
 	p[1] = rep.winY;
 }
-__attribute__((hot,nonnull))
+__attribute__((nonnull))
 static void draw_outline(Display * dpy, struct JBWMClient * restrict c)
 {
 	const uint8_t o = c->opt.no_title_bar ? 0 : jbwm_get_font_height();

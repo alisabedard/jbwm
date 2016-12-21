@@ -11,11 +11,12 @@ static Status xmsg(Display * d, const Window w,
 	const Atom a, const long x)
 {
 	JBWM_LOG("xmsg");
-	return XSendEvent(d, w, false, NoEventMask, &(XEvent){
-		.xclient.type = ClientMessage, .xclient.window = w,
-		.xclient.message_type = a, .xclient.format = 32,
-		.xclient.data.l[0] = x, .xclient.data.l[1] = CurrentTime
-	});
+	XClientMessageEvent e = { .type = ClientMessage, .window = w,
+		.message_type = a, .format = 32 };
+	long * restrict l = e.data.l;
+	l[0] = x;
+	l[1] = CurrentTime;
+	return XSendEvent(d, w, false, NoEventMask, (XEvent *)&e);
 }
 static Atom get_atom(Display * d,
 	Atom * a, const char * name)

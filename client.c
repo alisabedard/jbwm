@@ -75,14 +75,14 @@ static inline bool matches(struct JBWMClient * i,
 	return i->parent == w || i->window == w;
 #endif//JBWM_USE_TITLE_BAR
 }
-__attribute__((hot,pure))
+__attribute__((pure))
 static struct JBWMClient * search(struct JBWMClient * restrict c,
 	const Window w)
 {
 	return (!c || matches(c, w)) ? c : search(c->next, w);
 }
 // Return the client that has specified window as either window or parent
-__attribute__((hot,pure))
+__attribute__((pure))
 struct JBWMClient * jbwm_get_client(const Window w)
 {
 	return search(head, w);

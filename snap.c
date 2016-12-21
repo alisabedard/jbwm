@@ -13,7 +13,7 @@
 #include "client.h"
 #include "font.h"
 #include "screen.h"
-__attribute__ ((const, hot, warn_unused_result))
+__attribute__ ((const, warn_unused_result))
 static int sborder(const int xy, const int edge)
 {
 	if (abs(xy + edge) < JBWM_SNAP)
@@ -35,12 +35,12 @@ void jbwm_snap_border(struct JBWMClient * restrict c)
 /* Definition of this as an inline function guarantees no side-effects
  * and minimizes over-expansion (the full expansion of jbwm_snap_dim
  * is approximately a dozen lines).  */
-__attribute__ ((const, hot, warn_unused_result))
+__attribute__ ((const, warn_unused_result))
 static inline int absmin(const int a, const int b)
 {
 	return abs(a) < abs(b) ? a : b;
 }
-__attribute__ ((const, hot, warn_unused_result))
+__attribute__ ((const, warn_unused_result))
 static int jbwm_snap_dim(const int cxy, const int cwh, const int cixy,
 	const int ciwh, const int d)
 {
