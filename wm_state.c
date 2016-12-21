@@ -60,12 +60,14 @@ void jbwm_set_wm_state(struct JBWMClient * restrict c, const int8_t state)
 static bool has_delete_proto(Display * d, const Window w)
 {
 	bool found=false;
-	Atom *p;
-	int i;
-	if (XGetWMProtocols(d, w, &p, &i)) {
-		while(i-- && !found)
-			found = p[i] == get_wm_delete_window(d);
-		XFree(p);
+	{ // * p, i scope
+		Atom * p;
+		int i;
+		if (XGetWMProtocols(d, w, &p, &i)) {
+			while(i-- && !found)
+				found = p[i] == get_wm_delete_window(d);
+			XFree(p);
+		}
 	}
 	return found;
 }
