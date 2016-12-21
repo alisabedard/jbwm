@@ -18,30 +18,24 @@
 #include "ewmh_state.h" // keep
 #include "ewmh.h" // keep
 #include "font.h"
-#include "jbwm.h"
 #include "log.h"
 #include "shape.h"
 #include "title_bar.h"
 #include "util.h" // keep
 #include "wm_state.h"
+extern inline Window jbwm_get_root(struct JBWMClient * restrict c);
+extern inline struct JBWMScreen * jbwm_get_screen(struct JBWMClient
+	* restrict c);
 __attribute__((nonnull))
-void jbwm_configure_client(struct JBWMClient * restrict c)
+static void jbwm_configure_client(struct JBWMClient * restrict c)
 {
 	const Window w = c->window;
-	struct JBWMRectangle * g = &c->size;
+	struct JBWMRectangle * restrict g = &c->size;
 	XSendEvent(jbwm_get_display(), w, true, StructureNotifyMask, (XEvent
 		*) &(XConfigureEvent){.x = g->x, .y = g->y, .width = g->width,
 		.height = g->height, .type = ConfigureNotify, .event = w,
 		.window = w, .above = c->parent, .override_redirect = true,
 		.border_width = c->border});
-}
-struct JBWMScreen * jbwm_get_screen(struct JBWMClient * restrict c)
-{
-	return jbwm_get_screens() + c->screen;
-}
-Window jbwm_get_root(struct JBWMClient * restrict c)
-{
-	return jbwm_get_screen(c)->root;
 }
 void jbwm_move_resize(struct JBWMClient * restrict c)
 {
