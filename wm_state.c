@@ -75,12 +75,16 @@ void jbwm_send_wm_delete(struct JBWMClient * restrict c)
 {
 	Display * d = jbwm_get_display();
 	const Window w = c->window;
-	if (c->opt.remove) { // this allows a second click to force a kill
+	if (c->opt.remove)
+		// this allows a second click to force a kill
 		XKillClient(d, w);
-		return;
+	else {
+		c->opt.remove = true;
+		if (has_delete_proto(d, w))
+			xmsg(d, w, get_wm_protocols(d),
+				get_wm_delete_window(d));
+		else // client does not support protocol, force kill:
+			XKillClient(d, w);
 	}
-	c->opt.remove = true;
-	has_delete_proto(d, w) ? xmsg(d, w, get_wm_protocols(d),
-		get_wm_delete_window(d)) : XKillClient(d, w);
 	XSync(d, false); // Process everything now.
 }
