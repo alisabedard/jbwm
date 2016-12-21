@@ -216,17 +216,13 @@ static void setup_screen(const uint8_t i)
 }
 static void jbwm_set_defaults(void)
 {
-	setenv(JBWM_ENV_FG, JBWM_DEF_FG, 0);
-	setenv(JBWM_ENV_FC, JBWM_DEF_FC, 0);
-	setenv(JBWM_ENV_BG, JBWM_DEF_BG, 0);
-	setenv(JBWM_ENV_TERM, JBWM_DEF_TERM, 0);
+#define SETENV(i) setenv(JBWM_ENV_##i, JBWM_DEF_##i, 0)
+	SETENV(FG); SETENV(FC); SETENV(BG); SETENV(TERM);
 #ifdef JBWM_USE_TITLE_BAR
-	setenv(JBWM_ENV_CLOSE, JBWM_DEF_CLOSE, 0);
-	setenv(JBWM_ENV_RESIZE, JBWM_DEF_RESIZE, 0);
-	setenv(JBWM_ENV_SHADE, JBWM_DEF_SHADE, 0);
-	setenv(JBWM_ENV_STICK, JBWM_DEF_STICK, 0);
-	setenv(JBWM_ENV_FONT, JBWM_DEF_FONT, 0);
+	SETENV(CLOSE); SETENV(RESIZE); SETENV(SHADE);
+	SETENV(STICK); SETENV(FONT);
 #endif//JBWM_USE_TITLE_BAR
+#undef SETENV
 }
 int main(int argc, char **argv)
 {
