@@ -95,9 +95,9 @@ static void draw_outline(Display * dpy, struct JBWMClient * restrict c)
 	*rect = (xRectangle) {g->x, g->y - o,
 		g->width + BORDER, g->height + BORDER + o};
 }
-static void drag_event_loop(struct JBWMClient * restrict c, const bool resize)
+static void drag_event_loop(Display * d,
+	struct JBWMClient * restrict c, const bool resize)
 {
-	Display * d = jbwm_get_display();
 	const uint8_t b = c->border;
 	const int16_t original[] = {c->size.x, c->size.y};
 	int16_t start[2];
@@ -133,7 +133,7 @@ void jbwm_drag(struct JBWMClient * restrict c, const bool resize)
 		struct JBWMRectangle * restrict g = &c->size;
 		jbwm_warp(d, c->window, g->width, g->height);
 	}
-	drag_event_loop(c, resize);
+	drag_event_loop(d, c, resize);
 	if (c->border)
 		draw_outline(d, c);
 	XUngrabPointer(d, CurrentTime);
