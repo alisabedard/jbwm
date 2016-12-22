@@ -22,7 +22,7 @@ $(exe): $(objects)
 	ls -l $(exe).tmp >> sz.log
 	rm -f $(exe).tmp
 	tail sz.log
-#include depend.mk
+include depend.mk
 # Use `` for basename for BSD make compatibility
 ${objects}:
 	${CC} ${CFLAGS} ${jbwm_cflags} -c `basename $@ .o`.c

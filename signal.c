@@ -5,6 +5,7 @@
 #include "JBWMClient.h"
 #include "JBWMClientOptions.h"
 #include "client.h"
+#include "display.h"
 #include "log.h"
 #include "title_bar.h"
 static void atexit_cb(void)
@@ -20,6 +21,7 @@ static void atexit_cb(void)
 		free(i);
 		i = j;
 	}
+	XCloseDisplay(jbwm_get_display());
 }
 static void signal_cb(int sig)
 {

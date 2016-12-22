@@ -46,7 +46,7 @@ select.o: select.c select.h JBWMClient.h JBWMClientOptions.h \
 shape.o: shape.c shape.h JBWMClient.h JBWMClientOptions.h JBWMRectangle.h \
  display.h log.h
 signal.o: signal.c signal.h JBWMClient.h JBWMClientOptions.h \
- JBWMRectangle.h client.h log.h title_bar.h
+ JBWMRectangle.h client.h display.h log.h title_bar.h
 snap.o: snap.c snap.h JBWMSize.h JBWMClient.h JBWMClientOptions.h \
  JBWMRectangle.h JBWMDefaults.h JBWMPoint.h JBWMScreen.h pixel_t.h \
  client.h font.h screen.h jbwm.h
