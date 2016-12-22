@@ -106,10 +106,9 @@ static XftDraw * get_xft_draw(Display * d, const Window w, const uint8_t
 static void draw_xft(Display * d, struct JBWMClient * restrict c,
 	const int16_t * restrict p, char * restrict name, const size_t l)
 {
-	XftFont * f = jbwm_get_font();
 	const uint8_t s = c->screen;
 	XftDrawStringUtf8(get_xft_draw(d, c->tb.win, s),
-		get_color(d, s), f, p[0], p[1],
+		get_color(d, s), jbwm_get_font(), p[0], p[1],
 		(XftChar8 *) name,  l);
 }
 // Free result with XFree if not NULL
