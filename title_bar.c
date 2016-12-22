@@ -17,40 +17,34 @@
 #include "select.h"
 #include "util.h"
 #include "wm_state.h"
-static void set_shaded(Display * d, struct JBWMClient * restrict c)
-{
-	c->old_size.height = c->size.height;
-	c->size.height = -1;
-	c->opt.shaded = true;
-	jbwm_set_wm_state(c, IconicState);
-	jbwm_ewmh_add_state(d, c->window,
-		jbwm_ewmh_get_atom(JBWM_EWMH_WM_STATE_SHADED));
-	jbwm_select_client(c);
-}
-static void set_not_shaded(Display * d, struct JBWMClient * restrict c)
-{
-	c->size.height = c->old_size.height;
-	c->opt.shaded = false;
-	jbwm_move_resize(c);
-	jbwm_set_wm_state(c, NormalState);
-	jbwm_ewmh_remove_state(d, c->window,
-		jbwm_ewmh_get_atom(JBWM_EWMH_WM_STATE_SHADED));
-}
+// This implements window shading, a substitute for iconification.
 void jbwm_toggle_shade(struct JBWMClient * restrict c)
 {
 	// Honor !MJBWM_EWMH_WM_FUNC_MINIMIZE
 	if (c->opt.no_min || c->opt.fullscreen)
 		return;
-	// This implements window shading, a substitute for iconification.
-	(c->opt.shaded ? set_not_shaded : set_shaded)(jbwm_get_display(), c);
-	jbwm_update_title_bar(c);
+	const bool s = c->opt.shaded = !c->opt.shaded;
+	int8_t state = 0;
+	void (*f)(Display *, Window, Atom);
+	if (s) {
+		c->old_size.height = c->size.height;
+		c->size.height = -1;
+		state = IconicState;
+		f = &jbwm_ewmh_add_state;
+	} else {
+		c->size.height = c->old_size.height;
+		state = NormalState;
+		f = &jbwm_ewmh_remove_state;
+	}
+	jbwm_move_resize(c);
+	jbwm_set_wm_state(c, state);
+	enum { ATOM = JBWM_EWMH_WM_STATE_SHADED };
+	f(jbwm_get_display(), c->window, jbwm_ewmh_get_atom(ATOM));
 }
 static uint16_t mv(Display * d, const Window w, uint16_t x)
 {
-	if (w) {
-		x -= jbwm_get_font_height();
-		XMoveWindow(d, w, x, 0);
-	}
+	if (w)
+		XMoveWindow(d, w, x -= jbwm_get_font_height(), 0);
 	return x;
 }
 static void move_buttons(Display * d,
