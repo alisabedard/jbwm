@@ -21,17 +21,16 @@ struct JBWMClient * jbwm_get_current_client(void)
 }
 void jbwm_set_current_client(struct JBWMClient * restrict c)
 {
-	if (c)
-		current = c;
+	current = c;
 }
 struct JBWMClient * jbwm_get_head_client(void)
 {
 	return head;
 }
-void jbwm_set_head_client(struct JBWMClient * restrict c)
+void jbwm_prepend_client(struct JBWMClient * restrict c)
 {
-	if (c)
-		head = c;
+	c->next = head;
+	head = c;
 }
 /* Note:  As *c and *i may alias each other, use of 'restrict'
    in relink_r would be invalid. */
