@@ -27,8 +27,10 @@
 #endif//!DEBUG_KEYS
 static struct {
 	uint16_t grab_mask, mod_mask;
-} jbwm_keys_data = { .grab_mask = JBWM_KEYMASK_GRAB,
-	.mod_mask = JBWM_KEYMASK_MOD };
+} jbwm_keys_data = {
+	.grab_mask = JBWM_KEYMASK_GRAB,
+	.mod_mask = JBWM_KEYMASK_MOD
+};
 void jbwm_set_grab_mask(const uint16_t mask)
 {
 	jbwm_keys_data.grab_mask = mask;
