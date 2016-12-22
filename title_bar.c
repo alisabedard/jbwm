@@ -102,12 +102,8 @@ draw_xft(Display * d, struct JBWMClient * restrict c,
 	const uint8_t s = c->screen;
 	Visual * v = DefaultVisual(d, s);
 	XftDraw *xd = XftDrawCreate(d, c->tb.win, v, c->cmap);
-	/* Prevent the text from going over the resize button.  */
-	const uint16_t max_width = c->size.width
-		- 3 * jbwm_get_font_height();
 	XftDrawStringUtf8(xd, get_color(d, s), f, p[0], p[1],
-		(XftChar8 *) name, e.width > max_width
-		&& e.width > 0 ? l * max_width / e.width : l);
+		(XftChar8 *) name,  l);
 	XftDrawDestroy(xd);
 }
 // Free result with XFree if not NULL
