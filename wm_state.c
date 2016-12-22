@@ -1,6 +1,7 @@
 // Copyright 2016, Jeffrey E. Bedard
 #include "wm_state.h"
 #include <X11/Xatom.h>
+#include <string.h>
 #include "display.h"
 #include "ewmh.h"
 #include "ewmh_state.h"
@@ -19,7 +20,7 @@ static Status xmsg(Display * restrict d, const Window w,
 		l[0] = x;
 		l[1] = CurrentTime;
 	}
-	return XSendEvent(d, w, false, NoEventMask, (XEvent *)&e);
+	return XSendEvent(d, w, false, NoEventMask, (void*)&e);
 }
 static Atom get_atom(Display * restrict d,
 	Atom * restrict a, const char * restrict name)

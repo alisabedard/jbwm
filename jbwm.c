@@ -21,6 +21,7 @@
 #include "keys.h"
 #include "log.h"
 #include "new.h"
+#include "signal.h"
 #include "util.h"
 // Macros:
 #define ENV(e) JBWM_ENV_##e
@@ -216,6 +217,7 @@ int main(int argc, char **argv)
 	screens = s;
 	while (i--)
 		setup_screen(d, i);
+	jbwm_set_signal_handler();
 	jbwm_event_loop(d);
 	return 0;
 }

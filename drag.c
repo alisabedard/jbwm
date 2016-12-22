@@ -78,7 +78,7 @@ static void query_pointer(Display * dpy, const Window w,
 	xQueryPointerReply rep;
 	xResourceReq * req;
 	GetResReq(QueryPointer, w, req);
-	_XReply(dpy, (xReply *)&rep, 0, true);
+	_XReply(dpy, (void *)&rep, 0, true);
 	p[0] = rep.winX;
 	p[1] = rep.winY;
 }
