@@ -22,7 +22,7 @@ $(exe): $(objects)
 	ls -l $(exe).tmp >> sz.log
 	rm -f $(exe).tmp
 	tail sz.log
-include depend.mk
+#include depend.mk
 # Use `` for basename for BSD make compatibility
 ${objects}:
 	${CC} ${CFLAGS} ${jbwm_cflags} -c `basename $@ .o`.c
@@ -73,6 +73,11 @@ small: clean
 	tail small.log
 clang: clean
 	make -f Makefile.clang
+#depend:
+#	bmkdep -f depend.mk -- ${CFLAGS} \
+#		-I/usr/include/freetype2 *.c
+#depend:
+#	cc -E -MM *.c > depend.mk
 depend:
-	cc -E -MM *.c > depend.mk
+	cc -I/usr/include/freetype2 -E -MM *.c > depend.mk
 #EOF
