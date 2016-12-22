@@ -92,19 +92,27 @@ static XftColor * get_color(Display * d, const int8_t screen)
 	}
 	return &color;
 }
-static void
-draw_xft(Display * d, struct JBWMClient * restrict c,
-	const int16_t * restrict p, char * name, const size_t l)
+static XftDraw * get_xft_draw(Display * d, const Window w, const uint8_t
+	screen)
+{
+	static XftDraw * x;
+	if (!x)
+		x = XftDrawCreate(d, w, DefaultVisual(d, screen),
+			DefaultColormap(d, screen));
+	else
+		XftDrawChange(x, w);
+	return x;
+}
+static void draw_xft(Display * d, struct JBWMClient * restrict c,
+	const int16_t * restrict p, char * restrict name, const size_t l)
 {
 	XftFont * f = jbwm_get_font();
 	XGlyphInfo e;
 	XftTextExtentsUtf8(d, f, (XftChar8 *) name, l, &e);
 	const uint8_t s = c->screen;
-	Visual * v = DefaultVisual(d, s);
-	XftDraw *xd = XftDrawCreate(d, c->tb.win, v, c->cmap);
-	XftDrawStringUtf8(xd, get_color(d, s), f, p[0], p[1],
+	XftDrawStringUtf8(get_xft_draw(d, c->tb.win, s),
+		get_color(d, s), f, p[0], p[1],
 		(XftChar8 *) name,  l);
-	XftDrawDestroy(xd);
 }
 // Free result with XFree if not NULL
 __attribute__((pure))
