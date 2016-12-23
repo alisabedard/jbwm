@@ -24,7 +24,7 @@ jbwm_pixel_t jbwm_get_pixel(Display * dpy,
 		name, &c, &d);
 	return c.pixel;
 }
-__attribute__((warn_unused_result))
+__attribute__((warn_unused_result,nonnull))
 void *jbwm_get_property(Display * dpy, Window w,
 	Atom property, uint16_t * num_items)
 {
@@ -33,8 +33,12 @@ void *jbwm_get_property(Display * dpy, Window w,
 	{
 		long unsigned int b;
 		int d;
-		XGetWindowProperty(dpy, w, property, 0, 1024, false,
-			AnyPropertyType, &property, &d, &n, &b, &prop);
+		if (XGetWindowProperty(dpy, w, property, 0, 1024, false,
+			AnyPropertyType, &property, &d, &n, &b, &prop)
+			!= Success) {
+			*num_items = 0;
+			return NULL;
+		}
 	}
 	*num_items = n;
 	return prop;
