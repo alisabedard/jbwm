@@ -14,11 +14,14 @@
 #include "util.h"
 #define EWMH_ATOM(a) jbwm_ewmh_get_atom(JBWM_EWMH_##a)
 #define WM_STATE(a) EWMH_ATOM(WM_STATE_##a)
+static inline jbwm_pixel_t get_bg(struct JBWMClient * restrict c)
+{
+	return jbwm_get_screen(c)->pixels.bg;
+}
 static void set_state_not_focused(Display * d,
 	struct JBWMClient * restrict c)
 {
-	XSetWindowBorder(d, c->parent,
-		jbwm_get_screen(c)->pixels.bg);
+	XSetWindowBorder(d, c->parent, get_bg(c));
 	jbwm_ewmh_remove_state(d, c->window, WM_STATE(FOCUSED));
 }
 static void unselect_current(Display * d, struct JBWMClient * restrict c)
