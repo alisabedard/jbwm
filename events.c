@@ -56,7 +56,7 @@ void jbwm_free_client(struct JBWMClient * restrict c)
 		const Window w = c->window;
 		delete_ewmh_properties(d, w);
 		{ // * p scope
-			struct JBWMRectangle * p = &c->size;
+			struct JBWMRectangle * restrict p = &c->size;
 			XReparentWindow(d, w, jbwm_get_root(c), p->x, p->y);
 		}
 		XRemoveFromSaveSet(d, w);
