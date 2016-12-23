@@ -19,29 +19,27 @@ jbwm_pixel_t jbwm_get_pixel(Display * dpy,
 {
 	if (!name) // sanitize input to avoid segfault
 		return 0;
-	XColor c, d;
+	XColor c;
 	XAllocNamedColor(dpy, DefaultColormap(dpy, screen),
-		name, &c, &d);
+		name, &c, &(XColor){0});
 	return c.pixel;
 }
 __attribute__((warn_unused_result,nonnull))
 void *jbwm_get_property(Display * dpy, Window w,
 	Atom property, uint16_t * num_items)
 {
-	unsigned char * prop;
-	long unsigned int n;
-	{
-		long unsigned int b;
-		int d;
-		if (XGetWindowProperty(dpy, w, property, 0, 1024, false,
-			AnyPropertyType, &property, &d, &n, &b, &prop)
-			!= Success) {
-			*num_items = 0;
-			return NULL;
-		}
+	unsigned char * value = NULL;
+	long unsigned int n = 0;
+	XGetWindowProperty(dpy, w, property, 0, 1024, false,
+		AnyPropertyType, &property, &(int){0}, &n,
+		&(unsigned long){0}, &value);
+	if (property == None) {
+		// Requested property not found
+		XFree(value);
+		value = NULL;
 	}
 	*num_items = n;
-	return prop;
+	return value;
 }
 void jbwm_grab_button(Display * d, const Window w,
 	const unsigned int mask, const unsigned int btn)
