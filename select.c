@@ -29,10 +29,9 @@ static void unselect_current(struct JBWMClient * restrict c)
 }
 static void set_border(struct JBWMClient * restrict c)
 {
-#define PIX(f) jbwm_get_screen(c)->pixels.f
+	struct JBWMPixels * restrict p = &jbwm_get_screen(c)->pixels;
 	XSetWindowBorder(jbwm_get_display(), c->parent,
-		c->opt.sticky ? PIX(fc) : PIX(fg));
-#undef PIX
+		c->opt.sticky ? p->fc : p->fg);
 }
 static void set_focused(struct JBWMClient * restrict c)
 {
