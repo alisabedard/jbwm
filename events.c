@@ -68,18 +68,15 @@ void jbwm_free_client(struct JBWMClient * restrict c)
 	// Allow future clients with the same window ID:
 	last_window = 0;
 }
-static void cleanup(void)
+static void cleanup(struct JBWMClient * i)
 {
 	JBWM_LOG("cleanup");
-	events_need_cleanup = false;
-	struct JBWMClient * restrict c = jbwm_get_head_client();
-	struct JBWMClient * i;
-	do {
-		i = c->next;
-		if (!c->opt.remove)
-			break;
-		jbwm_free_client(c);
-	} while(i && (c = i));
+	if (!i)
+		return;
+	struct JBWMClient * next = i->next; // save
+	if (i->opt.remove)
+		jbwm_free_client(i);
+	cleanup(next);
 }
 static void handle_property_change(XPropertyEvent * e,
 	struct JBWMClient * restrict c)
@@ -218,8 +215,10 @@ void jbwm_event_loop(Display * d)
 			JBWM_LOG("Unhandled event %d", ev.type);
 #endif//LOG_LEVEL
 		}
-		if (events_need_cleanup)
-			cleanup();
+		if (events_need_cleanup) {
+			cleanup(jbwm_get_head_client());
+			events_need_cleanup = false;
+		}
 	}
 }
 
