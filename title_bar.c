@@ -106,13 +106,9 @@ static void draw_xft(Display * d, struct JBWMClient * restrict c,
 		(XftChar8 *) name,  l);
 }
 // Free result with XFree if not NULL
-__attribute__((pure))
-static char * jbwm_get_title(Display * d, const Window w)
+static inline char * jbwm_get_title(Display * d, const Window w)
 {
-	XTextProperty tp;
-	if (!XGetWMName(d, w, &tp))
-		  return NULL;
-	return (char *)tp.value;
+	return jbwm_get_property(d, w, XA_WM_NAME, &(uint16_t){0});
 }
 static void draw_title(Display * d, struct JBWMClient * restrict c)
 {
