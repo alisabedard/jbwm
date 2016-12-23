@@ -3,8 +3,8 @@
 // Copyright 1999-2015, Ciaran Anscomb <jbwm@6809.org.uk>
 // See README for license and other details.
 #include "util.h"
-#include "jbwm.h"
 #include <stdbool.h>
+#include <stddef.h>
 void jbwm_set_property(Display * d, const Window win,
 	const Atom property, const Atom type,
 	void * data, uint16_t size)

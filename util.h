@@ -4,8 +4,9 @@
 // See README for license and other details.
 #ifndef JBWM_UTIL_H
 #define JBWM_UTIL_H
-#include <stdint.h>
+#include <X11/X.h>
 #include <X11/Xlib.h>
+#include <stdint.h>
 #include "pixel_t.h"
 void jbwm_set_property(Display * d, const Window win,
 	const Atom property, const Atom type,
