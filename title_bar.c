@@ -59,16 +59,21 @@ static Window get_win(Display * d, const Window p,
 	uint8_t h = jbwm_get_font_height();
 	return XCreateSimpleWindow(d, p, 0, 0, h, h, 0, 0, bg);
 }
-static Window new_title_bar(Display * d, struct JBWMClient * restrict c)
+static void add_buttons(Display * d, struct JBWMClient * restrict c,
+	const struct JBWMPixels * restrict p, const Window t)
 {
-	const struct JBWMPixels * p = &jbwm_get_screen(c)->pixels;
-	const Window t = c->tb.win = get_win(d, c->parent, p->bg);
-	XSelectInput(d, t, ExposureMask);
 	struct JBWMClientOptions * o = &c->opt;
 	c->tb.close = o->no_close ? 0 : get_win(d, t, p->close);
 	c->tb.resize = o->no_resize ? 0: get_win(d, t, p->resize);
 	c->tb.shade = o->no_min ? 0 : get_win(d, t, p->shade);
 	c->tb.stick = get_win(d, t, p->stick);
+}
+static Window new_title_bar(Display * d, struct JBWMClient * restrict c)
+{
+	const struct JBWMPixels * p = &jbwm_get_screen(c)->pixels;
+	const Window t = c->tb.win = get_win(d, c->parent, p->bg);
+	add_buttons(d, c, p, t);
+	XSelectInput(d, t, ExposureMask);
 	XMapRaised(d, t);
 	XMapSubwindows(d, t);
 	jbwm_grab_button(d, t, 0, AnyButton);
