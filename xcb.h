@@ -9,14 +9,21 @@ typedef uint32_t pixel_t;
 void jb_check_x(xcb_connection_t * x);
 /* Create a gc with foreground and background as specified.
    If gc is passed as 0, a new gc value is generated and returned.  */
+#ifdef __cplusplus
+xcb_gcontext_t jb_create_gc(xcb_connection_t * xc, xcb_gcontext_t gc,
+	const xcb_window_t win, const char * fg, const char * bg);
+#else//!__cplusplus
 xcb_gcontext_t jb_create_gc(xcb_connection_t * xc, xcb_gcontext_t gc,
 	const xcb_window_t win, const char * restrict fg,
 	const char * restrict bg);
+#endif//__cplusplus
 xcb_atom_t jb_get_atom(xcb_connection_t * x, const char * name);
 xcb_colormap_t jb_get_colormap(xcb_connection_t * xc,
 	const xcb_window_t win);
+/* Get the cursor specified by name.  Note, specifying name as restrict
+ * qualified here breaks C++ builds.  */
 xcb_cursor_t jb_get_cursor(xcb_connection_t * xc,
-	const char * restrict name);
+	const char * name);
 xcb_colormap_t jb_get_default_colormap(xcb_connection_t * xc);
 pixel_t jb_get_pixel(xcb_connection_t * x, const xcb_colormap_t cmap,
 	const char * color);
