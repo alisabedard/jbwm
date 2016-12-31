@@ -1,6 +1,9 @@
 // Copyright 2016, Jeffrey E. Bedard
 #ifndef LIBJB_XCB_H
 #define LIBJB_XCB_H
+#ifdef __cplusplus
+extern "C" {
+#endif//__cplusplus
 #include <stdbool.h>
 #include <xcb/xcb.h>
 typedef uint32_t pixel_t;
@@ -48,4 +51,7 @@ void jb_set_window_name(xcb_connection_t * xc, const xcb_window_t win,
 	char * name);
 bool jb_xcb_cookie_has_error(xcb_connection_t * x,
 	const xcb_void_cookie_t c);
+#ifdef __cplusplus
+}
+#endif//__cplusplus
 #endif//!LIBJB_XCB_H
