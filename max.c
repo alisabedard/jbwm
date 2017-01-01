@@ -1,4 +1,4 @@
-// Copyright 2016, Jeffrey E. Bedard
+// Copyright 2017, Jeffrey E. Bedard
 #include "max.h"
 #include "JBWMClient.h"
 #include "JBWMScreen.h"

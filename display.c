@@ -1,4 +1,4 @@
-// Copyright 2016, Jeffrey E. Bedard
+// Copyright 2017, Jeffrey E. Bedard
 #include "display.h"
 #include <X11/Xlibint.h>
 #include <X11/Xproto.h>

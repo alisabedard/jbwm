@@ -1,4 +1,4 @@
-// Copyright 2016, Jeffrey E. Bedard
+// Copyright 2017, Jeffrey E. Bedard
 #include "font.h"
 #include <stdlib.h>
 #include <X11/Xft/Xft.h>

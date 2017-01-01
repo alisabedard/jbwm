@@ -1,4 +1,4 @@
-// Copyright 2016, Jeffrey E. Bedard
+// Copyright 2017, Jeffrey E. Bedard
 #ifndef JBWM_MAX_H
 #define JBWM_MAX_H
 struct JBWMClient;

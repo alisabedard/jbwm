@@ -1,4 +1,4 @@
-// Copyright 2016, Jeffrey E. Bedard
+// Copyright 2017, Jeffrey E. Bedard
 #ifndef JBWM_FONT_H
 #define JBWM_FONT_H
 #ifdef JBWM_USE_TITLE_BAR

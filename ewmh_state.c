@@ -1,4 +1,4 @@
-// Copyright 2016, Jeffrey E. Bedard <jefbed@gmail.com>
+// Copyright 2017, Jeffrey E. Bedard <jefbed@gmail.com>
 #undef DEBUG
 #include "ewmh_state.h"
 #include <X11/Xatom.h>
