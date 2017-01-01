@@ -1,4 +1,4 @@
-// Copyright 2016, Jeffrey E. Bedard
+// Copyright 2017, Jeffrey E. Bedard
 #ifndef LIBJB_JBDIM_H
 #define LIBJB_JBDIM_H
 #include <stdint.h>

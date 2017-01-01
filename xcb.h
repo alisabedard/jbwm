@@ -1,4 +1,4 @@
-// Copyright 2016, Jeffrey E. Bedard
+// Copyright 2017, Jeffrey E. Bedard
 #ifndef LIBJB_XCB_H
 #define LIBJB_XCB_H
 #include <stdbool.h>
