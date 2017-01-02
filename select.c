@@ -41,7 +41,12 @@ static void set_focused(Display * d, struct JBWMClient * restrict c)
 	XSetInputFocus(d, w, RevertToPointerRoot, CurrentTime);
 	jbwm_ewmh_add_state(d, w, WM_STATE(FOCUSED));
 }
+#ifdef JBWM_USE_EWMH
 static void set_active_window(Display * d, struct JBWMClient * restrict c)
+#else//!JBWM_USE_EWMH
+static void set_active_window(Display * d __attribute__((unused)),
+	struct JBWMClient * restrict c)
+#endif//JBWM_USE_EWMH
 {
 	/* Store the window id as a static variable here in case
 	 * client c is freed before the X server handles the event.

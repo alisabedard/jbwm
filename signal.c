@@ -12,9 +12,12 @@ static void atexit_cb(void)
 	JBWM_LOG("atexit_cb");
 	struct JBWMClient * i = jbwm_get_head_client();
 	while (i) {
+#ifdef JBWM_USE_TITLE_BAR
 		// Some clients crash if left shaded at exit:
-		if (i->opt.shaded)
+		if (i->opt.shaded) {
 			jbwm_toggle_shade(i);
+		}
+#endif//JBWM_USE_TITLE_BAR
 		// swap:
 		struct JBWMClient * j = i->next;
 		free(i);
