@@ -1,6 +1,5 @@
 // Copyright 2017, Jeffrey E. Bedard
 #include "font.h"
-#include <stdlib.h>
 #include <X11/Xft/Xft.h>
 #include "config.h"
 #include "jbwm.h"
