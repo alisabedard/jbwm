@@ -5,15 +5,9 @@
 //#undef DEBUG
 #include "screen.h"
 #include <X11/Xatom.h> // keep
-#include <X11/Xlib.h>
 #include <X11/Xutil.h>
-#include <stdbool.h>
-#include "JBWMClient.h"
-#include "JBWMClientOptions.h"
-#include "JBWMDefaults.h"
-#include "JBWMRectangle.h"
-#include "JBWMScreen.h"
 #include "client.h"
+#include "config.h"
 #include "display.h"
 #include "ewmh_state.h" // keep
 #include "ewmh.h" // keep

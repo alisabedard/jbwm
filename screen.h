@@ -4,11 +4,9 @@
 // See README for license and other details.
 #ifndef JBWM_SCREEN_H
 #define JBWM_SCREEN_H
-#include <X11/X.h>
-#include <stdint.h>
-#include "jbwm.h"
 #include "JBWMClient.h"
 #include "JBWMScreen.h"
+#include "jbwm.h" // for jbwm_get_screens()
 inline struct JBWMScreen * jbwm_get_screen(struct JBWMClient * restrict c)
 {
 	return jbwm_get_screens() + c->screen;
