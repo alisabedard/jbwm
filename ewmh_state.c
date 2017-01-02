@@ -2,7 +2,6 @@
 #undef DEBUG
 #include "ewmh_state.h"
 #include <X11/Xatom.h>
-#include "JBWMScreen.h"
 #include "client.h"
 #include "display.h"
 #include "drag.h"
