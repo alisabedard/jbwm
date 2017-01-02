@@ -3,18 +3,14 @@
 // Copyright 1999-2015, Ciaran Anscomb <jbwm@6809.org.uk>
 // See README for license and other details.
 #include "new.h"
-#include <stdlib.h>
 #include <X11/Xatom.h>
 #include <X11/Xutil.h>
-#include "JBWMClient.h"
-#include "JBWMScreen.h"
+#include <stdlib.h>
 #include "client.h"
 #include "config.h"
 #include "display.h"
 #include "ewmh.h"
-#include "jbwm.h"
 #include "keys.h"
-#include "log.h"
 #include "macros.h"
 #include "mwm.h"
 #include "screen.h"
