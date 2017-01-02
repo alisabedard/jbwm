@@ -5,10 +5,7 @@
 //#undef DEBUG
 #include "snap.h"
 #include <stdlib.h>
-#include "JBWMSize.h"
-#include "JBWMClient.h"
 #include "JBWMPoint.h"
-#include "JBWMScreen.h"
 #include "client.h"
 #include "config.h"
 #include "font.h"
