@@ -26,6 +26,10 @@ struct JBWMScreen * jbwm_get_screens(void)
 {
 	return screens;
 }
+void jbwm_set_screens(struct JBWMScreen * restrict s)
+{
+	screens = s;
+}
 /* Used for overriding the default WM modifiers */
 __attribute__((warn_unused_result))
 static uint16_t parse_modifiers(char * arg)
@@ -54,7 +58,7 @@ static uint16_t parse_modifiers(char * arg)
 	// everything else becomes mod1
 	return Mod1Mask;
 }
-static void parse_argv(uint8_t argc, char **argv)
+void jbwm_parse_command_line(const uint8_t argc, char **argv)
 {
 	JBWM_LOG("parse_argv(%d,%s...)", argc, argv[0]);
 	static const char optstring[] = "1:2:b:d:F:f:hs:Vv";
@@ -181,7 +185,7 @@ static void setup_event_listeners(Display * d, const Window root)
 	XChangeWindowAttributes(d, root, CWEventMask,
 		&(XSetWindowAttributes){.event_mask = EMASK });
 }
-static void setup_screen(Display * d, const uint8_t i)
+void jbwm_init_screen(Display * d, const uint8_t i)
 {
 	struct JBWMScreen * s = &screens[i];
 	setup_screen_elements(d, i);
@@ -192,7 +196,7 @@ static void setup_screen(Display * d, const uint8_t i)
 	setup_clients(d, s);
 	jbwm_ewmh_init_screen(s);
 }
-static void jbwm_set_defaults(void)
+void jbwm_set_defaults(void)
 {
 #define SETENV(i) setenv(ENV(i), JBWM_DEF_##i, 0)
 	SETENV(FG); SETENV(FC); SETENV(BG); SETENV(TERM);
@@ -201,19 +205,4 @@ static void jbwm_set_defaults(void)
 	SETENV(STICK); SETENV(FONT);
 #endif//JBWM_USE_TITLE_BAR
 #undef SETENV
-}
-int main(int argc, char **argv)
-{
-	jbwm_set_defaults();
-	parse_argv(argc, argv);
-	Display * d = jbwm_open_display();
-	uint8_t i = ScreenCount(d);
-	// allocate using dynamically sized array on stack
-	struct JBWMScreen s[i]; // remains in scope till exit.
-	screens = s;
-	while (i--)
-		setup_screen(d, i);
-	jbwm_set_signal_handler();
-	jbwm_events_loop(d);
-	return 0;
 }
