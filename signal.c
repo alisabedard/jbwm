@@ -20,12 +20,14 @@ static void atexit_cb(void)
 		free(i);
 		i = j;
 	}
-	XCloseDisplay(jbwm_get_display());
+	/*  exit() closes the display when it closes all open file
+	 *  descriptors.  Trying to do so manually results in exit hanging on
+	 *  the first invocation and a second invocation being necessary.  */
 }
 static void signal_cb(int sig)
 {
 	JBWM_LOG("signal_cb: %d", sig);
-	exit(sig); // defer to atexit_cb
+	exit(sig); // Pass the signal to the exit handler
 }
 void jbwm_set_signal_handler(void)
 {
