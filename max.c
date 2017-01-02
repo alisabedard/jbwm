@@ -1,7 +1,5 @@
 // Copyright 2017, Jeffrey E. Bedard
 #include "max.h"
-#include "JBWMClient.h"
-#include "JBWMScreen.h"
 #include "display.h"
 #include "ewmh.h"
 #include "ewmh_state.h"
