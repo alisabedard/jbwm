@@ -28,4 +28,12 @@
 #define JBWM_ENV_STICK "JBWM_STICK"
 #define JBWM_ENV_TERM "JBWM_TERM"
 #define JBWM_NAME "jbwm"
+/* Compile-time defaults of an integer type shall be stored here.  */
+enum {
+	JBWM_KEYMASK_GRAB = Mod4Mask,
+	JBWM_KEYMASK_MOD = ControlMask,
+	JBWM_SNAP = 15,
+	JBWM_RESIZE_INCREMENT = 20,
+	JBWM_MAX_DESKTOPS = 10
+};
 #endif//JBWM_CONFIG_H

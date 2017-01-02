@@ -5,7 +5,6 @@
 #include "keys.h"
 #include <stdlib.h>
 #include <unistd.h>
-#include "JBWMDefaults.h"
 #include "JBWMScreen.h"
 #include "client.h"
 #include "config.h"

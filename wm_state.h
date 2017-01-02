@@ -1,6 +1,7 @@
 // Copyright 2017, Jeffrey E. Bedard
 #ifndef JBWM_WM_STATE_H
 #define JBWM_WM_STATE_H
+#include <X11/Xlib.h>
 #include "JBWMClient.h"
 // Return WM_STATE atom
 Atom jbwm_get_wm_state(Display * d);

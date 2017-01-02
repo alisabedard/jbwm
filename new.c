@@ -5,8 +5,8 @@
 #include "new.h"
 #include <stdlib.h>
 #include <X11/Xatom.h>
+#include <X11/Xutil.h>
 #include "JBWMClient.h"
-#include "JBWMDefaults.h"
 #include "JBWMScreen.h"
 #include "client.h"
 #include "config.h"

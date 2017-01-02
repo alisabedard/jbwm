@@ -3,17 +3,14 @@
 // Copyright 1999-2015, Ciaran Anscomb <jbwm@6809.org.uk>
 // See README for license and other details.
 #include "client.h"
-#include "JBWMClient.h"
-#include "JBWMScreen.h"
 #include "display.h"
 #include "ewmh.h"
 #include "ewmh_state.h"
-#include "jbwm.h"
+#include "JBWMClient.h"
 #include "log.h"
 #include "screen.h"
 #include "select.h"
 #include "title_bar.h"
-#include "util.h"
 static struct JBWMClient * current, * head;
 struct JBWMClient * jbwm_get_current_client(void)
 {

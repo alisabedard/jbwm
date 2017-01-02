@@ -7,10 +7,10 @@
 #include <stdlib.h>
 #include "JBWMSize.h"
 #include "JBWMClient.h"
-#include "JBWMDefaults.h"
 #include "JBWMPoint.h"
 #include "JBWMScreen.h"
 #include "client.h"
+#include "config.h"
 #include "font.h"
 #include "screen.h"
 __attribute__ ((const, warn_unused_result))

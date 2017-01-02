@@ -4,9 +4,7 @@
 // See README for license and other details.
 #ifndef JBWM_CLIENT_STRUCT_H
 #define JBWM_CLIENT_STRUCT_H
-#include <stdbool.h>
-#include <stdint.h>
-#include <X11/Xutil.h>
+#include <X11/X.h>
 #include "JBWMClientOptions.h"
 #include "JBWMRectangle.h"
 struct JBWMScreen;

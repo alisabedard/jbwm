@@ -1,7 +1,7 @@
 // Copyright 2017, Jeffrey E. Bedard
 #include "wm_state.h"
 #include <X11/Xatom.h>
-#include <string.h>
+#include <X11/Xutil.h>
 #include "display.h"
 #include "ewmh.h"
 #include "ewmh_state.h"
