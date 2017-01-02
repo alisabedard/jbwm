@@ -4,20 +4,16 @@
 // See README for license and other details.
 //#undef DEBUG
 #include "jbwm.h"
-#include <X11/X.h>
-#include <X11/Xlib.h>
 #include <stdbool.h>
-#include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
 #include "JBWMScreen.h"
-#include "JBWMSize.h"
 #include "config.h"
 #include "display.h"
-#include "events.h"
 #include "ewmh.h"
+#include "events.h"
 #include "keys.h"
 #include "log.h"
 #include "new.h"
