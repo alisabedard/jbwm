@@ -5,8 +5,8 @@
 #ifndef JBWM_EWMH_H
 #define JBWM_EWMH_H
 #ifdef JBWM_USE_EWMH
-#include <stdint.h>
 #include <X11/Xlib.h>
+#include <stdint.h>
 struct JBWMClient;
 struct JBWMScreen;
 Atom jbwm_ewmh_get_atom(const uint8_t index);
