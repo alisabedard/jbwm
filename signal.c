@@ -2,10 +2,9 @@
 #include "signal.h"
 #include <signal.h>
 #include <stdlib.h>
-#include "JBWMClient.h"
-#include "JBWMClientOptions.h"
 #include "client.h"
 #include "display.h"
+#include "JBWMClient.h"
 #include "log.h"
 #include "title_bar.h"
 static void atexit_cb(void)
