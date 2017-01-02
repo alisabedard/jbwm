@@ -3,19 +3,14 @@
 // Copyright 1999-2015, Ciaran Anscomb <jbwm@6809.org.uk>
 // See README for license and other details.
 #include "select.h"
-#include <X11/X.h>
+#include <X11/Xatom.h>
 #include <X11/Xlib.h>
-#include <X11/Xatom.h> // keep
-#include "JBWMClient.h"
-#include "JBWMClientOptions.h"
-#include "JBWMScreen.h"
 #include "client.h"
 #include "display.h"
 #include "ewmh.h"
 #include "ewmh_state.h"
-#include "pixel_t.h"
 #include "screen.h"
-#include "util.h" // keep
+#include "util.h"
 #define EWMH_ATOM(a) jbwm_ewmh_get_atom(JBWM_EWMH_##a)
 #define WM_STATE(a) EWMH_ATOM(WM_STATE_##a)
 static inline jbwm_pixel_t get_bg(struct JBWMClient * restrict c)
