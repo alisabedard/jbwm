@@ -29,42 +29,17 @@
 #endif//LOG_LEVEL>7
 static bool events_need_cleanup;
 static Window last_window;
+// Allow future clients with the same window ID:
+void jbwm_events_clear_last_window(void)
+{
+	last_window = 0;
+}
 __attribute__((pure))
 static struct JBWMScreen * get_screen(const int8_t i,
 	const Window root)
 {
 	struct JBWMScreen * s = jbwm_get_screens();
 	return s[i].root == root ? s + i : get_screen(i - 1, root);
-}
-#ifdef JBWM_USE_EWMH
-static void delete_ewmh_properties(Display * d,
-	const Window w)
-{
-	// Per ICCCM + wm-spec
-	XDeleteProperty(d, w, jbwm_ewmh_get_atom(JBWM_EWMH_WM_STATE));
-	XDeleteProperty(d, w, jbwm_ewmh_get_atom(JBWM_EWMH_WM_DESKTOP));
-}
-#else//!JBWM_USE_EWMH
-#define delete_ewmh_properties(d, w)
-#endif//JBWM_USE_EWMH
-void jbwm_free_client(struct JBWMClient * restrict c)
-{
-	Display * d = jbwm_get_display();
-	{ // w scope
-		const Window w = c->window;
-		delete_ewmh_properties(d, w);
-		{ // * p scope
-			struct JBWMRectangle * restrict p = &c->size;
-			XReparentWindow(d, w, jbwm_get_root(c), p->x, p->y);
-		}
-		XRemoveFromSaveSet(d, w);
-	}
-	if(c->parent)
-		XDestroyWindow(d, c->parent);
-	jbwm_relink_client_list(c);
-	free(c);
-	// Allow future clients with the same window ID:
-	last_window = 0;
 }
 static void cleanup(struct JBWMClient * i)
 {
@@ -73,7 +48,7 @@ static void cleanup(struct JBWMClient * i)
 		return;
 	struct JBWMClient * next = i->next; // save
 	if (i->opt.remove)
-		jbwm_free_client(i);
+		jbwm_client_free(i);
 	cleanup(next);
 }
 static void handle_property_change(XPropertyEvent * e,

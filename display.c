@@ -1,12 +1,11 @@
 // Copyright 2017, Jeffrey E. Bedard
 #include "display.h"
-#include <X11/Xlibint.h>
 #include <X11/Xproto.h>
 #include <errno.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include "client.h"
 #include "config.h"
-#include "events.h"
 #include "font.h"
 #include "jbwm.h"
 #include "log.h"
@@ -19,7 +18,7 @@ static void cleanup(const Window w)
 {
 	struct JBWMClient * restrict c = jbwm_get_client(w);
 	if (c) // match found
-		jbwm_free_client(c);
+		jbwm_client_free(c);
 }
 __attribute__((pure))
 static int handle_xerror(Display * dpy __attribute__((unused)),

@@ -3,8 +3,10 @@
 // Copyright 1999-2015, Ciaran Anscomb <jbwm@6809.org.uk>
 // See README for license and other details.
 #include "client.h"
+#include <stdlib.h>
 #include "JBWMClient.h"
 #include "display.h"
+#include "events.h"
 #include "ewmh.h"
 #include "ewmh_state.h"
 #include "log.h"
@@ -91,3 +93,33 @@ void jbwm_toggle_sticky(struct JBWMClient * restrict c)
 		  JBWM_EWMH_WM_STATE_STICKY));
 #endif//JBWM_USE_EWMH
 }
+#ifdef JBWM_USE_EWMH
+static void delete_ewmh_properties(Display * d,
+	const Window w)
+{
+	// Per ICCCM + wm-spec
+	XDeleteProperty(d, w, jbwm_ewmh_get_atom(JBWM_EWMH_WM_STATE));
+	XDeleteProperty(d, w, jbwm_ewmh_get_atom(JBWM_EWMH_WM_DESKTOP));
+}
+#else//!JBWM_USE_EWMH
+#define delete_ewmh_properties(d, w)
+#endif//JBWM_USE_EWMH
+void jbwm_client_free(struct JBWMClient * restrict c)
+{
+	Display * d = jbwm_get_display();
+	{ // w scope
+		const Window w = c->window;
+		delete_ewmh_properties(d, w);
+		{ // * p scope
+			struct JBWMRectangle * restrict p = &c->size;
+			XReparentWindow(d, w, jbwm_get_root(c), p->x, p->y);
+		}
+		XRemoveFromSaveSet(d, w);
+	}
+	if(c->parent)
+		XDestroyWindow(d, c->parent);
+	jbwm_relink_client_list(c);
+	free(c);
+	jbwm_events_clear_last_window();
+}
+
