@@ -102,7 +102,7 @@ static void handle_colormap_notify(struct JBWMClient * restrict c,
 	if (c && e->new)
 		XInstallColormap(e->display, c->cmap = e->colormap);
 }
-void jbwm_event_loop(Display * d)
+void jbwm_events_loop(Display * d)
 {
 	for (;;) {
 		XEvent ev;

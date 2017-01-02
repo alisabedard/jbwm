@@ -214,6 +214,6 @@ int main(int argc, char **argv)
 	while (i--)
 		setup_screen(d, i);
 	jbwm_set_signal_handler();
-	jbwm_event_loop(d);
+	jbwm_events_loop(d);
 	return 0;
 }

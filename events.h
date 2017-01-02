@@ -8,5 +8,5 @@
 struct JBWMClient;
 // Allow future clients with the same window ID:
 void jbwm_events_clear_last_window(void);
-void jbwm_event_loop(Display * d) __attribute__((noreturn));
+void jbwm_events_loop(Display * d) __attribute__((noreturn));
 #endif /* ! JBWM_EVENTS_H */
