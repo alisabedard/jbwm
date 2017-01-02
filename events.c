@@ -7,15 +7,13 @@
 #undef DEBUG
 #endif//LOG_LEVEL
 #include "events.h"
-#include <stdlib.h>
 #include <X11/Xatom.h>
-#include "JBWMScreen.h"
+#include <stdlib.h>
 #include "button_event.h"
 #include "client.h"
 #include "display.h"
 #include "ewmh_state.h"
 #include "ewmh.h"
-#include "jbwm.h"
 #include "keys.h"
 #include "log.h"
 #include "new.h"
