@@ -8,7 +8,6 @@
 #include "client.h"
 #include "drag.h"
 #include "log.h"
-#include "screen.h"
 #include "title_bar.h"
 #include "wm_state.h"
 #ifdef JBWM_USE_TITLE_BAR
