@@ -4,6 +4,7 @@
 // See README for license and other details.
 #ifndef JBWM_CONFIG_H
 #define JBWM_CONFIG_H
+#include <X11/X.h> // for keymasks
 /* Note:  Also, adjust the values in JBWMDefaults.h as necessary.  */
 #define JBWM_DEF_TERM "xterm"
 /* Default fonts */
