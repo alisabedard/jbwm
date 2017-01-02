@@ -4,7 +4,6 @@
 // See README for license and other details.
 #include "util.h"
 #include <stdbool.h>
-#include <stddef.h>
 void jbwm_set_property(Display * d, const Window win,
 	const Atom property, const Atom type,
 	void * data, uint16_t size)
