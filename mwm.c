@@ -32,7 +32,7 @@ enum MwmStatus {
 	MWM_TEAROFF_WINDOW = 1
 };
 struct JBWMMwm { // paraphrased from MwmUtil.h
-	uint32_t flags, functions, decor, input_mode, status;
+	unsigned long flags, functions, decor, input_mode, status;
 };
 static void process_flags(struct JBWMClient * restrict c)
 {
@@ -73,17 +73,31 @@ static void do_functions(struct JBWMClientOptions * o,
 static void do_decorations(struct JBWMClientOptions * o,
 	const enum MwmDecor f)
 {
-	o->no_border=!(f & MWM_DECOR_BORDER);
+	o->no_border = !(f & MWM_DECOR_BORDER);
 #ifdef ENABLE_NO_RESIZE
-	if (!(f & MWM_DECOR_RESIZEH))
-		o->no_resize = true;
+	if (f & MWM_DECOR_RESIZEH) {
+		JBWM_LOG("decor resize");
+		o->no_resize = false;
+	}
 #endif//ENABLE_NO_RESIZE
-	if (!(f & MWM_DECOR_MENU))
-		o->no_close = true;
-	if (!(f & MWM_DECOR_MINIMIZE))
-		o->no_min = true;
-	if (!(f & MWM_DECOR_TITLE))
+	if (f & MWM_DECOR_MENU) {
+		JBWM_LOG("decor close");
+		o->no_close = false;
+	}
+	if (f & MWM_DECOR_MINIMIZE) {
+		JBWM_LOG("decor min");
+		o->no_min = false;
+	}
+#define JBWM_ENABLE_TITLE_BAR_HINT
+#ifdef JBWM_ENABLE_TITLE_BAR_HINT
+	if (f & MWM_DECOR_TITLE) {
+		JBWM_LOG("decor title_bar");
+		o->no_title_bar = false;
+	} else {
+		JBWM_LOG("decor no_title_bar");
 		o->no_title_bar = true;
+	}
+#endif//JBWM_ENABLE_TITLE_BAR_HINT
 }
 static Atom get_mwm_hints_atom(Display * d)
 {
