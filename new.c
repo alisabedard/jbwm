@@ -127,7 +127,11 @@ static void init_geometry(struct JBWMClient * restrict c)
 	const bool pos = process_size_hints(jbwm_get_display(), c->window, g,
 		a_geo.width, a_geo.height);
 	{ // scr_sz scope
-		const struct JBWMSize scr_sz = jbwm_get_screen(c)->size;
+		struct JBWMScreen * s = jbwm_get_screen(c);
+		if (!s) {
+			g->x = g->y = 0;
+		}
+		const struct JBWMSize scr_sz = s->size;
 		check_dimensions(g, scr_sz);
 		if (pos && (a_geo.x || a_geo.y)) {
 			JBWM_LOG("\t\tPosition is set by hints.");
