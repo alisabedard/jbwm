@@ -13,6 +13,7 @@
 #include "ewmh.h" // keep
 #include "font.h"
 #include "log.h"
+#include "mwm.h"
 #include "shape.h"
 #include "title_bar.h"
 #include "util.h" // keep
@@ -37,6 +38,10 @@ void jbwm_move_resize(struct JBWMClient * restrict c)
 	struct JBWMClientOptions * restrict o = &c->opt;
 	const uint8_t offset = o->no_title_bar || o->fullscreen
 		? 0 : jbwm_get_font_height();
+	if(offset) { // Leave braces in case title bar support was disabled.
+		jbwm_handle_mwm_hints(c);
+		jbwm_update_title_bar(c);
+	} // Skip shaped and fullscreen clients.
 	{ // * d, * g scope
 		struct JBWMRectangle * restrict g = &c->size;
 		Display * d = jbwm_get_display();
@@ -45,9 +50,6 @@ void jbwm_move_resize(struct JBWMClient * restrict c)
 		XMoveResizeWindow(d, c->window, 0, offset,
 			g->width, g->height);
 	}
-	if(offset) { // Leave braces in case title bar support was disabled.
-		jbwm_update_title_bar(c);
-	} // Skip shaped and fullscreen clients.
 	jbwm_set_shape(c);
 	jbwm_configure_client(c);
 }
