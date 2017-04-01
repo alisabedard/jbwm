@@ -85,8 +85,7 @@ void jbwm_set_vert(struct JBWMClient * restrict c)
 static void set_not_fullscreen(struct JBWMClient * restrict c)
 {
 	c->opt.fullscreen = false;
-	set_not_horz(c);
-	set_not_vert(c);
+	c->size = c->before_fullscreen;
 	Display * d = jbwm_get_display();
 	XSetWindowBorderWidth(d, c->parent, c->border);
 	jbwm_ewmh_remove_state(d, c->window,
@@ -103,16 +102,11 @@ void jbwm_set_not_fullscreen(struct JBWMClient * restrict c)
 static void set_fullscreen(struct JBWMClient * restrict c)
 {
 	c->opt.fullscreen = true;
-	/* If the window is already maximized in any direction,
-	   restore its original size before setting fullscreen.
-	   Without these checks, the window will loose its
-	   original size after being set fullscreen.  */
-	if (c->opt.max_horz)
-		set_not_horz(c);
-	if (c->opt.max_vert)
-		set_not_vert(c);
-	set_horz(c);
-	set_vert(c);
+	c->before_fullscreen = c->size;
+	c->size.x = c->size.y = 0;
+	c->size.width = jbwm_get_screen(c)->size.width;
+	c->size.height = jbwm_get_screen(c)->size.height;
+
 	Display * d = jbwm_get_display();
 	XSetWindowBorderWidth(d, c->parent, 0);
 	jbwm_ewmh_add_state(d, c->window,

@@ -25,6 +25,6 @@ struct JBWMClient {
 	uint8_t border:1;
 	uint8_t vdesk:4;
 	uint8_t screen;
-	struct JBWMRectangle size, old_size;
+	struct JBWMRectangle size, old_size, before_fullscreen;
 } __attribute__((packed));
 #endif /* JBWM_CLIENT_STRUCT_H */
