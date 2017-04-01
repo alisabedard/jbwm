@@ -130,6 +130,7 @@ static void init_geometry(struct JBWMClient * restrict c)
 		struct JBWMScreen * s = jbwm_get_screen(c);
 		if (!s) {
 			g->x = g->y = 0;
+			return;
 		}
 		const struct JBWMSize scr_sz = s->size;
 		check_dimensions(g, scr_sz);
@@ -156,9 +157,8 @@ static Window get_parent(struct JBWMClient * restrict c)
 	Display * d = jbwm_get_display();
 	return XCreateWindow(d, jbwm_get_root(c), g->x, g->y,
 		g->width, g->height, c->border, CFP, CFP,
-		DefaultVisual(d, c->screen), CW_VM,
-		&(XSetWindowAttributes){.override_redirect=true,
-		.event_mask = WA_EM});
+		CFP, CW_VM, &(XSetWindowAttributes){
+		.override_redirect=true, .event_mask = WA_EM});
 }
 __attribute__((nonnull))
 static void reparent(struct JBWMClient * restrict c)
