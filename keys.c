@@ -15,6 +15,7 @@
 #include "max.h"
 #include "screen.h"
 #include "select.h"
+#include "signal.h"
 #include "snap.h"
 #include "title_bar.h"
 #include "util.h"
@@ -204,7 +205,8 @@ static void start_terminal(void)
 	if (fork() == 0) {
 		char * t = getenv(JBWM_ENV_TERM);
 		execlp(t, t, (char*)NULL);
-	}
+	} else // in controlling process:
+		jbwm_wait_child();
 }
 void jbwm_handle_key_event(XKeyEvent * e)
 {

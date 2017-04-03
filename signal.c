@@ -2,6 +2,7 @@
 #include "signal.h"
 #include <signal.h>
 #include <stdlib.h>
+#include <sys/wait.h>
 #include "client.h"
 #include "display.h"
 #include "JBWMClient.h"
@@ -31,6 +32,14 @@ static void signal_cb(int sig)
 {
 	JBWM_LOG("signal_cb: %d", sig);
 	exit(sig); // Pass the signal to the exit handler
+}
+static void sigchld_cb(int sig __attribute__((unused)))
+{
+	wait(NULL);
+}
+void jbwm_wait_child(void)
+{
+	signal(SIGCHLD, sigchld_cb); // reap zombies
 }
 void jbwm_set_signal_handler(void)
 {
