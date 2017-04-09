@@ -1,4 +1,4 @@
-// Copyright 2016, Jeffrey E. Bedard
+// Copyright 2017, Jeffrey E. Bedard
 #ifndef LIBJB_UTIL_H
 #define LIBJB_UTIL_H
 #ifdef __cplusplus
@@ -6,12 +6,14 @@ extern "C" {
 #endif//__cplusplus
 #include <stdbool.h>
 typedef int fd_t;
+// If val is false, print msg then abort()
+void jb_assert(const bool val, char * msg);
 // If val is false, print msg then return !val
 bool jb_check(const bool val, const char * msg);
 // If val is false, print msg then exit(1)
 void jb_require(const bool val, const char * msg);
-// If val is false, print msg then abort()
-void jb_assert(const bool val, char * msg);
+// Execute command in a new background process
+void jb_system(const char * command);
 #ifdef __cplusplus
 }
 #endif//__cplusplus

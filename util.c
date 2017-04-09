@@ -1,8 +1,23 @@
-// Copyright 2016, Jeffrey E. Bedard
+// Copyright 2017, Jeffrey E. Bedard
 #include "util.h"
 #include <stdint.h>
 #include <stdlib.h>
+#include <sys/wait.h>
 #include <unistd.h>
+static void sigchld(int sig __attribute((unused)))
+{
+	wait(NULL);
+}
+// Execute command in a new background process
+void jb_system(const char * command)
+{
+	if (fork() == 0) { // child:
+		execlp(command, command, (char *)NULL);
+		// execlp only returns on error
+	} else { // in controlling process:
+		signal(SIGCHLD, sigchld);
+	}
+}
 // If val is false, print msg then return !val
 bool jb_check(const bool val, const char * msg)
 {

@@ -1,5 +1,5 @@
 #!/usr/bin/gawk -f
-# Copyright 2016, Jeffrey E. Bedard
+# Copyright 2017, Jeffrey E. Bedard
 # Simple utility to show source code lines that are too long.
 BEGIN {
 	FS="\t";
