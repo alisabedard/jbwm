@@ -4,7 +4,7 @@
 #include <stdlib.h>
 #include <sys/wait.h>
 #include <unistd.h>
-static void sigchld(int sig __attribute((unused)))
+static void wait_cb(int sig __attribute((unused)))
 {
 	wait(NULL);
 }
@@ -14,8 +14,13 @@ void jb_system(const char * command)
 	if (fork() == 0) { // child:
 		execlp(command, command, (char *)NULL);
 		// execlp only returns on error
+		exit(1);
 	} else { // in controlling process:
-		signal(SIGCHLD, sigchld);
+		static bool wait_cb_registered;
+		if (!wait_cb_registered) {
+			signal(SIGCHLD, wait_cb);
+			wait_cb_registered = true;
+		}
 	}
 }
 // If val is false, print msg then return !val
