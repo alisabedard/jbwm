@@ -10,6 +10,8 @@ typedef int fd_t;
 void jb_assert(const bool val, char * msg);
 // If val is false, print msg then return !val
 bool jb_check(const bool val, const char * msg);
+// Execute command in a new background process
+void jb_execvp(const char * command, char *const argv[]);
 // If val is false, print msg then exit(1)
 void jb_require(const bool val, const char * msg);
 // Execute command in a new background process

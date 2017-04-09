@@ -1,5 +1,6 @@
 // Copyright 2017, Jeffrey E. Bedard
 #include "util.h"
+#include <errno.h>
 #include <stdint.h>
 #include <stdlib.h>
 #include <sys/wait.h>
@@ -9,10 +10,11 @@ static void wait_cb(int sig __attribute((unused)))
 	wait(NULL);
 }
 // Execute command in a new background process
-void jb_system(const char * command)
+void jb_execvp(const char * command, char *const argv[])
 {
 	if (fork() == 0) { // child:
-		execlp(command, command, (char *)NULL);
+		errno = 0;
+		execvp(command, argv);
 		// execlp only returns on error
 		exit(1);
 	} else { // in controlling process:
