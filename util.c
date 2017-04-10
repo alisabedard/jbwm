@@ -43,8 +43,8 @@ void jb_shell(const char * command)
 		init_wait_cb();
 }
 /* Execute command in a new background process.  Note, this does not handle
-   quoted arguments properly.  For that, use jb_shell().  This version
-   has the advantage of not spawning a shell process.  */
+   quoted arguments properly.  For that, use jb_shell().  This version has the
+   advantage of not spawning a shell process.  */
 void jb_system(const char * command)
 {
 	enum { MAXARGS = 64 };
