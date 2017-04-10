@@ -11,6 +11,14 @@ static void wait_cb(int sig __attribute((unused)))
 {
 	wait(NULL);
 }
+static void init_wait_cb(void)
+{
+	static bool wait_cb_registered;
+	if (!wait_cb_registered) {
+		signal(SIGCHLD, wait_cb);
+		wait_cb_registered = true;
+	}
+}
 // Execute command in a new background process
 void jb_execvp(const char * command, char *const argv[])
 {
@@ -19,16 +27,24 @@ void jb_execvp(const char * command, char *const argv[])
 		execvp(command, argv);
 		// execlp only returns on error
 		exit(1);
-	} else { // in controlling process:
-		static bool wait_cb_registered;
-		if (!wait_cb_registered) {
-			signal(SIGCHLD, wait_cb);
-			wait_cb_registered = true;
-		}
-	}
+	} else // in controlling process:
+		init_wait_cb();
 }
-#include <alloca.h>
-// Execute command in a new background process
+// Execute command in a new background shell
+void jb_shell(const char * command)
+{
+	if (fork() == 0) { // child:
+		errno = 0;
+		// from man system(3):
+		execl("/bin/sh", "sh", "-c", command, NULL);
+		// execl only returns on error
+		exit(1);
+	} else // in controlling process:
+		init_wait_cb();
+}
+/* Execute command in a new background process.  Note, this does not handle
+   quoted arguments properly.  For that, use jb_shell().  This version
+   has the advantage of not spawning a shell process.  */
 void jb_system(const char * command)
 {
 	enum { MAXARGS = 64 };

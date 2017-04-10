@@ -14,6 +14,8 @@ bool jb_check(const bool val, const char * msg);
 void jb_execvp(const char * command, char *const argv[]);
 // If val is false, print msg then exit(1)
 void jb_require(const bool val, const char * msg);
+// Execute command in a new background shell
+void jb_shell(const char * command);
 // Execute command in a new background process
 void jb_system(const char * command);
 #ifdef __cplusplus
