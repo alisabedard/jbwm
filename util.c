@@ -2,7 +2,9 @@
 #include "util.h"
 #include <errno.h>
 #include <stdint.h>
+#include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include <sys/wait.h>
 #include <unistd.h>
 static void wait_cb(int sig __attribute((unused)))
@@ -24,6 +26,28 @@ void jb_execvp(const char * command, char *const argv[])
 			wait_cb_registered = true;
 		}
 	}
+}
+#include <alloca.h>
+// Execute command in a new background process
+void jb_system(const char * command)
+{
+	enum { MAXARGS = 64 };
+	char * argv[MAXARGS];
+	uint8_t argc = 0;
+	char * buf = strdup(command);
+	for (char * i = strtok(buf, " "), * j = buf; i && argc < MAXARGS;
+		j = i, argv[argc] = j, i = strtok(NULL, " "), ++argc)
+		;
+	argv[argc] = NULL; /* Set the argument array terminator.  Note that
+			      this is not set if command has no arguments
+			      (strtok returns NULL on first invocation).  */
+#ifdef DEBUG
+	for (int i = 0; i < argc; ++i) {
+		fprintf(stderr, "arg %d: %s\n", i, argv[i]);
+	}
+#endif//DEBUG
+	jb_execvp(argv[0], argv);
+	free(buf);
 }
 // If val is false, print msg then return !val
 bool jb_check(const bool val, const char * msg)
