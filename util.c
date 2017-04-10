@@ -51,13 +51,14 @@ void jb_system(const char * command)
 	char * argv[MAXARGS];
 	uint8_t argc = 0;
 	char * buf = strdup(command);
-	for (char * i = strtok(buf, " "), * j = buf; i && argc < MAXARGS;
-		j = i, argv[argc] = j, i = strtok(NULL, " "), ++argc)
-		;
+	for (char * i = strtok(buf, " "); i && argc < MAXARGS;
+		i = strtok(NULL, " "), ++argc)
+		argv[argc] = i;
 	argv[argc] = NULL; /* Set the argument array terminator.  Note that
 			      this is not set if command has no arguments
 			      (strtok returns NULL on first invocation).  */
 #ifdef DEBUG
+	fprintf(stderr, "argc is %d\n", argc);
 	for (int i = 0; i < argc; ++i) {
 		fprintf(stderr, "arg %d: %s\n", i, argv[i]);
 	}
