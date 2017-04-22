@@ -81,5 +81,7 @@ clang: clean
 depend:
 	cc -I/usr/include/freetype2 -E -MM *.c > depend.mk
 cppcheck:
-	cppcheck --enable=all --inconclusive --std=posix *.c
+	cppcheck --enable=all -j 4 -DDEBUG --inline-suppr \
+		--inconclusive --std=c11 *.c \
+		> /dev/null
 #EOF
