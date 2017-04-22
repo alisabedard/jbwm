@@ -22,11 +22,12 @@ extern inline Window jbwm_get_root(struct JBWMClient * restrict c);
 extern inline struct JBWMScreen * jbwm_get_screen(struct JBWMClient
 	* restrict c);
 __attribute__((nonnull))
-static void jbwm_configure_client(struct JBWMClient * restrict c)
+static void jbwm_configure_client(Display * d,
+	struct JBWMClient * restrict c)
 {
 	const Window w = c->window;
 	struct JBWMRectangle * restrict g = &c->size;
-	XSendEvent(jbwm_get_display(), w, true, StructureNotifyMask, (XEvent
+	XSendEvent(d, w, true, StructureNotifyMask, (XEvent
 		*) &(XConfigureEvent){.x = g->x, .y = g->y, .width = g->width,
 		.height = g->height, .type = ConfigureNotify, .event = w,
 		.window = w, .above = c->parent, .override_redirect = true,
@@ -42,16 +43,16 @@ void jbwm_move_resize(struct JBWMClient * restrict c)
 		jbwm_handle_mwm_hints(c);
 		jbwm_update_title_bar(c);
 	} // Skip shaped and fullscreen clients.
-	{ // * d, * g scope
+	Display * d = jbwm_get_display();
+	{ //  * g scope
 		struct JBWMRectangle * restrict g = &c->size;
-		Display * d = jbwm_get_display();
 		XMoveResizeWindow(d, c->parent, g->x, g->y - offset,
 			g->width, g->height + offset);
 		XMoveResizeWindow(d, c->window, 0, offset,
 			g->width, g->height);
 	}
 	jbwm_set_shape(c);
-	jbwm_configure_client(c);
+	jbwm_configure_client(d, c);
 }
 static void showing(struct JBWMClient * restrict c,
 	int (* mapping)(Display *, Window),
