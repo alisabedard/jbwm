@@ -113,8 +113,7 @@ static void init_geometry(struct JBWMClient * restrict c)
 	const bool viewable = get_window_attributes(c, &a_geo);
 	struct JBWMRectangle * g = &c->size;
 	if (viewable) {
-		/* Test if the reparent that is to come
-		   would trigger an unmap event. */
+		/* Increment unmap event counter for the reparent event.  */
 		++c->ignore_unmap;
 		/* If the window is already on screen before the window
 		   manager starts, simply save its geometry then return. */
