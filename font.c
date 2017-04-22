@@ -25,8 +25,3 @@ uint8_t jbwm_get_font_height(void)
 {
 	return jbwm_font->ascent + jbwm_font->descent;
 }
-uint8_t jbwm_get_font_width(void)
-{
-	return jbwm_font->max_advance_width;
-}
-
