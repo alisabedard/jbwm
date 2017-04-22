@@ -40,15 +40,15 @@ static uint8_t wm_desktop(Display * d, const Window w, uint8_t vdesk)
 	JBWM_LOG("wm_desktop(w: %d): vdesk is %d\n", (int) w, vdesk);
 	return vdesk;
 }
-#else//!JBWM_USE_EWMH
-#define wm_desktop(d, w, vdesk) vdesk
 #endif//JBWM_USE_EWMH
 __attribute__((nonnull))
 static void init_properties(struct JBWMClient * restrict c)
 {
 	jbwm_handle_mwm_hints(c);
 	c->vdesk = jbwm_get_screen(c)->vdesk;
+#ifdef JBWM_USE_EWMH
 	c->vdesk = wm_desktop(jbwm_get_display(), c->window, c->vdesk);
+#endif//JBWM_USE_EWMH
 }
 __attribute__((const))
 static uint16_t get_per_min(uint16_t spec, uint16_t min)

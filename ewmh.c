@@ -98,7 +98,7 @@ static Window * get_ordered_client_list(Display * d)
 			XFree(wl);
 		}
 	}
-	JBWM_LOG("get_ordered_client_list() n: %d", n);
+	JBWM_LOG("get_ordered_client_list() n: %d", (int)n);
 	wprop(d, DefaultRootWindow(d), JBWM_EWMH_CLIENT_LIST_STACKING,
 		XA_WINDOW, window_list, n);
 	return window_list;

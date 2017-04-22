@@ -60,7 +60,6 @@ static void commit_key_move(struct JBWMClient * restrict c)
 }
 struct KeyMoveFlags {
 	bool horz:1, pos:1, mod:1;
-	uint8_t pad:5;
 };
 __attribute__((nonnull))
 static void key_move(struct JBWMClient * restrict c,
