@@ -80,4 +80,6 @@ clang: clean
 #	cc -E -MM *.c > depend.mk
 depend:
 	cc -I/usr/include/freetype2 -E -MM *.c > depend.mk
+cppcheck:
+	cppcheck --enable=all --inconclusive --std=posix *.c
 #EOF
