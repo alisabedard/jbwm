@@ -10,7 +10,7 @@
 void jbwm_set_property(Display * d, const Window win,
 	const Atom property, const Atom type,
 	void * data, uint16_t size);
-jbwm_pixel_t jbwm_get_pixel(Display * d, const uint8_t screen,
+jbwm_pixel_t jbwm_get_pixel(Display * dpy, const uint8_t screen,
 	const char * name);
 // Free the result with XFree
 void * jbwm_get_property(Display * dpy, const Window w,
