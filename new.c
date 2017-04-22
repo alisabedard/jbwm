@@ -71,15 +71,11 @@ static bool process_size_hints(Display * d, const Window win,
 	}
 	return (h.flags & USPosition);
 }
-static void check_max_size(uint16_t * dim, const uint16_t scr_dim)
-{
-	*dim = JB_MIN(*dim, scr_dim);
-}
-static void check_dimensions(struct JBWMRectangle * g,
+static void check_dimensions(struct JBWMRectangle * restrict g,
 	const struct JBWMSize s)
 {
-	check_max_size(&g->width,s.width);
-	check_max_size(&g->height,s.height);
+	g->width = JB_MIN(g->width, s.width);
+	g->height = JB_MIN(g->height, s.height);
 }
 __attribute__((const))
 static int16_t get_center(const uint16_t wh, const uint16_t swh)
