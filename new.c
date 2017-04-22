@@ -81,6 +81,7 @@ static void check_dimensions(struct JBWMRectangle * g,
 	check_max_size(&g->width,s.width);
 	check_max_size(&g->height,s.height);
 }
+__attribute__((const))
 static int16_t get_center(const uint16_t wh, const uint16_t swh)
 {
 	return (swh >> 1) - (wh >> 1);
