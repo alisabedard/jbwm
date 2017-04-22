@@ -55,7 +55,7 @@ static uint16_t get_per_min(uint16_t spec, uint16_t min)
 {
 	return (spec >= min) ? spec : min;
 }
-static bool process_size_hints(Display * d, const Window win,
+static bool do_hints(Display * d, const Window win,
 	struct JBWMRectangle * g, const uint16_t a_w,
 	const uint16_t a_h)
 {
@@ -120,7 +120,7 @@ static void init_geometry(struct JBWMClient * restrict c)
 	c->ignore_unmap += viewable ? 1 : 0;
 	//bool pos = viewable;
 	JBWM_LOG("\t\tVIEWABLE: %d", viewable);
-	const bool pos = process_size_hints(jbwm_get_display(), c->window, g,
+	const bool pos = do_hints(jbwm_get_display(), c->window, g,
 		a_geo.width, a_geo.height);
 	{ // scr_sz scope
 		struct JBWMScreen * s = jbwm_get_screen(c);
