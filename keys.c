@@ -204,6 +204,8 @@ static void start_terminal(void)
 	if (fork() == 0) {
 		char * t = getenv(JBWM_ENV_TERM);
 		execlp(t, t, (char*)NULL);
+		// This is only reached on error.
+		exit(1);
 	} else // in controlling process:
 		jbwm_wait_child();
 }

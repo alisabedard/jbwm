@@ -7,12 +7,6 @@ int main(int argc, char **argv)
 {
 	jbwm_set_defaults();
 	jbwm_parse_command_line(argc, argv);
-	XInitThreads(); /* This must be the first xlib function called in a
-			   multi-threaded environment.  Even though we are not
-			   explicitly doing anything multi-threaded, jbwm
-			   crashes on ARMv7 warning that this may not have
-			   been called.  Such implies behind-the-scenes
-			   multi-threading may be occurring.  */
 	Display * d = jbwm_open_display();
 	uint8_t i = ScreenCount(d);
 	// allocate using dynamically sized array on stack
