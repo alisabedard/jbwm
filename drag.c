@@ -1,7 +1,7 @@
 // Copyright 2017, Jeffrey E. Bedard <jefbed@gmail.com>
 #include "drag.h"
-#include <X11/cursorfont.h>
 #include <X11/Xlibint.h>
+#include <X11/cursorfont.h>
 #include "display.h"
 #include "font.h"
 #include "screen.h"
