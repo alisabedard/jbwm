@@ -103,18 +103,20 @@ static void drag_event_loop(Display * d,
 	int16_t start[2];
 	query_pointer(d, root, start);
 	for (;;) {
-		int16_t p[2];
-		{ // e scope
-			XEvent e;
-			XMaskEvent(d, JBWMMouseMask, &e);
-			if (e.type != MotionNotify)
-				return;
-			p[0] = e.xmotion.x;
-			p[1] = e.xmotion.y;
+		{ // p scope
+			int16_t p[2];
+			{ // e scope
+				XEvent e;
+				XMaskEvent(d, JBWMMouseMask, &e);
+				if (e.type != MotionNotify)
+					return;
+				p[0] = e.xmotion.x;
+				p[1] = e.xmotion.y;
+			}
+			if (b)
+				draw_outline(d, root, gid, c);
+			do_changes(c, resize, start, original, p);
 		}
-		if (b)
-			draw_outline(d, root, gid, c);
-		do_changes(c, resize, start, original, p);
 		if (b)
 			draw_outline(d, root, gid, c);
 		else
