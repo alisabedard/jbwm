@@ -40,16 +40,6 @@ static void set_position(struct JBWMClient * restrict c,
 	c->size.y = get_diff(1, original, start, p);
 	jbwm_snap_client(c);
 }
-static void do_changes(struct JBWMClient * restrict c, const bool resize,
-	const int16_t * restrict start,
-	const int16_t * restrict original,
-	const int16_t * restrict p)
-{
-	if (resize)
-		set_size(c, p);
-	else // drag
-		set_position(c, original, start, p);
-}
 void jbwm_warp(Display * dpy, const Window w, const int16_t x,
 	const int16_t y)
 {
@@ -98,10 +88,10 @@ static void drag_event_loop(Display * d,
 	struct JBWMClient * restrict c, const Window root,
 	const GContext gid, const bool resize)
 {
-	const uint8_t b = c->border;
 	const int16_t original[] = {c->size.x, c->size.y};
 	int16_t start[2];
 	query_pointer(d, root, start);
+	const uint8_t b = c->border;
 	for (;;) {
 		{ // p scope
 			int16_t p[2];
@@ -115,7 +105,10 @@ static void drag_event_loop(Display * d,
 			}
 			if (b)
 				draw_outline(d, root, gid, c);
-			do_changes(c, resize, start, original, p);
+			if (resize)
+				set_size(c, p);
+			else
+				set_position(c, original, start, p);
 		}
 		if (b)
 			draw_outline(d, root, gid, c);
