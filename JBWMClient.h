@@ -6,13 +6,9 @@
 #define JBWM_CLIENT_STRUCT_H
 #include <X11/X.h>
 #include "JBWMClientOptions.h"
+#include "JBWMClientTitlebar.h"
 #include "JBWMRectangle.h"
 struct JBWMScreen;
-#ifdef JBWM_USE_TITLE_BAR
-struct JBWMClientTitlebar {
-	Window win, close, resize, shade, stick;
-};
-#endif//JBWM_USE_TITLE_BAR
 struct JBWMClient {
 	struct JBWMClient * next;
 #ifdef JBWM_USE_TITLE_BAR
