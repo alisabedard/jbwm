@@ -5,16 +5,12 @@
 #include "title_bar.h"
 #include <X11/Xatom.h>
 #include <X11/Xft/Xft.h>
-#include <string.h>
-#include "JBWMScreen.h"
 #include "config.h"
 #include "display.h"
 #include "ewmh.h"
 #include "ewmh_state.h"
 #include "font.h"
-#include "jbwm.h"
 #include "screen.h"
-#include "select.h"
 #include "util.h"
 #include "wm_state.h"
 // This implements window shading, a substitute for iconification.
@@ -81,14 +77,11 @@ static Window new_title_bar(Display * d, struct JBWMClient * restrict c)
 }
 static XftColor * get_color(Display * d, const int8_t screen)
 {
-	static bool init;
 	static XftColor color;
-	if (!init) {
+	if (!color.pixel)
 		XftColorAllocName(d, DefaultVisual(d, screen),
 			DefaultColormap(d, screen), getenv(JBWM_ENV_FG),
 			&color);
-		init = true;
-	}
 	return &color;
 }
 static XftDraw * get_xft_draw(Display * d, const Window w, const uint8_t
