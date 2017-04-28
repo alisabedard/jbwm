@@ -18,6 +18,5 @@ struct JBWMClientOptions {
 	bool shaped : 1;
 	bool sticky : 1;
 	bool tearoff : 1;
-	bool pad0 : 1;
 } __attribute__((packed));
 #endif//!JBWM_JBWMCLIENTOPTIONS_H
