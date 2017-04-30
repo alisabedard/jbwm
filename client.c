@@ -8,7 +8,6 @@
 #include "display.h"
 #include "ewmh.h"
 #include "ewmh_state.h"
-#include "log.h"
 #include "screen.h"
 #include "select.h"
 #include "title_bar.h"
@@ -41,7 +40,6 @@ static void relink_r(const struct JBWMClient * c, struct JBWMClient * i)
 // Relink c's linked list to exclude c
 void jbwm_relink_client_list(struct JBWMClient * restrict c)
 {
-	JBWM_LOG("relink_window_list");
 	if (current == c) // Remove selection target
 		current = NULL;
 	if (head == c) {
@@ -52,7 +50,6 @@ void jbwm_relink_client_list(struct JBWMClient * restrict c)
 }
 void jbwm_set_client_vdesk(struct JBWMClient * restrict c, const uint8_t d)
 {
-	JBWM_LOG("jbwm_set_client_vdesk");
 	const uint8_t p = c->vdesk; // save previous
 	c->vdesk = d;
 	// use jbwm_set_vdesk to validate d:
@@ -83,7 +80,6 @@ struct JBWMClient * jbwm_get_client(const Window w)
 }
 void jbwm_toggle_sticky(struct JBWMClient * restrict c)
 {
-	JBWM_LOG("stick");
 	c->opt.sticky ^= true; // toggle
 	jbwm_select_client(c);
 	jbwm_update_title_bar(c);
