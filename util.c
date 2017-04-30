@@ -5,6 +5,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <sys/signal.h> // for FreeBSD
 #include <sys/wait.h>
 #include <unistd.h>
 static void wait_cb(int sig __attribute((unused)))
