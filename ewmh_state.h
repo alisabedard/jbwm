@@ -1,3 +1,4 @@
+// Copyright 2017, Jeffrey E. Bedard
 #ifndef JBWM_EWMH_STATE_H
 #define JBWM_EWMH_STATE_H
 #ifdef JBWM_USE_EWMH
