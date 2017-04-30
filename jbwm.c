@@ -151,17 +151,13 @@ static void setup_screen_elements(Display * d, const uint8_t i)
 static void setup_gc(Display * d, struct JBWMScreen * s)
 {
 	allocate_colors(d, s);
-	enum {
-		VM = GCFunction | GCSubwindowMode | GCLineWidth
-			| GCForeground | GCBackground
-	};
-	XGCValues gv = {.foreground = s->pixels.fg,
-		.background = s->pixels.bg,
-		.function = GXxor,
-		.subwindow_mode = IncludeInferiors,
-		.line_width = 1
-	};
-	s->gc = XCreateGC(d, s->root, VM, &gv);
+	s->gc = XCreateGC(d, s->root, GCFunction | GCSubwindowMode
+		| GCLineWidth | GCForeground | GCBackground,
+		&(XGCValues){.foreground = s->pixels.fg,
+		.background = s->pixels.bg, .function = GXxor,
+		.subwindow_mode = IncludeInferiors, .line_width = 1
+	});
+
 }
 static void setup_event_listeners(Display * d, const Window root)
 {
