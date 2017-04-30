@@ -5,19 +5,12 @@
 //#undef DEBUG
 #include "screen.h"
 #include <X11/Xatom.h> // keep
-#include <X11/Xutil.h>
 #include "client.h"
 #include "config.h"
 #include "display.h"
-#include "ewmh_state.h" // keep
 #include "ewmh.h" // keep
-#include "font.h"
 #include "log.h"
-#include "mwm.h"
-#include "shape.h"
-#include "title_bar.h"
 #include "util.h" // keep
-#include "wm_state.h"
 static struct JBWMScreen * screens;
 struct JBWMScreen * jbwm_get_screens(void)
 {
@@ -30,54 +23,6 @@ void jbwm_set_screens(struct JBWMScreen * restrict s)
 extern inline Window jbwm_get_root(struct JBWMClient * restrict c);
 extern inline struct JBWMScreen * jbwm_get_screen(struct JBWMClient
 	* restrict c);
-__attribute__((nonnull))
-static void jbwm_configure_client(Display * d,
-	struct JBWMClient * restrict c)
-{
-	const Window w = c->window;
-	struct JBWMRectangle * restrict g = &c->size;
-	XSendEvent(d, w, true, StructureNotifyMask, (XEvent
-		*) &(XConfigureEvent){.x = g->x, .y = g->y, .width = g->width,
-		.height = g->height, .type = ConfigureNotify, .event = w,
-		.window = w, .above = c->parent, .override_redirect = true,
-		.border_width = c->border});
-}
-void jbwm_move_resize(struct JBWMClient * restrict c)
-{
-	JBWM_LOG("jbwm_move_resize");
-	struct JBWMClientOptions * restrict o = &c->opt;
-	const uint8_t offset = o->no_title_bar || o->fullscreen
-		? 0 : jbwm_get_font_height();
-	if(offset) { // Leave braces in case title bar support was disabled.
-		jbwm_handle_mwm_hints(c);
-		jbwm_update_title_bar(c);
-	} // Skip shaped and fullscreen clients.
-	Display * d = jbwm_get_display();
-	{ //  * g scope
-		struct JBWMRectangle * restrict g = &c->size;
-		XMoveResizeWindow(d, c->parent, g->x, g->y - offset,
-			g->width, g->height + offset);
-		XMoveResizeWindow(d, c->window, 0, offset,
-			g->width, g->height);
-	}
-	jbwm_set_shape(c);
-	jbwm_configure_client(d, c);
-}
-static void showing(struct JBWMClient * restrict c,
-	int (* mapping)(Display *, Window),
-	const int8_t wm_state)
-{
-	mapping(jbwm_get_display(), c->parent);
-	jbwm_set_wm_state(c, wm_state);
-}
-void jbwm_hide_client(struct JBWMClient * restrict c)
-{
-	showing(c, XUnmapWindow, IconicState);
-}
-void jbwm_restore_client(struct JBWMClient * restrict c)
-{
-	showing(c, XMapWindow, NormalState);
-}
 static void check_visibility(struct JBWMScreen * s,
 	struct JBWMClient * restrict c, const uint8_t v)
 {

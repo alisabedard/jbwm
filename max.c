@@ -5,6 +5,7 @@
 #include "ewmh_state.h"
 #include "font.h"
 #include "log.h"
+#include "move_resize.h"
 #include "screen.h"
 #include "title_bar.h"
 /* In this file, the static companion functions perform the requested option

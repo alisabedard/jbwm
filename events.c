@@ -16,6 +16,7 @@
 #include "ewmh.h"
 #include "keys.h"
 #include "log.h"
+#include "move_resize.h"
 #include "new.h"
 #include "screen.h"
 #include "select.h"

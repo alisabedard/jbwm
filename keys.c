@@ -13,6 +13,7 @@
 #include "jbwm.h"
 #include "log.h"
 #include "max.h"
+#include "move_resize.h"
 #include "screen.h"
 #include "select.h"
 #include "signal.h"

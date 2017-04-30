@@ -10,6 +10,7 @@
 #include "ewmh.h"
 #include "ewmh_state.h"
 #include "font.h"
+#include "move_resize.h"
 #include "screen.h"
 #include "util.h"
 #include "wm_state.h"

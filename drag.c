@@ -4,6 +4,7 @@
 #include <X11/cursorfont.h>
 #include "display.h"
 #include "font.h"
+#include "move_resize.h"
 #include "screen.h"
 #include "snap.h"
 enum {

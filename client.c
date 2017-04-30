@@ -3,6 +3,7 @@
 // Copyright 1999-2015, Ciaran Anscomb <jbwm@6809.org.uk>
 // See README for license and other details.
 #include "client.h"
+#include <X11/Xutil.h>
 #include <stdlib.h>
 #include "display.h"
 #include "ewmh.h"
@@ -11,6 +12,7 @@
 #include "screen.h"
 #include "select.h"
 #include "title_bar.h"
+#include "wm_state.h"
 static struct JBWMClient * current, * head;
 struct JBWMClient * jbwm_get_current_client(void)
 {
@@ -118,5 +120,20 @@ void jbwm_client_free(Display * d, struct JBWMClient * restrict c)
 		XDestroyWindow(d, c->parent);
 	jbwm_relink_client_list(c);
 	free(c);
+}
+static void showing(struct JBWMClient * restrict c,
+	int (* mapping)(Display *, Window),
+	const int8_t wm_state)
+{
+	mapping(jbwm_get_display(), c->parent);
+	jbwm_set_wm_state(c, wm_state);
+}
+void jbwm_hide_client(struct JBWMClient * restrict c)
+{
+	showing(c, XUnmapWindow, IconicState);
+}
+void jbwm_restore_client(struct JBWMClient * restrict c)
+{
+	showing(c, XMapWindow, NormalState);
 }
 
