@@ -23,9 +23,8 @@ ewmh_state.o: ewmh_state.c ewmh_state.h client.h display.h drag.h ewmh.h \
  JBWMSize.h select.h util.h wm_state.h
 font.o: font.c font.h config.h jbwm.h
 jbwm.o: jbwm.c jbwm.h JBWMScreen.h JBWMPixels.h pixel_t.h JBWMSize.h \
- config.h display.h ewmh.h events.h keys.h log.h new.h screen.h \
- JBWMClient.h JBWMClientOptions.h JBWMClientTitlebar.h JBWMRectangle.h \
- signal.h util.h
+ config.h ewmh.h keys.h log.h new.h screen.h JBWMClient.h \
+ JBWMClientOptions.h JBWMClientTitlebar.h JBWMRectangle.h util.h
 keys.o: keys.c keys.h JBWMScreen.h JBWMPixels.h pixel_t.h JBWMSize.h \
  client.h config.h display.h drag.h jbwm.h log.h max.h move_resize.h \
  screen.h JBWMClient.h JBWMClientOptions.h JBWMClientTitlebar.h \

@@ -4,21 +4,17 @@
 // See README for license and other details.
 //#undef DEBUG
 #include "jbwm.h"
-#include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
 #include "JBWMScreen.h"
 #include "config.h"
-#include "display.h"
 #include "ewmh.h"
-#include "events.h"
 #include "keys.h"
 #include "log.h"
 #include "new.h"
 #include "screen.h"
-#include "signal.h"
 #include "util.h"
 // Macros:
 #define ENV(e) JBWM_ENV_##e
