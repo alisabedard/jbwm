@@ -17,19 +17,11 @@
 #include "keys.h"
 #include "log.h"
 #include "new.h"
+#include "screen.h"
 #include "signal.h"
 #include "util.h"
 // Macros:
 #define ENV(e) JBWM_ENV_##e
-static struct JBWMScreen * screens;
-struct JBWMScreen * jbwm_get_screens(void)
-{
-	return screens;
-}
-void jbwm_set_screens(struct JBWMScreen * restrict s)
-{
-	screens = s;
-}
 /* Used for overriding the default WM modifiers */
 __attribute__((warn_unused_result))
 static uint16_t parse_modifiers(char * arg)
@@ -153,7 +145,7 @@ static void setup_clients(Display * d, struct JBWMScreen * s)
 }
 static void setup_screen_elements(Display * d, const uint8_t i)
 {
-	struct JBWMScreen * s = screens;
+	struct JBWMScreen * s = jbwm_get_screens();
 	s->screen = i;
 	s->vdesk = 0;
 	s->root = RootWindow(d, i);
@@ -187,7 +179,7 @@ static void setup_event_listeners(Display * d, const Window root)
 }
 void jbwm_init_screen(Display * d, const uint8_t i)
 {
-	struct JBWMScreen * s = &screens[i];
+	struct JBWMScreen * s = &jbwm_get_screens()[i];
 	setup_screen_elements(d, i);
 	setup_gc(d, s);
 	setup_event_listeners(d, s->root);

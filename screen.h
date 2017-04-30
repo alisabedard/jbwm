@@ -6,7 +6,7 @@
 #define JBWM_SCREEN_H
 #include "JBWMClient.h"
 #include "JBWMScreen.h"
-#include "jbwm.h" // for jbwm_get_screens()
+struct JBWMScreen * jbwm_get_screens(void);
 inline struct JBWMScreen * jbwm_get_screen(struct JBWMClient * restrict c)
 {
 	return jbwm_get_screens() + c->screen;
@@ -21,6 +21,7 @@ void jbwm_move_resize(struct JBWMClient * restrict c)
 	__attribute__((nonnull));
 void jbwm_restore_client(struct JBWMClient * restrict c)
 	__attribute__((nonnull));
+void jbwm_set_screens(struct JBWMScreen * restrict s);
 uint8_t jbwm_set_vdesk(struct JBWMScreen * s, uint8_t v)
 	__attribute__((nonnull));
 #endif /* JBWM_SCREEN_H */

@@ -18,6 +18,15 @@
 #include "title_bar.h"
 #include "util.h" // keep
 #include "wm_state.h"
+static struct JBWMScreen * screens;
+struct JBWMScreen * jbwm_get_screens(void)
+{
+	return screens;
+}
+void jbwm_set_screens(struct JBWMScreen * restrict s)
+{
+	screens = s;
+}
 extern inline Window jbwm_get_root(struct JBWMClient * restrict c);
 extern inline struct JBWMScreen * jbwm_get_screen(struct JBWMClient
 	* restrict c);
@@ -58,8 +67,7 @@ static void showing(struct JBWMClient * restrict c,
 	int (* mapping)(Display *, Window),
 	const int8_t wm_state)
 {
-	Display * d = jbwm_get_display();
-	mapping(d, c->parent);
+	mapping(jbwm_get_display(), c->parent);
 	jbwm_set_wm_state(c, wm_state);
 }
 void jbwm_hide_client(struct JBWMClient * restrict c)

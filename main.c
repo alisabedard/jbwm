@@ -2,6 +2,7 @@
 #include "JBWMScreen.h"
 #include "display.h"
 #include "events.h"
+#include "screen.h"
 #include "signal.h"
 int main(int argc, char **argv)
 {
