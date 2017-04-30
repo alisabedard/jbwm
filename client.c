@@ -6,7 +6,6 @@
 #include <stdlib.h>
 #include "JBWMClient.h"
 #include "display.h"
-#include "events.h"
 #include "ewmh.h"
 #include "ewmh_state.h"
 #include "log.h"
@@ -120,6 +119,5 @@ void jbwm_client_free(struct JBWMClient * restrict c)
 		XDestroyWindow(d, c->parent);
 	jbwm_relink_client_list(c);
 	free(c);
-	jbwm_events_clear_last_window();
 }
 

@@ -29,11 +29,6 @@
 #endif//LOG_LEVEL>7
 static bool events_need_cleanup;
 static Window last_window;
-// Allow future clients with the same window ID:
-void jbwm_events_clear_last_window(void)
-{
-	last_window = 0;
-}
 __attribute__((pure))
 static struct JBWMScreen * get_screen(const int8_t i,
 	const Window root)
