@@ -7,7 +7,9 @@
 #include <stdint.h>
 #include <X11/Xlib.h>
 struct JBWMClient;
-void jbwm_client_free(struct JBWMClient * restrict c) __attribute__((nonnull));
+// Free client and destroy its windows and properties.
+void jbwm_client_free(Display * d,
+	struct JBWMClient * restrict c) __attribute__((nonnull));
 // Search for the JBWMClient matching the specified window
 struct JBWMClient * jbwm_get_client(Window w)
 	__attribute__((pure));

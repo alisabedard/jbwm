@@ -18,7 +18,7 @@ static void cleanup(const Window w)
 {
 	struct JBWMClient * restrict c = jbwm_get_client(w);
 	if (c) // match found
-		jbwm_client_free(c);
+		jbwm_client_free(display, c);
 }
 __attribute__((pure))
 static int handle_xerror(Display * dpy __attribute__((unused)),

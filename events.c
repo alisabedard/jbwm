@@ -43,7 +43,7 @@ static void cleanup(struct JBWMClient * i)
 		return;
 	struct JBWMClient * next = i->next; // save
 	if (i->opt.remove)
-		jbwm_client_free(i);
+		jbwm_client_free(jbwm_get_display(), i);
 	cleanup(next);
 }
 static void handle_property_change(XPropertyEvent * e,

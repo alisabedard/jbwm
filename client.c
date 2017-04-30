@@ -4,7 +4,6 @@
 // See README for license and other details.
 #include "client.h"
 #include <stdlib.h>
-#include "JBWMClient.h"
 #include "display.h"
 #include "ewmh.h"
 #include "ewmh_state.h"
@@ -103,9 +102,9 @@ static void delete_ewmh_properties(Display * d,
 #else//!JBWM_USE_EWMH
 #define delete_ewmh_properties(d, w)
 #endif//JBWM_USE_EWMH
-void jbwm_client_free(struct JBWMClient * restrict c)
+// Free client and destroy its windows and properties.
+void jbwm_client_free(Display * d, struct JBWMClient * restrict c)
 {
-	Display * d = jbwm_get_display();
 	{ // w scope
 		const Window w = c->window;
 		delete_ewmh_properties(d, w);
