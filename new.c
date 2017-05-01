@@ -156,7 +156,7 @@ static Window get_parent(Display * d, struct JBWMClient * restrict c)
 	struct JBWMRectangle * g = &c->size;
 	return XCreateWindow(d, jbwm_get_root(c), g->x, g->y,
 		g->width, g->height, c->border, CFP, CFP,
-		CFP, CW_VM, &(XSetWindowAttributes){
+		NULL, CW_VM, &(XSetWindowAttributes){
 		.override_redirect=true, .event_mask = WA_EM});
 }
 __attribute__((nonnull))
