@@ -45,6 +45,7 @@ case $OS in
 	OpenBSD)
 		cat >> $CF <<- EOF
 		# OpenBSD:
+		CC=clang
 		jbwm_cflags+=-I/usr/X11R6/include
 		jbwm_cflags+=-I/usr/X11R6/include/freetype2
 		jbwm_ldflags+=-L/usr/X11R6/lib
