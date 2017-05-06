@@ -44,12 +44,13 @@ static int handle_xerror(Display * dpy __attribute__((unused)),
 Display * jbwm_open_display(void)
 {
 	errno = ECONNREFUSED; // Default error message
-	enum { SZ = 64 };
-	char buf[SZ];
-	snprintf(buf, SZ, "Cannot open DISPLAY (%s)",
-		getenv(JBWM_ENV_DISPLAY));
-	if (!(display = XOpenDisplay(NULL)))
+	if (!(display = XOpenDisplay(NULL))) {
+		enum { SZ = 64 };
+		char buf[SZ];
+		snprintf(buf, SZ, "Cannot open DISPLAY (%s)",
+			getenv(JBWM_ENV_DISPLAY));
 		jbwm_error(buf);
+	}
 	XSetErrorHandler(handle_xerror);
 	jbwm_open_font(display);
 	return display;
