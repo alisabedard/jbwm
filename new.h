@@ -4,7 +4,7 @@
 // See README for license and other details.
 #ifndef JBWM_NEW_H
 #define JBWM_NEW_H
-#include <X11/X.h>
+#include <X11/Xlib.h>
 struct JBWMScreen;
-void jbwm_new_client(struct JBWMScreen * s, const Window w);
+void jbwm_new_client(Display * d, struct JBWMScreen * s, const Window w);
 #endif//!JBWM_NEW_H

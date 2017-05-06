@@ -135,7 +135,7 @@ static void setup_clients(Display * d, struct JBWMScreen * s)
 		if (check_redirect(d, w[n])) {
 			JBWM_LOG("Starting client %d, window 0x%x",
 				n, (int)w[n]);
-			jbwm_new_client(s, w[n]);
+			jbwm_new_client(d, s, w[n]);
 		}
 	XFree(w);
 }

@@ -8,7 +8,6 @@
 #include <stdlib.h>
 #include "client.h"
 #include "config.h"
-#include "display.h"
 #include "ewmh.h"
 #include "keys.h"
 #include "macros.h"
@@ -191,12 +190,11 @@ static void do_grabs(Display * d, const Window w)
 	jbwm_grab_window_keys(d, w);
 	jbwm_ewmh_set_allowed_actions(d, w);
 }
-void jbwm_new_client(struct JBWMScreen * s, const Window w)
+void jbwm_new_client(Display * d, struct JBWMScreen * s, const Window w)
 {
 	JBWM_LOG("jbwm_new_client(..., w: %d)", (int)w);
 	struct JBWMClient * restrict c = get_JBWMClient(w, s);
 	jbwm_prepend_client(c);
-	Display * d = jbwm_get_display();
 	do_grabs(d, w);
 	init_geometry(d, c);
 	init_properties(d, c);
