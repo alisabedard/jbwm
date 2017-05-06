@@ -6,7 +6,6 @@
 #include <X11/Xatom.h>
 #include <X11/Xlib.h>
 #include "client.h"
-#include "display.h"
 #include "ewmh.h"
 #include "ewmh_state.h"
 #include "screen.h"
@@ -60,14 +59,13 @@ static void set_active_window(Display * d __attribute__((unused)),
 #endif//JBWM_USE_EWMH
 	jbwm_set_current_client(c);
 }
-void jbwm_select_client(struct JBWMClient * restrict c)
+void jbwm_select_client(Display * d, struct JBWMClient * restrict c)
 {
-	if (c) {
-		Display * d = jbwm_get_display();
-		unselect_current(d, c);
-		set_border(d, c);
-		set_focused(d, c);
-		set_active_window(d, c);
-	}
+	if (!c)
+		return;
+	unselect_current(d, c);
+	set_border(d, c);
+	set_focused(d, c);
+	set_active_window(d, c);
 }
 

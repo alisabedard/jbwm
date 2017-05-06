@@ -162,7 +162,7 @@ __attribute__((nonnull))
 static void reparent(Display * d, struct JBWMClient * restrict c)
 {
 	JBWM_LOG("reparent()");
-	jbwm_new_shaped_client(c);
+	jbwm_new_shaped_client(d, c);
 	const Window p = c->parent = get_parent(d, c), w = c->window;
 	XAddToSaveSet(d, w);
 	XReparentWindow(d, w, p, 0, 0);
@@ -200,5 +200,5 @@ void jbwm_new_client(Display * d, struct JBWMScreen * s, const Window w)
 	init_properties(d, c);
 	reparent(d, c);
 	jbwm_restore_client(c);
-	jbwm_select_client(c);
+	jbwm_select_client(d, c);
 }

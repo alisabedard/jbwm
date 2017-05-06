@@ -81,7 +81,7 @@ struct JBWMClient * jbwm_get_client(const Window w)
 void jbwm_toggle_sticky(Display * d, struct JBWMClient * restrict c)
 {
 	c->opt.sticky ^= true; // toggle
-	jbwm_select_client(c);
+	jbwm_select_client(d, c);
 	jbwm_update_title_bar(d, c);
 #ifdef JBWM_USE_EWMH
 	(c->opt.sticky ? jbwm_ewmh_add_state : jbwm_ewmh_remove_state)

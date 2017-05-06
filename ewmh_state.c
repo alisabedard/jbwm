@@ -3,7 +3,6 @@
 #include "ewmh_state.h"
 #include <X11/Xatom.h>
 #include "client.h"
-#include "display.h"
 #include "drag.h"
 #include "ewmh.h"
 #include "jbwm.h"
@@ -63,12 +62,12 @@ void jbwm_ewmh_add_state(Display * d, const Window w,
   data.l[2] = second property to alter
   data.l[3] = source indication
   other data.l[] elements = 0 */
-static void set_state(struct JBWMClient * restrict c,
+static void set_state(Display * d, struct JBWMClient * restrict c,
 	bool add, const enum JBWMAtomIndex t)
 {
 	JBWM_LOG("set_state(c, add: %s, t: %d)", add ? "true" : "false",
 		(int) t);
-	jbwm_print_atom(c->d, jbwm_ewmh_get_atom(t), __FILE__, __LINE__);
+	jbwm_print_atom(d, jbwm_ewmh_get_atom(t), __FILE__, __LINE__);
 	if (!c)
 		return;
 	switch(t) {
@@ -81,8 +80,7 @@ static void set_state(struct JBWMClient * restrict c,
 	case JBWM_EWMH_WM_STATE_ABOVE:
 		add = !add; // fall through
 	case JBWM_EWMH_WM_STATE_BELOW:
-		(add ? XRaiseWindow : XLowerWindow)(jbwm_get_display(),
-			c->parent);
+		(add ? XRaiseWindow : XLowerWindow)(d, c->parent);
 		break;
 	case JBWM_EWMH_WM_STATE_HIDDEN:
 		(add ? jbwm_hide_client : jbwm_restore_client)(c);
@@ -113,17 +111,17 @@ static void check_state(XClientMessageEvent * e,	// event data
 	switch (e->data.l[0]) {
 	default:
 	case 0:	// remove
-		set_state(c, false, t);
+		set_state(d, c, false, t);
 		jbwm_ewmh_remove_state(d, e->window, state);
 		break;
 	case 1:	// add
-		set_state(c, true, t);
+		set_state(d, c, true, t);
 		jbwm_ewmh_add_state(d, e->window, state);
 		break;
 	case 2: { // toggle
 			const bool add = !ewmh_get_state(e->display,
 				e->window, state);
-			set_state(c, add, t);
+			set_state(d, c, add, t);
 			(add ? jbwm_ewmh_add_state : jbwm_ewmh_remove_state)
 				(d, e->window, state);
 		}
@@ -155,7 +153,7 @@ static bool client_specific_message(XClientMessageEvent * e,
 	} else if (t == jbwm_ewmh_get_atom(JBWM_EWMH_WM_STATE))
 		handle_wm_state_changes(e, c);
 	else if (t == jbwm_ewmh_get_atom(JBWM_EWMH_ACTIVE_WINDOW))
-		jbwm_select_client(c);
+		jbwm_select_client(d, c);
 	else if (t == jbwm_ewmh_get_atom(JBWM_EWMH_CLOSE_WINDOW))
 		jbwm_send_wm_delete(d, c);
 	else

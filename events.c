@@ -140,7 +140,7 @@ void jbwm_events_loop(Display * d)
 			break;
 		case EnterNotify:
 			if (c && ev.xcrossing.window == c->parent)
-				jbwm_select_client(c);
+				jbwm_select_client(d, c);
 			break;
 #ifdef JBWM_USE_TITLE_BAR
 		case Expose:

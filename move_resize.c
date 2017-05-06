@@ -38,7 +38,7 @@ void jbwm_move_resize(Display * d, struct JBWMClient * restrict c)
 		XMoveResizeWindow(d, c->window, 0, offset,
 			g->width, g->height);
 	}
-	jbwm_set_shape(c);
+	jbwm_set_shape(d, c);
 	jbwm_configure_client(d, c);
 }
 

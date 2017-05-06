@@ -4,7 +4,8 @@
 // See README for license and other details.
 #ifndef JBWM_SELECT_H
 #define JBWM_SELECT_H
+#include <X11/Xlib.h>
 struct JBWMClient;
 // Set client as that receiving focus
-void jbwm_select_client(struct JBWMClient * restrict c);
+void jbwm_select_client(Display * d, struct JBWMClient * restrict c);
 #endif//!JBWM_SELECT_H
