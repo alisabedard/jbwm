@@ -21,6 +21,15 @@ static void jbwm_configure_client(Display * d,
 		.window = w, .above = c->parent, .override_redirect = true,
 		.border_width = c->border});
 }
+static void do_move(Display * d, struct JBWMClient * restrict c,
+	const uint8_t offset)
+{
+	struct JBWMRectangle * restrict g = &c->size;
+	XMoveResizeWindow(d, c->parent, g->x, g->y - offset,
+		g->width, g->height + offset);
+	XMoveResizeWindow(d, c->window, 0, offset,
+		g->width, g->height);
+}
 void jbwm_move_resize(Display * d, struct JBWMClient * restrict c)
 {
 	JBWM_LOG("jbwm_move_resize");
@@ -31,13 +40,7 @@ void jbwm_move_resize(Display * d, struct JBWMClient * restrict c)
 		jbwm_handle_mwm_hints(c);
 		jbwm_update_title_bar(d, c);
 	} // Skip shaped and fullscreen clients.
-	{ //  * g scope
-		struct JBWMRectangle * restrict g = &c->size;
-		XMoveResizeWindow(d, c->parent, g->x, g->y - offset,
-			g->width, g->height + offset);
-		XMoveResizeWindow(d, c->window, 0, offset,
-			g->width, g->height);
-	}
+	do_move(d, c, offset);
 	jbwm_set_shape(d, c);
 	jbwm_configure_client(d, c);
 }
