@@ -78,14 +78,14 @@ struct JBWMClient * jbwm_get_client(const Window w)
 {
 	return search(head, w);
 }
-void jbwm_toggle_sticky(struct JBWMClient * restrict c)
+void jbwm_toggle_sticky(Display * d, struct JBWMClient * restrict c)
 {
 	c->opt.sticky ^= true; // toggle
 	jbwm_select_client(c);
-	jbwm_update_title_bar(c);
+	jbwm_update_title_bar(d, c);
 #ifdef JBWM_USE_EWMH
 	(c->opt.sticky ? jbwm_ewmh_add_state : jbwm_ewmh_remove_state)
-		(jbwm_get_display(), c->window,jbwm_ewmh_get_atom(
+		(d, c->window,jbwm_ewmh_get_atom(
 		  JBWM_EWMH_WM_STATE_STICKY));
 #endif//JBWM_USE_EWMH
 }

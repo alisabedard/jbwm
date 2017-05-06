@@ -53,11 +53,11 @@ static void handle_property_change(XPropertyEvent * e,
 	if(e->state != PropertyNewValue)
 		return;
 	if (e->atom == XA_WM_NAME)
-		jbwm_update_title_bar(c);
+		jbwm_update_title_bar(e->display, c);
 	else {
 		jbwm_print_atom(e->display, e->atom, __FILE__, __LINE__);
 		if (e->atom == jbwm_get_wm_state(e->display))
-			jbwm_move_resize(c);
+			jbwm_move_resize(e->display, c);
 	}
 }
 static void handle_configure_request(XConfigureRequestEvent * e)
@@ -115,12 +115,13 @@ void jbwm_events_loop(Display * d)
 			break;
 		case ConfigureNotify:
 			if (c && !ev.xconfigure.override_redirect)
-				jbwm_move_resize(c);
+				jbwm_move_resize(d, c);
 			break;
 		case ConfigureRequest:
 			handle_configure_request(&ev.xconfigurerequest);
 			XSync(d, false);
-			if (c) jbwm_move_resize(c);
+			if (c)
+				jbwm_move_resize(d, c);
 			break;
 		case ReparentNotify:
 			ELOG("ReparentNotify");
@@ -144,7 +145,7 @@ void jbwm_events_loop(Display * d)
 #ifdef JBWM_USE_TITLE_BAR
 		case Expose:
 			if (c && !ev.xexpose.count)
-				jbwm_update_title_bar(c);
+				jbwm_update_title_bar(d, c);
 			break;
 #endif//JBWM_USE_TITLE_BAR
 #ifdef JBWM_USE_EWMH

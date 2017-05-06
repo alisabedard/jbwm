@@ -16,7 +16,7 @@ static void atexit_cb(void)
 #ifdef JBWM_USE_TITLE_BAR
 		// Some clients crash if left shaded at exit:
 		if (i->opt.shaded) {
-			jbwm_toggle_shade(i);
+			jbwm_toggle_shade(jbwm_get_display(), i);
 		}
 #endif//JBWM_USE_TITLE_BAR
 		// swap:

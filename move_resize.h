@@ -4,7 +4,8 @@
 // See README for license and other details.
 #ifndef JBWM_MOVE_RESIZE_H
 #define JBWM_MOVE_RESIZE_H
+#include <X11/Xlib.h>
 struct JBWMClient;
-void jbwm_move_resize(struct JBWMClient * restrict c)
+void jbwm_move_resize(Display * d, struct JBWMClient * restrict c)
 	__attribute__((nonnull));
 #endif//!JBWM_MOVE_RESIZE_H

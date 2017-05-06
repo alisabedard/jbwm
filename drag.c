@@ -113,7 +113,7 @@ static void drag_event_loop(Display * d,
 		if (b)
 			draw_outline(d, root, gid, c);
 		else
-			jbwm_move_resize(c);
+			jbwm_move_resize(d, c);
 	}
 }
 /* Drag the specified client.  Resize the client if resize is true.  */
@@ -134,6 +134,6 @@ void jbwm_drag(Display * d, struct JBWMClient * restrict c,
 	if (c->border)
 		draw_outline(d, r, gid, c);
 	XUngrabPointer(d, CurrentTime);
-	jbwm_move_resize(c);
+	jbwm_move_resize(d, c);
 }
 

@@ -29,7 +29,7 @@ void jbwm_set_client_vdesk(struct JBWMClient * restrict c, const uint8_t d)
 	__attribute((nonnull));
 // Assign c as the current client
 void jbwm_set_current_client(struct JBWMClient * restrict c);
-void jbwm_toggle_sticky(struct JBWMClient * restrict c)
+void jbwm_toggle_sticky(Display * d, struct JBWMClient * restrict c)
 	__attribute__((nonnull));
 void jbwm_restore_client(struct JBWMClient * restrict c)
 	__attribute__((nonnull));

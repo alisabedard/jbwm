@@ -4,7 +4,6 @@
 // See README for license and other details.
 #include "move_resize.h"
 #include "JBWMClient.h"
-#include "display.h"
 #include "font.h"
 #include "log.h"
 #include "mwm.h"
@@ -22,7 +21,7 @@ static void jbwm_configure_client(Display * d,
 		.window = w, .above = c->parent, .override_redirect = true,
 		.border_width = c->border});
 }
-void jbwm_move_resize(struct JBWMClient * restrict c)
+void jbwm_move_resize(Display * d, struct JBWMClient * restrict c)
 {
 	JBWM_LOG("jbwm_move_resize");
 	struct JBWMClientOptions * restrict o = &c->opt;
@@ -30,9 +29,8 @@ void jbwm_move_resize(struct JBWMClient * restrict c)
 		? 0 : jbwm_get_font_height();
 	if(offset) { // Leave braces in case title bar support was disabled.
 		jbwm_handle_mwm_hints(c);
-		jbwm_update_title_bar(c);
+		jbwm_update_title_bar(d, c);
 	} // Skip shaped and fullscreen clients.
-	Display * d = jbwm_get_display();
 	{ //  * g scope
 		struct JBWMRectangle * restrict g = &c->size;
 		XMoveResizeWindow(d, c->parent, g->x, g->y - offset,

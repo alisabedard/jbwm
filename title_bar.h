@@ -5,10 +5,12 @@
 #ifndef JBWM_TITLE_BAR_H
 #define JBWM_TITLE_BAR_H
 #ifdef JBWM_USE_TITLE_BAR
+#include <X11/Xlib.h>
 struct JBWMClient;
-void jbwm_toggle_shade(struct JBWMClient * restrict c)
+void jbwm_toggle_shade(Display * d, struct JBWMClient * restrict c)
 	__attribute__((nonnull));
-void jbwm_update_title_bar(struct JBWMClient * restrict c) __attribute__((nonnull));
+void jbwm_update_title_bar(Display * d,
+	struct JBWMClient * restrict c) __attribute__((nonnull));
 #else//!JBWM_USE_TITLE_BAR
 #define jbwm_toggle_shade(c)
 #define jbwm_update_title_bar(c)

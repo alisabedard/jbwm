@@ -24,9 +24,9 @@ static void handle_title_bar_button(XButtonEvent * e,
 	else if (e->subwindow == c->tb.resize && !o->no_resize)
 		jbwm_drag(e->display, c, !c->opt.no_resize);
 	else if (e->subwindow == c->tb.shade && !c->opt.no_min)
-		jbwm_toggle_shade(c);
+		jbwm_toggle_shade(e->display, c);
 	else if (e->subwindow == c->tb.stick)
-		jbwm_toggle_sticky(c);
+		jbwm_toggle_sticky(e->display, c);
 	else
 		jbwm_drag(e->display, c, false);
 }

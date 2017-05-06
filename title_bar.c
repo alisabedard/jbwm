@@ -6,7 +6,6 @@
 #include <X11/Xatom.h>
 #include <X11/Xft/Xft.h>
 #include "config.h"
-#include "display.h"
 #include "ewmh.h"
 #include "ewmh_state.h"
 #include "font.h"
@@ -15,7 +14,7 @@
 #include "util.h"
 #include "wm_state.h"
 // This implements window shading, a substitute for iconification.
-void jbwm_toggle_shade(struct JBWMClient * restrict c)
+void jbwm_toggle_shade(Display * d, struct JBWMClient * restrict c)
 {
 	// Honor !MJBWM_EWMH_WM_FUNC_MINIMIZE
 	if (c->opt.no_min || c->opt.fullscreen)
@@ -33,8 +32,7 @@ void jbwm_toggle_shade(struct JBWMClient * restrict c)
 		state = NormalState;
 		f = &jbwm_ewmh_remove_state;
 	}
-	jbwm_move_resize(c);
-	Display * d = jbwm_get_display();
+	jbwm_move_resize(d, c);
 	jbwm_set_wm_state(d, c, state);
 	enum { ATOM = JBWM_EWMH_WM_STATE_SHADED };
 	f(d, c->window, jbwm_ewmh_get_atom(ATOM));
@@ -126,12 +124,11 @@ static void remove_title_bar(Display * d, struct JBWMClient * restrict c)
 	XDestroyWindow(d, c->tb.win);
 	c->tb.win = 0;
 }
-void jbwm_update_title_bar(struct JBWMClient * restrict c)
+void jbwm_update_title_bar(Display * d, struct JBWMClient * restrict c)
 {
 	if (c->opt.shaped)
 		return;
 	Window w = c->tb.win;
-	Display * d = jbwm_get_display();
 	if (c->opt.fullscreen && w) {
 		remove_title_bar(d, c);
 		return;

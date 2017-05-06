@@ -8,7 +8,6 @@
 #include "JBWMScreen.h"
 #include "client.h"
 #include "config.h"
-#include "display.h"
 #include "drag.h"
 #include "jbwm.h"
 #include "log.h"
@@ -55,7 +54,7 @@ __attribute__((nonnull))
 static void commit_key_move(Display * d, struct JBWMClient * restrict c)
 {
 	jbwm_snap_border(c);
-	jbwm_move_resize(c);
+	jbwm_move_resize(d, c);
 	point(d, c, 1, 1);
 }
 struct KeyMoveFlags {
@@ -157,13 +156,13 @@ static void handle_client_key_event(Display * d,
 		(c->opt.max_vert ? jbwm_set_not_vert : jbwm_set_vert)(c);
 		break;
 	case JBWM_KEY_STICK:
-		jbwm_toggle_sticky(c);
+		jbwm_toggle_sticky(d, c);
 		break;
 	case JBWM_KEY_MOVE:
 		jbwm_drag(d, c, false);
 		break;
 	case JBWM_KEY_SHADE:
-		jbwm_toggle_shade(c);
+		jbwm_toggle_shade(d, c);
 		break;
 	}
 }
