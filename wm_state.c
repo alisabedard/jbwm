@@ -42,9 +42,9 @@ Atom jbwm_get_wm_state(Display * d)
 	static Atom a;
 	return get_atom(d, &a, "WM_STATE");
 }
-void jbwm_set_wm_state(struct JBWMClient * restrict c, const int8_t state)
+void jbwm_set_wm_state(Display * d, struct JBWMClient * restrict c,
+	const int8_t state)
 {
-	Display * d = jbwm_get_display();
 	const Window w = c->window;
 	jbwm_set_property(d, w, jbwm_get_wm_state(d), XA_CARDINAL,
 		&(uint32_t){state}, 1);
@@ -72,9 +72,8 @@ static bool has_delete_proto(Display * d, const Window w)
 	}
 	return found;
 }
-void jbwm_send_wm_delete(struct JBWMClient * restrict c)
+void jbwm_send_wm_delete(Display * d, struct JBWMClient * restrict c)
 {
-	Display * d = jbwm_get_display();
 	const Window w = c->window;
 	if (c->opt.remove)
 		// this allows a second click to force a kill

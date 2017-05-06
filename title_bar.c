@@ -34,9 +34,10 @@ void jbwm_toggle_shade(struct JBWMClient * restrict c)
 		f = &jbwm_ewmh_remove_state;
 	}
 	jbwm_move_resize(c);
-	jbwm_set_wm_state(c, state);
+	Display * d = jbwm_get_display();
+	jbwm_set_wm_state(d, c, state);
 	enum { ATOM = JBWM_EWMH_WM_STATE_SHADED };
-	f(jbwm_get_display(), c->window, jbwm_ewmh_get_atom(ATOM));
+	f(d, c->window, jbwm_ewmh_get_atom(ATOM));
 }
 static uint16_t mv(Display * d, const Window w, uint16_t x)
 {

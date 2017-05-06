@@ -120,18 +120,18 @@ void jbwm_client_free(Display * d, struct JBWMClient * restrict c)
 	jbwm_relink_client_list(c);
 	free(c);
 }
-static void showing(struct JBWMClient * restrict c,
+static void showing(Display * d, struct JBWMClient * restrict c,
 	int (* mapping)(Display *, Window),
 	const int8_t wm_state)
 {
-	mapping(jbwm_get_display(), c->parent);
-	jbwm_set_wm_state(c, wm_state);
+	mapping(d, c->parent);
+	jbwm_set_wm_state(d, c, wm_state);
 }
 void jbwm_hide_client(struct JBWMClient * restrict c)
 {
-	showing(c, XUnmapWindow, IconicState);
+	showing(jbwm_get_display(), c, XUnmapWindow, IconicState);
 }
 void jbwm_restore_client(struct JBWMClient * restrict c)
 {
-	showing(c, XMapWindow, NormalState);
+	showing(jbwm_get_display(), c, XMapWindow, NormalState);
 }

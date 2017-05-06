@@ -20,7 +20,7 @@ static void handle_title_bar_button(XButtonEvent * e,
 	if (!e->subwindow)
 		jbwm_drag(c, false);
 	else if (e->subwindow == c->tb.close && !o->no_close)
-		jbwm_send_wm_delete(c);
+		jbwm_send_wm_delete(e->display, c);
 	else if (e->subwindow == c->tb.resize && !o->no_resize)
 		jbwm_drag(c, !c->opt.no_resize);
 	else if (e->subwindow == c->tb.shade && !c->opt.no_min)
