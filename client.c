@@ -135,4 +135,3 @@ void jbwm_restore_client(struct JBWMClient * restrict c)
 {
 	showing(c, XMapWindow, NormalState);
 }
-
