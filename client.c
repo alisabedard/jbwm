@@ -100,18 +100,21 @@ static void delete_ewmh_properties(Display * d,
 #else//!JBWM_USE_EWMH
 #define delete_ewmh_properties(d, w)
 #endif//JBWM_USE_EWMH
+static void
+free_window(Display * d, struct JBWMClient * restrict c)
+{
+	const Window w = c->window;
+	delete_ewmh_properties(d, w);
+	{ // * p scope
+		struct JBWMRectangle * restrict p = &c->size;
+		XReparentWindow(d, w, jbwm_get_root(c), p->x, p->y);
+	}
+	XRemoveFromSaveSet(d, w);
+}
 // Free client and destroy its windows and properties.
 void jbwm_client_free(Display * d, struct JBWMClient * restrict c)
 {
-	{ // w scope
-		const Window w = c->window;
-		delete_ewmh_properties(d, w);
-		{ // * p scope
-			struct JBWMRectangle * restrict p = &c->size;
-			XReparentWindow(d, w, jbwm_get_root(c), p->x, p->y);
-		}
-		XRemoveFromSaveSet(d, w);
-	}
+	free_window(d, c);
 	if(c->parent)
 		XDestroyWindow(d, c->parent);
 	jbwm_relink_client_list(c);
