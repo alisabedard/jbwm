@@ -116,10 +116,10 @@ static void toggle_maximize(struct JBWMClient * restrict c)
 	 ? set_not_maximized : set_maximized)(c);
 }
 __attribute__((nonnull))
-static void handle_client_key_event(struct JBWMClient * restrict c,
+static void handle_client_key_event(Display * d,
+	struct JBWMClient * restrict c,
 	const bool mod, const KeySym key)
 {
-	Display * d = jbwm_get_display();
 	JBWM_LOG("handle_client_key_event: %d", (int)key);
 	if (c->opt.fullscreen) {
 		// only allow exiting from fullscreen
@@ -245,7 +245,7 @@ void jbwm_handle_key_event(XKeyEvent * e)
 		break;
 	default:
 		if (c)
-			handle_client_key_event(c, opt.mod, key);
+			handle_client_key_event(e->display, c, opt.mod, key);
 	}
 }
 __attribute__((nonnull))
@@ -257,9 +257,8 @@ static void grab(Display * d, struct JBWMScreen * s,
 			 jbwm_keys_data.grab_mask | mask, s->root, true,
 			 GrabModeAsync, GrabModeAsync);
 }
-void jbwm_grab_screen_keys(struct JBWMScreen * s)
+void jbwm_grab_screen_keys(Display * d, struct JBWMScreen * s)
 {
-	Display * d = jbwm_get_display();
 	grab(d, s, (KeySym[]){JBWM_KEYS_TO_GRAB}, 0);
 	grab(d, s, (KeySym[]){JBWM_ALT_KEYS_TO_GRAB},
 		jbwm_keys_data.mod_mask);

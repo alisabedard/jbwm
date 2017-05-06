@@ -9,7 +9,8 @@
 #include <X11/Xlib.h>
 struct JBWMScreen;
 void jbwm_handle_key_event(XKeyEvent * e) __attribute__((nonnull));
-void jbwm_grab_screen_keys(struct JBWMScreen * s) __attribute__((nonnull));
+void jbwm_grab_screen_keys(Display * d, struct JBWMScreen * s)
+	__attribute__((nonnull));
 void jbwm_grab_window_keys(Display * d, const Window win);
 void jbwm_set_grab_mask(const uint16_t mask);
 void jbwm_set_mod_mask(const uint16_t mask);
