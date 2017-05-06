@@ -144,19 +144,20 @@ static void handle_wm_state_changes(XClientMessageEvent * e,
 static bool client_specific_message(XClientMessageEvent * e,
 	struct JBWMClient * restrict c, const Atom t)
 {
-	jbwm_print_atom(e->display, t, __FILE__, __LINE__);
+	Display * d = e->display;
+	jbwm_print_atom(d, t, __FILE__, __LINE__);
 	if (t == jbwm_ewmh_get_atom(JBWM_EWMH_WM_DESKTOP))
 		jbwm_set_client_vdesk(c, e->data.l[0]);
 	// If user moves window (client-side title bars):
 	else if (t == jbwm_ewmh_get_atom(JBWM_EWMH_WM_MOVERESIZE)) {
-		XRaiseWindow(e->display, c->parent);
-		jbwm_drag(c, false);
+		XRaiseWindow(d, c->parent);
+		jbwm_drag(d, c, false);
 	} else if (t == jbwm_ewmh_get_atom(JBWM_EWMH_WM_STATE))
 		handle_wm_state_changes(e, c);
 	else if (t == jbwm_ewmh_get_atom(JBWM_EWMH_ACTIVE_WINDOW))
 		jbwm_select_client(c);
 	else if (t == jbwm_ewmh_get_atom(JBWM_EWMH_CLOSE_WINDOW))
-		jbwm_send_wm_delete(e->display, c);
+		jbwm_send_wm_delete(d, c);
 	else
 		  return false;
 	return true;

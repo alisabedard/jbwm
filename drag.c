@@ -2,7 +2,6 @@
 #include "drag.h"
 #include <X11/Xlibint.h>
 #include <X11/cursorfont.h>
-#include "display.h"
 #include "font.h"
 #include "move_resize.h"
 #include "screen.h"
@@ -118,9 +117,9 @@ static void drag_event_loop(Display * d,
 	}
 }
 /* Drag the specified client.  Resize the client if resize is true.  */
-void jbwm_drag(struct JBWMClient * restrict c, const bool resize)
+void jbwm_drag(Display * d, struct JBWMClient * restrict c,
+	const bool resize)
 {
-	Display * d = jbwm_get_display();
 	XRaiseWindow(d, c->parent);
 	if (resize && (c->opt.no_resize || c->opt.shaded))
 		return;

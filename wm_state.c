@@ -2,7 +2,6 @@
 #include "wm_state.h"
 #include <X11/Xatom.h>
 #include <X11/Xutil.h>
-#include "display.h"
 #include "ewmh.h"
 #include "ewmh_state.h"
 #include "log.h"
