@@ -10,19 +10,19 @@
 /* In this file, the static companion functions perform the requested option
    directly, while the global functions call the corresponding static
    function and perform sanity checks and adjustments.  */
-static void set_not_horz(struct JBWMClient * restrict c)
+static void set_not_horz(Display * d, struct JBWMClient * restrict c)
 {
 	c->opt.max_horz = false;
 	c->size.x = c->old_size.x;
 	c->size.width = c->old_size.width;
-	jbwm_ewmh_remove_state(jbwm_get_display(), c->window,
+	jbwm_ewmh_remove_state(d, c->window,
 		jbwm_ewmh_get_atom(JBWM_EWMH_WM_STATE_MAXIMIZED_HORZ));
 }
-void jbwm_set_not_horz(struct JBWMClient * restrict c)
+void jbwm_set_not_horz(Display * d, struct JBWMClient * restrict c)
 {
 	if (c->opt.max_horz)
-		set_not_horz(c);
-	jbwm_move_resize(jbwm_get_display(), c);
+		set_not_horz(d, c);
+	jbwm_move_resize(d, c);
 }
 static void set_horz(struct JBWMClient * restrict c)
 {
@@ -32,10 +32,10 @@ static void set_horz(struct JBWMClient * restrict c)
 	c->size.x = 0;
 	c->size.width = jbwm_get_screen(c)->size.width;
 }
-void jbwm_set_horz(struct JBWMClient * restrict c)
+void jbwm_set_horz(Display * d, struct JBWMClient * restrict c)
 {
-	if (c->opt.max_horz) return;
-	Display * d = jbwm_get_display();
+	if (c->opt.max_horz)
+		return;
 	jbwm_ewmh_add_state(d, c->window,
 		jbwm_ewmh_get_atom(JBWM_EWMH_WM_STATE_MAXIMIZED_HORZ));
 	set_horz(c);
@@ -50,9 +50,8 @@ static void set_not_vert(Display * d, struct JBWMClient * restrict c)
 	jbwm_ewmh_remove_state(d, c->window,
 		jbwm_ewmh_get_atom(JBWM_EWMH_WM_STATE_MAXIMIZED_VERT));
 }
-void jbwm_set_not_vert(struct JBWMClient * restrict c)
+void jbwm_set_not_vert(Display * d, struct JBWMClient * restrict c)
 {
-	Display * d = jbwm_get_display();
 	if (c->opt.max_vert && !c->opt.shaded)
 		set_not_vert(d, c);
 	jbwm_move_resize(d, c);
@@ -67,11 +66,10 @@ static void set_vert(Display * d, struct JBWMClient * restrict c)
 	jbwm_ewmh_add_state(d, c->window,
 		jbwm_ewmh_get_atom(JBWM_EWMH_WM_STATE_MAXIMIZED_VERT));
 }
-void jbwm_set_vert(struct JBWMClient * restrict c)
+void jbwm_set_vert(Display * d, struct JBWMClient * restrict c)
 {
 	if (c->opt.max_vert || c->opt.shaded)
 		return;
-	Display * d = jbwm_get_display();
 	set_vert(d, c);
 	// Offset to hide borders:
 	c->size.height -= c->border << 1;
@@ -90,9 +88,8 @@ static void set_not_fullscreen(Display * d, struct JBWMClient * restrict c)
 		jbwm_ewmh_get_atom(JBWM_EWMH_WM_STATE_FULLSCREEN));
 	jbwm_update_title_bar(d, c);
 }
-void jbwm_set_not_fullscreen(struct JBWMClient * restrict c)
+void jbwm_set_not_fullscreen(Display * d, struct JBWMClient * restrict c)
 {
-	Display * d = jbwm_get_display();
 	if(c->opt.fullscreen)
 		set_not_fullscreen(d, c);
 	jbwm_move_resize(d, c);
@@ -109,11 +106,10 @@ static void set_fullscreen(Display * d, struct JBWMClient * restrict c)
 		jbwm_ewmh_get_atom(JBWM_EWMH_WM_STATE_FULLSCREEN));
 	jbwm_update_title_bar(d, c);
 }
-void jbwm_set_fullscreen(struct JBWMClient * restrict c)
+void jbwm_set_fullscreen(Display * d, struct JBWMClient * restrict c)
 {
 	if (c->opt.fullscreen || c->opt.shaded || c->opt.no_max)
 		return;
-	Display * d = jbwm_get_display();
 	set_fullscreen(d, c);
 	jbwm_move_resize(d, c);
 }
