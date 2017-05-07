@@ -2,7 +2,7 @@
 #include "font.h"
 #include <X11/Xft/Xft.h>
 #include "config.h"
-#include "jbwm.h"
+#include "util.h"
 static XftFont * jbwm_font;
 void jbwm_open_font(Display * d)
 {

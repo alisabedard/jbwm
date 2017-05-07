@@ -7,6 +7,7 @@
 #include <X11/Xlib.h>
 #include <stdint.h>
 #include "pixel_t.h"
+void jbwm_error(const char * restrict msg) __attribute__((noreturn));
 void jbwm_set_property(Display * d, const Window win,
 	const Atom property, const Atom type,
 	void * data, uint16_t size);

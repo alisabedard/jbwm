@@ -6,9 +6,8 @@
 #include <stdlib.h>
 #include "client.h"
 #include "config.h"
-#include "font.h"
-#include "jbwm.h"
 #include "log.h"
+#include "util.h"
 static void cleanup(Display * display, const Window w)
 {
 	struct JBWMClient * restrict c = jbwm_get_client(w);
@@ -43,11 +42,10 @@ Display * jbwm_open_display(void)
 	if (!(display = XOpenDisplay(NULL))) {
 		enum { SZ = 128 };
 		char buf[SZ];
-		snprintf(buf, SZ, "Cannot open DISPLAY (%s)",
+		snprintf(buf, SZ, "Cannot open DISPLAY %s",
 			getenv(JBWM_ENV_DISPLAY));
 		jbwm_error(buf);
 	}
 	XSetErrorHandler(handle_xerror);
-	jbwm_open_font(display);
 	return display;
 }

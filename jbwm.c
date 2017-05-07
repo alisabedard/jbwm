@@ -84,12 +84,6 @@ void jbwm_parse_command_line(const uint8_t argc, char **argv)
 			exit(1);
 		}
 }
-__attribute__((noreturn))
-void jbwm_error(const char * msg)
-{
-	perror(msg);
-	exit(1);
-}
 static void allocate_colors(Display * d, struct JBWMScreen * restrict s)
 {
 	const uint8_t n = s->screen;
