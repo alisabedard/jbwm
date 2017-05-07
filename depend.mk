@@ -9,16 +9,15 @@ display.o: display.c display.h client.h config.h font.h jbwm.h log.h
 drag.o: drag.c drag.h font.h move_resize.h screen.h JBWMClient.h \
  JBWMClientOptions.h JBWMClientTitlebar.h JBWMRectangle.h JBWMScreen.h \
  JBWMPixels.h pixel_t.h JBWMSize.h snap.h
-events.o: events.c events.h button_event.h client.h display.h \
- ewmh_state.h ewmh.h keys.h log.h move_resize.h new.h screen.h \
- JBWMClient.h JBWMClientOptions.h JBWMClientTitlebar.h JBWMRectangle.h \
- JBWMScreen.h JBWMPixels.h pixel_t.h JBWMSize.h select.h title_bar.h \
- util.h wm_state.h
+events.o: events.c events.h button_event.h client.h ewmh_state.h ewmh.h \
+ keys.h log.h move_resize.h new.h screen.h JBWMClient.h \
+ JBWMClientOptions.h JBWMClientTitlebar.h JBWMRectangle.h JBWMScreen.h \
+ JBWMPixels.h pixel_t.h JBWMSize.h select.h title_bar.h util.h wm_state.h
 ewmh.o: ewmh.c ewmh.h JBWMClient.h JBWMClientOptions.h \
  JBWMClientTitlebar.h JBWMRectangle.h JBWMScreen.h JBWMPixels.h pixel_t.h \
  JBWMSize.h client.h config.h display.h font.h log.h macros.h util.h
-ewmh_state.o: ewmh_state.c ewmh_state.h client.h display.h drag.h ewmh.h \
- jbwm.h log.h max.h screen.h JBWMClient.h JBWMClientOptions.h \
+ewmh_state.o: ewmh_state.c ewmh_state.h client.h drag.h ewmh.h jbwm.h \
+ log.h max.h screen.h JBWMClient.h JBWMClientOptions.h \
  JBWMClientTitlebar.h JBWMRectangle.h JBWMScreen.h JBWMPixels.h pixel_t.h \
  JBWMSize.h select.h util.h wm_state.h
 font.o: font.c font.h config.h jbwm.h
@@ -48,11 +47,11 @@ new.o: new.c new.h client.h config.h ewmh.h keys.h macros.h mwm.h \
 screen.o: screen.c screen.h JBWMClient.h JBWMClientOptions.h \
  JBWMClientTitlebar.h JBWMRectangle.h JBWMScreen.h JBWMPixels.h pixel_t.h \
  JBWMSize.h client.h config.h display.h ewmh.h log.h util.h
-select.o: select.c select.h client.h display.h ewmh.h ewmh_state.h \
- screen.h JBWMClient.h JBWMClientOptions.h JBWMClientTitlebar.h \
- JBWMRectangle.h JBWMScreen.h JBWMPixels.h pixel_t.h JBWMSize.h util.h
+select.o: select.c select.h client.h ewmh.h ewmh_state.h screen.h \
+ JBWMClient.h JBWMClientOptions.h JBWMClientTitlebar.h JBWMRectangle.h \
+ JBWMScreen.h JBWMPixels.h pixel_t.h JBWMSize.h util.h
 shape.o: shape.c shape.h JBWMClient.h JBWMClientOptions.h \
- JBWMClientTitlebar.h JBWMRectangle.h display.h log.h
+ JBWMClientTitlebar.h JBWMRectangle.h log.h
 signal.o: signal.c signal.h client.h display.h JBWMClient.h \
  JBWMClientOptions.h JBWMClientTitlebar.h JBWMRectangle.h log.h \
  title_bar.h
