@@ -15,7 +15,6 @@ int main(int argc, char **argv)
 	jbwm_set_screens(s);
 	while (i--)
 		jbwm_init_screen(d, i);
-	jbwm_set_signal_handler();
 	jbwm_events_loop(d);
 	return 0;
 }
