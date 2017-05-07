@@ -11,7 +11,6 @@
 #include "JBWMScreen.h"
 #include "client.h"
 #include "config.h"
-#include "display.h"
 #include "font.h"
 #include "log.h"
 #include "macros.h"
@@ -121,9 +120,8 @@ void jbwm_ewmh_set_allowed_actions(Display * d,
 	};
 	jbwm_set_property(d, w, a[0], XA_ATOM, &a, sizeof(a) / sizeof(Atom));
 }
-static void init_desktops(struct JBWMScreen * s)
+static void init_desktops(Display * d, struct JBWMScreen * s)
 {
-	Display * d = jbwm_get_display();
 	const Window r = s->root;
 	enum {INT=XA_CARDINAL, WIN=XA_WINDOW};
 	wprop(d, r, JBWM_EWMH_DESKTOP_GEOMETRY, INT, &s->size, 2);
@@ -155,9 +153,8 @@ static Window init_supporting(Display * d,
 	set_name(d, w);
 	return w;
 }
-void jbwm_ewmh_init_screen(struct JBWMScreen * s)
+void jbwm_ewmh_init_screen(Display * d, struct JBWMScreen * s)
 {
-	Display * d = jbwm_get_display();
 	if (!jbwm_ewmh[0])
 		jbwm_ewmh_init(d);
 	Window r = s->root;
@@ -168,11 +165,11 @@ void jbwm_ewmh_init_screen(struct JBWMScreen * s)
 	 * Use the address of the r field within s, not &r, so we
 	 * don't lose scope.  */
 	wprop(d, r, JBWM_EWMH_CLIENT_LIST, XA_WINDOW, &s->root, 1);
-	init_desktops(s);
+	init_desktops(d, s);
 	s->supporting = init_supporting(d, r);
 }
 // Required by wm-spec:
-void jbwm_set_frame_extents(struct JBWMClient * restrict c)
+void jbwm_set_frame_extents(Display * d, struct JBWMClient * restrict c)
 {
 	JBWM_LOG("jbwm_set_frame_extents()");
 	// Fields: left, right, top, bottom
@@ -181,6 +178,5 @@ void jbwm_set_frame_extents(struct JBWMClient * restrict c)
 	f[0] = f[1] = f[2] = f[3] = b;
 	if (!c->opt.no_title_bar)
 		f[2] += jbwm_get_font_height();
-	wprop(jbwm_get_display(), c->parent,
-		JBWM_EWMH_FRAME_EXTENTS, XA_CARDINAL, f, 4);
+	wprop(d, c->parent, JBWM_EWMH_FRAME_EXTENTS, XA_CARDINAL, f, 4);
 }

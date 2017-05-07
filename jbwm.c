@@ -178,7 +178,7 @@ void jbwm_init_screen(Display * d, const uint8_t i)
 	jbwm_grab_screen_keys(d, s);
 	/* scan all the windows on this screen */
 	setup_clients(d, s);
-	jbwm_ewmh_init_screen(s);
+	jbwm_ewmh_init_screen(d, s);
 }
 void jbwm_set_defaults(void)
 {

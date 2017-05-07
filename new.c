@@ -168,7 +168,7 @@ static void reparent(Display * d, struct JBWMClient * restrict c)
 	XReparentWindow(d, w, p, 0, 0);
 	XMapWindow(d, w);
 	// Required by wm-spec:
-	jbwm_set_frame_extents(c);
+	jbwm_set_frame_extents(d, c);
 }
 // Allocate the client structure with some defaults set
 static struct JBWMClient * get_JBWMClient(const Window w,
