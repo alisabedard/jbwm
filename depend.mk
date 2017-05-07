@@ -39,7 +39,7 @@ move_resize.o: move_resize.c move_resize.h JBWMClient.h \
  JBWMClientOptions.h JBWMClientTitlebar.h JBWMRectangle.h font.h log.h \
  mwm.h shape.h title_bar.h
 mwm.o: mwm.c mwm.h JBWMClient.h JBWMClientOptions.h JBWMClientTitlebar.h \
- JBWMRectangle.h display.h log.h mwmproto.h util.h pixel_t.h
+ JBWMRectangle.h log.h mwmproto.h util.h pixel_t.h
 new.o: new.c new.h client.h config.h ewmh.h keys.h macros.h mwm.h \
  screen.h JBWMClient.h JBWMClientOptions.h JBWMClientTitlebar.h \
  JBWMRectangle.h JBWMScreen.h JBWMPixels.h pixel_t.h JBWMSize.h select.h \
