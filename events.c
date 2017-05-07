@@ -11,7 +11,6 @@
 #include <stdlib.h>
 #include "button_event.h"
 #include "client.h"
-#include "display.h"
 #include "ewmh_state.h"
 #include "ewmh.h"
 #include "keys.h"
@@ -37,15 +36,15 @@ static struct JBWMScreen * get_screen(const int8_t i,
 	struct JBWMScreen * s = jbwm_get_screens();
 	return s[i].root == root ? s + i : get_screen(i - 1, root);
 }
-static void cleanup(struct JBWMClient * i)
+static void cleanup(Display * d, struct JBWMClient * i)
 {
 	JBWM_LOG("cleanup");
 	if (!i)
 		return;
 	struct JBWMClient * next = i->next; // save
 	if (i->opt.remove)
-		jbwm_client_free(jbwm_get_display(), i);
-	cleanup(next);
+		jbwm_client_free(d, i);
+	cleanup(d, next);
 }
 static void handle_property_change(XPropertyEvent * e,
 	struct JBWMClient * restrict c)
@@ -187,7 +186,7 @@ void jbwm_events_loop(Display * d)
 #endif//LOG_LEVEL
 		}
 		if (events_need_cleanup) {
-			cleanup(jbwm_get_head_client());
+			cleanup(d, jbwm_get_head_client());
 			events_need_cleanup = false;
 		}
 	}
