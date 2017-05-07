@@ -86,14 +86,16 @@ void jbwm_handle_mwm_hints(Display * d, struct JBWMClient * restrict c)
 		mwm_hints, &(uint16_t){0});
 	if(!m)
 		return;
-	if ((c->opt.tearoff = m->flags & MWM_HINTS_STATUS && m->status &
-		MWM_TEAROFF_WINDOW))
-		goto mwm_end; // skip the following if tear-off window
-	if (m->flags & MWM_HINTS_FUNCTIONS && !(m->functions & MWM_FUNC_ALL))
-		do_functions(&c->opt, m->functions);
-	if (m->flags & MWM_HINTS_DECORATIONS && !(m->decor & MWM_DECOR_ALL))
-		do_decorations(&c->opt, m->decor);
-mwm_end:
+	if (!((c->opt.tearoff = m->flags & MWM_HINTS_STATUS && m->status &
+		MWM_TEAROFF_WINDOW))) {
+		// skip the following if tear-off window
+		if (m->flags & MWM_HINTS_FUNCTIONS
+			&& !(m->functions & MWM_FUNC_ALL))
+			do_functions(&c->opt, m->functions);
+		if (m->flags & MWM_HINTS_DECORATIONS
+			&& !(m->decor & MWM_DECOR_ALL))
+			do_decorations(&c->opt, m->decor);
+	}
 	XFree(m);
 	process_flags(c);
 }
