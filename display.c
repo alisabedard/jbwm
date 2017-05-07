@@ -9,15 +9,14 @@
 #include "font.h"
 #include "jbwm.h"
 #include "log.h"
-static Display * display;
-static void cleanup(const Window w)
+static void cleanup(Display * display, const Window w)
 {
 	struct JBWMClient * restrict c = jbwm_get_client(w);
 	if (c) // match found
 		jbwm_client_free(display, c);
 }
 __attribute__((pure))
-static int handle_xerror(Display * dpy __attribute__((unused)),
+static int handle_xerror(Display * d,
 	XErrorEvent * restrict e)
 {
 	switch (e->error_code) {
@@ -26,7 +25,7 @@ static int handle_xerror(Display * dpy __attribute__((unused)),
 			jbwm_error("Cannot access the root window");
 		break;
 	case BadWindow:
-		cleanup(e->resourceid);
+		cleanup(d, e->resourceid);
 		return 0;
 	case BadAtom:
 		return 0;
@@ -39,6 +38,7 @@ static int handle_xerror(Display * dpy __attribute__((unused)),
 }
 Display * jbwm_open_display(void)
 {
+	Display * display;
 	errno = ECONNREFUSED; // Default error message
 	if (!(display = XOpenDisplay(NULL))) {
 		enum { SZ = 64 };
