@@ -187,16 +187,16 @@ static void next(Display * d)
 	struct JBWMClient * restrict c = get_next_on_vdesk();
 	if (!c)
 		return;
-	jbwm_restore_client(c);
+	jbwm_restore_client(d, c);
 	jbwm_select_client(d, c);
 	point(d, c, 0, 0);
 	point(d, c, c->size.width, c->size.height);
 }
-static void cond_client_to_desk(struct JBWMClient * restrict c,
-	struct JBWMScreen * s, const uint8_t d, const bool mod)
+static void cond_client_to_desk(Display * d, struct JBWMClient * restrict c,
+	struct JBWMScreen * s, const uint8_t desktop, const bool mod)
 {
-	mod && c ? jbwm_set_client_vdesk(c, d)
-		: jbwm_set_vdesk(s, d);
+	mod && c ? jbwm_set_client_vdesk(d, c, desktop)
+		: jbwm_set_vdesk(d, s, desktop);
 }
 static void start_terminal(void)
 {
@@ -233,14 +233,14 @@ void jbwm_handle_key_event(XKeyEvent * e)
 	case XK_1: case XK_2: case XK_3: case XK_4: case XK_5:
 	case XK_6: case XK_7: case XK_8: case XK_9:
 		// First desktop 0, per wm-spec
-		cond_client_to_desk(c, s, opt.zero
+		cond_client_to_desk(e->display, c, s, opt.zero
 			? 10 : key - XK_1, opt.mod);
 		break;
 	case JBWM_KEY_PREVDESK:
-		cond_client_to_desk(c, s, s->vdesk - 1, opt.mod);
+		cond_client_to_desk(e->display, c, s, s->vdesk - 1, opt.mod);
 		break;
 	case JBWM_KEY_NEXTDESK:
-		cond_client_to_desk(c, s, s->vdesk + 1, opt.mod);
+		cond_client_to_desk(e->display, c, s, s->vdesk + 1, opt.mod);
 		break;
 	default:
 		if (c)

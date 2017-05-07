@@ -199,6 +199,6 @@ void jbwm_new_client(Display * d, struct JBWMScreen * s, const Window w)
 	init_geometry(d, c);
 	init_properties(d, c);
 	reparent(d, c);
-	jbwm_restore_client(c);
+	jbwm_restore_client(d, c);
 	jbwm_select_client(d, c);
 }

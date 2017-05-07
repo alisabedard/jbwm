@@ -83,7 +83,7 @@ static void set_state(Display * d, struct JBWMClient * restrict c,
 		(add ? XRaiseWindow : XLowerWindow)(d, c->parent);
 		break;
 	case JBWM_EWMH_WM_STATE_HIDDEN:
-		(add ? jbwm_hide_client : jbwm_restore_client)(c);
+		(add ? jbwm_hide_client : jbwm_restore_client)(d, c);
 		break;
 	case JBWM_EWMH_WM_STATE_MAXIMIZED_VERT:
 		(add ? jbwm_set_vert : jbwm_set_not_vert)(c);
@@ -145,7 +145,7 @@ static bool client_specific_message(XClientMessageEvent * e,
 	Display * d = e->display;
 	jbwm_print_atom(d, t, __FILE__, __LINE__);
 	if (t == jbwm_ewmh_get_atom(JBWM_EWMH_WM_DESKTOP))
-		jbwm_set_client_vdesk(c, e->data.l[0]);
+		jbwm_set_client_vdesk(d, c, e->data.l[0]);
 	// If user moves window (client-side title bars):
 	else if (t == jbwm_ewmh_get_atom(JBWM_EWMH_WM_MOVERESIZE)) {
 		XRaiseWindow(d, c->parent);
@@ -206,7 +206,8 @@ void jbwm_ewmh_handle_client_message(XClientMessageEvent * e,
 		  return;
 	if (t == jbwm_ewmh_get_atom(JBWM_EWMH_CURRENT_DESKTOP)) {
 		const uint8_t i = c ? c->screen : 0;
-		jbwm_set_vdesk(jbwm_get_screens() + i, e->data.l[0]);
+		jbwm_set_vdesk(e->display, jbwm_get_screens() + i,
+			e->data.l[0]);
 	} else if (t == jbwm_ewmh_get_atom(JBWM_EWMH_MOVERESIZE_WINDOW)) {
 		// If something else moves the window:
 		handle_moveresize(e);

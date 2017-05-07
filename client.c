@@ -48,14 +48,15 @@ void jbwm_relink_client_list(struct JBWMClient * restrict c)
 	}
 	relink_r(c, head);
 }
-void jbwm_set_client_vdesk(struct JBWMClient * restrict c, const uint8_t d)
+void jbwm_set_client_vdesk(Display * d, struct JBWMClient * restrict c,
+	const uint8_t desktop)
 {
 	const uint8_t p = c->vdesk; // save previous
-	c->vdesk = d;
-	// use jbwm_set_vdesk to validate d:
+	c->vdesk = desktop;
+	// use jbwm_set_vdesk to validate desktop:
 	struct JBWMScreen * s = &jbwm_get_screens()[c->screen];
-	c->vdesk = jbwm_set_vdesk(s, d);
-	jbwm_set_vdesk(s, p);
+	c->vdesk = jbwm_set_vdesk(d, s, desktop);
+	jbwm_set_vdesk(d, s, p);
 }
 static inline bool matches(struct JBWMClient * i,
 	const Window w)
@@ -127,11 +128,11 @@ static void showing(Display * d, struct JBWMClient * restrict c,
 	mapping(d, c->parent);
 	jbwm_set_wm_state(d, c, wm_state);
 }
-void jbwm_hide_client(struct JBWMClient * restrict c)
+void jbwm_hide_client(Display * d, struct JBWMClient * restrict c)
 {
-	showing(jbwm_get_display(), c, XUnmapWindow, IconicState);
+	showing(d, c, XUnmapWindow, IconicState);
 }
-void jbwm_restore_client(struct JBWMClient * restrict c)
+void jbwm_restore_client(Display * d, struct JBWMClient * restrict c)
 {
-	showing(jbwm_get_display(), c, XMapWindow, NormalState);
+	showing(d, c, XMapWindow, NormalState);
 }
