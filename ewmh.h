@@ -12,7 +12,7 @@ struct JBWMScreen;
 Atom jbwm_ewmh_get_atom(const uint8_t index);
 void jbwm_ewmh_update_client_list(Display * d);
 void jbwm_ewmh_set_allowed_actions(Display * d,
-	const Window w);
+	const Window w) __attribute__((nonnull));
 void jbwm_ewmh_init_screen(Display * d, struct JBWMScreen * s)
 	__attribute__((nonnull));
 void jbwm_set_frame_extents(Display * d, struct JBWMClient * restrict c);

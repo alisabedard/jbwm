@@ -1,7 +1,7 @@
 // Copyright 2017, Jeffrey E. Bedard <jefbed@gmail.com>
 #include "drag.h"
-#include <X11/Xlibint.h>
 #include <X11/cursorfont.h>
+#include <stdlib.h>
 #include "font.h"
 #include "move_resize.h"
 #include "screen.h"
@@ -10,13 +10,19 @@ enum {
 	JBWMMouseMask = ButtonPressMask | ButtonReleaseMask
 		| PointerMotionMask
 };
-static void grab_pointer(Display * d, const Window w)
+extern inline void jbwm_warp(Display * dpy, const Window w, const short x,
+	const short y);
+static Cursor get_font_cursor(Display * d)
 {
 	static Cursor c;
 	if (!c)
 		c = XCreateFontCursor(d, XC_fleur);
+	return c;
+}
+static void grab_pointer(Display * d, const Window w)
+{
 	XGrabPointer(d, w, false, JBWMMouseMask, GrabModeAsync,
-		GrabModeAsync, None, c, CurrentTime);
+		GrabModeAsync, None, get_font_cursor(d), CurrentTime);
 }
 static void set_size(struct JBWMClient * restrict c,
 	const int16_t * restrict p)
@@ -40,40 +46,19 @@ static void set_position(struct JBWMClient * restrict c,
 	c->size.y = get_diff(1, original, start, p);
 	jbwm_snap_client(c);
 }
-void jbwm_warp(Display * dpy, const Window w, const int16_t x,
-	const int16_t y)
-{
-	xWarpPointerReq * req;
-	GetReq(WarpPointer, req);
-	req->srcWid = None;
-	req->dstWid = w;
-	req->dstX = x;
-	req->dstY = y;
-}
 __attribute__((nonnull))
-static void query_pointer(Display * dpy, const Window w,
+static void query_pointer(Display * dpy, Window w,
 	int16_t * restrict p)
 {
-	xQueryPointerReply rep;
-	xResourceReq * req;
-	GetResReq(QueryPointer, w, req);
-	_XReply(dpy, (void *)&rep, 0, true);
-	p[0] = rep.winX;
-	p[1] = rep.winY;
-}
-static inline void draw_rectangle(Display * dpy, const Window root,
-	const GContext gid, const xRectangle i)
-{
-	xPolyRectangleReq * req;
-	GetReqExtra(PolyRectangle, sizeof(xRectangle), req);
-	req->drawable = root;
-	req->gc = gid;
-	xRectangle * rect = (xRectangle *) (req + 1);
-	*rect = i;
+	int d, x, y;
+	unsigned int u;
+	XQueryPointer(dpy, w, &w, &w, &d, &d, &x, &y, &u);
+	p[0] = x;
+	p[1] = y;
 }
 __attribute__((nonnull))
 static void draw_outline(Display * dpy, const Window root,
-	const GContext gid, struct JBWMClient * restrict c)
+	GC gc, struct JBWMClient * restrict c)
 {
 	static uint8_t fh;
 	if (!fh) // save the value
@@ -81,12 +66,12 @@ static void draw_outline(Display * dpy, const Window root,
 	const uint8_t o = c->opt.no_title_bar ? 0 : fh;
 	const struct JBWMRectangle * restrict g = &c->size;
 	enum { BORDER = 1 };
-	draw_rectangle(dpy, root, gid, (xRectangle) {g->x, g->y - o,
-		g->width + BORDER, g->height + BORDER + o});
+	XDrawRectangle(dpy, root, gc, g->x, g->y - o,
+		g->width + BORDER, g->height + BORDER + o);
 }
 static void drag_event_loop(Display * d,
-	struct JBWMClient * restrict c, const Window root,
-	const GContext gid, const bool resize)
+	struct JBWMClient * restrict c, const Window root, GC gc,
+	const bool resize)
 {
 	const int16_t original[] = {c->size.x, c->size.y};
 	int16_t start[2];
@@ -104,14 +89,14 @@ static void drag_event_loop(Display * d,
 				p[1] = e.xmotion.y;
 			}
 			if (b)
-				draw_outline(d, root, gid, c);
+				draw_outline(d, root, gc, c);
 			if (resize)
 				set_size(c, p);
 			else
 				set_position(c, original, start, p);
 		}
 		if (b)
-			draw_outline(d, root, gid, c);
+			draw_outline(d, root, gc, c);
 		else
 			jbwm_move_resize(d, c);
 	}
@@ -129,10 +114,10 @@ void jbwm_drag(Display * d, struct JBWMClient * restrict c,
 		struct JBWMRectangle * restrict g = &c->size;
 		jbwm_warp(d, c->window, g->width, g->height);
 	}
-	const GContext gid = jbwm_get_screen(c)->gc->gid;
-	drag_event_loop(d, c, r, gid, resize);
+	GC gc = jbwm_get_screen(c)->gc;
+	drag_event_loop(d, c, r, gc, resize);
 	if (c->border)
-		draw_outline(d, r, gid, c);
+		draw_outline(d, r, gc, c);
 	XUngrabPointer(d, CurrentTime);
 	jbwm_move_resize(d, c);
 }
