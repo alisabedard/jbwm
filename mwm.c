@@ -79,9 +79,8 @@ static Atom get_mwm_hints_atom(Display * d)
 	static Atom a;
 	return a ? a : (a = XInternAtom(d, "_MOTIF_WM_HINTS", false));
 }
-void jbwm_handle_mwm_hints(struct JBWMClient * restrict c)
+void jbwm_handle_mwm_hints(Display * d, struct JBWMClient * restrict c)
 {
-	Display * d = jbwm_get_display();
 	const Atom mwm_hints = get_mwm_hints_atom(d);
 	struct JBWMMwm * m = jbwm_get_property(d, c->window,
 		mwm_hints, &(uint16_t){0});

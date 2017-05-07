@@ -43,7 +43,7 @@ static uint8_t wm_desktop(Display * d, const Window w, uint8_t vdesk)
 __attribute__((nonnull))
 static void init_properties(Display * d, struct JBWMClient * restrict c)
 {
-	jbwm_handle_mwm_hints(c);
+	jbwm_handle_mwm_hints(d, c);
 	c->vdesk = jbwm_get_screen(c)->vdesk;
 #ifdef JBWM_USE_EWMH
 	c->vdesk = wm_desktop(d, c->window, c->vdesk);

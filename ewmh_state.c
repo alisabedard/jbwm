@@ -72,7 +72,7 @@ static void set_state(Display * d, struct JBWMClient * restrict c,
 		return;
 	switch(t) {
 	case JBWM_EWMH_WM_STATE_FULLSCREEN:
-		(add?jbwm_set_fullscreen:jbwm_set_not_fullscreen)(c);
+		(add?jbwm_set_fullscreen:jbwm_set_not_fullscreen)(d, c);
 		break;
 	case JBWM_EWMH_WM_STATE_STICKY:
 		c->opt.sticky=add;
@@ -86,10 +86,10 @@ static void set_state(Display * d, struct JBWMClient * restrict c,
 		(add ? jbwm_hide_client : jbwm_restore_client)(d, c);
 		break;
 	case JBWM_EWMH_WM_STATE_MAXIMIZED_VERT:
-		(add ? jbwm_set_vert : jbwm_set_not_vert)(c);
+		(add ? jbwm_set_vert : jbwm_set_not_vert)(d, c);
 		break;
 	case JBWM_EWMH_WM_STATE_MAXIMIZED_HORZ:
-		(add ? jbwm_set_horz : jbwm_set_not_horz)(c);
+		(add ? jbwm_set_horz : jbwm_set_not_horz)(d, c);
 		break;
 	default:
 		JBWM_LOG("\tWARNING:  Unhandled state");

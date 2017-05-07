@@ -10,10 +10,6 @@
 #include "jbwm.h"
 #include "log.h"
 static Display * display;
-Display * jbwm_get_display(void)
-{
-	return display;
-}
 static void cleanup(const Window w)
 {
 	struct JBWMClient * restrict c = jbwm_get_client(w);
