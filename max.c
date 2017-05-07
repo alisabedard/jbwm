@@ -1,6 +1,5 @@
 // Copyright 2017, Jeffrey E. Bedard
 #include "max.h"
-#include "display.h"
 #include "ewmh.h"
 #include "ewmh_state.h"
 #include "font.h"

@@ -7,7 +7,6 @@
 #include <X11/Xatom.h> // keep
 #include "client.h"
 #include "config.h"
-#include "display.h"
 #include "ewmh.h" // keep
 #include "log.h"
 #include "util.h" // keep
