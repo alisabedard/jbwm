@@ -63,7 +63,8 @@ indent:
 	indent *.[ch]
 	sed 's/ \/\//\/\//g' -i'~~' *.[ch]
 debug: clean
-	make -f Makefile.debug -j 4
+	./configure -d
+	make
 small: clean
 	CFLAGS='-flto -Os -march=native' ./configure -estx
 	make -j4
