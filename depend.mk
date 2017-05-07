@@ -30,7 +30,7 @@ keys.o: keys.c keys.h JBWMScreen.h JBWMPixels.h pixel_t.h JBWMSize.h \
  select.h signal.h snap.h title_bar.h util.h wm_state.h
 main.o: main.c jbwm.h JBWMScreen.h JBWMPixels.h pixel_t.h JBWMSize.h \
  display.h font.h events.h screen.h JBWMClient.h JBWMClientOptions.h \
- JBWMClientTitlebar.h JBWMRectangle.h signal.h
+ JBWMClientTitlebar.h JBWMRectangle.h
 max.o: max.c max.h display.h ewmh.h ewmh_state.h font.h move_resize.h \
  screen.h JBWMClient.h JBWMClientOptions.h JBWMClientTitlebar.h \
  JBWMRectangle.h JBWMScreen.h JBWMPixels.h pixel_t.h JBWMSize.h \

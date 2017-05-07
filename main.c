@@ -4,7 +4,6 @@
 #include "font.h"
 #include "events.h"
 #include "screen.h"
-#include "signal.h"
 int main(int argc, char **argv)
 {
 	jbwm_set_defaults();
