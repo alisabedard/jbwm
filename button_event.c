@@ -4,7 +4,6 @@
 // See README for license and other details.
 #undef DEBUG
 #include "button_event.h"
-#include "JBWMClient.h"
 #include "client.h"
 #include "drag.h"
 #include "log.h"
