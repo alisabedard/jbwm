@@ -26,21 +26,14 @@ static Atom get_atom(Display * restrict d,
 {
 	return *a ? *a : (*a = XInternAtom(d, name, false));
 }
-static Atom get_wm_protocols(Display * d)
-{
-	static Atom a;
-	return get_atom(d, &a, "WM_PROTOCOLS");
+#define ATOM_GETTER(func, atom) Atom func(Display * d) \
+{\
+	static Atom a;\
+	return get_atom(d, &a, atom);\
 }
-static Atom get_wm_delete_window(Display * d)
-{
-	static Atom a;
-	return get_atom(d, &a, "WM_DELETE_WINDOW");
-}
-Atom jbwm_get_wm_state(Display * d)
-{
-	static Atom a;
-	return get_atom(d, &a, "WM_STATE");
-}
+static ATOM_GETTER(get_wm_protocols, "WM_PROTOCOLS");
+static ATOM_GETTER(get_wm_delete_window, "WM_DELETE_WINDOW");
+ATOM_GETTER(jbwm_get_wm_state, "WM_STATE");
 void jbwm_set_wm_state(Display * d, struct JBWMClient * restrict c,
 	const int8_t state)
 {
