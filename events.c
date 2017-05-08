@@ -8,11 +8,10 @@
 #endif//LOG_LEVEL
 #include "events.h"
 #include <X11/Xatom.h>
-#include <stdlib.h>
 #include "button_event.h"
 #include "client.h"
-#include "ewmh_state.h"
 #include "ewmh.h"
+#include "ewmh_state.h"
 #include "keys.h"
 #include "log.h"
 #include "move_resize.h"

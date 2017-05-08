@@ -8,7 +8,7 @@ display.o: display.c display.h client.h config.h log.h util.h pixel_t.h
 drag.o: drag.c drag.h font.h move_resize.h screen.h JBWMClient.h \
  JBWMClientOptions.h JBWMClientTitlebar.h JBWMRectangle.h JBWMScreen.h \
  JBWMPixels.h pixel_t.h JBWMSize.h snap.h
-events.o: events.c events.h button_event.h client.h ewmh_state.h ewmh.h \
+events.o: events.c events.h button_event.h client.h ewmh.h ewmh_state.h \
  keys.h log.h move_resize.h new.h screen.h JBWMClient.h \
  JBWMClientOptions.h JBWMClientTitlebar.h JBWMRectangle.h JBWMScreen.h \
  JBWMPixels.h pixel_t.h JBWMSize.h select.h title_bar.h util.h wm_state.h
