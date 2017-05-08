@@ -1,8 +1,8 @@
-#include "jbwm.h"
 #include "JBWMScreen.h"
+#include "events.h"
 #include "display.h"
 #include "font.h"
-#include "events.h"
+#include "jbwm.h"
 #include "screen.h"
 int main(int argc, char **argv)
 {
