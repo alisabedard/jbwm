@@ -11,7 +11,7 @@
 #include "button_event.h"
 #include "client.h"
 #include "ewmh.h"
-#include "ewmh_state.h"
+#include "ewmh_client.h"
 #include "keys.h"
 #include "log.h"
 #include "move_resize.h"
