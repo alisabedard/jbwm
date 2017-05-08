@@ -27,8 +27,8 @@ keys.o: keys.c keys.h JBWMScreen.h JBWMPixels.h pixel_t.h JBWMSize.h \
  client.h config.h drag.h jbwm.h log.h max.h move_resize.h screen.h \
  JBWMClient.h JBWMClientOptions.h JBWMClientTitlebar.h JBWMRectangle.h \
  select.h signal.h snap.h title_bar.h util.h wm_state.h
-main.o: main.c jbwm.h JBWMScreen.h JBWMPixels.h pixel_t.h JBWMSize.h \
- display.h font.h events.h screen.h JBWMClient.h JBWMClientOptions.h \
+main.o: main.c JBWMScreen.h JBWMPixels.h pixel_t.h JBWMSize.h events.h \
+ display.h font.h jbwm.h screen.h JBWMClient.h JBWMClientOptions.h \
  JBWMClientTitlebar.h JBWMRectangle.h
 max.o: max.c max.h ewmh.h ewmh_state.h font.h move_resize.h screen.h \
  JBWMClient.h JBWMClientOptions.h JBWMClientTitlebar.h JBWMRectangle.h \
