@@ -86,8 +86,7 @@ static void center(struct JBWMRectangle * g, const struct JBWMSize s)
 	g->y = get_center(g->height,s.height);
 }
 // returns true if window is viewable
-static bool get_window_attributes(Display * d,
-	struct JBWMClient * restrict c,
+static bool get_window_attributes(Display * d, struct JBWMClient * restrict c,
 	struct JBWMRectangle * a_geo)
 {
 	XWindowAttributes a;
@@ -102,8 +101,22 @@ static bool get_window_attributes(Display * d,
 	a_geo->height = a.height;
 	return a.map_state == IsViewable;
 }
+static void init_geometry_for_screen_size(Display * d, const Window window,
+	struct JBWMRectangle * g, const struct JBWMRectangle * restrict a_geo,
+	const struct JBWMSize scr_sz)
+{
+	check_dimensions(g, scr_sz);
+	if (do_hints(d, window, g, a_geo->width, a_geo->height)
+		&& (a_geo->x || a_geo->y)) {
+		JBWM_LOG("\t\tPosition is set by hints.");
+		g->x = a_geo->x;
+		g->y = a_geo->y;
+	} else
+		center(g, scr_sz);
+
+}
 static void init_geometry_for_screen(Display * d,
-	struct JBWMClient * restrict c, struct JBWMRectangle * g,
+	struct JBWMClient * c, struct JBWMRectangle * g,
 	const struct JBWMRectangle * restrict a_geo)
 {
 	struct JBWMScreen * s = jbwm_get_screen(c);
@@ -111,20 +124,10 @@ static void init_geometry_for_screen(Display * d,
 		g->x = g->y = 0;
 		return;
 	}
-	{ // scr_sz scope
-		const struct JBWMSize scr_sz = s->size;
-		check_dimensions(g, scr_sz);
-		if (do_hints(d, c->window, g, a_geo->width, a_geo->height)
-			&& (a_geo->x || a_geo->y)) {
-			JBWM_LOG("\t\tPosition is set by hints.");
-			g->x = a_geo->x;
-			g->y = a_geo->y;
-		} else
-			center(g, scr_sz);
-	}
+	init_geometry_for_screen_size(d, c->window, g, a_geo, s->size);
 }
 __attribute__((nonnull))
-static void init_geometry(Display * d, struct JBWMClient * restrict c)
+static void init_geometry(Display * d, struct JBWMClient * c)
 {
 	struct JBWMRectangle a_geo;
 	const bool viewable = get_window_attributes(d, c, &a_geo);
