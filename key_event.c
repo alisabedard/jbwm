@@ -1,13 +1,12 @@
 // Copyright 2017, Jeffrey E. Bedard
 #include "key_event.h"
-#include <stdbool.h>
 #include <stdlib.h>
-#include <unistd.h>
 #include "JBWMKeys.h"
 #include "JBWMScreen.h"
 #include "client.h"
 #include "config.h"
 #include "drag.h"
+#include "exec.h"
 #include "key_masks.h"
 #include "keys.h"
 #include "log.h"
@@ -15,7 +14,6 @@
 #include "move_resize.h"
 #include "screen.h"
 #include "select.h"
-#include "signal.h"
 #include "snap.h"
 #include "title_bar.h"
 #include "wm_state.h"
@@ -174,16 +172,6 @@ static void cond_client_to_desk(Display * d, struct JBWMClient * restrict c,
 	mod && c ? jbwm_set_client_vdesk(d, c, desktop)
 		: jbwm_set_vdesk(d, s, desktop);
 }
-static void start_terminal(void)
-{
-	if (fork() == 0) {
-		char * t = getenv(JBWM_ENV_TERM);
-		execlp(t, t, (char*)NULL);
-		// This is only reached on error.
-		exit(1);
-	} else // in controlling process:
-		jbwm_wait_child();
-}
 void jbwm_handle_key_event(XKeyEvent * e)
 {
 	JBWM_LOG("jbwm_handle_key_event");
@@ -197,7 +185,7 @@ void jbwm_handle_key_event(XKeyEvent * e)
 	} opt = {s->vdesk, e->state & jbwm_get_mod_mask(), 0};
 	switch (key) {
 	case JBWM_KEY_NEW:
-		start_terminal();
+		jbwm_start_terminal();
 		break;
 	case JBWM_KEY_QUIT:
 		exit(0);

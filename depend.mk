@@ -26,6 +26,7 @@ ewmh_state.o: ewmh_state.c ewmh_state.h client.h drag.h ewmh.h jbwm.h \
 ewmh_wm_state.o: ewmh_wm_state.c ewmh_wm_state.h JBWMClient.h \
  JBWMClientOptions.h JBWMClientTitlebar.h JBWMRectangle.h client.h ewmh.h \
  ewmh_state.h log.h max.h util.h pixel_t.h
+exec.o: exec.c exec.h config.h
 font.o: font.c font.h config.h util.h pixel_t.h
 jbwm.o: jbwm.c jbwm.h JBWMScreen.h JBWMPixels.h pixel_t.h JBWMSize.h \
  config.h ewmh.h key_masks.h keys.h log.h new.h screen.h JBWMClient.h \
@@ -33,8 +34,8 @@ jbwm.o: jbwm.c jbwm.h JBWMScreen.h JBWMPixels.h pixel_t.h JBWMSize.h \
 key_event.o: key_event.c key_event.h JBWMKeys.h JBWMScreen.h JBWMPixels.h \
  pixel_t.h JBWMSize.h client.h config.h drag.h key_masks.h keys.h log.h \
  max.h move_resize.h screen.h JBWMClient.h JBWMClientOptions.h \
- JBWMClientTitlebar.h JBWMRectangle.h select.h signal.h snap.h \
- title_bar.h wm_state.h
+ JBWMClientTitlebar.h JBWMRectangle.h select.h snap.h title_bar.h \
+ wm_state.h
 key_masks.o: key_masks.c key_masks.h config.h
 keys.o: keys.c keys.h JBWMKeys.h JBWMScreen.h JBWMPixels.h pixel_t.h \
  JBWMSize.h key_masks.h
@@ -49,8 +50,8 @@ move_resize.o: move_resize.c move_resize.h JBWMClient.h \
  mwm.h shape.h title_bar.h
 mwm.o: mwm.c mwm.h JBWMClient.h JBWMClientOptions.h JBWMClientTitlebar.h \
  JBWMRectangle.h log.h mwmproto.h util.h pixel_t.h
-new.o: new.c new.h client.h config.h ewmh.h key_masks.h macros.h mwm.h \
- screen.h JBWMClient.h JBWMClientOptions.h JBWMClientTitlebar.h \
+new.o: new.c new.h client.h config.h ewmh.h key_masks.h log.h macros.h \
+ mwm.h screen.h JBWMClient.h JBWMClientOptions.h JBWMClientTitlebar.h \
  JBWMRectangle.h JBWMScreen.h JBWMPixels.h pixel_t.h JBWMSize.h select.h \
  shape.h util.h
 screen.o: screen.c screen.h JBWMClient.h JBWMClientOptions.h \
@@ -61,7 +62,6 @@ select.o: select.c select.h client.h ewmh.h ewmh_state.h screen.h \
  JBWMScreen.h JBWMPixels.h pixel_t.h JBWMSize.h util.h
 shape.o: shape.c shape.h JBWMClient.h JBWMClientOptions.h \
  JBWMClientTitlebar.h JBWMRectangle.h log.h
-signal.o: signal.c signal.h
 snap.o: snap.c snap.h JBWMPoint.h client.h config.h font.h screen.h \
  JBWMClient.h JBWMClientOptions.h JBWMClientTitlebar.h JBWMRectangle.h \
  JBWMScreen.h JBWMPixels.h pixel_t.h JBWMSize.h
