@@ -11,6 +11,7 @@
 #include "JBWMScreen.h"
 #include "config.h"
 #include "ewmh.h"
+#include "key_masks.h"
 #include "keys.h"
 #include "log.h"
 #include "new.h"

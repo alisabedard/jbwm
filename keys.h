@@ -5,41 +5,13 @@
 #ifndef JBWM_KEYS_H
 #define JBWM_KEYS_H
 #include <stdint.h>
-#include <X11/keysym.h>
 #include <X11/Xlib.h>
+#include "JBWMKeys.h"
 struct JBWMScreen;
 void jbwm_handle_key_event(XKeyEvent * e) __attribute__((nonnull));
 void jbwm_grab_screen_keys(Display * d, struct JBWMScreen * s)
 	__attribute__((nonnull));
 void jbwm_grab_window_keys(Display * d, const Window win);
-void jbwm_set_grab_mask(const uint16_t mask);
-void jbwm_set_mod_mask(const uint16_t mask);
-enum JBWMKeys {
-	JBWM_KEY_NEXT=XK_Tab,
-	JBWM_KEY_NEW=XK_Return,
-	JBWM_KEY_QUIT=XK_Escape,
-	JBWM_KEY_TOPLEFT=XK_KP_Home,
-	JBWM_KEY_TOPRIGHT=XK_KP_Page_Up,
-	JBWM_KEY_BOTTOMLEFT=XK_KP_End,
-	JBWM_KEY_BOTTOMRIGHT=XK_KP_Page_Down,
-	JBWM_KEY_RAISE=XK_Up,
-	JBWM_KEY_LOWER=XK_Down,
-	JBWM_KEY_PREVDESK=XK_Left,
-	JBWM_KEY_NEXTDESK=XK_Right,
-	JBWM_KEY_UP=XK_k,
-	JBWM_KEY_DOWN=XK_j,
-	JBWM_KEY_LEFT=XK_h,
-	JBWM_KEY_RIGHT=XK_l,
-	JBWM_KEY_MAX_H=XK_x,
-	JBWM_KEY_MAX_V=XK_z,
-	JBWM_KEY_ALTLOWER=XK_minus,
-	JBWM_KEY_INFO=XK_F5,
-	JBWM_KEY_MAX=XK_space,
-	JBWM_KEY_STICK=XK_period,
-	JBWM_KEY_MOVE=XK_m,
-	JBWM_KEY_SHADE=XK_s,
-	JBWM_KEY_FS=XK_a
-};
 /* Mixtures of Ctrl, Alt an Escape are used for things like VMWare and
  * XFree86/Cygwin, so the KILL key is an option in the Makefile */
 #ifndef JBWM_KEY_KILL

@@ -10,6 +10,7 @@
 #include "config.h"
 #include "drag.h"
 #include "jbwm.h"
+#include "key_masks.h"
 #include "log.h"
 #include "max.h"
 #include "move_resize.h"
@@ -25,23 +26,9 @@
 #undef JBWM_LOG
 #define JBWM_LOG(...)
 #endif//!DEBUG_KEYS
-static struct {
-	uint16_t grab_mask, mod_mask;
-} jbwm_keys_data = {
-	.grab_mask = JBWM_KEYMASK_GRAB,
-	.mod_mask = JBWM_KEYMASK_MOD
-};
-void jbwm_set_grab_mask(const uint16_t mask)
-{
-	jbwm_keys_data.grab_mask = mask;
-}
-void jbwm_set_mod_mask(const uint16_t mask)
-{
-	jbwm_keys_data.mod_mask = mask;
-}
 void jbwm_grab_window_keys(Display * d, const Window win)
 {
-	jbwm_grab_button(d, win, jbwm_keys_data.grab_mask, AnyButton);
+	jbwm_grab_button(d, win, jbwm_get_grab_mask(), AnyButton);
 }
 __attribute__((nonnull))
 static void point(Display * d, struct JBWMClient * restrict c,
@@ -218,7 +205,7 @@ void jbwm_handle_key_event(XKeyEvent * e)
 		uint8_t vdesk:6;
 		bool mod:1;
 		bool zero:1;
-	} opt = {s->vdesk, e->state & jbwm_keys_data.mod_mask, 0};
+	} opt = {s->vdesk, e->state & jbwm_get_mod_mask(), 0};
 	switch (key) {
 	case JBWM_KEY_NEW:
 		start_terminal();
@@ -251,14 +238,14 @@ __attribute__((nonnull))
 static void grab(Display * d, struct JBWMScreen * s,
 	KeySym * ks, const uint32_t mask)
 {
+	const uint16_t m = jbwm_get_grab_mask();
 	for (; *ks; ++ks)
-		XGrabKey(d, XKeysymToKeycode(d, *ks),
-			 jbwm_keys_data.grab_mask | mask, s->root, true,
-			 GrabModeAsync, GrabModeAsync);
+		XGrabKey(d, XKeysymToKeycode(d, *ks), m | mask, s->root,
+			true, GrabModeAsync, GrabModeAsync);
 }
 void jbwm_grab_screen_keys(Display * d, struct JBWMScreen * s)
 {
 	grab(d, s, (KeySym[]){JBWM_KEYS_TO_GRAB}, 0);
 	grab(d, s, (KeySym[]){JBWM_ALT_KEYS_TO_GRAB},
-		jbwm_keys_data.mod_mask);
+		jbwm_get_mod_mask());
 }
