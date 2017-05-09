@@ -10,17 +10,13 @@
 #include "config.h"
 #include "ewmh.h"
 #include "key_masks.h"
+#include "log.h"
 #include "macros.h"
 #include "mwm.h"
 #include "screen.h"
 #include "select.h"
 #include "shape.h"
 #include "util.h"
-//#define JBWM_DEBUG_NEW
-#ifndef JBWM_DEBUG_NEW
-#undef JBWM_LOG
-#define JBWM_LOG(...)
-#endif//!JBWM_DEBUG_NEW
 #ifdef JBWM_USE_EWMH
 static uint8_t wm_desktop(Display * d, const Window w, uint8_t vdesk)
 {
