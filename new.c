@@ -106,6 +106,27 @@ static bool get_window_attributes(Display * d,
 	a_geo->height = a.height;
 	return a.map_state == IsViewable;
 }
+static void init_geometry_for_screen(Display * d,
+	struct JBWMClient * restrict c, struct JBWMRectangle * g,
+	const struct JBWMRectangle * restrict a_geo)
+{
+	struct JBWMScreen * s = jbwm_get_screen(c);
+	if (!s) {
+		g->x = g->y = 0;
+		return;
+	}
+	{ // scr_sz scope
+		const struct JBWMSize scr_sz = s->size;
+		check_dimensions(g, scr_sz);
+		if (do_hints(d, c->window, g, a_geo->width, a_geo->height)
+			&& (a_geo->x || a_geo->y)) {
+			JBWM_LOG("\t\tPosition is set by hints.");
+			g->x = a_geo->x;
+			g->y = a_geo->y;
+		} else
+			center(g, scr_sz);
+	}
+}
 __attribute__((nonnull))
 static void init_geometry(Display * d, struct JBWMClient * restrict c)
 {
@@ -121,25 +142,8 @@ static void init_geometry(Display * d, struct JBWMClient * restrict c)
 		return;
 	}
 	c->ignore_unmap += viewable ? 1 : 0;
-	//bool pos = viewable;
 	JBWM_LOG("\t\tVIEWABLE: %d", viewable);
-	const bool pos = do_hints(d, c->window, g,
-		a_geo.width, a_geo.height);
-	{ // *s, scr_sz scope
-		struct JBWMScreen * s = jbwm_get_screen(c);
-		if (!s) {
-			g->x = g->y = 0;
-			return;
-		}
-		const struct JBWMSize scr_sz = s->size;
-		check_dimensions(g, scr_sz);
-		if (pos && (a_geo.x || a_geo.y)) {
-			JBWM_LOG("\t\tPosition is set by hints.");
-			g->x = a_geo.x;
-			g->y = a_geo.y;
-		} else
-			center(g, scr_sz);
-	}
+	init_geometry_for_screen(d, c, g, &a_geo);
 	JBWM_LOG("init_geometry() win: 0x%x, x: %d, y: %d, w: %d, h: %d",
 		(int)c->window, g->x, g->y, g->width, g->height);
 }
