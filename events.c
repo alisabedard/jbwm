@@ -12,7 +12,7 @@
 #include "client.h"
 #include "ewmh.h"
 #include "ewmh_client.h"
-#include "keys.h"
+#include "key_event.h"
 #include "log.h"
 #include "move_resize.h"
 #include "new.h"
