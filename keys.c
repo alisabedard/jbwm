@@ -7,17 +7,17 @@
 #include "JBWMScreen.h"
 #include "key_masks.h"
 __attribute__((nonnull))
-static void grab(Display * d, struct JBWMScreen * s,
-	KeySym * ks, const uint32_t mask)
+static void grab(Display * d, const Window root,
+	KeySym * ks, const uint32_t modifiers)
 {
 	const uint16_t m = jbwm_get_grab_mask();
 	for (; *ks; ++ks)
-		XGrabKey(d, XKeysymToKeycode(d, *ks), m | mask, s->root,
+		XGrabKey(d, XKeysymToKeycode(d, *ks), m | modifiers, root,
 			True, GrabModeAsync, GrabModeAsync);
 }
 void jbwm_grab_screen_keys(Display * d, struct JBWMScreen * s)
 {
-	grab(d, s, (KeySym[]){JBWM_KEYS_TO_GRAB}, 0);
-	grab(d, s, (KeySym[]){JBWM_ALT_KEYS_TO_GRAB},
-		jbwm_get_mod_mask());
+	const Window r = s->root;
+	grab(d, r, (KeySym[]){JBWM_KEYS_TO_GRAB}, 0);
+	grab(d, r, (KeySym[]){JBWM_ALT_KEYS_TO_GRAB}, jbwm_get_mod_mask());
 }
