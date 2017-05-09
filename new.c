@@ -113,7 +113,6 @@ static void init_geometry_for_screen_size(Display * d, const Window window,
 		g->y = a_geo->y;
 	} else
 		center(g, scr_sz);
-
 }
 static void init_geometry_for_screen(Display * d,
 	struct JBWMClient * c, struct JBWMRectangle * g,
