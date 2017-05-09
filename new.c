@@ -161,7 +161,7 @@ static Window get_parent(Display * d, struct JBWMClient * restrict c)
 		.override_redirect=true, .event_mask = WA_EM});
 }
 __attribute__((nonnull))
-static void reparent(Display * d, struct JBWMClient * restrict c)
+static void reparent(Display * d, struct JBWMClient * c)
 {
 	JBWM_LOG("reparent()");
 	jbwm_new_shaped_client(d, c);
@@ -187,6 +187,9 @@ static struct JBWMClient * get_JBWMClient(const Window w,
 // Grab input and setup JBWM_USE_EWMH for client window
 static void do_grabs(Display * d, const Window w)
 {
+	/* jbwm_ewmh_set_allowed_actions must come before jbwm_grab_buttons.
+	 * */
+	jbwm_ewmh_set_allowed_actions(d, w);
 	XSelectInput(d, w, EnterWindowMask | PropertyChangeMask
 		| ColormapChangeMask);
 	// keys to grab:
@@ -198,7 +201,6 @@ void jbwm_new_client(Display * d, struct JBWMScreen * s, const Window w)
 	struct JBWMClient * restrict c = get_JBWMClient(w, s);
 	jbwm_prepend_client(c);
 	do_grabs(d, w);
-	jbwm_ewmh_set_allowed_actions(d, w);
 	init_geometry(d, c);
 	init_properties(d, c);
 	reparent(d, c);
