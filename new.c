@@ -9,7 +9,7 @@
 #include "client.h"
 #include "config.h"
 #include "ewmh.h"
-#include "keys.h"
+#include "key_masks.h"
 #include "macros.h"
 #include "mwm.h"
 #include "screen.h"
@@ -182,13 +182,10 @@ static struct JBWMClient * get_JBWMClient(const Window w,
 // Grab input and setup JBWM_USE_EWMH for client window
 static void do_grabs(Display * d, const Window w)
 {
-	enum {
-		MASK = EnterWindowMask | PropertyChangeMask
-			| ColormapChangeMask
-	};
-	XSelectInput(d, w, MASK);
-	jbwm_grab_window_keys(d, w);
-	jbwm_ewmh_set_allowed_actions(d, w);
+	XSelectInput(d, w, EnterWindowMask | PropertyChangeMask
+		| ColormapChangeMask);
+	// keys to grab:
+	jbwm_grab_button(d, w, jbwm_get_grab_mask(), AnyButton);
 }
 void jbwm_new_client(Display * d, struct JBWMScreen * s, const Window w)
 {
@@ -196,6 +193,7 @@ void jbwm_new_client(Display * d, struct JBWMScreen * s, const Window w)
 	struct JBWMClient * restrict c = get_JBWMClient(w, s);
 	jbwm_prepend_client(c);
 	do_grabs(d, w);
+	jbwm_ewmh_set_allowed_actions(d, w);
 	init_geometry(d, c);
 	init_properties(d, c);
 	reparent(d, c);

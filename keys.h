@@ -8,6 +8,4 @@
 struct JBWMScreen;
 void jbwm_grab_screen_keys(Display * d, struct JBWMScreen * s)
 	__attribute__((nonnull));
-void jbwm_grab_window_keys(Display * d, const Window win)
-	__attribute__((nonnull));
 #endif//!JBWM_KEYS_H

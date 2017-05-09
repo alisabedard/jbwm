@@ -37,7 +37,7 @@ key_event.o: key_event.c key_event.h JBWMKeys.h JBWMScreen.h JBWMPixels.h \
  title_bar.h wm_state.h
 key_masks.o: key_masks.c key_masks.h config.h
 keys.o: keys.c keys.h JBWMKeys.h JBWMScreen.h JBWMPixels.h pixel_t.h \
- JBWMSize.h key_masks.h util.h
+ JBWMSize.h key_masks.h
 main.o: main.c JBWMScreen.h JBWMPixels.h pixel_t.h JBWMSize.h events.h \
  display.h font.h jbwm.h screen.h JBWMClient.h JBWMClientOptions.h \
  JBWMClientTitlebar.h JBWMRectangle.h
@@ -49,7 +49,7 @@ move_resize.o: move_resize.c move_resize.h JBWMClient.h \
  mwm.h shape.h title_bar.h
 mwm.o: mwm.c mwm.h JBWMClient.h JBWMClientOptions.h JBWMClientTitlebar.h \
  JBWMRectangle.h log.h mwmproto.h util.h pixel_t.h
-new.o: new.c new.h client.h config.h ewmh.h keys.h macros.h mwm.h \
+new.o: new.c new.h client.h config.h ewmh.h key_masks.h macros.h mwm.h \
  screen.h JBWMClient.h JBWMClientOptions.h JBWMClientTitlebar.h \
  JBWMRectangle.h JBWMScreen.h JBWMPixels.h pixel_t.h JBWMSize.h select.h \
  shape.h util.h

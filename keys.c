@@ -6,11 +6,6 @@
 #include "JBWMKeys.h"
 #include "JBWMScreen.h"
 #include "key_masks.h"
-#include "util.h"
-void jbwm_grab_window_keys(Display * d, const Window win)
-{
-	jbwm_grab_button(d, win, jbwm_get_grab_mask(), AnyButton);
-}
 __attribute__((nonnull))
 static void grab(Display * d, struct JBWMScreen * s,
 	KeySym * ks, const uint32_t mask)
