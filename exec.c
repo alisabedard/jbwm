@@ -1,5 +1,5 @@
 // Copyright 2017, Jeffrey E. Bedard <jefbed@gmail.com>
-#include "signal.h"
+#include "exec.h"
 #include <signal.h>
 #include <stdlib.h>
 #include <sys/wait.h>

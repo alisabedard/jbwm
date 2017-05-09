@@ -1,5 +1,5 @@
 // Copyright 2017, Jeffrey E. Bedard <jefbed@gmail.com>
-#ifndef JBWM_SIGNAL_H
-#define JBWM_SIGNAL_H
+#ifndef JBWM_EXEC_H
+#define JBWM_EXEC_H
 void jbwm_start_terminal(void);
-#endif//!JBWM_SIGNAL_H
+#endif//!JBWM_EXEC_H
