@@ -160,18 +160,18 @@ static Window get_parent(Display * d, struct JBWMClient * restrict c)
 		NULL, CW_VM, &(XSetWindowAttributes){
 		.override_redirect=true, .event_mask = WA_EM});
 }
+static void reparent_window(Display * d, Window parent, Window window)
+{
+	XAddToSaveSet(d, window);
+	XReparentWindow(d, window, parent, 0, 0);
+	XMapWindow(d, window);
+}
 __attribute__((nonnull))
-static void reparent(Display * d, struct JBWMClient * c)
+static void reparent(Display * d, struct JBWMClient * restrict c)
 {
 	JBWM_LOG("reparent()");
 	jbwm_new_shaped_client(d, c);
-	{ // p, w scope
-		const Window p = c->parent = get_parent(d, c),
-		      w = c->window;
-		XAddToSaveSet(d, w);
-		XReparentWindow(d, w, p, 0, 0);
-		XMapWindow(d, w);
-	}
+	reparent_window(d, c->parent = get_parent(d, c), c->window);
 	// Required by wm-spec:
 	jbwm_set_frame_extents(d, c);
 }
