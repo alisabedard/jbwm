@@ -95,10 +95,8 @@ static bool get_window_attributes(Display * d, struct JBWMClient * restrict c,
 		"x: %d, y: %d, w: %d, h: %d",
 		(int)c->window, a.x, a.y, a.width, a.height);
 	c->cmap = a.colormap;
-	a_geo->x = a.x;
-	a_geo->y = a.y;
-	a_geo->width = a.width;
-	a_geo->height = a.height;
+	*a_geo = (struct JBWMRectangle){.x = a.x, .y = a.y, .width = a.width,
+		.height = a.height};
 	return a.map_state == IsViewable;
 }
 static void init_geometry_for_screen_size(Display * d, const Window window,
