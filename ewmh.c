@@ -100,7 +100,7 @@ static Window * get_ordered_client_list(Display * d)
 	enum {MAX_CLIENTS= 64};
 	static Window window_list[MAX_CLIENTS];
 	// get ordered list of all windows on default screen:
-	unsigned int n = get_window_list(d, MAX_CLIENTS, window_list);
+	const unsigned int n = get_window_list(d, MAX_CLIENTS, window_list);
 	JBWM_LOG("get_ordered_client_list() n: %d", (int)n);
 	wprop(d, DefaultRootWindow(d), JBWM_EWMH_CLIENT_LIST_STACKING,
 		XA_WINDOW, window_list, n);
