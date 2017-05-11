@@ -34,7 +34,7 @@ static void commit_key_move(Display * d, struct JBWMClient * restrict c)
 struct KeyMoveFlags {
 	bool horz:1, pos:1, mod:1;
 };
-static bool can_resize(struct JBWMClientOptions * restrict opt)
+static inline bool can_resize(struct JBWMClientOptions * restrict opt)
 {
 	return !opt->shaped && !opt->no_resize;
 }
@@ -43,8 +43,8 @@ static void key_move(Display * dpy, struct JBWMClient * restrict c,
 	const struct KeyMoveFlags f)
 {
 	enum { I = JBWM_RESIZE_INCREMENT };
-	struct JBWMRectangle * s = &c->size;
-	uint16_t *wh = f.horz ? &s->width : &s->height;
+	struct JBWMRectangle * restrict s = &c->size;
+	uint16_t * restrict wh = f.horz ? &s->width : &s->height;
 	const int8_t d = f.pos ? I : - I;
 	if(f.mod && (*wh > I << 1) && can_resize(&c->opt))
 		*wh += d;
