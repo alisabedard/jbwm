@@ -2,10 +2,6 @@
 // Copyright 2008-2017, Jeffrey E. Bedard <jefbed@gmail.com>
 // Copyright 1999-2015, Ciaran Anscomb <jbwm@6809.org.uk>
 // See README for license and other details.
-#define LOG_LEVEL 0
-#if LOG_LEVEL == 0
-#undef DEBUG
-#endif//LOG_LEVEL
 #include "events.h"
 #include <X11/Xatom.h>
 #include "button_event.h"
@@ -21,11 +17,6 @@
 #include "title_bar.h"
 #include "util.h"
 #include "wm_state.h"
-#if LOG_LEVEL > 7
-#define ELOG(...) JBWM_LOG(__VA_ARGS__)
-#else//LOG_LEVEL<=6
-#define ELOG(...)
-#endif//LOG_LEVEL>7
 static bool events_need_cleanup;
 static Window last_window;
 __attribute__((pure))
@@ -122,17 +113,17 @@ void jbwm_events_loop(Display * d)
 				jbwm_move_resize(d, c);
 			break;
 		case ReparentNotify:
-			ELOG("ReparentNotify");
+			JBWM_LOG("ReparentNotify");
 			/* Reset last_window to allow other clients
 			 * with the same window id to be started.  */
 			last_window = 0;
 			break;
 		case KeyPress:
-			ELOG("KeyPress");
+			JBWM_LOG("KeyPress");
 			jbwm_handle_key_event(&ev.xkey);
 			break;
 		case ButtonPress:
-			ELOG("ButtonPress");
+			JBWM_LOG("ButtonPress");
 			if(c)
 				jbwm_handle_button_event(&ev.xbutton, c);
 			break;
@@ -148,18 +139,18 @@ void jbwm_events_loop(Display * d)
 #endif//JBWM_USE_TITLE_BAR
 #ifdef JBWM_USE_EWMH
 		case CreateNotify:
-			ELOG("CreateNotify");
+			JBWM_LOG("CreateNotify");
 			if (ev.xcreatewindow.override_redirect) // internal
 				jbwm_ewmh_update_client_list(d);
 			break;
 		case DestroyNotify:
-			ELOG("DestroyNotify");
+			JBWM_LOG("DestroyNotify");
 			if (!c) // only bother if event was not on a client
 				jbwm_ewmh_update_client_list(d);
 			break;
 #endif//JBWM_USE_EWMH
 		case UnmapNotify:
-			ELOG("UnmapNotify");
+			JBWM_LOG("UnmapNotify");
 			if (c)
 				mark_removal(c);
 			break;
