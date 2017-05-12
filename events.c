@@ -51,11 +51,9 @@ static void handle_property_change(XPropertyEvent * e,
 }
 static void handle_configure_request(XConfigureRequestEvent * e)
 {
-#if LOG_LEVEL > 4
 	JBWM_LOG("handle_configure_request():"
 		"x: %d, y: %d, w: %d, h: %d, b: %d",
 		e->x, e->y, e->width, e->height, e->border_width);
-#endif//LOG_LEVEL
 	XConfigureWindow(e->display, e->window, e->value_mask,
 		&(XWindowChanges){ .x = e->x, .y = e->y,
 		.width = e->width, .height = e->height,
@@ -76,9 +74,7 @@ static void handle_map_request(XMapRequestEvent * e)
 }
 static inline void mark_removal(struct JBWMClient * restrict c)
 {
-#if LOG_LEVEL > 4
 	JBWM_LOG("mark_removal(): ignore_unmap is %d", c->ignore_unmap);
-#endif//LOG_LEVEL
 	c->opt.remove = events_need_cleanup = (c->ignore_unmap--<1);
 }
 static void handle_colormap_notify(struct JBWMClient * restrict c,
@@ -170,10 +166,10 @@ void jbwm_events_loop(Display * d)
 			jbwm_ewmh_handle_client_message(&ev.xclient, c);
 			break;
 #endif//JBWM_USE_EWMH
-#if LOG_LEVEL > 3
+#ifdef DEBUG
 		default:
 			JBWM_LOG("Unhandled event %d", ev.type);
-#endif//LOG_LEVEL
+#endif//DEBUG
 		}
 		if (events_need_cleanup) {
 			cleanup(d, jbwm_get_head_client());
