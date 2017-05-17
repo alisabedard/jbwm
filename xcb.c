@@ -32,16 +32,22 @@ void jb_check_x(xcb_connection_t * x)
 		break;
 	case XCB_CONN_ERROR:
 		xerr(x, "X transport error, DISPLAY unavailable");
+		break;
 	case XCB_CONN_CLOSED_EXT_NOTSUPPORTED:
 		xerr(x, "Extension not supported");
+		break;
 	case XCB_CONN_CLOSED_MEM_INSUFFICIENT:
 		xerr(x, "Insufficient memory");
+		break;
 	case XCB_CONN_CLOSED_REQ_LEN_EXCEED:
 		xerr(x, "Request length exceeded");
+		break;
 	case XCB_CONN_CLOSED_PARSE_ERR:
 		xerr(x, "Invalid DISPLAY string");
+		break;
 	case XCB_CONN_CLOSED_INVALID_SCREEN:
 		xerr(x, "Invalid screen");
+		break;
 	}
 }
 xcb_connection_t * jb_get_xcb_connection(const char * display, int * screen)
