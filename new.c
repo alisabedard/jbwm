@@ -50,7 +50,7 @@ static uint16_t get_per_min(uint16_t spec, uint16_t min)
 {
 	return (spec >= min) ? spec : min;
 }
-static bool do_hints(Display * d, const Window win,
+static bool handle_wm_normal_hints(Display * d, const Window win,
 	struct JBWMRectangle * g, const uint16_t a_w,
 	const uint16_t a_h)
 {
@@ -104,7 +104,7 @@ static void init_geometry_for_screen_size(Display * d, const Window window,
 	const struct JBWMSize scr_sz)
 {
 	check_dimensions(g, scr_sz);
-	if (do_hints(d, window, g, a_geo->width, a_geo->height)
+	if (handle_wm_normal_hints(d, window, g, a_geo->width, a_geo->height)
 		&& (a_geo->x || a_geo->y)) {
 		JBWM_LOG("\t\tPosition is set by hints.");
 		g->x = a_geo->x;
@@ -149,8 +149,8 @@ static Window get_parent(Display * d, struct JBWMClient * restrict c)
 	enum {
 		CFP = CopyFromParent,
 		CW_VM = CWOverrideRedirect | CWEventMask,
-		WA_EM = SubstructureRedirectMask | SubstructureNotifyMask
-		| ButtonPressMask | EnterWindowMask
+		WA_EM = SubstructureRedirectMask | SubstructureNotifyMask |
+			ButtonPressMask | EnterWindowMask
 	};
 	struct JBWMRectangle * g = &c->size;
 	return XCreateWindow(d, jbwm_get_root(c), g->x, g->y,
@@ -185,8 +185,7 @@ static struct JBWMClient * get_JBWMClient(const Window w,
 // Grab input and setup JBWM_USE_EWMH for client window
 static void do_grabs(Display * d, const Window w)
 {
-	/* jbwm_ewmh_set_allowed_actions must come before jbwm_grab_buttons.
-	 * */
+	// jbwm_ewmh_set_allowed_actions must come before jbwm_grab_buttons.
 	jbwm_ewmh_set_allowed_actions(d, w);
 	XSelectInput(d, w, EnterWindowMask | PropertyChangeMask
 		| ColormapChangeMask);
