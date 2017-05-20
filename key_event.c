@@ -62,6 +62,7 @@ static void handle_key_move(Display * d, struct JBWMClient * restrict c,
 	switch (k) {
 	case JBWM_KEY_LEFT:
 		f.pos = false;
+		// FALLTHROUGH
 	case JBWM_KEY_RIGHT:
 		f.horz = true;
 		break;
@@ -196,6 +197,7 @@ void jbwm_handle_key_event(XKeyEvent * e)
 		break;
 	case XK_0:
 		opt.zero = true;
+		// FALLTHROUGH
 	case XK_1: case XK_2: case XK_3: case XK_4: case XK_5:
 	case XK_6: case XK_7: case XK_8: case XK_9:
 		// First desktop 0, per wm-spec

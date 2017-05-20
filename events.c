@@ -18,7 +18,6 @@
 #include "util.h"
 #include "wm_state.h"
 static bool events_need_cleanup;
-static Window last_window;
 __attribute__((pure))
 static struct JBWMScreen * get_screen(const int8_t i,
 	const Window root)
@@ -39,7 +38,7 @@ static void cleanup(Display * d, struct JBWMClient * i)
 static void handle_property_change(XPropertyEvent * e,
 	struct JBWMClient * restrict c)
 {
-	if(e->state != PropertyNewValue)
+	if (e->state != PropertyNewValue)
 		return;
 	if (e->atom == XA_WM_NAME)
 		jbwm_update_title_bar(e->display, c);
@@ -64,13 +63,13 @@ static void handle_map_request(XMapRequestEvent * e)
 {
 	/* This check fixes a race condition in old libreoffice and certain
 	   Motif dialogs where an attempt is made to request mapping twice: */
-	const Window w = e->window;
-	if (w == last_window)
+	static unsigned long serial;
+	if (e->serial == serial)
 		return;
-	last_window = w;
+	serial = e->serial;
 	JBWM_LOG("MapRequest, send_event:%d", e->send_event);
 	jbwm_new_client(e->display, get_screen(ScreenCount(e->display),
-		e->parent), w);
+		e->parent), e->window);
 }
 static inline void mark_removal(struct JBWMClient * restrict c)
 {
@@ -96,6 +95,7 @@ void jbwm_events_loop(Display * d)
 		case MapNotify:
 		case MappingNotify:
 		case MotionNotify:
+		case ReparentNotify:
 			// ignore
 			break;
 		case ConfigureNotify:
@@ -107,12 +107,6 @@ void jbwm_events_loop(Display * d)
 			XSync(d, false);
 			if (c)
 				jbwm_move_resize(d, c);
-			break;
-		case ReparentNotify:
-			JBWM_LOG("ReparentNotify");
-			/* Reset last_window to allow other clients
-			 * with the same window id to be started.  */
-			last_window = 0;
 			break;
 		case KeyPress:
 			JBWM_LOG("KeyPress");
