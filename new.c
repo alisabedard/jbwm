@@ -45,11 +45,6 @@ static void init_properties(Display * d, struct JBWMClient * restrict c)
 	c->vdesk = wm_desktop(d, c->window, c->vdesk);
 #endif//JBWM_USE_EWMH
 }
-__attribute__((const))
-static uint16_t get_per_min(uint16_t spec, uint16_t min)
-{
-	return (spec >= min) ? spec : min;
-}
 static bool handle_wm_normal_hints(Display * d, const Window win,
 	struct JBWMRectangle * restrict g,
 	const struct JBWMRectangle * restrict a_geo)
@@ -60,8 +55,8 @@ static bool handle_wm_normal_hints(Display * d, const Window win,
 	XSizeHints h;
 	if (XGetWMNormalHints(d, win, &h, &(long){0}) && (h.flags & USSize)) {
 		// if size hints provided, use them
-		g->width = get_per_min(h.width, h.min_width);
-		g->height = get_per_min(h.height, h.min_height);
+		g->width = JB_MAX(h.width, h.min_width);
+		g->height = JB_MAX(h.height, h.min_height);
 	} else { // use existing window attributes
 		g->width = a_geo->width;
 		g->height = a_geo->height;
@@ -69,10 +64,10 @@ static bool handle_wm_normal_hints(Display * d, const Window win,
 	return (h.flags & USPosition);
 }
 static void check_dimensions(struct JBWMRectangle * restrict g,
-	const struct JBWMSize s)
+	const struct JBWMSize screen)
 {
-	g->width = JB_MIN(g->width, s.width);
-	g->height = JB_MIN(g->height, s.height);
+	g->width = JB_MIN(g->width, screen.width);
+	g->height = JB_MIN(g->height, screen.height);
 }
 __attribute__((const))
 static int16_t get_center(const uint16_t wh, const uint16_t swh)
