@@ -34,20 +34,22 @@ static void commit_key_move(Display * d, struct JBWMClient * restrict c)
 struct KeyMoveFlags {
 	bool horz:1, pos:1, mod:1;
 };
+static inline bool can_resize(struct JBWMClientOptions * restrict opt)
+{
+	return !opt->shaped && !opt->no_resize;
+}
 __attribute__((nonnull))
 static void key_move(Display * dpy, struct JBWMClient * restrict c,
 	const struct KeyMoveFlags f)
 {
 	enum { I = JBWM_RESIZE_INCREMENT };
+	struct JBWMRectangle * restrict s = &c->size;
+	uint16_t * restrict wh = f.horz ? &s->width : &s->height;
 	const int8_t d = f.pos ? I : - I;
-	struct JBWMRectangle * s = &c->size;
-	uint16_t * wh = f.horz ? &s->width : &s->height;
-	int16_t * xy = f.horz ? &s->x : &s->y;
-	struct JBWMClientOptions * restrict o = &c->opt;
-	if(f.mod && (*wh > I << 1) && !o->shaped && !o->no_resize)
+	if(f.mod && (*wh > I << 1) && can_resize(&c->opt))
 		*wh += d;
 	else
-		*xy += d;
+		*(f.horz ? &s->x : &s->y) += d;
 	commit_key_move(dpy, c);
 }
 static void handle_key_move(Display * d, struct JBWMClient * restrict c,
@@ -60,6 +62,7 @@ static void handle_key_move(Display * d, struct JBWMClient * restrict c,
 	switch (k) {
 	case JBWM_KEY_LEFT:
 		f.pos = false;
+		// FALLTHROUGH
 	case JBWM_KEY_RIGHT:
 		f.horz = true;
 		break;
@@ -194,6 +197,7 @@ void jbwm_handle_key_event(XKeyEvent * e)
 		break;
 	case XK_0:
 		opt.zero = true;
+		// FALLTHROUGH
 	case XK_1: case XK_2: case XK_3: case XK_4: case XK_5:
 	case XK_6: case XK_7: case XK_8: case XK_9:
 		// First desktop 0, per wm-spec

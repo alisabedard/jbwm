@@ -50,7 +50,7 @@ static uint16_t get_per_min(uint16_t spec, uint16_t min)
 {
 	return (spec >= min) ? spec : min;
 }
-static bool do_hints(Display * d, const Window win,
+static bool handle_wm_normal_hints(Display * d, const Window win,
 	struct JBWMRectangle * g, const uint16_t a_w,
 	const uint16_t a_h)
 {
@@ -95,10 +95,8 @@ static bool get_window_attributes(Display * d, struct JBWMClient * restrict c,
 		"x: %d, y: %d, w: %d, h: %d",
 		(int)c->window, a.x, a.y, a.width, a.height);
 	c->cmap = a.colormap;
-	a_geo->x = a.x;
-	a_geo->y = a.y;
-	a_geo->width = a.width;
-	a_geo->height = a.height;
+	*a_geo = (struct JBWMRectangle){.x = a.x, .y = a.y, .width = a.width,
+		.height = a.height};
 	return a.map_state == IsViewable;
 }
 static void init_geometry_for_screen_size(Display * d, const Window window,
@@ -106,7 +104,7 @@ static void init_geometry_for_screen_size(Display * d, const Window window,
 	const struct JBWMSize scr_sz)
 {
 	check_dimensions(g, scr_sz);
-	if (do_hints(d, window, g, a_geo->width, a_geo->height)
+	if (handle_wm_normal_hints(d, window, g, a_geo->width, a_geo->height)
 		&& (a_geo->x || a_geo->y)) {
 		JBWM_LOG("\t\tPosition is set by hints.");
 		g->x = a_geo->x;
@@ -151,8 +149,8 @@ static Window get_parent(Display * d, struct JBWMClient * restrict c)
 	enum {
 		CFP = CopyFromParent,
 		CW_VM = CWOverrideRedirect | CWEventMask,
-		WA_EM = SubstructureRedirectMask | SubstructureNotifyMask
-		| ButtonPressMask | EnterWindowMask
+		WA_EM = SubstructureRedirectMask | SubstructureNotifyMask |
+			ButtonPressMask | EnterWindowMask
 	};
 	struct JBWMRectangle * g = &c->size;
 	return XCreateWindow(d, jbwm_get_root(c), g->x, g->y,
@@ -160,18 +158,18 @@ static Window get_parent(Display * d, struct JBWMClient * restrict c)
 		NULL, CW_VM, &(XSetWindowAttributes){
 		.override_redirect=true, .event_mask = WA_EM});
 }
+static void reparent_window(Display * d, Window parent, Window window)
+{
+	XAddToSaveSet(d, window);
+	XReparentWindow(d, window, parent, 0, 0);
+	XMapWindow(d, window);
+}
 __attribute__((nonnull))
 static void reparent(Display * d, struct JBWMClient * restrict c)
 {
 	JBWM_LOG("reparent()");
 	jbwm_new_shaped_client(d, c);
-	{ // p, w scope
-		const Window p = c->parent = get_parent(d, c),
-		      w = c->window;
-		XAddToSaveSet(d, w);
-		XReparentWindow(d, w, p, 0, 0);
-		XMapWindow(d, w);
-	}
+	reparent_window(d, c->parent = get_parent(d, c), c->window);
 	// Required by wm-spec:
 	jbwm_set_frame_extents(d, c);
 }
@@ -187,6 +185,8 @@ static struct JBWMClient * get_JBWMClient(const Window w,
 // Grab input and setup JBWM_USE_EWMH for client window
 static void do_grabs(Display * d, const Window w)
 {
+	// jbwm_ewmh_set_allowed_actions must come before jbwm_grab_buttons.
+	jbwm_ewmh_set_allowed_actions(d, w);
 	XSelectInput(d, w, EnterWindowMask | PropertyChangeMask
 		| ColormapChangeMask);
 	// keys to grab:
@@ -198,7 +198,6 @@ void jbwm_new_client(Display * d, struct JBWMScreen * s, const Window w)
 	struct JBWMClient * restrict c = get_JBWMClient(w, s);
 	jbwm_prepend_client(c);
 	do_grabs(d, w);
-	jbwm_ewmh_set_allowed_actions(d, w);
 	init_geometry(d, c);
 	init_properties(d, c);
 	reparent(d, c);

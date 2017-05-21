@@ -83,20 +83,24 @@ static Window * get_mixed_client_list(Display * d)
 		XA_WINDOW, l, n);
 	return l;
 }
+static unsigned int get_window_list(Display * d, const uint8_t max_clients,
+	Window * window_list)
+{
+	Window * wl, nil;
+	unsigned int n;
+	if (XQueryTree(d, DefaultRootWindow(d), &nil, &nil, &wl, &n)) {
+		n = JB_MIN(n, max_clients); // limit to MAX_CLIENTS
+		memcpy(window_list, wl, n * sizeof(Window));
+		XFree(wl);
+	}
+	return n;
+}
 static Window * get_ordered_client_list(Display * d)
 {
 	enum {MAX_CLIENTS= 64};
 	static Window window_list[MAX_CLIENTS];
 	// get ordered list of all windows on default screen:
-	unsigned int n = 0;
-	{ // * wl, nil scope
-		Window * wl, nil;
-		if (XQueryTree(d, DefaultRootWindow(d), &nil, &nil, &wl, &n)) {
-			n = JB_MIN(n, MAX_CLIENTS); // limit to MAX_CLIENTS
-			memcpy(window_list, wl, n * sizeof(Window));
-			XFree(wl);
-		}
-	}
+	const unsigned int n = get_window_list(d, MAX_CLIENTS, window_list);
 	JBWM_LOG("get_ordered_client_list() n: %d", (int)n);
 	wprop(d, DefaultRootWindow(d), JBWM_EWMH_CLIENT_LIST_STACKING,
 		XA_WINDOW, window_list, n);

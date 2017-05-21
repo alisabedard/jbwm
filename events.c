@@ -2,10 +2,6 @@
 // Copyright 2008-2017, Jeffrey E. Bedard <jefbed@gmail.com>
 // Copyright 1999-2015, Ciaran Anscomb <jbwm@6809.org.uk>
 // See README for license and other details.
-#define LOG_LEVEL 0
-#if LOG_LEVEL == 0
-#undef DEBUG
-#endif//LOG_LEVEL
 #include "events.h"
 #include <X11/Xatom.h>
 #include "button_event.h"
@@ -21,13 +17,7 @@
 #include "title_bar.h"
 #include "util.h"
 #include "wm_state.h"
-#if LOG_LEVEL > 7
-#define ELOG(...) JBWM_LOG(__VA_ARGS__)
-#else//LOG_LEVEL<=6
-#define ELOG(...)
-#endif//LOG_LEVEL>7
 static bool events_need_cleanup;
-static Window last_window;
 __attribute__((pure))
 static struct JBWMScreen * get_screen(const int8_t i,
 	const Window root)
@@ -48,7 +38,7 @@ static void cleanup(Display * d, struct JBWMClient * i)
 static void handle_property_change(XPropertyEvent * e,
 	struct JBWMClient * restrict c)
 {
-	if(e->state != PropertyNewValue)
+	if (e->state != PropertyNewValue)
 		return;
 	if (e->atom == XA_WM_NAME)
 		jbwm_update_title_bar(e->display, c);
@@ -60,11 +50,9 @@ static void handle_property_change(XPropertyEvent * e,
 }
 static void handle_configure_request(XConfigureRequestEvent * e)
 {
-#if LOG_LEVEL > 4
 	JBWM_LOG("handle_configure_request():"
 		"x: %d, y: %d, w: %d, h: %d, b: %d",
 		e->x, e->y, e->width, e->height, e->border_width);
-#endif//LOG_LEVEL
 	XConfigureWindow(e->display, e->window, e->value_mask,
 		&(XWindowChanges){ .x = e->x, .y = e->y,
 		.width = e->width, .height = e->height,
@@ -75,19 +63,17 @@ static void handle_map_request(XMapRequestEvent * e)
 {
 	/* This check fixes a race condition in old libreoffice and certain
 	   Motif dialogs where an attempt is made to request mapping twice: */
-	const Window w = e->window;
-	if (w == last_window)
+	static unsigned long serial;
+	if (e->serial == serial)
 		return;
-	last_window = w;
+	serial = e->serial;
 	JBWM_LOG("MapRequest, send_event:%d", e->send_event);
 	jbwm_new_client(e->display, get_screen(ScreenCount(e->display),
-		e->parent), w);
+		e->parent), e->window);
 }
 static inline void mark_removal(struct JBWMClient * restrict c)
 {
-#if LOG_LEVEL > 4
 	JBWM_LOG("mark_removal(): ignore_unmap is %d", c->ignore_unmap);
-#endif//LOG_LEVEL
 	c->opt.remove = events_need_cleanup = (c->ignore_unmap--<1);
 }
 static void handle_colormap_notify(struct JBWMClient * restrict c,
@@ -109,6 +95,7 @@ void jbwm_events_loop(Display * d)
 		case MapNotify:
 		case MappingNotify:
 		case MotionNotify:
+		case ReparentNotify:
 			// ignore
 			break;
 		case ConfigureNotify:
@@ -121,18 +108,12 @@ void jbwm_events_loop(Display * d)
 			if (c)
 				jbwm_move_resize(d, c);
 			break;
-		case ReparentNotify:
-			ELOG("ReparentNotify");
-			/* Reset last_window to allow other clients
-			 * with the same window id to be started.  */
-			last_window = 0;
-			break;
 		case KeyPress:
-			ELOG("KeyPress");
+			JBWM_LOG("KeyPress");
 			jbwm_handle_key_event(&ev.xkey);
 			break;
 		case ButtonPress:
-			ELOG("ButtonPress");
+			JBWM_LOG("ButtonPress");
 			if(c)
 				jbwm_handle_button_event(&ev.xbutton, c);
 			break;
@@ -148,18 +129,18 @@ void jbwm_events_loop(Display * d)
 #endif//JBWM_USE_TITLE_BAR
 #ifdef JBWM_USE_EWMH
 		case CreateNotify:
-			ELOG("CreateNotify");
+			JBWM_LOG("CreateNotify");
 			if (ev.xcreatewindow.override_redirect) // internal
 				jbwm_ewmh_update_client_list(d);
 			break;
 		case DestroyNotify:
-			ELOG("DestroyNotify");
+			JBWM_LOG("DestroyNotify");
 			if (!c) // only bother if event was not on a client
 				jbwm_ewmh_update_client_list(d);
 			break;
 #endif//JBWM_USE_EWMH
 		case UnmapNotify:
-			ELOG("UnmapNotify");
+			JBWM_LOG("UnmapNotify");
 			if (c)
 				mark_removal(c);
 			break;
@@ -179,10 +160,10 @@ void jbwm_events_loop(Display * d)
 			jbwm_ewmh_handle_client_message(&ev.xclient, c);
 			break;
 #endif//JBWM_USE_EWMH
-#if LOG_LEVEL > 3
+#ifdef DEBUG
 		default:
 			JBWM_LOG("Unhandled event %d", ev.type);
-#endif//LOG_LEVEL
+#endif//DEBUG
 		}
 		if (events_need_cleanup) {
 			cleanup(d, jbwm_get_head_client());
