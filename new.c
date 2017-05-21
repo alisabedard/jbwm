@@ -51,21 +51,20 @@ static uint16_t get_per_min(uint16_t spec, uint16_t min)
 	return (spec >= min) ? spec : min;
 }
 static bool handle_wm_normal_hints(Display * d, const Window win,
-	struct JBWMRectangle * g, const uint16_t a_w,
-	const uint16_t a_h)
+	struct JBWMRectangle * restrict g,
+	const struct JBWMRectangle * restrict a_geo)
 {
-	XSizeHints h;
-	XGetWMNormalHints(d, win, &h, &(long){0});
 	/* Though these statements may be combined, writing the following
 	 * assignment this way ensures the conditional is only evaluated once.
 	 * */
-	if (h.flags & USSize) {
+	XSizeHints h;
+	if (XGetWMNormalHints(d, win, &h, &(long){0}) && (h.flags & USSize)) {
 		// if size hints provided, use them
 		g->width = get_per_min(h.width, h.min_width);
 		g->height = get_per_min(h.height, h.min_height);
 	} else { // use existing window attributes
-		g->width = a_w;
-		g->height = a_h;
+		g->width = a_geo->width;
+		g->height = a_geo->height;
 	}
 	return (h.flags & USPosition);
 }
@@ -82,8 +81,8 @@ static int16_t get_center(const uint16_t wh, const uint16_t swh)
 }
 static void center(struct JBWMRectangle * g, const struct JBWMSize s)
 {
-	g->x = get_center(g->width,s.width);
-	g->y = get_center(g->height,s.height);
+	g->x = get_center(g->width, s.width);
+	g->y = get_center(g->height, s.height);
 }
 // returns true if window is viewable
 static bool get_window_attributes(Display * d, struct JBWMClient * restrict c,
@@ -104,7 +103,7 @@ static void init_geometry_for_screen_size(Display * d, const Window window,
 	const struct JBWMSize scr_sz)
 {
 	check_dimensions(g, scr_sz);
-	if (handle_wm_normal_hints(d, window, g, a_geo->width, a_geo->height)
+	if (handle_wm_normal_hints(d, window, g, a_geo)
 		&& (a_geo->x || a_geo->y)) {
 		JBWM_LOG("\t\tPosition is set by hints.");
 		g->x = a_geo->x;
