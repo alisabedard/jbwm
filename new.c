@@ -47,19 +47,20 @@ static void init_properties(Display * d, struct JBWMClient * restrict c)
 }
 static bool handle_wm_normal_hints(Display * d, const Window win,
 	struct JBWMRectangle * restrict g,
-	const struct JBWMRectangle * restrict a_geo)
+	const struct JBWMRectangle * restrict attribute_geometry)
 {
 	/* Though these statements may be combined, writing the following
 	 * assignment this way ensures the conditional is only evaluated once.
 	 * */
 	XSizeHints h;
-	if (XGetWMNormalHints(d, win, &h, &(long){0}) && (h.flags & USSize)) {
+	if (XGetWMNormalHints(d, win, &h, &(long){0})
+		&& (h.flags & USSize)) {
 		// if size hints provided, use them
 		g->width = JB_MAX(h.width, h.min_width);
 		g->height = JB_MAX(h.height, h.min_height);
 	} else { // use existing window attributes
-		g->width = a_geo->width;
-		g->height = a_geo->height;
+		g->width = attribute_geometry->width;
+		g->height = attribute_geometry->height;
 	}
 	return (h.flags & USPosition);
 }
@@ -74,14 +75,16 @@ static int16_t get_center(const uint16_t wh, const uint16_t swh)
 {
 	return (swh >> 1) - (wh >> 1);
 }
-static void center(struct JBWMRectangle * g, const struct JBWMSize s)
+static void center(struct JBWMRectangle * restrict g,
+	const struct JBWMSize s)
 {
 	g->x = get_center(g->width, s.width);
 	g->y = get_center(g->height, s.height);
 }
 // returns true if window is viewable
-static bool get_window_attributes(Display * d, struct JBWMClient * restrict c,
-	struct JBWMRectangle * a_geo)
+static bool get_window_attributes(Display * d,
+	struct JBWMClient * restrict c,
+	struct JBWMRectangle * attribute_geometry)
 {
 	XWindowAttributes a;
 	XGetWindowAttributes(d, c->window, &a);
@@ -89,51 +92,53 @@ static bool get_window_attributes(Display * d, struct JBWMClient * restrict c,
 		"x: %d, y: %d, w: %d, h: %d",
 		(int)c->window, a.x, a.y, a.width, a.height);
 	c->cmap = a.colormap;
-	*a_geo = (struct JBWMRectangle){.x = a.x, .y = a.y, .width = a.width,
-		.height = a.height};
+	*attribute_geometry = (struct JBWMRectangle){.x = a.x, .y = a.y,
+		.width = a.width, .height = a.height};
 	return a.map_state == IsViewable;
 }
 static void init_geometry_for_screen_size(Display * d, const Window window,
-	struct JBWMRectangle * g, const struct JBWMRectangle * restrict a_geo,
-	const struct JBWMSize scr_sz)
+	struct JBWMRectangle * g, const struct JBWMRectangle * restrict
+	attribute_geometry, const struct JBWMSize scr_sz)
 {
 	check_dimensions(g, scr_sz);
-	if (handle_wm_normal_hints(d, window, g, a_geo)
-		&& (a_geo->x || a_geo->y)) {
+	if (handle_wm_normal_hints(d, window, g, attribute_geometry)
+		&& (attribute_geometry->x || attribute_geometry->y)) {
 		JBWM_LOG("\t\tPosition is set by hints.");
-		g->x = a_geo->x;
-		g->y = a_geo->y;
+		g->x = attribute_geometry->x;
+		g->y = attribute_geometry->y;
 	} else
 		center(g, scr_sz);
 }
 static void init_geometry_for_screen(Display * d,
 	struct JBWMClient * c, struct JBWMRectangle * g,
-	const struct JBWMRectangle * restrict a_geo)
+	const struct JBWMRectangle * restrict attribute_geometry)
 {
 	struct JBWMScreen * s = jbwm_get_screen(c);
 	if (!s) {
 		g->x = g->y = 0;
 		return;
 	}
-	init_geometry_for_screen_size(d, c->window, g, a_geo, s->size);
+	init_geometry_for_screen_size(d, c->window, g,
+		attribute_geometry, s->size);
 }
 __attribute__((nonnull))
 static void init_geometry(Display * d, struct JBWMClient * c)
 {
-	struct JBWMRectangle a_geo;
-	const bool viewable = get_window_attributes(d, c, &a_geo);
+	struct JBWMRectangle attribute_geometry;
+	const bool viewable = get_window_attributes(d, c,
+		&attribute_geometry);
 	struct JBWMRectangle * g = &c->size;
 	if (viewable) {
 		/* Increment unmap event counter for the reparent event.  */
 		++c->ignore_unmap;
 		/* If the window is already on screen before the window
 		   manager starts, simply save its geometry then return. */
-		*g = a_geo;
+		*g = attribute_geometry;
 		return;
 	}
 	c->ignore_unmap += viewable ? 1 : 0;
 	JBWM_LOG("\t\tVIEWABLE: %d", viewable);
-	init_geometry_for_screen(d, c, g, &a_geo);
+	init_geometry_for_screen(d, c, g, &attribute_geometry);
 	JBWM_LOG("init_geometry() win: 0x%x, x: %d, y: %d, w: %d, h: %d",
 		(int)c->window, g->x, g->y, g->width, g->height);
 }
