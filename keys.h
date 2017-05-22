@@ -5,7 +5,6 @@
 #ifndef JBWM_KEYS_H
 #define JBWM_KEYS_H
 #include <X11/Xlib.h>
-struct JBWMScreen;
-void jbwm_grab_screen_keys(Display * d, struct JBWMScreen * s)
+void jbwm_grab_root_keys(Display * d, const Window root)
 	__attribute__((nonnull));
 #endif//!JBWM_KEYS_H

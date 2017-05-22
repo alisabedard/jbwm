@@ -9,13 +9,11 @@
 #include "JBWMPixels.h"
 #include "JBWMSize.h"
 struct JBWMScreen {
-	GC gc;
-	Window root;
+	Screen * xlib;
 #ifdef JBWM_USE_EWMH
 	Window supporting;
 #endif//JBWM_USE_EWMH
 	struct JBWMPixels pixels;
-	struct JBWMSize size;
-	uint8_t screen, vdesk;
+	uint8_t id, vdesk;
 } __attribute__((packed));
 #endif//!JBWM_JBWMSCREEN_H

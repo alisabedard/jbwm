@@ -25,7 +25,7 @@ extern inline struct JBWMScreen * jbwm_get_screen(struct JBWMClient
 static void check_visibility(Display * d, struct JBWMScreen * s,
 	struct JBWMClient * restrict c, const uint8_t v)
 {
-	if (c->screen != s->screen)
+	if (c->screen != s->id)
 		return;
 	if (c->vdesk == v || c->opt.sticky) {
 		c->vdesk = v; // allow moving windows by sticking
@@ -43,7 +43,7 @@ uint8_t jbwm_set_vdesk(Display * d, struct JBWMScreen * s, uint8_t v)
 		check_visibility(d, s, c, v);
 	s->vdesk = v;
 #ifdef JBWM_USE_EWMH
-	jbwm_set_property(d, s->root,
+	jbwm_set_property(d, s->xlib->root,
 		jbwm_ewmh_get_atom(JBWM_EWMH_CURRENT_DESKTOP),
 		XA_CARDINAL, &v, 1);
 #endif//JBWM_USE_EWMH

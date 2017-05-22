@@ -22,7 +22,8 @@ void jbwm_snap_border(struct JBWMClient * restrict c)
 	struct JBWMRectangle * restrict g = &(c->size);
 	// snap to screen border
 	g->x = sborder(g->x, 0);
-	const struct JBWMSize s = jbwm_get_screen(c)->size;
+	Screen * restrict xs = jbwm_get_screen(c)->xlib;
+	const struct JBWMSize s = {xs->width, xs->height};
 	const uint8_t b = c->border * 2;
 	g->x = sborder(g->x, g->width - s.width + b);
 	g->y = sborder(g->y, c->opt.no_title_bar ? 0 :

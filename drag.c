@@ -108,13 +108,15 @@ void jbwm_drag(Display * d, struct JBWMClient * restrict c,
 	XRaiseWindow(d, c->parent);
 	if (resize && (c->opt.no_resize || c->opt.shaded))
 		return;
-	const Window r = jbwm_get_root(c);
+	const struct JBWMScreen * restrict s = jbwm_get_screen(c);
+	const Screen * restrict xs = s->xlib;
+	const Window r = xs->root;
 	grab_pointer(d, r);
 	if (resize) {
 		struct JBWMRectangle * restrict g = &c->size;
 		jbwm_warp(d, c->window, g->width, g->height);
 	}
-	GC gc = jbwm_get_screen(c)->gc;
+	GC gc = xs->default_gc;
 	drag_event_loop(d, c, r, gc, resize);
 	if (c->border)
 		draw_outline(d, r, gc, c);

@@ -87,7 +87,7 @@ void jbwm_parse_command_line(const uint8_t argc, char **argv)
 }
 static void allocate_colors(Display * d, struct JBWMScreen * restrict s)
 {
-	const uint8_t n = s->screen;
+	const uint8_t n = s->id;
 #define PIX(field, env) s->pixels.field = jbwm_get_pixel(d, n, getenv(env));
 	PIX(bg, ENV(BG));
 	PIX(fc, ENV(FC));
@@ -124,7 +124,7 @@ static Window * get_windows(Display * dpy, const Window root,
 static void setup_clients(Display * d, struct JBWMScreen * s)
 {
 	uint16_t n;
-	Window * w = get_windows(d, s->root, &n);
+	Window * w = get_windows(d, s->xlib->root, &n);
 	JBWM_LOG("Started with %d clients", n);
 	while (n--)
 		if (check_redirect(d, w[n])) {
@@ -137,22 +137,18 @@ static void setup_clients(Display * d, struct JBWMScreen * s)
 static void setup_screen_elements(Display * d, const uint8_t i)
 {
 	struct JBWMScreen * s = jbwm_get_screens();
-	s->screen = i;
+	s->xlib = ScreenOfDisplay(d, i);
+	s->id = i;
 	s->vdesk = 0;
-	s->root = RootWindow(d, i);
-	s->size.width = DisplayWidth(d, i);
-	s->size.height = DisplayHeight(d, i);
 }
 static void setup_gc(Display * d, struct JBWMScreen * s)
 {
 	allocate_colors(d, s);
-	s->gc = XCreateGC(d, s->root, GCFunction | GCSubwindowMode
-		| GCLineWidth | GCForeground | GCBackground,
-		&(XGCValues){.foreground = s->pixels.fg,
-		.background = s->pixels.bg, .function = GXxor,
-		.subwindow_mode = IncludeInferiors, .line_width = 1
-	});
-
+	XChangeGC(d, s->xlib->default_gc, GCFunction | GCSubwindowMode |
+		GCLineWidth | GCForeground | GCBackground,
+		&(XGCValues){.foreground = s->pixels.fg, .background =
+		s->pixels.bg, .function = GXxor, .subwindow_mode =
+		IncludeInferiors, .line_width = 1});
 }
 static void setup_event_listeners(Display * d, const Window root)
 {
@@ -169,8 +165,9 @@ void jbwm_init_screen(Display * d, const uint8_t i)
 	struct JBWMScreen * s = &jbwm_get_screens()[i];
 	setup_screen_elements(d, i);
 	setup_gc(d, s);
-	setup_event_listeners(d, s->root);
-	jbwm_grab_screen_keys(d, s);
+	const Window r = s->xlib->root;
+	setup_event_listeners(d, r);
+	jbwm_grab_root_keys(d, r);
 	/* scan all the windows on this screen */
 	setup_clients(d, s);
 	jbwm_ewmh_init_screen(d, s);

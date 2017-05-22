@@ -120,7 +120,8 @@ static void init_geometry_for_screen(Display * d,
 		return;
 	}
 	init_geometry_for_screen_size(d, c->window, g,
-		attribute_geometry, s->size);
+		attribute_geometry, (struct JBWMSize){s->xlib->width,
+		s->xlib->height});
 }
 __attribute__((nonnull))
 static void init_geometry(Display * d, struct JBWMClient * c)
@@ -178,8 +179,7 @@ static struct JBWMClient * get_JBWMClient(const Window w,
 	struct JBWMScreen * s)
 {
 	struct JBWMClient * restrict c = malloc(sizeof(struct JBWMClient));
-	*c = (struct JBWMClient) {.screen = s->screen,
-		.window = w, .border = 1};
+	*c = (struct JBWMClient) {.screen = s->id, .window = w, .border = 1};
 	return c;
 }
 // Grab input and setup JBWM_USE_EWMH for client window

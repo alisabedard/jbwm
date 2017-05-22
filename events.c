@@ -19,11 +19,10 @@
 #include "wm_state.h"
 static bool events_need_cleanup;
 __attribute__((pure))
-static struct JBWMScreen * get_screen(const int8_t i,
-	const Window root)
+static struct JBWMScreen * get_screen(const int8_t i, const Window root)
 {
 	struct JBWMScreen * s = jbwm_get_screens();
-	return s[i].root == root ? s + i : get_screen(i - 1, root);
+	return s[i - 1].xlib->root == root ? s + i : get_screen(i - 1, root);
 }
 static void cleanup(Display * d, struct JBWMClient * i)
 {

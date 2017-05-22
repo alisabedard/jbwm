@@ -4,7 +4,6 @@
 // See README for license and other details.
 #include "keys.h"
 #include "JBWMKeys.h"
-#include "JBWMScreen.h"
 #include "key_masks.h"
 __attribute__((nonnull))
 static void grab(Display * d, const Window root,
@@ -15,9 +14,8 @@ static void grab(Display * d, const Window root,
 		XGrabKey(d, XKeysymToKeycode(d, *ks), m | modifiers, root,
 			True, GrabModeAsync, GrabModeAsync);
 }
-void jbwm_grab_screen_keys(Display * d, struct JBWMScreen * s)
+void jbwm_grab_root_keys(Display * d, const Window root)
 {
-	const Window r = s->root;
-	grab(d, r, (KeySym[]){JBWM_KEYS_TO_GRAB}, 0);
-	grab(d, r, (KeySym[]){JBWM_ALT_KEYS_TO_GRAB}, jbwm_get_mod_mask());
+	grab(d, root, (KeySym[]){JBWM_KEYS_TO_GRAB}, 0);
+	grab(d, root, (KeySym[]){JBWM_ALT_KEYS_TO_GRAB}, jbwm_get_mod_mask());
 }

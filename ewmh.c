@@ -126,16 +126,18 @@ void jbwm_ewmh_set_allowed_actions(Display * d,
 }
 static void init_desktops(Display * d, struct JBWMScreen * s)
 {
-	const Window r = s->root;
+	Screen * xs = s->xlib;
+	const Window r = xs->root;
 	enum {INT=XA_CARDINAL, WIN=XA_WINDOW};
-	wprop(d, r, JBWM_EWMH_DESKTOP_GEOMETRY, INT, &s->size, 2);
+	wprop(d, r, JBWM_EWMH_DESKTOP_GEOMETRY, INT,
+		(int32_t[]){xs->width, xs->height}, 2);
 	wprop(d, r, JBWM_EWMH_CURRENT_DESKTOP, INT, &s->vdesk, 1);
 	wprop(d, r, JBWM_EWMH_NUMBER_OF_DESKTOPS, INT,
 		&(long){JBWM_MAX_DESKTOPS}, 1);
 	wprop(d, r, JBWM_EWMH_DESKTOP_VIEWPORT, INT,
 		&(long[]){0, 0}, 2);
-	/* Pass the address of the field within s to keep scope.  */
-	wprop(d, r, JBWM_EWMH_VIRTUAL_ROOTS, WIN, &s->root, 1);
+	/* Pass the address of the field within xs to keep scope.  */
+	wprop(d, r, JBWM_EWMH_VIRTUAL_ROOTS, WIN, &xs->root, 1);
 }
 static void set_name(Display * d, const Window w)
 {
@@ -161,14 +163,15 @@ void jbwm_ewmh_init_screen(Display * d, struct JBWMScreen * s)
 {
 	if (!jbwm_ewmh[0])
 		jbwm_ewmh_init(d);
-	Window r = s->root;
+	Screen * xs = s->xlib;
+	Window r = xs->root;
 	wprop(d, r, JBWM_EWMH_SUPPORTED, XA_ATOM, jbwm_ewmh,
 		JBWM_EWMH_ATOMS_COUNT);
 	set_name(d, r);
 	/* Set this to the root window until we have some clients.
 	 * Use the address of the r field within s, not &r, so we
 	 * don't lose scope.  */
-	wprop(d, r, JBWM_EWMH_CLIENT_LIST, XA_WINDOW, &s->root, 1);
+	wprop(d, r, JBWM_EWMH_CLIENT_LIST, XA_WINDOW, &xs->root, 1);
 	init_desktops(d, s);
 	s->supporting = init_supporting(d, r);
 }
