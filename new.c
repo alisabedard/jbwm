@@ -21,15 +21,13 @@
 static uint8_t wm_desktop(Display * d, const Window w, uint8_t vdesk)
 {
 	uint16_t n;
-	unsigned long *lprop = jbwm_get_property(d, w,
-		jbwm_ewmh_get_atom(JBWM_EWMH_WM_DESKTOP), &n);
+	const Atom a = jbwm_ewmh_get_atom(JBWM_EWMH_WM_DESKTOP);
+	unsigned long *lprop = jbwm_get_property(d, w, a, &n);
 	if (lprop) {
 		if (n && lprop[0] < JBWM_MAX_DESKTOPS) // is valid
 			vdesk = lprop[0]; // Set vdesk to property value
 		else // Set to a valid desktop number:
-			jbwm_set_property(d, w,
-				jbwm_ewmh_get_atom(JBWM_EWMH_WM_DESKTOP),
-				XA_CARDINAL, &vdesk, 1);
+			jbwm_set_property(d, w, a, XA_CARDINAL, &vdesk, 1);
 		XFree(lprop);
 	}
 	JBWM_LOG("wm_desktop(w: %d): vdesk is %d\n", (int) w, vdesk);
