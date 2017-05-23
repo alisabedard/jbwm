@@ -124,20 +124,22 @@ void jbwm_ewmh_set_allowed_actions(Display * d,
 	};
 	jbwm_set_property(d, w, a[0], XA_ATOM, &a, sizeof(a) / sizeof(Atom));
 }
-static void init_desktops(Display * d, struct JBWMScreen * s)
+static void init_desktops(struct JBWMScreen * s)
 {
 	Screen * xs = s->xlib;
-	const Window r = xs->root;
+	Display * d = DisplayOfScreen(xs);
+	static Window r;
+	r = RootWindowOfScreen(xs);
 	enum {INT=XA_CARDINAL, WIN=XA_WINDOW};
 	wprop(d, r, JBWM_EWMH_DESKTOP_GEOMETRY, INT,
-		(int32_t[]){xs->width, xs->height}, 2);
+		(int32_t[]){WidthOfScreen(xs), HeightOfScreen(xs)}, 2);
 	wprop(d, r, JBWM_EWMH_CURRENT_DESKTOP, INT, &s->vdesk, 1);
 	wprop(d, r, JBWM_EWMH_NUMBER_OF_DESKTOPS, INT,
 		&(long){JBWM_MAX_DESKTOPS}, 1);
 	wprop(d, r, JBWM_EWMH_DESKTOP_VIEWPORT, INT,
 		&(long[]){0, 0}, 2);
-	/* Pass the address of the field within xs to keep scope.  */
-	wprop(d, r, JBWM_EWMH_VIRTUAL_ROOTS, WIN, &xs->root, 1);
+	// Declared r static to keep scope
+	wprop(d, r, JBWM_EWMH_VIRTUAL_ROOTS, WIN, &r, 1);
 }
 static void set_name(Display * d, const Window w)
 {
@@ -149,8 +151,7 @@ static void set_supporting(Display * d, const Window w,
 {
 	wprop(d, w, JBWM_EWMH_SUPPORTING_WM_CHECK, XA_WINDOW, s, 1);
 }
-static Window init_supporting(Display * d,
-	const Window r)
+static Window init_supporting(Display * d, const Window r)
 {
 	Window w = XCreateSimpleWindow(d, r, 0, 0, 1, 1, 0, 0, 0);
 	set_supporting(d, r, &w);
@@ -163,16 +164,15 @@ void jbwm_ewmh_init_screen(Display * d, struct JBWMScreen * s)
 {
 	if (!jbwm_ewmh[0])
 		jbwm_ewmh_init(d);
-	Screen * xs = s->xlib;
-	Window r = xs->root;
+	static Window r;
+	r = RootWindow(d, s->id);
 	wprop(d, r, JBWM_EWMH_SUPPORTED, XA_ATOM, jbwm_ewmh,
 		JBWM_EWMH_ATOMS_COUNT);
 	set_name(d, r);
 	/* Set this to the root window until we have some clients.
-	 * Use the address of the r field within s, not &r, so we
-	 * don't lose scope.  */
-	wprop(d, r, JBWM_EWMH_CLIENT_LIST, XA_WINDOW, &xs->root, 1);
-	init_desktops(d, s);
+	 * Declared r static so we don't lose scope.  */
+	wprop(d, r, JBWM_EWMH_CLIENT_LIST, XA_WINDOW, &r, 1);
+	init_desktops(s);
 	s->supporting = init_supporting(d, r);
 }
 // Required by wm-spec:
