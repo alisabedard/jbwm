@@ -23,13 +23,14 @@ void jbwm_set_not_horz(Display * d, struct JBWMClient * restrict c)
 		set_not_horz(d, c);
 	jbwm_move_resize(d, c);
 }
-static void set_horz(struct JBWMClient * restrict c)
+static void set_horz(struct JBWMClient * restrict c,
+	const uint16_t display_width)
 {
 	c->opt.max_horz = true;
 	c->old_size.x = c->size.x;
 	c->old_size.width = c->size.width;
 	c->size.x = 0;
-	c->size.width = jbwm_get_screen(c)->xlib->width;
+	c->size.width = display_width;
 }
 void jbwm_set_horz(Display * d, struct JBWMClient * restrict c)
 {
@@ -37,7 +38,7 @@ void jbwm_set_horz(Display * d, struct JBWMClient * restrict c)
 		return;
 	jbwm_ewmh_add_state(d, c->window,
 		jbwm_ewmh_get_atom(JBWM_EWMH_WM_STATE_MAXIMIZED_HORZ));
-	set_horz(c);
+	set_horz(c, DisplayWidth(d, jbwm_get_screen(c)->id));
 	c->size.width -= c->border << 1;
 	jbwm_move_resize(d, c);
 }
@@ -61,7 +62,7 @@ static void set_vert(Display * d, struct JBWMClient * restrict c)
 	c->old_size.y = c->size.y;
 	c->old_size.height = c->size.height;
 	c->size.y = 0;
-	c->size.height = jbwm_get_screen(c)->xlib->height;
+	c->size.height = DisplayHeight(d, jbwm_get_screen(c)->id);
 	jbwm_ewmh_add_state(d, c->window,
 		jbwm_ewmh_get_atom(JBWM_EWMH_WM_STATE_MAXIMIZED_VERT));
 }
@@ -98,9 +99,9 @@ static void set_fullscreen(Display * d, struct JBWMClient * restrict c)
 	c->opt.fullscreen = true;
 	c->before_fullscreen = c->size;
 	c->size.x = c->size.y = 0;
-	Screen * xs = jbwm_get_screen(c)->xlib;
-	c->size.width = xs->width;
-	c->size.height = xs->height;
+	const uint8_t id = jbwm_get_screen(c)->id;
+	c->size.width = DisplayWidth(d, id);
+	c->size.height = DisplayHeight(d, id);
 	XSetWindowBorderWidth(d, c->parent, 0);
 	jbwm_ewmh_add_state(d, c->window,
 		jbwm_ewmh_get_atom(JBWM_EWMH_WM_STATE_FULLSCREEN));

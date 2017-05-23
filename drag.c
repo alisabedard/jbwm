@@ -37,14 +37,14 @@ static int get_diff(const uint8_t i, const int16_t * restrict original,
 {
 	return original[i] - start[i] + p[i];
 }
-static void set_position(struct JBWMClient * restrict c,
+static void set_position(Display * d, struct JBWMClient * restrict c,
 	const int16_t * restrict original,
 	const int16_t * restrict start,
 	const int16_t * restrict p)
 {
 	c->size.x = get_diff(0, original, start, p);
 	c->size.y = get_diff(1, original, start, p);
-	jbwm_snap_client(c);
+	jbwm_snap_client(d, c);
 }
 __attribute__((nonnull))
 static void query_pointer(Display * dpy, Window w,
@@ -93,7 +93,7 @@ static void drag_event_loop(Display * d,
 			if (resize)
 				set_size(c, p);
 			else
-				set_position(c, original, start, p);
+				set_position(d, c, original, start, p);
 		}
 		if (b)
 			draw_outline(d, root, gc, c);
@@ -109,14 +109,13 @@ void jbwm_drag(Display * d, struct JBWMClient * restrict c,
 	if (resize && (c->opt.no_resize || c->opt.shaded))
 		return;
 	const struct JBWMScreen * restrict s = jbwm_get_screen(c);
-	const Screen * restrict xs = s->xlib;
-	const Window r = xs->root;
+	const Window r = RootWindow(d, s->id);
 	grab_pointer(d, r);
 	if (resize) {
 		struct JBWMRectangle * restrict g = &c->size;
 		jbwm_warp(d, c->window, g->width, g->height);
 	}
-	GC gc = xs->default_gc;
+	GC gc = DefaultGC(d, s->id);
 	drag_event_loop(d, c, r, gc, resize);
 	if (c->border)
 		draw_outline(d, r, gc, c);

@@ -120,8 +120,8 @@ static void init_geometry_for_screen(Display * d,
 		return;
 	}
 	init_geometry_for_screen_size(d, c->window, g,
-		attribute_geometry, (struct JBWMSize){s->xlib->width,
-		s->xlib->height});
+		attribute_geometry, (struct JBWMSize){DisplayWidth(d, s->id),
+			DisplayHeight(d, s->id)});
 }
 __attribute__((nonnull))
 static void init_geometry(Display * d, struct JBWMClient * c)
@@ -154,7 +154,7 @@ static Window get_parent(Display * d, struct JBWMClient * restrict c)
 			ButtonPressMask | EnterWindowMask
 	};
 	struct JBWMRectangle * g = &c->size;
-	return XCreateWindow(d, jbwm_get_root(c), g->x, g->y,
+	return XCreateWindow(d, jbwm_get_root(d, c), g->x, g->y,
 		g->width, g->height, c->border, CFP, CFP,
 		NULL, CW_VM, &(XSetWindowAttributes){
 		.override_redirect=true, .event_mask = WA_EM});

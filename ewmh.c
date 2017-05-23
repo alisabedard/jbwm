@@ -124,15 +124,14 @@ void jbwm_ewmh_set_allowed_actions(Display * d,
 	};
 	jbwm_set_property(d, w, a[0], XA_ATOM, &a, sizeof(a) / sizeof(Atom));
 }
-static void init_desktops(struct JBWMScreen * s)
+static void init_desktops(Display * d, struct JBWMScreen * s)
 {
-	Screen * xs = s->xlib;
-	Display * d = DisplayOfScreen(xs);
+	const uint8_t id = s->id;
 	static Window r;
-	r = RootWindowOfScreen(xs);
+	r = RootWindow(d, id);
 	enum {INT=XA_CARDINAL, WIN=XA_WINDOW};
 	wprop(d, r, JBWM_EWMH_DESKTOP_GEOMETRY, INT,
-		(int32_t[]){WidthOfScreen(xs), HeightOfScreen(xs)}, 2);
+		(int32_t[]){DisplayWidth(d, id), DisplayHeight(d, id)}, 2);
 	wprop(d, r, JBWM_EWMH_CURRENT_DESKTOP, INT, &s->vdesk, 1);
 	wprop(d, r, JBWM_EWMH_NUMBER_OF_DESKTOPS, INT,
 		&(long){JBWM_MAX_DESKTOPS}, 1);
@@ -172,7 +171,7 @@ void jbwm_ewmh_init_screen(Display * d, struct JBWMScreen * s)
 	/* Set this to the root window until we have some clients.
 	 * Declared r static so we don't lose scope.  */
 	wprop(d, r, JBWM_EWMH_CLIENT_LIST, XA_WINDOW, &r, 1);
-	init_desktops(s);
+	init_desktops(d, s);
 	s->supporting = init_supporting(d, r);
 }
 // Required by wm-spec:

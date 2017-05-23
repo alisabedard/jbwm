@@ -19,11 +19,12 @@ void jbwm_set_screens(struct JBWMScreen * restrict s)
 {
 	screens = s;
 }
-extern inline Window jbwm_get_root(struct JBWMClient * restrict c);
-extern inline struct JBWMScreen * jbwm_get_screen(struct JBWMClient
-	* restrict c);
-static void check_visibility(Display * d, struct JBWMScreen * s,
-	struct JBWMClient * restrict c, const uint8_t v)
+extern inline Window jbwm_get_root(Display * d,
+	struct JBWMClient * restrict c);
+extern inline struct JBWMScreen * jbwm_get_screen(struct JBWMClient * restrict
+	c);
+static void check_visibility(Display * d, struct JBWMScreen * s, struct
+	JBWMClient * restrict c, const uint8_t v)
 {
 	if (c->screen != s->id)
 		return;
@@ -43,7 +44,7 @@ uint8_t jbwm_set_vdesk(Display * d, struct JBWMScreen * s, uint8_t v)
 		check_visibility(d, s, c, v);
 	s->vdesk = v;
 #ifdef JBWM_USE_EWMH
-	jbwm_set_property(d, s->xlib->root,
+	jbwm_set_property(d, RootWindow(d, s->id),
 		jbwm_ewmh_get_atom(JBWM_EWMH_CURRENT_DESKTOP),
 		XA_CARDINAL, &v, 1);
 #endif//JBWM_USE_EWMH

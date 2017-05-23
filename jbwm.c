@@ -124,7 +124,7 @@ static Window * get_windows(Display * dpy, const Window root,
 static void setup_clients(Display * d, struct JBWMScreen * s)
 {
 	uint16_t n;
-	Window * w = get_windows(d, s->xlib->root, &n);
+	Window * w = get_windows(d, RootWindow(d, s->id), &n);
 	JBWM_LOG("Started with %d clients", n);
 	while (n--)
 		if (check_redirect(d, w[n])) {
@@ -134,17 +134,10 @@ static void setup_clients(Display * d, struct JBWMScreen * s)
 		}
 	XFree(w);
 }
-static void setup_screen_elements(Display * d, const uint8_t i)
-{
-	struct JBWMScreen * s = jbwm_get_screens();
-	s->xlib = ScreenOfDisplay(d, i);
-	s->id = i;
-	s->vdesk = 0;
-}
 static void setup_gc(Display * d, struct JBWMScreen * s)
 {
 	allocate_colors(d, s);
-	XChangeGC(d, s->xlib->default_gc, GCFunction | GCSubwindowMode |
+	XChangeGC(d, DefaultGC(d, s->id), GCFunction | GCSubwindowMode |
 		GCLineWidth | GCForeground | GCBackground,
 		&(XGCValues){.foreground = s->pixels.fg, .background =
 		s->pixels.bg, .function = GXxor, .subwindow_mode =
@@ -163,9 +156,10 @@ static void setup_event_listeners(Display * d, const Window root)
 void jbwm_init_screen(Display * d, const uint8_t i)
 {
 	struct JBWMScreen * s = &jbwm_get_screens()[i];
-	setup_screen_elements(d, i);
+	s->id = i;
+	s->vdesk = 0;
 	setup_gc(d, s);
-	const Window r = s->xlib->root;
+	const Window r = RootWindow(d, i);
 	setup_event_listeners(d, r);
 	jbwm_grab_root_keys(d, r);
 	/* scan all the windows on this screen */

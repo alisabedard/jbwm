@@ -9,7 +9,6 @@
 #include "JBWMPixels.h"
 #include "JBWMSize.h"
 struct JBWMScreen {
-	Screen * xlib;
 #ifdef JBWM_USE_EWMH
 	Window supporting;
 #endif//JBWM_USE_EWMH
