@@ -134,16 +134,15 @@ static void setup_clients(Display * d, struct JBWMScreen * s)
 		}
 	XFree(w);
 }
-static void setup_gc(Display * d, struct JBWMScreen * s)
+static inline void setup_gc(Display * d, struct JBWMScreen * s)
 {
-	allocate_colors(d, s);
 	XChangeGC(d, DefaultGC(d, s->id), GCFunction | GCSubwindowMode |
 		GCLineWidth | GCForeground | GCBackground,
 		&(XGCValues){.foreground = s->pixels.fg, .background =
 		s->pixels.bg, .function = GXxor, .subwindow_mode =
 		IncludeInferiors, .line_width = 1});
 }
-static void setup_event_listeners(Display * d, const Window root)
+static inline void setup_event_listeners(Display * d, const Window root)
 {
 	enum {
 		EMASK = SubstructureRedirectMask | SubstructureNotifyMask |
@@ -158,6 +157,7 @@ void jbwm_init_screen(Display * d, const uint8_t i)
 	struct JBWMScreen * s = &jbwm_get_screens()[i];
 	s->id = i;
 	s->vdesk = 0;
+	allocate_colors(d, s);
 	setup_gc(d, s);
 	const Window r = RootWindow(d, i);
 	setup_event_listeners(d, r);
