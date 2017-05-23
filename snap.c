@@ -6,6 +6,7 @@
 #include "snap.h"
 #include <stdlib.h>
 #include "JBWMPoint.h"
+#include "JBWMSize.h"
 #include "client.h"
 #include "config.h"
 #include "font.h"

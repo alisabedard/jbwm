@@ -6,6 +6,7 @@
 #include <X11/Xatom.h>
 #include <X11/Xutil.h>
 #include <stdlib.h>
+#include "JBWMSize.h"
 #include "client.h"
 #include "config.h"
 #include "ewmh.h"
