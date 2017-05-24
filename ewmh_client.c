@@ -8,6 +8,7 @@
 #include "screen.h"
 #include "select.h"
 #include "util.h"
+#include "vdesk.h"
 #include "wm_state.h"
 static void handle_moveresize(XClientMessageEvent * e)
 {

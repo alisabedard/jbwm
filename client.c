@@ -10,6 +10,7 @@
 #include "screen.h"
 #include "select.h"
 #include "title_bar.h"
+#include "vdesk.h"
 #include "wm_state.h"
 static struct JBWMClient * current, * head;
 struct JBWMClient * jbwm_get_current_client(void)

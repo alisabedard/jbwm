@@ -16,6 +16,7 @@
 #include "select.h"
 #include "snap.h"
 #include "title_bar.h"
+#include "vdesk.h"
 #include "wm_state.h"
 __attribute__((nonnull))
 static void point(Display * d, struct JBWMClient * restrict c,

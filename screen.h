@@ -16,6 +16,4 @@ inline Window jbwm_get_root(Display * d, struct JBWMClient * restrict c)
 	return RootWindow(d, jbwm_get_screen(c)->id);
 }
 void jbwm_set_screens(struct JBWMScreen * restrict s);
-uint8_t jbwm_set_vdesk(Display * d, struct JBWMScreen * s, uint8_t v)
-	__attribute__((nonnull));
 #endif /* JBWM_SCREEN_H */
