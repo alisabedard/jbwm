@@ -6,7 +6,6 @@
 #include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
-__attribute__((noreturn))
 void jbwm_error(const char * restrict msg)
 {
 	perror(msg);
@@ -34,7 +33,6 @@ jbwm_pixel_t jbwm_get_pixel(Display * dpy,
 		r = 0;
 	return r;
 }
-__attribute__((warn_unused_result,nonnull))
 void *jbwm_get_property(Display * dpy, Window w,
 	Atom property, uint16_t * num_items)
 {
@@ -52,9 +50,9 @@ void *jbwm_get_property(Display * dpy, Window w,
 	return value;
 }
 void jbwm_grab_button(Display * d, const Window w,
-	const unsigned int mask, const unsigned int btn)
+	const unsigned int mask)
 {
-	XGrabButton(d, btn, mask, w, false,
+	XGrabButton(d, AnyButton, mask, w, false,
 		    ButtonPressMask | ButtonReleaseMask, GrabModeAsync,
 		    GrabModeSync, None, None);
 }

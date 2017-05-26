@@ -72,7 +72,7 @@ static Window new_title_bar(Display * d, struct JBWMClient * restrict c)
 	XSelectInput(d, t, ExposureMask);
 	XMapRaised(d, t);
 	XMapSubwindows(d, t);
-	jbwm_grab_button(d, t, 0, AnyButton);
+	jbwm_grab_button(d, t, None);
 	return t;
 }
 static XftColor * get_color(Display * d, const int8_t screen)

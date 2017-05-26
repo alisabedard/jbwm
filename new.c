@@ -191,7 +191,7 @@ static void do_grabs(Display * d, const Window w)
 	XSelectInput(d, w, EnterWindowMask | PropertyChangeMask
 		| ColormapChangeMask);
 	// keys to grab:
-	jbwm_grab_button(d, w, jbwm_get_grab_mask(), AnyButton);
+	jbwm_grab_button(d, w, jbwm_get_grab_mask());
 }
 void jbwm_new_client(Display * d, struct JBWMScreen * s, const Window w)
 {
