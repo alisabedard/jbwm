@@ -38,8 +38,8 @@ __attribute__((warn_unused_result,nonnull))
 void *jbwm_get_property(Display * dpy, Window w,
 	Atom property, uint16_t * num_items)
 {
-	unsigned char * value = NULL;
-	long unsigned int n = 0;
+	unsigned char * value;
+	long unsigned int n;
 	XGetWindowProperty(dpy, w, property, 0, 1024, false,
 		AnyPropertyType, &property, &(int){0}, &n,
 		&(unsigned long){0}, &value);
