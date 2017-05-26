@@ -24,12 +24,15 @@ void jbwm_set_property(Display * d, const Window win,
 jbwm_pixel_t jbwm_get_pixel(Display * dpy,
 	const uint8_t screen, const char * name)
 {
-	if (!name) // sanitize input to avoid segfault
-		return 0;
-	XColor c;
-	XAllocNamedColor(dpy, DefaultColormap(dpy, screen),
-		name, &c, &(XColor){0});
-	return c.pixel;
+	jbwm_pixel_t r;
+	if (name) { // sanitize input to avoid segfault
+		XColor c;
+		XAllocNamedColor(dpy, DefaultColormap(dpy, screen),
+			name, &c, &(XColor){0});
+		r = c.pixel;
+	} else
+		r = 0;
+	return r;
 }
 __attribute__((warn_unused_result,nonnull))
 void *jbwm_get_property(Display * dpy, Window w,
