@@ -75,24 +75,19 @@ static Window new_title_bar(Display * d, struct JBWMClient * restrict c)
 	jbwm_grab_button(d, t, None);
 	return t;
 }
-static XftColor * get_color(Display * d, const int8_t screen)
-{
-	static XftColor color;
-	if (!color.pixel)
-		XftColorAllocName(d, DefaultVisual(d, screen),
-			DefaultColormap(d, screen), getenv(JBWM_ENV_FG),
-			&color);
-	return &color;
-}
 static void draw_xft(Display * d, struct JBWMClient * restrict c,
 	const int16_t * restrict p, char * restrict name, const size_t l)
 {
 	const uint8_t s = c->screen;
-	XftDraw * xd = XftDrawCreate(d, c->tb.win, DefaultVisual(d, s),
-		DefaultColormap(d, s));
-	XftDrawStringUtf8(xd, get_color(d, s), jbwm_get_font(), p[0], p[1],
+	const Colormap cm = DefaultColormap(d, s);
+	Visual * v = DefaultVisual(d, s);
+	XftColor clr;
+	XftColorAllocName(d, v, cm, getenv(JBWM_ENV_FG), &clr);
+	XftDraw * xd = XftDrawCreate(d, c->tb.win, v, cm);
+	XftDrawStringUtf8(xd, &clr, jbwm_get_font(), p[0], p[1],
 		(XftChar8 *) name,  l);
 	XftDrawDestroy(xd);
+	XftColorFree(d, v, cm, &clr);
 }
 // Free result with XFree if not NULL
 static inline char * jbwm_get_title(Display * d, const Window w)
