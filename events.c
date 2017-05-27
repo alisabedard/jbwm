@@ -42,9 +42,10 @@ static void handle_property_change(XPropertyEvent * e,
 	if (e->atom == XA_WM_NAME)
 		jbwm_update_title_bar(e->display, c);
 	else {
-		jbwm_print_atom(e->display, e->atom, __FILE__, __LINE__);
-		if (e->atom == jbwm_get_wm_state(e->display))
-			jbwm_move_resize(e->display, c);
+		Display * d = e->display;
+		jbwm_print_atom(d, e->atom, __FILE__, __LINE__);
+		if (e->atom == jbwm_get_wm_state(d))
+			jbwm_move_resize(d, c);
 	}
 }
 static void handle_configure_request(XConfigureRequestEvent * e)
