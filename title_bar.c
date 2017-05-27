@@ -34,8 +34,7 @@ void jbwm_toggle_shade(Display * d, struct JBWMClient * restrict c)
 	}
 	jbwm_move_resize(d, c);
 	jbwm_set_wm_state(d, c, state);
-	enum { ATOM = JBWM_EWMH_WM_STATE_SHADED };
-	f(d, c->window, jbwm_ewmh_get_atom(ATOM));
+	f(d, c->window, jbwm_ewmh_get_atom(JBWM_EWMH_WM_STATE_SHADED));
 }
 static uint16_t mv(Display * d, const Window w, uint16_t x)
 {
@@ -64,23 +63,28 @@ static void add_buttons(Display * d, struct JBWMClient * restrict c,
 	c->tb.shade = o->no_min ? 0 : get_win(d, t, p->shade);
 	c->tb.stick = get_win(d, t, p->stick);
 }
+static void configure_title_bar(Display * d, const Window t)
+{
+	XSelectInput(d, t, ExposureMask);
+	XMapRaised(d, t);
+	XMapSubwindows(d, t);
+	jbwm_grab_button(d, t, None);
+}
 static Window new_title_bar(Display * d, struct JBWMClient * restrict c)
 {
 	const struct JBWMPixels * p = &jbwm_get_screen(c)->pixels;
 	const Window t = c->tb.win = get_win(d, c->parent, p->bg);
 	add_buttons(d, c, p, t);
-	XSelectInput(d, t, ExposureMask);
-	XMapRaised(d, t);
-	XMapSubwindows(d, t);
-	jbwm_grab_button(d, t, None);
+	configure_title_bar(d, t);
 	return t;
 }
 static void draw_xft(struct JBWMClient * restrict c,
 	const int16_t * restrict p, char * restrict name, const size_t l)
 {
 	struct JBWMScreen * scr = jbwm_get_screen(c);
-	XftDrawChange(scr->xft, c->tb.win); // set target
-	XftDrawStringUtf8(scr->xft, &scr->font_color, jbwm_get_font(),
+	XftDraw * restrict xd = scr->xft;
+	XftDrawChange(xd, c->tb.win); // set target
+	XftDrawStringUtf8(xd, &scr->font_color, jbwm_get_font(),
 		p[0], p[1], (XftChar8 *)name, l);
 }
 // Free result with XFree if not NULL
