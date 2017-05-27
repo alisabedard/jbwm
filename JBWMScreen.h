@@ -5,9 +5,13 @@
 #ifndef JBWM_JBWMSCREEN_H
 #define JBWM_JBWMSCREEN_H
 #include <stdint.h>
+#include <X11/Xft/Xft.h>
 #include <X11/Xlib.h>
 #include "JBWMPixels.h"
 struct JBWMScreen {
+	Screen * xlib;
+	XftDraw * xft;
+	XftColor font_color;
 #ifdef JBWM_USE_EWMH
 	Window supporting;
 #endif//JBWM_USE_EWMH

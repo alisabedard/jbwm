@@ -18,13 +18,11 @@
 #include "util.h"
 #include "wm_state.h"
 static bool events_need_cleanup;
-__attribute__((pure))
-static struct JBWMScreen * get_screen(Display * d, const int8_t i,
-	const Window root)
+static struct JBWMScreen * get_screen(const Window root, const int i)
 {
 	struct JBWMScreen * s = jbwm_get_screens();
-	return RootWindow(d, s[i - 1].id) == root ? s + i : get_screen(d,
-		i - 1, root);
+	return RootWindowOfScreen(s[i].xlib) == root ? s
+		: get_screen(root, i + 1);
 }
 static void cleanup(Display * d, struct JBWMClient * i)
 {
@@ -69,8 +67,8 @@ static void handle_map_request(XMapRequestEvent * e)
 		return;
 	serial = e->serial;
 	JBWM_LOG("MapRequest, send_event:%d", e->send_event);
-	jbwm_new_client(e->display, get_screen(e->display,
-		ScreenCount(e->display), e->parent), e->window);
+	Display * d = e->display;
+	jbwm_new_client(d, get_screen(e->parent, 0), e->window);
 }
 static inline void mark_removal(struct JBWMClient * restrict c)
 {

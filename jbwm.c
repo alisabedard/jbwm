@@ -85,6 +85,12 @@ void jbwm_parse_command_line(const uint8_t argc, char **argv)
 			exit(1);
 		}
 }
+static void allocate_xft_color(Display * d, struct JBWMScreen * s)
+{
+	XftColorAllocName(d, DefaultVisualOfScreen(s->xlib),
+		DefaultColormapOfScreen(s->xlib), getenv(ENV(FG)),
+		&s->font_color);
+}
 static void allocate_colors(Display * d, struct JBWMScreen * restrict s)
 {
 	const uint8_t n = s->id;
@@ -97,6 +103,7 @@ static void allocate_colors(Display * d, struct JBWMScreen * restrict s)
 	PIX(resize, ENV(RESIZE));
 	PIX(shade, ENV(SHADE));
 	PIX(stick, ENV(STICK));
+	allocate_xft_color(d, s);
 #endif//JBWM_USE_TITLE_BAR
 #undef PIX
 }
@@ -152,14 +159,24 @@ static inline void setup_event_listeners(Display * d, const Window root)
 	XChangeWindowAttributes(d, root, CWEventMask,
 		&(XSetWindowAttributes){.event_mask = EMASK });
 }
+/* Create a unique XftDraw for each screen to properly handle colormaps and
+ * screen limitations.  */
+static XftDraw * new_xft_draw(Screen * s)
+{
+	return XftDrawCreate(DisplayOfScreen(s), RootWindowOfScreen(s),
+		DefaultVisualOfScreen(s), DefaultColormapOfScreen(s));
+}
 void jbwm_init_screen(Display * d, const uint8_t i)
 {
+	JBWM_LOG("jbwm_init_screen(d, i), i is %d", i);
 	struct JBWMScreen * s = &jbwm_get_screens()[i];
 	s->id = i;
 	s->vdesk = 0;
+	const Window r = RootWindow(d, i);
+	s->xlib = ScreenOfDisplay(d, i);
+	s->xft = new_xft_draw(s->xlib);
 	allocate_colors(d, s);
 	setup_gc(d, s);
-	const Window r = RootWindow(d, i);
 	setup_event_listeners(d, r);
 	jbwm_grab_root_keys(d, r);
 	/* scan all the windows on this screen */

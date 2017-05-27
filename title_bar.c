@@ -75,19 +75,13 @@ static Window new_title_bar(Display * d, struct JBWMClient * restrict c)
 	jbwm_grab_button(d, t, None);
 	return t;
 }
-static void draw_xft(Display * d, struct JBWMClient * restrict c,
+static void draw_xft(struct JBWMClient * restrict c,
 	const int16_t * restrict p, char * restrict name, const size_t l)
 {
-	const uint8_t s = c->screen;
-	const Colormap cm = DefaultColormap(d, s);
-	Visual * v = DefaultVisual(d, s);
-	XftColor clr;
-	XftColorAllocName(d, v, cm, getenv(JBWM_ENV_FG), &clr);
-	XftDraw * xd = XftDrawCreate(d, c->tb.win, v, cm);
-	XftDrawStringUtf8(xd, &clr, jbwm_get_font(), p[0], p[1],
-		(XftChar8 *) name,  l);
-	XftDrawDestroy(xd);
-	XftColorFree(d, v, cm, &clr);
+	struct JBWMScreen * scr = jbwm_get_screen(c);
+	XftDrawChange(scr->xft, c->tb.win); // set target
+	XftDrawStringUtf8(scr->xft, &scr->font_color, jbwm_get_font(),
+		p[0], p[1], (XftChar8 *)name, l);
 }
 // Free result with XFree if not NULL
 static inline char * jbwm_get_title(Display * d, const Window w)
@@ -101,7 +95,7 @@ static void draw_title(Display * d, struct JBWMClient * restrict c)
 		return; // No title could be loaded, abort
 	const int16_t p[] = {jbwm_get_font_height() + 4,
 		jbwm_get_font_ascent()};
-	draw_xft(d, c, p, name, strlen(name));
+	draw_xft(c, p, name, strlen(name));
 	XFree(name);
 }
 static void remove_title_bar(Display * d, struct JBWMClient * restrict c)
