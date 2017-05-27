@@ -67,8 +67,7 @@ static void handle_map_request(XMapRequestEvent * e)
 		return;
 	serial = e->serial;
 	JBWM_LOG("MapRequest, send_event:%d", e->send_event);
-	Display * d = e->display;
-	jbwm_new_client(d, get_screen(e->parent, 0), e->window);
+	jbwm_new_client(e->display, get_screen(e->parent, 0), e->window);
 }
 static inline void mark_removal(struct JBWMClient * restrict c)
 {
