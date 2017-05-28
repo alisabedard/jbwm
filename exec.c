@@ -11,7 +11,6 @@ static void sigchld_cb(int sig __attribute__((unused)))
 }
 static void atexit_cb(void)
 {
-	kill(0, SIGHUP);
 	wait(NULL);
 }
 static void jbwm_wait_child(void)
