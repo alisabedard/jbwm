@@ -9,6 +9,11 @@ static void sigchld_cb(int sig __attribute__((unused)))
 {
 	wait(NULL);
 }
+static void atexit_cb(void)
+{
+	kill(0, SIGHUP);
+	wait(NULL);
+}
 static void jbwm_wait_child(void)
 {
 	signal(SIGCHLD, sigchld_cb); // reap zombies
@@ -16,6 +21,7 @@ static void jbwm_wait_child(void)
 static void jbwm_exec(const char * command)
 {
 	if (fork() == 0) {
+		atexit(atexit_cb);
 		execl("/bin/sh", "sh", "-c", command, NULL);
 		// This is only reached on error.
 		exit(1);
