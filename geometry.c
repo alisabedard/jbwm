@@ -6,22 +6,26 @@
 #include "log.h"
 #include "macros.h"
 #include "screen.h"
-static long handle_wm_normal_hints(Display * d, const Window win,
-	const struct JBWMRectangle * restrict attribute_geometry,
-	struct JBWMRectangle * restrict geometry_return)
+struct GeometryData {
+	Display * display;
+	struct JBWMRectangle * restrict attribute;
+	struct JBWMRectangle * restrict geometry;
+	Window window;
+};
+static long handle_wm_normal_hints(struct GeometryData * restrict g)
 {
 	/* Though these statements may be combined, writing the following
 	 * assignment this way ensures the conditional is only evaluated once.
 	 * */
 	XSizeHints h;
-	if (XGetWMNormalHints(d, win, &h, &(long){0})
+	if (XGetWMNormalHints(g->display, g->window, &h, &(long){0})
 		&& (h.flags & USSize)) {
 		// if size hints provided, use them
-		geometry_return->width = JB_MAX(h.width, h.min_width);
-		geometry_return->height = JB_MAX(h.height, h.min_height);
+		g->geometry->width = JB_MAX(h.width, h.min_width);
+		g->geometry->height = JB_MAX(h.height, h.min_height);
 	} else { // use existing window attributes
-		geometry_return->width = attribute_geometry->width;
-		geometry_return->height = attribute_geometry->height;
+		g->geometry->width = g->attribute->width;
+		g->geometry->height = g->attribute->height;
 	}
 	return h.flags;
 }
@@ -56,33 +60,32 @@ static bool get_window_attributes(Display * d, struct JBWMClient * restrict c,
 		.width = a.width, .height = a.height};
 	return a.map_state == IsViewable;
 }
-static void init_geometry_for_screen_size(Display * d, const Window window,
-	struct JBWMRectangle * g, const struct JBWMRectangle * restrict
-	attribute_geometry, const struct JBWMSize scr_sz)
+static void init_geometry_for_screen_size(struct GeometryData * g,
+	const struct JBWMSize screen_size)
 {
-	check_dimensions(g, scr_sz);
-	const long flags = handle_wm_normal_hints(d, window,
-		attribute_geometry, g);
+	check_dimensions(g->geometry, screen_size);
+	const long flags = handle_wm_normal_hints(g);
 	const bool user_specified_position = flags & USPosition;
-	const bool nonzero_position = attribute_geometry->x ||
-		attribute_geometry->y;
+	const bool nonzero_position = g->attribute->x ||
+		g->attribute->y;
 	if (user_specified_position && nonzero_position) {
 		JBWM_LOG("\t\tPosition is set by hints.");
-		g->x = attribute_geometry->x;
-		g->y = attribute_geometry->y;
+		g->geometry->x = g->attribute->x;
+		g->geometry->y = g->attribute->y;
 	} else // Position not specified
-		center(g, scr_sz);
+		center(g->geometry, screen_size);
 }
 static void init_geometry_for_screen(Display * d,
 	struct JBWMClient * c, struct JBWMRectangle * g,
-	const struct JBWMRectangle * restrict attribute_geometry)
+	struct JBWMRectangle * restrict attribute_geometry)
 {
 	struct JBWMScreen * s = jbwm_get_screen(c);
-	if (s)
-		init_geometry_for_screen_size(d, c->window, g,
-			attribute_geometry, (struct JBWMSize){DisplayWidth(d,
-			s->id), DisplayHeight(d, s->id)});
-	else
+	if (s) {
+		init_geometry_for_screen_size(&(struct GeometryData){ .display
+			= d, .attribute = attribute_geometry, .geometry = g,
+			.window = c->window}, (struct JBWMSize){
+			DisplayWidth(d, s->id), DisplayHeight(d, s->id)});
+	} else
 		g->x = g->y = 0;
 }
 void jbwm_set_client_geometry(Display * d, struct JBWMClient * c)
