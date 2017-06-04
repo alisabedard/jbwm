@@ -23,10 +23,8 @@ static long handle_wm_normal_hints(struct GeometryData * restrict g)
 		// if size hints provided, use them
 		g->geometry->width = JB_MAX(h.width, h.min_width);
 		g->geometry->height = JB_MAX(h.height, h.min_height);
-	} else { // use existing window attributes
-		g->geometry->width = g->attribute->width;
-		g->geometry->height = g->attribute->height;
-	}
+	} else // use existing window attributes
+		*g->geometry = *g->attribute;
 	return h.flags;
 }
 static void check_dimensions(struct JBWMRectangle * restrict g,
