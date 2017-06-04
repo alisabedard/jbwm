@@ -1,8 +1,9 @@
 // Copyright 2017, Jeffrey E. Bedard <jefbed@gmail.com>
 #include "exec.h"
-#include <signal.h>
-#include <sys/wait.h>
-#include <unistd.h>
+#include <signal.h> // for signal()
+#include <stdlib.h> // for exit()
+#include <unistd.h> // for fork()
+#include "config.h" // for JBWM_ENV_TERM
 void jbwm_exec(const char * command)
 {
 	if (fork() == 0) {
