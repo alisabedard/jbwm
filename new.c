@@ -72,7 +72,7 @@ static void check_dimensions(struct JBWMRectangle * restrict g,
 __attribute__((const))
 static int16_t get_center(const uint16_t wh, const uint16_t swh)
 {
-	return (swh >> 1) - (wh >> 1);
+	return (swh - wh) >> 1;
 }
 static void center(struct JBWMRectangle * restrict g,
 	const struct JBWMSize s)
