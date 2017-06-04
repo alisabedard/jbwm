@@ -78,13 +78,12 @@ static void init_geometry_for_screen(Display * d,
 	const struct JBWMRectangle * restrict attribute_geometry)
 {
 	struct JBWMScreen * s = jbwm_get_screen(c);
-	if (!s) {
+	if (s)
+		init_geometry_for_screen_size(d, c->window, g,
+			attribute_geometry, (struct JBWMSize){DisplayWidth(d,
+			s->id), DisplayHeight(d, s->id)});
+	else
 		g->x = g->y = 0;
-		return;
-	}
-	init_geometry_for_screen_size(d, c->window, g,
-		attribute_geometry, (struct JBWMSize){DisplayWidth(d, s->id),
-			DisplayHeight(d, s->id)});
 }
 void jbwm_set_client_geometry(Display * d, struct JBWMClient * c)
 {
