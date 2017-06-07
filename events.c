@@ -31,7 +31,7 @@ static void cleanup(Display * d, struct JBWMClient * i)
 		return;
 	struct JBWMClient * next = i->next; // save
 	if (i->opt.remove)
-		jbwm_client_free(d, i);
+		jbwm_client_free(i);
 	cleanup(d, next);
 }
 static void handle_property_change(XPropertyEvent * e,
@@ -40,12 +40,12 @@ static void handle_property_change(XPropertyEvent * e,
 	if (e->state != PropertyNewValue)
 		return;
 	if (e->atom == XA_WM_NAME)
-		jbwm_update_title_bar(e->display, c);
+		jbwm_update_title_bar(c);
 	else {
 		Display * d = e->display;
 		jbwm_print_atom(d, e->atom, __FILE__, __LINE__);
 		if (e->atom == jbwm_get_wm_state(d))
-			jbwm_move_resize(d, c);
+			jbwm_move_resize(c);
 	}
 }
 static void handle_configure_request(XConfigureRequestEvent * e)
@@ -99,13 +99,13 @@ void jbwm_events_loop(Display * d)
 			break;
 		case ConfigureNotify:
 			if (c && !ev.xconfigure.override_redirect)
-				jbwm_move_resize(d, c);
+				jbwm_move_resize(c);
 			break;
 		case ConfigureRequest:
 			handle_configure_request(&ev.xconfigurerequest);
 			XSync(d, false);
 			if (c)
-				jbwm_move_resize(d, c);
+				jbwm_move_resize(c);
 			break;
 		case KeyPress:
 			JBWM_LOG("KeyPress");
@@ -118,12 +118,12 @@ void jbwm_events_loop(Display * d)
 			break;
 		case EnterNotify:
 			if (c && ev.xcrossing.window == c->parent)
-				jbwm_select_client(d, c);
+				jbwm_select_client(c);
 			break;
 #ifdef JBWM_USE_TITLE_BAR
 		case Expose:
 			if (c && !ev.xexpose.count)
-				jbwm_update_title_bar(d, c);
+				jbwm_update_title_bar(c);
 			break;
 #endif//JBWM_USE_TITLE_BAR
 #ifdef JBWM_USE_EWMH

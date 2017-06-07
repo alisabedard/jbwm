@@ -41,17 +41,17 @@ static bool client_specific_message(XClientMessageEvent * e,
 	Display * d = e->display;
 	jbwm_print_atom(d, t, __FILE__, __LINE__);
 	if (t == jbwm_ewmh_get_atom(JBWM_EWMH_WM_DESKTOP))
-		jbwm_set_client_vdesk(d, c, e->data.l[0]);
+		jbwm_set_client_vdesk(c, e->data.l[0]);
 	// If user moves window (client-side title bars):
 	else if (t == jbwm_ewmh_get_atom(JBWM_EWMH_WM_MOVERESIZE)) {
 		XRaiseWindow(d, c->parent);
-		jbwm_drag(d, c, false);
+		jbwm_drag(c, false);
 	} else if (t == jbwm_ewmh_get_atom(JBWM_EWMH_WM_STATE))
 		jbwm_ewmh_handle_wm_state_changes(e, c);
 	else if (t == jbwm_ewmh_get_atom(JBWM_EWMH_ACTIVE_WINDOW))
-		jbwm_select_client(d, c);
+		jbwm_select_client(c);
 	else if (t == jbwm_ewmh_get_atom(JBWM_EWMH_CLOSE_WINDOW))
-		jbwm_send_wm_delete(d, c);
+		jbwm_send_wm_delete(c);
 	else
 		  return false;
 	return true;

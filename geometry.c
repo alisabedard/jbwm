@@ -45,10 +45,11 @@ static void center(struct JBWMRectangle * restrict g,
 	g->y = get_center(g->height, s.height);
 }
 // returns true if window is viewable
-static bool get_window_attributes(Display * d, struct JBWMClient * restrict c,
+static bool get_window_attributes(struct JBWMClient * restrict c,
 	struct JBWMRectangle * restrict attribute_geometry)
 {
 	XWindowAttributes a;
+	Display * d = c->display;
 	XGetWindowAttributes(d, c->window, &a);
 	JBWM_LOG("XGetWindowAttributes() win: 0x%x,"
 		"x: %d, y: %d, w: %d, h: %d",
@@ -79,23 +80,23 @@ static struct JBWMSize get_display_size(Display * d, const uint8_t screen)
 	return (struct JBWMSize) {DisplayWidth(d, screen),
 		DisplayHeight(d, screen)};
 }
-static void init_geometry_for_screen(Display * d,
-	struct JBWMClient * c, struct JBWMRectangle * g,
+static void init_geometry_for_screen( struct JBWMClient * c,
+	struct JBWMRectangle * restrict g,
 	struct JBWMRectangle * restrict attribute_geometry)
 {
 	struct JBWMScreen * s = jbwm_get_screen(c);
 	if (s) {
+		Display * d = c->display;
 		init_geometry_for_screen_size(&(struct GeometryData){ .display
 			= d, .attribute = attribute_geometry, .geometry = g,
 			.window = c->window}, get_display_size(d, s->id));
 	} else
 		g->x = g->y = 0;
 }
-void jbwm_set_client_geometry(Display * d, struct JBWMClient * c)
+void jbwm_set_client_geometry(struct JBWMClient * c)
 {
 	struct JBWMRectangle attribute_geometry;
-	const bool viewable = get_window_attributes(d, c,
-		&attribute_geometry);
+	const bool viewable = get_window_attributes(c, &attribute_geometry);
 	struct JBWMRectangle * g = &c->size;
 	if (viewable) {
 		/* Increment unmap event counter for the reparent event.  */
@@ -107,7 +108,7 @@ void jbwm_set_client_geometry(Display * d, struct JBWMClient * c)
 	}
 	c->ignore_unmap += viewable ? 1 : 0;
 	JBWM_LOG("\t\tVIEWABLE: %d", viewable);
-	init_geometry_for_screen(d, c, g, &attribute_geometry);
+	init_geometry_for_screen(c, g, &attribute_geometry);
 	JBWM_LOG("init_geometry() win: 0x%x, x: %d, y: %d, w: %d, h: %d",
 		(int)c->window, g->x, g->y, g->width, g->height);
 }

@@ -15,18 +15,19 @@ static bool is_shaped(Display * dpy, const Window win)
 	return XShapeQueryExtents(dpy, win, &s, &d, &d,
 		&u, &u, &d, &d, &d, &u, &u) && s;
 }
-void jbwm_set_shape(Display * d, struct JBWMClient * restrict c)
+void jbwm_set_shape(struct JBWMClient * c)
 {
 	if(c->opt.shaped) {
 		JBWM_LOG("XShapeCombineShape: %d", (int)c->window);
+		Display * d = c->display;
 		XFlush(d);
 		XShapeCombineShape(d, c->parent, ShapeBounding,
 			1, 1, c->window, ShapeBounding, ShapeSet);
 	}
 }
-void jbwm_new_shaped_client(Display * d, struct JBWMClient * restrict c)
+void jbwm_new_shaped_client(struct JBWMClient * c)
 {
-	if (is_shaped(d, c->window)) {
+	if (is_shaped(c->display, c->window)) {
 		JBWM_LOG("Window %d is shaped", (int)c->window);
 		c->border = 0;
 		c->opt.no_title_bar = c->opt.shaped = true;

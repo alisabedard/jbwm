@@ -48,15 +48,15 @@ void jbwm_relink_client_list(struct JBWMClient * restrict c)
 	}
 	relink_r(c, head);
 }
-void jbwm_set_client_vdesk(Display * d, struct JBWMClient * restrict c,
+void jbwm_set_client_vdesk(struct JBWMClient * restrict c,
 	const uint8_t desktop)
 {
 	const uint8_t p = c->vdesk; // save previous
 	c->vdesk = desktop;
 	// use jbwm_set_vdesk to validate desktop:
 	struct JBWMScreen * s = &jbwm_get_screens()[c->screen];
-	c->vdesk = jbwm_set_vdesk(d, s, desktop);
-	jbwm_set_vdesk(d, s, p);
+	c->vdesk = jbwm_set_vdesk(c->display, s, desktop);
+	jbwm_set_vdesk(c->display, s, p);
 }
 static inline bool matches(struct JBWMClient * i,
 	const Window w)
@@ -79,14 +79,14 @@ struct JBWMClient * jbwm_get_client(const Window w)
 {
 	return search(head, w);
 }
-void jbwm_toggle_sticky(Display * d, struct JBWMClient * restrict c)
+void jbwm_toggle_sticky(struct JBWMClient * restrict c)
 {
 	c->opt.sticky ^= true; // toggle
-	jbwm_select_client(d, c);
-	jbwm_update_title_bar(d, c);
+	jbwm_select_client(c);
+	jbwm_update_title_bar(c);
 #ifdef JBWM_USE_EWMH
 	(c->opt.sticky ? jbwm_ewmh_add_state : jbwm_ewmh_remove_state)
-		(d, c->window,jbwm_ewmh_get_atom(
+		(c->display, c->window,jbwm_ewmh_get_atom(
 		  JBWM_EWMH_WM_STATE_STICKY));
 #endif//JBWM_USE_EWMH
 }
@@ -102,37 +102,38 @@ static void delete_ewmh_properties(Display * d,
 #define delete_ewmh_properties(d, w)
 #endif//JBWM_USE_EWMH
 static void
-free_window(Display * d, struct JBWMClient * restrict c)
+free_window(struct JBWMClient * restrict c)
 {
 	const Window w = c->window;
+	Display * d = c->display;
 	delete_ewmh_properties(d, w);
 	{ // * p scope
 		struct JBWMRectangle * restrict p = &c->size;
-		XReparentWindow(d, w, jbwm_get_root(d, c), p->x, p->y);
+		XReparentWindow(d, w, jbwm_get_root(c), p->x, p->y);
 	}
 	XRemoveFromSaveSet(d, w);
 }
 // Free client and destroy its windows and properties.
-void jbwm_client_free(Display * d, struct JBWMClient * restrict c)
+void jbwm_client_free(struct JBWMClient * restrict c)
 {
-	free_window(d, c);
+	free_window(c);
 	if(c->parent)
-		XDestroyWindow(d, c->parent);
+		XDestroyWindow(c->display, c->parent);
 	jbwm_relink_client_list(c);
 	free(c);
 }
-static void showing(Display * d, struct JBWMClient * restrict c,
+static void showing(struct JBWMClient * restrict c,
 	int (* mapping)(Display *, Window),
 	const int8_t wm_state)
 {
-	mapping(d, c->parent);
-	jbwm_set_wm_state(d, c, wm_state);
+	mapping(c->display, c->parent);
+	jbwm_set_wm_state(c, wm_state);
 }
-void jbwm_hide_client(Display * d, struct JBWMClient * restrict c)
+void jbwm_hide_client(struct JBWMClient * restrict c)
 {
-	showing(d, c, XUnmapWindow, IconicState);
+	showing(c, XUnmapWindow, IconicState);
 }
-void jbwm_restore_client(Display * d, struct JBWMClient * restrict c)
+void jbwm_restore_client(struct JBWMClient * restrict c)
 {
-	showing(d, c, XMapWindow, NormalState);
+	showing(c, XMapWindow, NormalState);
 }

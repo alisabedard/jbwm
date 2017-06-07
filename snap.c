@@ -18,12 +18,13 @@ static int sborder(const int xy, const int edge)
 		return - edge;
 	return xy;
 }
-void jbwm_snap_border(Display * d, struct JBWMClient * restrict c)
+void jbwm_snap_border(struct JBWMClient * restrict c)
 {
 	struct JBWMRectangle * restrict g = &(c->size);
 	// snap to screen border
 	g->x = sborder(g->x, 0);
 	const uint8_t id = jbwm_get_screen(c)->id;
+	Display * d = c->display;
 	const struct JBWMSize s = {DisplayWidth(d, id), DisplayHeight(d, id)};
 	const uint8_t b = c->border * 2;
 	g->x = sborder(g->x, g->width - s.width + b);
@@ -69,9 +70,9 @@ static struct JBWMPoint search(struct JBWMClient * c)
 	}
 	return d;
 }
-void jbwm_snap_client(Display * dpy, struct JBWMClient * restrict c)
+void jbwm_snap_client(struct JBWMClient * restrict c)
 {
-	jbwm_snap_border(dpy, c);
+	jbwm_snap_border(c);
 	// Snap to other windows:
 	const struct JBWMPoint d = search(c);
 	if (abs(d.x) < JBWM_SNAP)

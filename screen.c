@@ -3,10 +3,8 @@
 // Copyright 1999-2015, Ciaran Anscomb <jbwm@6809.org.uk>
 // See README for license and other details.
 #include "screen.h"
-extern inline Window jbwm_get_root(Display * d, struct JBWMClient * restrict
-	c);
-extern inline struct JBWMScreen * jbwm_get_screen(struct JBWMClient * restrict
-	c);
+extern inline Window jbwm_get_root(struct JBWMClient * c);
+extern inline struct JBWMScreen * jbwm_get_screen(struct JBWMClient * c);
 static struct JBWMScreen * screens;
 struct JBWMScreen * jbwm_get_screens(void)
 {

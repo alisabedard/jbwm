@@ -9,7 +9,7 @@
 #include "util.h"
 //#define JBWM_ENABLE_NO_RESIZE_HINT
 #define JBWM_ENABLE_TITLE_BAR_HINT
-static void process_flags(struct JBWMClient * restrict c)
+static void process_flags(struct JBWMClient * c)
 {
 	struct JBWMClientOptions * o = &c->opt;
 	if (o->tearoff) {
@@ -78,8 +78,9 @@ static Atom get_mwm_hints_atom(Display * d)
 	static Atom a;
 	return a ? a : (a = XInternAtom(d, "_MOTIF_WM_HINTS", false));
 }
-void jbwm_handle_mwm_hints(Display * d, struct JBWMClient * restrict c)
+void jbwm_handle_mwm_hints(struct JBWMClient * c)
 {
+	Display * d = c->display;
 	const Atom mwm_hints = get_mwm_hints_atom(d);
 	struct JBWMMwm * m = jbwm_get_property(d, c->window,
 		mwm_hints, &(uint16_t){0});

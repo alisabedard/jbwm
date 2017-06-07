@@ -4,10 +4,9 @@
 // See README for license and other details.
 #ifndef JBWM_SNAP_H
 #define JBWM_SNAP_H
-#include <X11/Xlib.h>
 struct JBWMClient;
-void jbwm_snap_border(Display * d, struct JBWMClient * restrict c)
+void jbwm_snap_border(struct JBWMClient * restrict c)
 	__attribute__((nonnull));
-void jbwm_snap_client(Display * dpy, struct JBWMClient * restrict c)
+void jbwm_snap_client(struct JBWMClient * restrict c)
 	__attribute__((nonnull));
 #endif//JBWM_SNAP_H

@@ -35,16 +35,16 @@ static uint8_t wm_desktop(Display * d, const Window w, uint8_t vdesk)
 }
 #endif//JBWM_USE_EWMH
 __attribute__((nonnull))
-static void init_properties(Display * d, struct JBWMClient * restrict c)
+static void init_properties(struct JBWMClient * restrict c)
 {
-	jbwm_handle_mwm_hints(d, c);
+	jbwm_handle_mwm_hints(c);
 	c->vdesk = jbwm_get_screen(c)->vdesk;
 #ifdef JBWM_USE_EWMH
-	c->vdesk = wm_desktop(d, c->window, c->vdesk);
+	c->vdesk = wm_desktop(c->display, c->window, c->vdesk);
 #endif//JBWM_USE_EWMH
 }
 __attribute__((nonnull))
-static Window get_parent(Display * d, struct JBWMClient * restrict c)
+static Window get_parent(struct JBWMClient * restrict c)
 {
 	enum {
 		CFP = CopyFromParent,
@@ -53,7 +53,7 @@ static Window get_parent(Display * d, struct JBWMClient * restrict c)
 			ButtonPressMask | EnterWindowMask
 	};
 	struct JBWMRectangle * g = &c->size;
-	return XCreateWindow(d, jbwm_get_root(d, c), g->x, g->y,
+	return XCreateWindow(c->display, jbwm_get_root(c), g->x, g->y,
 		g->width, g->height, c->border, CFP, CFP,
 		NULL, CW_VM, &(XSetWindowAttributes){
 		.override_redirect=true, .event_mask = WA_EM});
@@ -64,14 +64,13 @@ static void reparent_window(Display * d, Window parent, Window window)
 	XReparentWindow(d, window, parent, 0, 0);
 	XMapWindow(d, window);
 }
-__attribute__((nonnull))
-static void reparent(Display * d, struct JBWMClient * restrict c)
+static void reparent(struct JBWMClient * restrict c)
 {
 	JBWM_LOG("reparent()");
-	jbwm_new_shaped_client(d, c);
-	reparent_window(d, c->parent = get_parent(d, c), c->window);
+	jbwm_new_shaped_client(c);
+	reparent_window(c->display, c->parent = get_parent(c), c->window);
 	// Required by wm-spec:
-	jbwm_set_frame_extents(d, c);
+	jbwm_set_frame_extents(c);
 }
 // Allocate the client structure with some defaults set
 static struct JBWMClient * get_JBWMClient(const Window w,
@@ -95,11 +94,12 @@ void jbwm_new_client(Display * d, struct JBWMScreen * s, const Window w)
 {
 	JBWM_LOG("jbwm_new_client(..., w: %d)", (int)w);
 	struct JBWMClient * restrict c = get_JBWMClient(w, s);
+	c->display = d; // convenience pointer;
 	jbwm_prepend_client(c);
 	do_grabs(d, w);
-	jbwm_set_client_geometry(d, c);
-	init_properties(d, c);
-	reparent(d, c);
-	jbwm_restore_client(d, c);
-	jbwm_select_client(d, c);
+	jbwm_set_client_geometry(c);
+	init_properties(c);
+	reparent(c);
+	jbwm_restore_client(c);
+	jbwm_select_client(c);
 }

@@ -11,16 +11,16 @@
 #include "ewmh.h"
 #include "log.h"
 #include "util.h"
-static void check_visibility(Display * d, struct JBWMScreen * s, struct
+static void check_visibility(struct JBWMScreen * s, struct
 	JBWMClient * restrict c, const uint8_t v)
 {
 	if (c->screen != s->id)
 		return;
 	if (c->vdesk == v || c->opt.sticky) {
 		c->vdesk = v; // allow moving windows by sticking
-		jbwm_restore_client(d, c);
+		jbwm_restore_client(c);
 	} else
-		jbwm_hide_client(d, c);
+		jbwm_hide_client(c);
 }
 uint8_t jbwm_set_vdesk(Display * d, struct JBWMScreen * s, uint8_t v)
 {
@@ -29,7 +29,7 @@ uint8_t jbwm_set_vdesk(Display * d, struct JBWMScreen * s, uint8_t v)
 		return s->vdesk;
 	for (struct JBWMClient * restrict c = jbwm_get_head_client();
 		c; c = c->next)
-		check_visibility(d, s, c, v);
+		check_visibility(s, c, v);
 	s->vdesk = v;
 #ifdef JBWM_USE_EWMH
 	jbwm_set_property(d, RootWindow(d, s->id),

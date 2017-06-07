@@ -14,7 +14,7 @@
 #include "util.h"
 #include "wm_state.h"
 // This implements window shading, a substitute for iconification.
-void jbwm_toggle_shade(Display * d, struct JBWMClient * restrict c)
+void jbwm_toggle_shade(struct JBWMClient * restrict c)
 {
 	// Honor !MJBWM_EWMH_WM_FUNC_MINIMIZE
 	if (c->opt.no_min || c->opt.fullscreen)
@@ -32,9 +32,9 @@ void jbwm_toggle_shade(Display * d, struct JBWMClient * restrict c)
 		state = NormalState;
 		f = &jbwm_ewmh_remove_state;
 	}
-	jbwm_move_resize(d, c);
-	jbwm_set_wm_state(d, c, state);
-	f(d, c->window, jbwm_ewmh_get_atom(JBWM_EWMH_WM_STATE_SHADED));
+	jbwm_move_resize(c);
+	jbwm_set_wm_state(c, state);
+	f(c->display, c->window, jbwm_ewmh_get_atom(JBWM_EWMH_WM_STATE_SHADED));
 }
 static uint16_t mv(Display * d, const Window w, uint16_t x)
 {
@@ -54,10 +54,11 @@ static Window get_win(Display * d, const Window p,
 	uint8_t h = jbwm_get_font_height();
 	return XCreateSimpleWindow(d, p, 0, 0, h, h, 0, 0, bg);
 }
-static void add_buttons(Display * d, struct JBWMClient * restrict c,
+static void add_buttons(struct JBWMClient * restrict c,
 	const struct JBWMPixels * restrict p, const Window t)
 {
 	struct JBWMClientOptions * o = &c->opt;
+	Display * d = c->display;
 	c->tb.close = o->no_close ? 0 : get_win(d, t, p->close);
 	c->tb.resize = o->no_resize ? 0: get_win(d, t, p->resize);
 	c->tb.shade = o->no_min ? 0 : get_win(d, t, p->shade);
@@ -70,11 +71,12 @@ static void configure_title_bar(Display * d, const Window t)
 	XMapSubwindows(d, t);
 	jbwm_grab_button(d, t, None);
 }
-static Window new_title_bar(Display * d, struct JBWMClient * restrict c)
+static Window new_title_bar(struct JBWMClient * restrict c)
 {
 	const struct JBWMPixels * p = &jbwm_get_screen(c)->pixels;
+	Display * d = c->display;
 	const Window t = c->tb.win = get_win(d, c->parent, p->bg);
-	add_buttons(d, c, p, t);
+	add_buttons(c, p, t);
 	configure_title_bar(d, t);
 	return t;
 }
@@ -92,9 +94,9 @@ static inline char * jbwm_get_title(Display * d, const Window w)
 {
 	return jbwm_get_property(d, w, XA_WM_NAME, &(uint16_t){0});
 }
-static void draw_title(Display * d, struct JBWMClient * restrict c)
+static void draw_title(struct JBWMClient * restrict c)
 {
-	char * name = jbwm_get_title(d, c->window);
+	char * name = jbwm_get_title(c->display, c->window);
 	if(!name)
 		return; // No title could be loaded, abort
 	const int16_t p[] = {jbwm_get_font_height() + 4,
@@ -102,31 +104,35 @@ static void draw_title(Display * d, struct JBWMClient * restrict c)
 	draw_xft(c, p, name, strlen(name));
 	XFree(name);
 }
-static void remove_title_bar(Display * d, struct JBWMClient * restrict c)
+static void remove_title_bar(struct JBWMClient * restrict c)
 {
 	++(c->ignore_unmap);
-	XDestroyWindow(d, c->tb.win);
+	XDestroyWindow(c->display, c->tb.win);
 	c->tb.win = 0;
 }
-void jbwm_update_title_bar(Display * d, struct JBWMClient * restrict c)
+void jbwm_update_title_bar(struct JBWMClient * restrict c)
 {
 	if (c->opt.shaped)
 		return;
 	Window w = c->tb.win;
 	if (c->opt.fullscreen && w) {
-		remove_title_bar(d, c);
+		remove_title_bar(c);
 		return;
 	}
 	if (!w)
-		w = new_title_bar(d, c);
+		w = new_title_bar(c);
 	/* Expand/Contract the title bar width as necessary:  */
-	{ // width scope
-		const uint16_t width = c->size.width;
-		XResizeWindow(d, w, width, jbwm_get_font_height());
-		move_buttons(d, &c->tb, width);
+	{ // * d scope
+		Display * d = c->display;
+		{ // width scope
+			const uint16_t width = c->size.width;
+			XResizeWindow(c->display, w, width,
+				jbwm_get_font_height());
+			move_buttons(d, &c->tb, width);
+		}
+		XClearWindow(d, w);
 	}
-	XClearWindow(d, w);
-	draw_title(d, c);
+	draw_title(c);
 	if (c->opt.no_title_bar)
-		remove_title_bar(d, c);
+		remove_title_bar(c);
 }

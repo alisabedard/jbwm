@@ -10,12 +10,11 @@
 #include "shape.h"
 #include "title_bar.h"
 __attribute__((nonnull))
-static void jbwm_configure_client(Display * d,
-	struct JBWMClient * restrict c)
+static void jbwm_configure_client(struct JBWMClient * restrict c)
 {
 	const Window w = c->window;
 	struct JBWMRectangle * restrict g = &c->size;
-	XSendEvent(d, w, true, StructureNotifyMask, (XEvent
+	XSendEvent(c->display, w, true, StructureNotifyMask, (XEvent
 		*) &(XConfigureEvent){.x = g->x, .y = g->y, .width = g->width,
 		.height = g->height, .type = ConfigureNotify, .event = w,
 		.window = w, .above = c->parent, .override_redirect = true,
@@ -30,18 +29,18 @@ static void do_move(Display * d, const Window parent,
 	XMoveResizeWindow(d, window, 0, offset,
 		sz->width, sz->height);
 }
-void jbwm_move_resize(Display * d, struct JBWMClient * restrict c)
+void jbwm_move_resize(struct JBWMClient * restrict c)
 {
 	JBWM_LOG("jbwm_move_resize");
 	struct JBWMClientOptions * restrict o = &c->opt;
 	const uint8_t offset = o->no_title_bar || o->fullscreen
 		? 0 : jbwm_get_font_height();
 	if(offset) { // Leave braces in case title bar support was disabled.
-		jbwm_handle_mwm_hints(d, c);
-		jbwm_update_title_bar(d, c);
+		jbwm_handle_mwm_hints(c);
+		jbwm_update_title_bar(c);
 	} // Skip shaped and fullscreen clients.
-	do_move(d, c->parent, c->window, &c->size, offset);
-	jbwm_set_shape(d, c);
-	jbwm_configure_client(d, c);
+	do_move(c->display, c->parent, c->window, &c->size, offset);
+	jbwm_set_shape(c);
+	jbwm_configure_client(c);
 }
 

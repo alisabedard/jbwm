@@ -34,10 +34,11 @@ static Atom get_atom(Display * restrict d,
 static ATOM_GETTER(get_wm_protocols, "WM_PROTOCOLS");
 static ATOM_GETTER(get_wm_delete_window, "WM_DELETE_WINDOW");
 ATOM_GETTER(jbwm_get_wm_state, "WM_STATE");
-void jbwm_set_wm_state(Display * d, struct JBWMClient * restrict c,
+void jbwm_set_wm_state(struct JBWMClient * restrict c,
 	const int8_t state)
 {
 	const Window w = c->window;
+	Display * d = c->display;
 	jbwm_set_property(d, w, jbwm_get_wm_state(d), XA_CARDINAL,
 		&(uint32_t){state}, 1);
 #ifdef JBWM_USE_EWMH
@@ -59,9 +60,10 @@ static bool has_delete_proto(Display * d, const Window w)
 	}
 	return found;
 }
-void jbwm_send_wm_delete(Display * d, struct JBWMClient * restrict c)
+void jbwm_send_wm_delete(struct JBWMClient * restrict c)
 {
 	const Window w = c->window;
+	Display * d = c->display;
 	if (c->opt.remove)
 		// this allows a second click to force a kill
 		XKillClient(d, w);

@@ -37,14 +37,14 @@ static int get_diff(const uint8_t i, const int16_t * restrict original,
 {
 	return original[i] - start[i] + p[i];
 }
-static void set_position(Display * d, struct JBWMClient * restrict c,
+static void set_position(struct JBWMClient * restrict c,
 	const int16_t * restrict original,
 	const int16_t * restrict start,
 	const int16_t * restrict p)
 {
 	c->size.x = get_diff(0, original, start, p);
 	c->size.y = get_diff(1, original, start, p);
-	jbwm_snap_client(d, c);
+	jbwm_snap_client(c);
 }
 __attribute__((nonnull))
 static void query_pointer(Display * dpy, Window w,
@@ -93,18 +93,18 @@ static void drag_event_loop(Display * d,
 			if (resize)
 				set_size(c, p);
 			else
-				set_position(d, c, original, start, p);
+				set_position(c, original, start, p);
 		}
 		if (b)
 			draw_outline(d, root, gc, c);
 		else
-			jbwm_move_resize(d, c);
+			jbwm_move_resize(c);
 	}
 }
 /* Drag the specified client.  Resize the client if resize is true.  */
-void jbwm_drag(Display * d, struct JBWMClient * restrict c,
-	const bool resize)
+void jbwm_drag(struct JBWMClient * restrict c, const bool resize)
 {
+	Display * d = c->display;
 	XRaiseWindow(d, c->parent);
 	if (resize && (c->opt.no_resize || c->opt.shaded))
 		return;
@@ -122,6 +122,6 @@ void jbwm_drag(Display * d, struct JBWMClient * restrict c,
 			draw_outline(d, r, gc, c);
 	}
 	XUngrabPointer(d, CurrentTime);
-	jbwm_move_resize(d, c);
+	jbwm_move_resize(c);
 }
 

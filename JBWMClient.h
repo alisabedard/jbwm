@@ -4,13 +4,14 @@
 // See README for license and other details.
 #ifndef JBWM_CLIENT_STRUCT_H
 #define JBWM_CLIENT_STRUCT_H
-#include <X11/X.h>
+#include <X11/Xlib.h>
 #include "JBWMClientOptions.h"
 #include "JBWMClientTitlebar.h"
 #include "JBWMRectangle.h"
 struct JBWMScreen;
 struct JBWMClient {
 	struct JBWMClient * next;
+	Display * display;
 #ifdef JBWM_USE_TITLE_BAR
 	struct JBWMClientTitlebar tb;
 #endif//JBWM_USE_TITLE_BAR

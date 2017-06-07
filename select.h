@@ -7,5 +7,5 @@
 #include <X11/Xlib.h>
 struct JBWMClient;
 // Set client as that receiving focus
-void jbwm_select_client(Display * d, struct JBWMClient * restrict c);
+void jbwm_select_client(struct JBWMClient * c);
 #endif//!JBWM_SELECT_H

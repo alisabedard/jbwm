@@ -19,18 +19,18 @@
 #include "vdesk.h"
 #include "wm_state.h"
 __attribute__((nonnull))
-static void point(Display * d, struct JBWMClient * restrict c,
+static void point(struct JBWMClient * restrict c,
 	const int16_t x, const int16_t y)
 {
-	XRaiseWindow(d, c->parent);
-	jbwm_warp(d, c->window, x, y);
+	XRaiseWindow(c->display, c->parent);
+	jbwm_warp(c->display, c->window, x, y);
 }
 __attribute__((nonnull))
-static void commit_key_move(Display * d, struct JBWMClient * restrict c)
+static void commit_key_move(struct JBWMClient * restrict c)
 {
-	jbwm_snap_border(d, c);
-	jbwm_move_resize(d, c);
-	point(d, c, 1, 1);
+	jbwm_snap_border(c);
+	jbwm_move_resize(c);
+	point(c, 1, 1);
 }
 struct KeyMoveFlags {
 	bool horz:1, pos:1, mod:1;
@@ -40,7 +40,7 @@ static inline bool can_resize(struct JBWMClientOptions * restrict opt)
 	return !opt->shaped && !opt->no_resize;
 }
 __attribute__((nonnull))
-static void key_move(Display * dpy, struct JBWMClient * restrict c,
+static void key_move(struct JBWMClient * restrict c,
 	const struct KeyMoveFlags f)
 {
 	enum { I = JBWM_RESIZE_INCREMENT };
@@ -51,9 +51,9 @@ static void key_move(Display * dpy, struct JBWMClient * restrict c,
 		*wh += d;
 	else
 		*(f.horz ? &s->x : &s->y) += d;
-	commit_key_move(dpy, c);
+	commit_key_move(c);
 }
-static void handle_key_move(Display * d, struct JBWMClient * restrict c,
+static void handle_key_move(struct JBWMClient * restrict c,
 	const KeySym k, const bool mod)
 {
 	/* These operations invalid when fullscreen.  */
@@ -70,19 +70,19 @@ static void handle_key_move(Display * d, struct JBWMClient * restrict c,
 	case JBWM_KEY_UP:
 		f.pos = false;
 	}
-	key_move(d, c, f);
+	key_move(c, f);
 }
-static void set_maximized(Display * d, struct JBWMClient * restrict c)
+static void set_maximized(struct JBWMClient * restrict c)
 {
-	jbwm_set_horz(d, c);
-	jbwm_set_vert(d, c);
+	jbwm_set_horz(c);
+	jbwm_set_vert(c);
 }
-static void set_not_maximized(Display * d, struct JBWMClient * restrict c)
+static void set_not_maximized(struct JBWMClient * restrict c)
 {
-	jbwm_set_not_horz(d, c);
-	jbwm_set_not_vert(d, c);
+	jbwm_set_not_horz(c);
+	jbwm_set_not_vert(c);
 }
-static void toggle_maximize(Display * d, struct JBWMClient * restrict c)
+static void toggle_maximize(struct JBWMClient * restrict c)
 {
 	const struct JBWMClientOptions o = c->opt;
 	// Honor !MWM_FUNC_MAXIMIZE
@@ -90,18 +90,17 @@ static void toggle_maximize(Display * d, struct JBWMClient * restrict c)
 	if (o.shaped || o.no_max || o.fullscreen)
 		return;
 	(o.max_horz && o.max_vert
-	 ? set_not_maximized : set_maximized)(d, c);
+	 ? set_not_maximized : set_maximized)(c);
 }
 __attribute__((nonnull))
-static void handle_client_key_event(Display * d,
-	struct JBWMClient * restrict c,
+static void handle_client_key_event(struct JBWMClient * restrict c,
 	const bool mod, const KeySym key)
 {
 	JBWM_LOG("handle_client_key_event: %d", (int)key);
 	if (c->opt.fullscreen) {
 		// only allow exiting from fullscreen
 		if (key == JBWM_KEY_FS)
-			jbwm_set_not_fullscreen(d, c);
+			jbwm_set_not_fullscreen(c);
 		return; // prevent other operations while fullscreen
 	}
 	switch (key) {
@@ -109,38 +108,38 @@ static void handle_client_key_event(Display * d,
 	case JBWM_KEY_RIGHT:
 	case JBWM_KEY_UP:
 	case JBWM_KEY_DOWN:
-		handle_key_move(d, c, key, mod);
+		handle_key_move(c, key, mod);
 		break;
 	case JBWM_KEY_KILL:
-		jbwm_send_wm_delete(d, c);
+		jbwm_send_wm_delete(c);
 		break;
 	case JBWM_KEY_LOWER:
 	case JBWM_KEY_ALTLOWER:
-		XLowerWindow(d, c->parent);
+		XLowerWindow(c->display, c->parent);
 		break;
 	case JBWM_KEY_RAISE:
-		XRaiseWindow(d, c->parent);
+		XRaiseWindow(c->display, c->parent);
 		break;
 	case JBWM_KEY_FS:
-		jbwm_set_fullscreen(d, c);
+		jbwm_set_fullscreen(c);
 		break;
 	case JBWM_KEY_MAX:
-		toggle_maximize(d, c);
+		toggle_maximize(c);
 		break;
 	case JBWM_KEY_MAX_H:
-		(c->opt.max_horz ? jbwm_set_not_horz : jbwm_set_horz)(d, c);
+		(c->opt.max_horz ? jbwm_set_not_horz : jbwm_set_horz)(c);
 		break;
 	case JBWM_KEY_MAX_V:
-		(c->opt.max_vert ? jbwm_set_not_vert : jbwm_set_vert)(d, c);
+		(c->opt.max_vert ? jbwm_set_not_vert : jbwm_set_vert)(c);
 		break;
 	case JBWM_KEY_STICK:
-		jbwm_toggle_sticky(d, c);
+		jbwm_toggle_sticky(c);
 		break;
 	case JBWM_KEY_MOVE:
-		jbwm_drag(d, c, false);
+		jbwm_drag(c, false);
 		break;
 	case JBWM_KEY_SHADE:
-		jbwm_toggle_shade(d, c);
+		jbwm_toggle_shade(c);
 		break;
 	}
 }
@@ -160,20 +159,20 @@ static struct JBWMClient * get_next_on_vdesk(void)
 	} while (c->vdesk != s[c->screen].vdesk);
 	return c;
 }
-static void next(Display * d)
+static void next(void)
 {
 	struct JBWMClient * restrict c = get_next_on_vdesk();
 	if (!c)
 		return;
-	jbwm_restore_client(d, c);
-	jbwm_select_client(d, c);
-	point(d, c, 0, 0);
-	point(d, c, c->size.width, c->size.height);
+	jbwm_restore_client(c);
+	jbwm_select_client(c);
+	point(c, 0, 0);
+	point(c, c->size.width, c->size.height);
 }
-static void cond_client_to_desk(Display * d, struct JBWMClient * restrict c,
+static void cond_client_to_desk(Display * d, struct JBWMClient * c,
 	struct JBWMScreen * s, const uint8_t desktop, const bool mod)
 {
-	mod && c ? jbwm_set_client_vdesk(d, c, desktop)
+	mod && c ? jbwm_set_client_vdesk(c, desktop)
 		: jbwm_set_vdesk(d, s, desktop);
 }
 void jbwm_handle_key_event(XKeyEvent * e)
@@ -194,7 +193,7 @@ void jbwm_handle_key_event(XKeyEvent * e)
 	case JBWM_KEY_QUIT:
 		exit(0);
 	case JBWM_KEY_NEXT:
-		next(e->display);
+		next();
 		break;
 	case XK_0:
 		opt.zero = true;
@@ -213,6 +212,6 @@ void jbwm_handle_key_event(XKeyEvent * e)
 		break;
 	default:
 		if (c)
-			handle_client_key_event(e->display, c, opt.mod, key);
+			handle_client_key_event(c, opt.mod, key);
 	}
 }
