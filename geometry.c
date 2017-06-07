@@ -73,6 +73,12 @@ static void init_geometry_for_screen_size(struct GeometryData * g,
 	} else // Position not specified
 		center(g->geometry, screen_size);
 }
+__attribute__((pure))
+static struct JBWMSize get_display_size(Display * d, const uint8_t screen)
+{
+	return (struct JBWMSize) {DisplayWidth(d, screen),
+		DisplayHeight(d, screen)};
+}
 static void init_geometry_for_screen(Display * d,
 	struct JBWMClient * c, struct JBWMRectangle * g,
 	struct JBWMRectangle * restrict attribute_geometry)
@@ -81,8 +87,7 @@ static void init_geometry_for_screen(Display * d,
 	if (s) {
 		init_geometry_for_screen_size(&(struct GeometryData){ .display
 			= d, .attribute = attribute_geometry, .geometry = g,
-			.window = c->window}, (struct JBWMSize){
-			DisplayWidth(d, s->id), DisplayHeight(d, s->id)});
+			.window = c->window}, get_display_size(d, s->id));
 	} else
 		g->x = g->y = 0;
 }
