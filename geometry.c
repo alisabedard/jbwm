@@ -46,7 +46,7 @@ static void center(struct JBWMRectangle * restrict g,
 }
 // returns true if window is viewable
 static bool get_window_attributes(struct JBWMClient * restrict c,
-	struct JBWMRectangle * restrict attribute_geometry)
+	struct JBWMRectangle * restrict geometry_attribute)
 {
 	XWindowAttributes a;
 	Display * d = c->display;
@@ -55,7 +55,7 @@ static bool get_window_attributes(struct JBWMClient * restrict c,
 		"x: %d, y: %d, w: %d, h: %d",
 		(int)c->window, a.x, a.y, a.width, a.height);
 	c->cmap = a.colormap;
-	*attribute_geometry = (struct JBWMRectangle){.x = a.x, .y = a.y,
+	*geometry_attribute = (struct JBWMRectangle){.x = a.x, .y = a.y,
 		.width = a.width, .height = a.height};
 	return a.map_state == IsViewable;
 }
@@ -81,29 +81,27 @@ static struct JBWMSize get_display_size(Display * d, const uint8_t screen)
 		DisplayHeight(d, screen)};
 }
 static void init_geometry_for_screen(struct JBWMClient * c,
-	struct JBWMRectangle * restrict g,
-	struct JBWMRectangle * restrict attribute_geometry)
+	struct JBWMRectangle * restrict geometry_attribute)
 {
 	struct JBWMScreen * s = jbwm_get_screen(c);
 	if (s) {
 		Display * d = c->display;
 		init_geometry_for_screen_size(&(struct GeometryData){ .display
-			= d, .attribute = attribute_geometry, .geometry = g,
-			.window = c->window}, get_display_size(d, s->id));
+			= d, .attribute = geometry_attribute, .geometry =
+			&c->size, .window = c->window},
+			get_display_size(d, s->id));
 	} else
-		g->x = g->y = 0;
+		c->size.x = c->size.y = 0;
 }
 void jbwm_set_client_geometry(struct JBWMClient * c)
 {
-	struct JBWMRectangle attribute_geometry;
-	const bool viewable = get_window_attributes(c, &attribute_geometry);
-	struct JBWMRectangle * g = &c->size;
-	if (viewable) {
+	struct JBWMRectangle geometry_attribute;
+	if (get_window_attributes(c, &geometry_attribute)) { // viewable
 		/* Increment unmap event counter for the reparent event.  */
 		++c->ignore_unmap;
 		/* If the window is already on screen before the window
 		   manager starts, simply save its geometry then return. */
-		*g = attribute_geometry;
-	} else
-		init_geometry_for_screen(c, g, &attribute_geometry);
+		c->size = geometry_attribute;
+	} else // not viewable yet
+		init_geometry_for_screen(c, &geometry_attribute);
 }
