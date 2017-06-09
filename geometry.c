@@ -80,7 +80,7 @@ static struct JBWMSize get_display_size(Display * d, const uint8_t screen)
 	return (struct JBWMSize) {DisplayWidth(d, screen),
 		DisplayHeight(d, screen)};
 }
-static void init_geometry_for_screen( struct JBWMClient * c,
+static void init_geometry_for_screen(struct JBWMClient * c,
 	struct JBWMRectangle * restrict g,
 	struct JBWMRectangle * restrict attribute_geometry)
 {
@@ -104,11 +104,6 @@ void jbwm_set_client_geometry(struct JBWMClient * c)
 		/* If the window is already on screen before the window
 		   manager starts, simply save its geometry then return. */
 		*g = attribute_geometry;
-		return;
-	}
-	c->ignore_unmap += viewable ? 1 : 0;
-	JBWM_LOG("\t\tVIEWABLE: %d", viewable);
-	init_geometry_for_screen(c, g, &attribute_geometry);
-	JBWM_LOG("init_geometry() win: 0x%x, x: %d, y: %d, w: %d, h: %d",
-		(int)c->window, g->x, g->y, g->width, g->height);
+	} else
+		init_geometry_for_screen(c, g, &attribute_geometry);
 }
