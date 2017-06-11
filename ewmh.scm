@@ -28,17 +28,18 @@
 			(display (string-append "\t\"" master-prefix
 				prefix (car l) "\",\n"))
 			(print-each prefix (cdr l))))))
+(define get-enum-line (lambda (prefix item)
+	(string-append "\t" master-prefix prefix item ",\n")))
 (define print-enum-line (lambda (prefix item)
-	(display (string-append "\t" master-prefix prefix item ",\n"))))
+	(display (get-enum-line prefix item))))
 (define print-each-enum (lambda (prefix l)
 	(if (null? l)
 		(begin (display "\n") 0)
 		(begin
 			(print-enum-line prefix (car l))
 			(print-each-enum prefix (cdr l))))))
-;		(begin (display (string-append
-;				"\t" master-prefix prefix (car l) ",\n"))
-;			(print-each-enum prefix (cdr l))))))
+(define get-guard (lambda (name) 
+	(string-append "JBWM_" name "_H\n")))
 
 ; The execution begins:
 
@@ -57,10 +58,11 @@
 ; JBWMAtomIndex:
 (define f (open-output-file "JBWMAtomIndex.h"))
 (set-current-output-port! f)
+(define ig "JBWMATOMINDEX")
 (display (string-append
 	(get-copyright-line)
-	"#ifndef JBWM_JBWMATOMINDEX_H\n"
-	"#define JBWM_JBWMATOMINDEX_H\n"))
+	"#ifndef " (get-guard ig)
+	"#define " (get-guard ig)))
 (begin-enum-definition "JBWMAtomIndex")
 (set! master-prefix "JBWM_EWMH_")
 (print-each-enum "" net)
@@ -70,5 +72,5 @@
 (display "\t// The following entry must be last:\n")
 (print-enum-line "" "ATOMS_COUNT")
 (end-c-definition)
-(display "#endif//JBWM_JBWMATOMINDEX_H\n")
+(display (string-append "#endif//!" (get-guard ig)))
 (close-port f)

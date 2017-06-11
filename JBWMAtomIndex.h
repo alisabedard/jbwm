@@ -48,4 +48,4 @@ enum JBWMAtomIndex{
 	// The following entry must be last:
 	JBWM_EWMH_ATOMS_COUNT,
 };
-#endif//JBWM_JBWMATOMINDEX_H
+#endif//!JBWM_JBWMATOMINDEX_H
