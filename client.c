@@ -5,6 +5,7 @@
 #include "client.h"
 #include <X11/Xutil.h>
 #include <stdlib.h>
+#include "JBWMAtomIndex.h"
 #include "ewmh.h"
 #include "ewmh_state.h"
 #include "screen.h"

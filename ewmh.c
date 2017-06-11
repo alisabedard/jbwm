@@ -7,6 +7,7 @@
 #include <X11/Xatom.h>
 #include <string.h>
 #include <unistd.h>
+#include "JBWMAtomIndex.h"
 #include "JBWMClient.h"
 #include "JBWMScreen.h"
 #include "client.h"
@@ -22,6 +23,7 @@ Atom jbwm_ewmh_get_atom(const uint8_t index)
 }
 static void jbwm_ewmh_init(Display * d)
 {
+#if 0
 	static char * atom_names [] = { // This list must match 1:1 with enum
 		"_NET_SUPPORTED",
 		"_NET_CURRENT_DESKTOP",
@@ -63,7 +65,10 @@ static void jbwm_ewmh_init(Display * d)
 		"_NET_WM_STATE_BELOW",
 		"_NET_WM_STATE_FOCUSED",
 	};
-	XInternAtoms(d, atom_names, JBWM_EWMH_ATOMS_COUNT, false, jbwm_ewmh);
+#endif
+#include "ewmh_atoms.c"
+	XInternAtoms(d, jbwm_atom_names,
+		JBWM_EWMH_ATOMS_COUNT, false, jbwm_ewmh);
 }
 static inline void wprop(Display * d, const Window win,
 	const enum JBWMAtomIndex i, const Atom type,

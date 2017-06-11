@@ -5,6 +5,7 @@
 #include "select.h"
 #include <X11/Xatom.h>
 #include <X11/Xlib.h>
+#include "JBWMAtomIndex.h"
 #include "client.h"
 #include "ewmh.h"
 #include "ewmh_state.h"

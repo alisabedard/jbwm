@@ -5,6 +5,7 @@
 #include "title_bar.h"
 #include <X11/Xatom.h>
 #include <X11/Xft/Xft.h>
+#include "JBWMAtomIndex.h"
 #include "config.h"
 #include "ewmh.h"
 #include "ewmh_state.h"

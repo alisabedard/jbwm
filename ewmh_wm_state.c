@@ -1,5 +1,6 @@
 // Copyright 2017, Jeffrey E. Bedard
 #include "ewmh_wm_state.h"
+#include "JBWMAtomIndex.h"
 #include "JBWMClient.h"
 #include "client.h"
 #include "ewmh.h"

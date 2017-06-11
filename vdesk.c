@@ -4,6 +4,7 @@
 // See README for license and other details.
 #include "vdesk.h"
 #include <X11/Xatom.h> // keep
+#include "JBWMAtomIndex.h"
 #include "JBWMClient.h"
 #include "JBWMScreen.h"
 #include "client.h"

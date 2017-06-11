@@ -1,5 +1,6 @@
 // Copyright 2017, Jeffrey E. Bedard
 #include "ewmh_client.h"
+#include "JBWMAtomIndex.h"
 #include "client.h"
 #include "config.h"
 #include "drag.h"

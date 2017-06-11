@@ -1,5 +1,6 @@
 // Copyright 2017, Jeffrey E. Bedard
 #include "max.h"
+#include "JBWMAtomIndex.h"
 #include "ewmh.h"
 #include "ewmh_state.h"
 #include "font.h"

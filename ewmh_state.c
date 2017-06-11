@@ -2,6 +2,7 @@
 #undef DEBUG
 #include "ewmh_state.h"
 #include <X11/Xatom.h>
+#include "JBWMAtomIndex.h"
 #include "client.h"
 #include "drag.h"
 #include "ewmh.h"
