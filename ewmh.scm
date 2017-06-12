@@ -1,5 +1,5 @@
 ; for MIT Scheme
-(define copyright "Copyright 2017, Jeffrey E. Bedard")
+(define copyright "// Copyright 2017, Jeffrey E. Bedard\n")
 ; Store the prefix as the first element in these lists:
 (define net '("" "SUPPORTED" "CURRENT_DESKTOP" "NUMBER_OF_DESKTOPS"
 	"DESKTOP_VIEWPORT" "DESKTOP_GEOMETRY" "SUPPORTING_WM_CHECK"
@@ -12,23 +12,23 @@
 	"MAXIMIZE_VERT"))
 (define wm-state '("WM_STATE_" "STICKY" "MAXIMIZED_VERT" "MAXIMIZED_HORZ"
 	"SHADED" "HIDDEN" "FULLSCREEN" "ABOVE" "BELOW" "FOCUSED"))
-(define get-copyright-line (lambda ()
-	(string-append "// " copyright "\n")))
+; The following prefix is applied to each entry
+(define master-prefix "_NET_")
 (define begin-array-definition (lambda (name) (begin
-	(display (string-append (get-copyright-line)
+	(display (string-append copyright
 		"static char * " name " [] = {\n"))
 	0)))
 (define begin-enum-definition (lambda (name)
 	(display (string-append "enum " name "{\n"))))
 (define end-c-definition (lambda () (display "};\n")))
-(define master-prefix "_NET_")
 (define endl (lambda () (display "\n") 0))
+(define get-array-line (lambda (prefix item)
+	(string-append "\t\"" master-prefix prefix item "\",\n")))
 (define print-each-array (lambda (prefix l)
 	(if (null? l)
 		(endl)
 		(begin
-			(display (string-append "\t\"" master-prefix prefix
-				(car l) "\",\n"))
+			(display (get-array-line prefix (car l)))
 			(print-each-array prefix (cdr l))))))
 (define get-enum-line (lambda (prefix item)
 	(string-append "\t" master-prefix prefix item ",\n")))
@@ -44,17 +44,17 @@
 	(string-append "JBWM_" name "_H\n")))
 (define print-each (lambda (function data)
 	(function (car data) (cdr data))))
-(define print-all (lambda (function) (begin
-	(print-each function net)
-	(print-each function wm)
-	(print-each function wm-action)
-	(print-each function wm-state))))
-(define redirect-output (lambda (file) (begin
-	(define outf (open-output-file file))
-	(set-current-output-port! outf))))
+(define print-all-listed (lambda (function cat) (begin
+	(if (null? cat)
+		0
+		(begin
+			(print-each function (car cat))
+			(print-all-listed function (cdr cat)))))))
+(define print-all (lambda (function)
+	(print-all-listed function (list net wm wm-action wm-state))))
 ; Generate "ewmh_atoms.c"
 (define write-ewmh-atoms-c (lambda ()
-	(let ((outf (open-output-file "emwh_atoms.c")))
+	(let ((outf (open-output-file "ewmh_atoms.c")))
 	(set-current-output-port! outf)
 	(begin-array-definition "jbwm_atom_names")
 	(print-all print-each-array)
@@ -65,8 +65,7 @@
 	(let ((outf (open-output-file "JBWMAtomIndex.h")))
 	(set-current-output-port! outf)
 	(define ig "JBWMATOMINDEX")
-	(display (string-append
-		(get-copyright-line)
+	(display (string-append copyright
 		"#ifndef " (get-guard ig)
 		"#define " (get-guard ig)))
 	(begin-enum-definition "JBWMAtomIndex")
