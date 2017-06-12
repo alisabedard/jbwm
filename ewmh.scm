@@ -1,4 +1,3 @@
-":";exec guile -s $0 "$@"
 ; for MIT Scheme
 (define copyright "Copyright 2017, Jeffrey E. Bedard")
 ; Store the prefix as the first element in these lists:
@@ -45,38 +44,41 @@
 	(string-append "JBWM_" name "_H\n")))
 (define print-each (lambda (function data)
 	(function (car data) (cdr data))))
-
-; The execution begins:
-
-; For atom_names:
-(define f (open-output-file "ewmh_atoms.c"))
-(set-current-output-port! f)
-(begin-array-definition "jbwm_atom_names")
-(print-each print-each-array net)
-(print-each print-each-array wm)
-(print-each print-each-array wm-action)
-(print-each print-each-array wm-state)
-(end-c-definition)
-(close-port f)
-
-; JBWMAtomIndex:
-(define f (open-output-file "JBWMAtomIndex.h"))
-(set-current-output-port! f)
-(define ig "JBWMATOMINDEX")
-(display (string-append
-	(get-copyright-line)
-	"#ifndef " (get-guard ig)
-	"#define " (get-guard ig)))
-(begin-enum-definition "JBWMAtomIndex")
-(set! master-prefix "JBWM_EWMH_")
-(print-each print-each-enum net)
-(print-each print-each-enum wm)
-(print-each print-each-enum wm-action)
-(print-each print-each-enum wm-state)
-(display "\t// The following entry must be last:\n")
-(print-enum-line "" "ATOMS_COUNT")
-(end-c-definition)
-(display (string-append "#endif//!" (get-guard ig)))
-(close-port f)
+(define print-all (lambda (function) (begin
+	(print-each function net)
+	(print-each function wm)
+	(print-each function wm-action)
+	(print-each function wm-state))))
+(define redirect-output (lambda (file) (begin
+	(define outf (open-output-file file))
+	(set-current-output-port! outf))))
+; Generate "ewmh_atoms.c"
+(define write-ewmh-atoms-c (lambda ()
+	(let ((outf (open-output-file "emwh_atoms.c")))
+	(set-current-output-port! outf)
+	(begin-array-definition "jbwm_atom_names")
+	(print-all print-each-array)
+	(end-c-definition)
+	(close-port outf))))
+; Generate "JBWMAtomIndex.h"
+(define write-jbwmatomindex-h (lambda ()
+	(let ((outf (open-output-file "JBWMAtomIndex.h")))
+	(set-current-output-port! outf)
+	(define ig "JBWMATOMINDEX")
+	(display (string-append
+		(get-copyright-line)
+		"#ifndef " (get-guard ig)
+		"#define " (get-guard ig)))
+	(begin-enum-definition "JBWMAtomIndex")
+	(set! master-prefix "JBWM_EWMH_")
+	(print-all print-each-enum)
+	(display "\t// The following entry must be last:\n")
+	(print-enum-line "" "ATOMS_COUNT")
+	(end-c-definition)
+	(display (string-append "#endif//!" (get-guard ig)))
+	(close-port outf))))
+; Execution:
+(write-ewmh-atoms-c)
+(write-jbwmatomindex-h)
 ; Restore normal output:
 (set-current-output-port! console-i/o-port)
