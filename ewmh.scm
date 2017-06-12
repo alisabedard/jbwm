@@ -16,8 +16,7 @@
 (define master-prefix "_NET_")
 (define begin-array-definition (lambda (name) (begin
 	(display (string-append copyright
-		"static char * " name " [] = {\n"))
-	0)))
+		"static char * " name " [] = {\n")))))
 (define begin-enum-definition (lambda (name)
 	(display (string-append "enum " name "{\n"))))
 (define end-c-definition (lambda () (display "};\n")))
