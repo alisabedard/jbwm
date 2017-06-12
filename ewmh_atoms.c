@@ -13,7 +13,6 @@ static char * jbwm_atom_names [] = {
 	"_NET_VIRTUAL_ROOTS",
 	"_NET_CLIENT_LIST_STACKING",
 	"_NET_FRAME_EXTENTS",
-
 	"_NET_WM_ALLOWED_ACTIONS",
 	"_NET_WM_NAME",
 	"_NET_WM_DESKTOP",
@@ -21,7 +20,6 @@ static char * jbwm_atom_names [] = {
 	"_NET_WM_PID",
 	"_NET_WM_WINDOW_TYPE",
 	"_NET_WM_STATE",
-
 	"_NET_WM_ACTION_MOVE",
 	"_NET_WM_ACTION_RESIZE",
 	"_NET_WM_ACTION_CLOSE",
@@ -32,7 +30,6 @@ static char * jbwm_atom_names [] = {
 	"_NET_WM_ACTION_BELOW",
 	"_NET_WM_ACTION_MAXIMIZE_HORZ",
 	"_NET_WM_ACTION_MAXIMIZE_VERT",
-
 	"_NET_WM_STATE_STICKY",
 	"_NET_WM_STATE_MAXIMIZED_VERT",
 	"_NET_WM_STATE_MAXIMIZED_HORZ",
@@ -42,5 +39,4 @@ static char * jbwm_atom_names [] = {
 	"_NET_WM_STATE_ABOVE",
 	"_NET_WM_STATE_BELOW",
 	"_NET_WM_STATE_FOCUSED",
-
 };
