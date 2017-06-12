@@ -18,7 +18,7 @@
 	(display (string-append copyright
 		"static char * " name " [] = {\n"))))
 (define begin-enum-definition (lambda (name)
-	(display (string-append "enum " name "{\n"))))
+	(display (string-append "enum " name " {\n"))))
 (define end-c-definition (lambda () (display "};\n")))
 (define get-array-line (lambda (prefix item)
 	(string-append "\t\"" master-prefix prefix item "\",\n")))
