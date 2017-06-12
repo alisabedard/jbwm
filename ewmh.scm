@@ -14,9 +14,9 @@
 	"SHADED" "HIDDEN" "FULLSCREEN" "ABOVE" "BELOW" "FOCUSED"))
 ; The following prefix is applied to each entry
 (define master-prefix "_NET_")
-(define begin-array-definition (lambda (name) (begin
+(define begin-array-definition (lambda (name)
 	(display (string-append copyright
-		"static char * " name " [] = {\n")))))
+		"static char * " name " [] = {\n"))))
 (define begin-enum-definition (lambda (name)
 	(display (string-append "enum " name "{\n"))))
 (define end-c-definition (lambda () (display "};\n")))
