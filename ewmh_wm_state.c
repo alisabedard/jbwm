@@ -25,7 +25,7 @@ static void set_state(struct JBWMClient * restrict c,
 {
 	JBWM_LOG("set_state(c, add: %s, t: %d)", add ? "true" : "false",
 		(int) t);
-	jbwm_print_atom(d, jbwm_ewmh_get_atom(t), __FILE__, __LINE__);
+	jbwm_print_atom(c->display, jbwm_ewmh_get_atom(t), __FILE__, __LINE__);
 	if (!c)
 		return;
 	switch(t) {
