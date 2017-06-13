@@ -5,17 +5,20 @@
 #include "keys.h"
 #include "JBWMKeys.h"
 #include "key_masks.h"
-__attribute__((nonnull))
-static void grab(Display * d, const Window root,
-	KeySym * ks, const uint32_t modifiers)
+__attribute__((nonnull(1)))
+static void grab_r(Display * d, const Window r, KeySym * k,
+	const uint32_t mask)
 {
-	const uint16_t m = jbwm_get_grab_mask();
-	for (; *ks; ++ks)
-		XGrabKey(d, XKeysymToKeycode(d, *ks), m | modifiers, root,
-			True, GrabModeAsync, GrabModeAsync);
+	if (*k) { // Terminate at KeySym 0
+		XGrabKey(d, XKeysymToKeycode(d, *k), mask, r, True,
+			GrabModeAsync, GrabModeAsync);
+		grab_r(d, r, ++k, mask);
+	}
 }
 void jbwm_grab_root_keys(Display * d, const Window root)
 {
-	grab(d, root, (KeySym[]){JBWM_KEYS_TO_GRAB}, 0);
-	grab(d, root, (KeySym[]){JBWM_ALT_KEYS_TO_GRAB}, jbwm_get_mod_mask());
+	const uint32_t m = jbwm_get_grab_mask();
+	grab_r(d, root, (KeySym[]){JBWM_KEYS_TO_GRAB}, m);
+	grab_r(d, root, (KeySym[]){JBWM_ALT_KEYS_TO_GRAB},
+		m | jbwm_get_mod_mask());
 }
