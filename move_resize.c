@@ -31,7 +31,6 @@ static void do_move(Display * d, const Window parent,
 }
 void jbwm_move_resize(struct JBWMClient * restrict c)
 {
-	JBWM_LOG("jbwm_move_resize");
 	struct JBWMClientOptions * restrict o = &c->opt;
 	const uint8_t offset = o->no_title_bar || o->fullscreen
 		? 0 : jbwm_get_font_height();
