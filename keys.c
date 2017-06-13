@@ -6,7 +6,7 @@
 #include "JBWMKeys.h"
 #include "key_masks.h"
 __attribute__((nonnull(1)))
-static void grab_r(Display * d, const Window r, KeySym * k,
+static void grab_r(Display * d, const Window r, KeySym * restrict k,
 	const uint32_t mask)
 {
 	if (*k) { // Terminate at KeySym 0
