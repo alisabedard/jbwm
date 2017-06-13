@@ -13,6 +13,14 @@
 #include "select.h"
 #include "util.h"
 #include "wm_state.h"
+static void nullify(const int n, const Atom state, Atom * restrict a)
+{
+	if (n) {
+		if (a[n] == state)
+			a[n] = 0;
+		nullify(n - 1, state, a);
+	}
+}
 // Remove specified atom from WM_STATE
 void jbwm_ewmh_remove_state(Display * d,
 	const Window w, const Atom state)
@@ -22,11 +30,8 @@ void jbwm_ewmh_remove_state(Display * d,
 	Atom *a = jbwm_get_property(d, w, ws, &n);
 	if (!a)
 		return;
-	const uint16_t nitems = n;
-	while (n--) // decrement here to prevent offset error
-		if (a[n] == state)
-			a[n] = 0;
-	jbwm_set_property(d, w, ws, XA_ATOM, a, nitems);
+	nullify(n, state, a);
+	jbwm_set_property(d, w, ws, XA_ATOM, a, n);
 	XFree(a);
 }
 bool jbwm_ewmh_get_state(Display * d,
