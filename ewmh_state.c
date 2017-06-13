@@ -34,6 +34,10 @@ void jbwm_ewmh_remove_state(Display * d,
 	jbwm_set_property(d, w, ws, XA_ATOM, a, n);
 	XFree(a);
 }
+static bool find_state(const Atom state, const int n, Atom * restrict a)
+{
+	return n ? a[n] == state ? true : find_state(state, n - 1, a) : false;
+}
 bool jbwm_ewmh_get_state(Display * d,
 	const Window w, const Atom state)
 {
@@ -42,9 +46,7 @@ bool jbwm_ewmh_get_state(Display * d,
 		jbwm_ewmh_get_atom(JBWM_EWMH_WM_STATE), &n);
 	bool found = false;
 	if (a) {
-		while (n--) // prevent offset error
-			if ((found = (a[n] == state)))
-				break;
+		found = find_state(state, n, a);
 		XFree(a);
 	}
 	return found;
