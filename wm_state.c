@@ -47,15 +47,20 @@ void jbwm_set_wm_state(struct JBWMClient * restrict c,
 		(d, w, jbwm_ewmh_get_atom(JBWM_EWMH_WM_STATE_HIDDEN));
 #endif//JBWM_USE_EWMH
 }
-static bool has_delete_proto(Display * d, const Window w)
+static bool find_delete_proto(const int i, const Atom * restrict p,
+	Display * d)
 {
-	bool found=false;
+	return (i < 0) ? false : p[i] == get_wm_delete_window(d) ? true
+		: find_delete_proto(i - 1, p, d);
+}
+static bool has_delete_proto(const Window w, Display * d)
+{
+	bool found = false;
 	{ // * p, i scope
 		Atom * p;
 		int i;
 		if (XGetWMProtocols(d, w, &p, &i)) {
-			while(i-- && !found)
-				found = p[i] == get_wm_delete_window(d);
+			found = find_delete_proto(i, p, d);
 			XFree(p);
 		}
 	}
@@ -70,7 +75,7 @@ void jbwm_send_wm_delete(struct JBWMClient * restrict c)
 		XKillClient(d, w);
 	else {
 		c->opt.remove = true;
-		if (has_delete_proto(d, w))
+		if (has_delete_proto(w, d))
 			xmsg(d, w, get_wm_protocols(d),
 				get_wm_delete_window(d));
 		else // client does not support protocol, force kill:
