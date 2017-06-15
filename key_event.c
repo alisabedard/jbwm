@@ -143,25 +143,21 @@ static void handle_client_key_event(struct JBWMClient * restrict c,
 		break;
 	}
 }
-static struct JBWMClient * get_next_on_vdesk(void)
+static struct JBWMClient * get_next_on_vdesk(struct JBWMClient * c)
 {
-	struct JBWMClient * restrict c = jbwm_get_current_client();
-	struct JBWMScreen * s = jbwm_get_screens();
-	do {
-		if (c) {
-			c = c->next;
-			if (!c && !jbwm_get_current_client())
-				break;
-		}
-		if (!c) c = jbwm_get_head_client();
-		if (!c || (c == jbwm_get_current_client()))
-			break;
-	} while (c->vdesk != s[c->screen].vdesk);
-	return c;
+	if (c)
+		c = c->next;
+	if (!c)
+		c = !jbwm_get_current_client() ? NULL
+			: jbwm_get_head_client();
+	return !c || c == jbwm_get_current_client()
+		|| (c->vdesk == jbwm_get_screens()[c->screen].vdesk)
+		? c : get_next_on_vdesk(c);
 }
 static void next(void)
 {
-	struct JBWMClient * restrict c = get_next_on_vdesk();
+	struct JBWMClient * restrict c =
+		get_next_on_vdesk(jbwm_get_current_client());
 	if (!c)
 		return;
 	jbwm_restore_client(c);
