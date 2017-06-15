@@ -15,11 +15,11 @@
 #include "wm_state.h"
 static void nullify(const int n, const Atom state, Atom * restrict a)
 {
-	if (n) {
-		if (a[n] == state)
-			a[n] = 0;
-		nullify(n - 1, state, a);
-	}
+	if (n < 0)
+		return;
+	if (a[n] == state)
+		a[n] = 0;
+	nullify(n - 1, state, a);
 }
 // Remove specified atom from WM_STATE
 void jbwm_ewmh_remove_state(Display * d,
