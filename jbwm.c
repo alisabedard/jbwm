@@ -142,8 +142,10 @@ static void setup_clients(Display * d, struct JBWMScreen * s)
 	uint16_t n;
 	Window * w = get_windows(d, RootWindow(d, s->id), &n);
 	JBWM_LOG("Started with %d clients", n);
-	set_up_next_window(n, d, s, w);
-	XFree(w);
+	if (w) { // Avoid segmentation fault on empty list.
+		set_up_next_window(n, d, s, w);
+		XFree(w);
+	}
 }
 static inline void setup_gc(Display * d, struct JBWMScreen * s)
 {
