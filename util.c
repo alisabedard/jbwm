@@ -57,7 +57,6 @@ void jbwm_grab_button(Display * d, const Window w,
 		    GrabModeSync, None, None);
 }
 #ifdef DEBUG
-#include <stdio.h>
 void jbwm_print_atom(Display * d, const Atom a, const char * src,
 	const uint16_t line)
 {
