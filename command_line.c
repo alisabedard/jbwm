@@ -43,8 +43,7 @@ void jbwm_parse_command_line(const int argc, char **argv)
 	JBWM_LOG("parse_argv(%d,%s...)", argc, argv[0]);
 	static const char optstring[] = "1:2:b:d:F:f:hs:Vv";
 	int8_t opt;
-#define ENV(e) JBWM_ENV_##e
-#define OVERRIDE(x) setenv(ENV(x), optarg, 1);
+#define OVERRIDE(x) setenv(JBWM_ENV_##x, optarg, 1);
 	while((opt = getopt(argc, argv, optstring)) != -1)
 		switch (opt) {
 		case '1':

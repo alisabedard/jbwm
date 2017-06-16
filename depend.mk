@@ -5,6 +5,7 @@ client.o: client.c client.h JBWMAtomIndex.h ewmh.h ewmh_state.h screen.h \
  JBWMClient.h JBWMClientOptions.h JBWMClientTitlebar.h JBWMRectangle.h \
  JBWMScreen.h JBWMPixels.h pixel_t.h select.h title_bar.h vdesk.h \
  wm_state.h
+command_line.o: command_line.c command_line.h config.h key_masks.h log.h
 display.o: display.c display.h client.h config.h log.h util.h pixel_t.h
 drag.o: drag.c drag.h font.h move_resize.h screen.h JBWMClient.h \
  JBWMClientOptions.h JBWMClientTitlebar.h JBWMRectangle.h JBWMScreen.h \
@@ -34,7 +35,7 @@ geometry.o: geometry.c geometry.h JBWMClient.h JBWMClientOptions.h \
  JBWMClientTitlebar.h JBWMRectangle.h JBWMScreen.h JBWMPixels.h pixel_t.h \
  JBWMSize.h log.h macros.h screen.h
 jbwm.o: jbwm.c jbwm.h JBWMScreen.h JBWMPixels.h pixel_t.h config.h ewmh.h \
- key_masks.h keys.h log.h new.h screen.h JBWMClient.h JBWMClientOptions.h \
+ keys.h log.h new.h screen.h JBWMClient.h JBWMClientOptions.h \
  JBWMClientTitlebar.h JBWMRectangle.h util.h
 key_event.o: key_event.c key_event.h JBWMKeys.h JBWMScreen.h JBWMPixels.h \
  pixel_t.h client.h config.h drag.h exec.h key_masks.h keys.h log.h max.h \
@@ -43,9 +44,9 @@ key_event.o: key_event.c key_event.h JBWMKeys.h JBWMScreen.h JBWMPixels.h \
  wm_state.h
 key_masks.o: key_masks.c key_masks.h config.h
 keys.o: keys.c keys.h JBWMKeys.h key_masks.h
-main.o: main.c JBWMScreen.h JBWMPixels.h pixel_t.h events.h display.h \
- font.h jbwm.h screen.h JBWMClient.h JBWMClientOptions.h \
- JBWMClientTitlebar.h JBWMRectangle.h
+main.o: main.c JBWMScreen.h JBWMPixels.h pixel_t.h command_line.h \
+ display.h events.h font.h jbwm.h screen.h JBWMClient.h \
+ JBWMClientOptions.h JBWMClientTitlebar.h JBWMRectangle.h
 max.o: max.c max.h JBWMAtomIndex.h ewmh.h ewmh_state.h font.h \
  move_resize.h screen.h JBWMClient.h JBWMClientOptions.h \
  JBWMClientTitlebar.h JBWMRectangle.h JBWMScreen.h JBWMPixels.h pixel_t.h \
