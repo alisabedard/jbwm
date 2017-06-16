@@ -101,14 +101,17 @@ static XftDraw * new_xft_draw(Screen * s)
 	return XftDrawCreate(DisplayOfScreen(s), RootWindowOfScreen(s),
 		DefaultVisualOfScreen(s), DefaultColormapOfScreen(s));
 }
-void jbwm_init_screen(Display * d, const uint8_t i)
+// Initialize SCREENS amount of screens.
+void jbwm_init_screens(Display * d, const short screens)
 {
-	JBWM_LOG("jbwm_init_screen(d, i), i is %d", i);
-	struct JBWMScreen * s = &jbwm_get_screens()[i];
-	s->id = i;
+	if (screens < 0)
+		return;
+	JBWM_LOG("jbwm_init_screen(d, screens), screens is %d", screens);
+	struct JBWMScreen * s = &jbwm_get_screens()[screens];
+	s->id = screens;
 	s->vdesk = 0;
-	const Window r = RootWindow(d, i);
-	s->xlib = ScreenOfDisplay(d, i);
+	const Window r = RootWindow(d, screens);
+	s->xlib = ScreenOfDisplay(d, screens);
 	s->xft = new_xft_draw(s->xlib);
 	allocate_colors(d, s);
 	setup_gc(d, s);
@@ -117,6 +120,7 @@ void jbwm_init_screen(Display * d, const uint8_t i)
 	/* scan all the windows on this screen */
 	setup_clients(d, s);
 	jbwm_ewmh_init_screen(d, s);
+	jbwm_init_screens(d, screens - 1);
 }
 void jbwm_set_defaults(void)
 {

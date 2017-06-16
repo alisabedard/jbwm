@@ -10,7 +10,8 @@
 #include "config.h"
 #include "key_masks.h"
 #include "log.h"
-/* Used for overriding the default WM modifiers */
+/* Used for overriding the default WM modifiers.  Note on type: key masks are
+ * 16 bits maximum, therefore we return a uint16_t. */
 __attribute__((warn_unused_result))
 static uint16_t parse_modifiers(char * arg)
 {
