@@ -110,13 +110,15 @@ void jbwm_init_screens(Display * d, const short screens)
 	struct JBWMScreen * s = &jbwm_get_screens()[screens];
 	s->id = screens;
 	s->vdesk = 0;
-	const Window r = RootWindow(d, screens);
 	s->xlib = ScreenOfDisplay(d, screens);
 	s->xft = new_xft_draw(s->xlib);
 	allocate_colors(d, s);
 	setup_gc(d, s);
-	setup_event_listeners(d, r);
-	jbwm_grab_root_keys(d, r);
+	{ // r scope
+		const Window r = RootWindow(d, screens);
+		setup_event_listeners(d, r);
+		jbwm_grab_root_keys(d, r);
+	}
 	/* scan all the windows on this screen */
 	setup_clients(d, s);
 	jbwm_ewmh_init_screen(d, s);
