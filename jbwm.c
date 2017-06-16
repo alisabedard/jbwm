@@ -107,7 +107,7 @@ void jbwm_init_screens(Display * d, const short screens)
 	if (screens < 0)
 		return;
 	JBWM_LOG("jbwm_init_screen(d, screens), screens is %d", screens);
-	struct JBWMScreen * s = &jbwm_get_screens()[screens];
+	struct JBWMScreen * restrict s = &jbwm_get_screens()[screens];
 	s->id = screens;
 	s->vdesk = 0;
 	s->xlib = ScreenOfDisplay(d, screens);
