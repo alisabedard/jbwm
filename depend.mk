@@ -44,9 +44,9 @@ key_event.o: key_event.c key_event.h JBWMKeys.h JBWMScreen.h JBWMPixels.h \
  wm_state.h
 key_masks.o: key_masks.c key_masks.h config.h
 keys.o: keys.c keys.h JBWMKeys.h key_masks.h
-main.o: main.c JBWMScreen.h JBWMPixels.h pixel_t.h command_line.h \
- display.h events.h font.h jbwm.h screen.h JBWMClient.h \
- JBWMClientOptions.h JBWMClientTitlebar.h JBWMRectangle.h
+main.o: main.c command_line.h display.h events.h font.h jbwm.h screen.h \
+ JBWMClient.h JBWMClientOptions.h JBWMClientTitlebar.h JBWMRectangle.h \
+ JBWMScreen.h JBWMPixels.h pixel_t.h
 max.o: max.c max.h JBWMAtomIndex.h ewmh.h ewmh_state.h font.h \
  move_resize.h screen.h JBWMClient.h JBWMClientOptions.h \
  JBWMClientTitlebar.h JBWMRectangle.h JBWMScreen.h JBWMPixels.h pixel_t.h \

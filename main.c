@@ -2,7 +2,6 @@
 // Copyright 2008-2017, Jeffrey E. Bedard <jefbed@gmail.com>
 // Copyright 1999-2015, Ciaran Anscomb <jbwm@6809.org.uk>
 // See README for license and other details.
-#include "JBWMScreen.h"
 #include "command_line.h"
 #include "display.h"
 #include "events.h"
