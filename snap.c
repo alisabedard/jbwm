@@ -10,6 +10,7 @@
 #include "client.h"
 #include "config.h"
 #include "font.h"
+#include "log.h"
 #include "screen.h"
 __attribute__ ((const, warn_unused_result))
 static int sborder(const int xy, const int edge)
@@ -48,25 +49,27 @@ static int jbwm_snap_dim(const int cxy, const int cwh, const int cixy,
 	return absmin(absmin(absmin(absmin(d, s), s - cwh), t - cwh), t);
 }
 /* Don't use restrict for struct JBWMClient withing this function, as
- * c and ci may alias each other.  It is fine for struct
- * JBWMRectangle.  */
+ * c and ci may alias each other.  Qualifier restrict is fine for struct
+ * JBWMRectangle.  This is performance critical, scaling O(n)
+ * relative to the number of windows, so leave iterative in definition to
+ * avoid further overhead.  */
 static struct JBWMPoint search(struct JBWMClient * c)
 {
 	struct JBWMPoint d = {JBWM_SNAP, JBWM_SNAP};
 	for (struct JBWMClient * ci = jbwm_get_head_client();
 		ci; ci = ci->next) {
-		if ((ci == c) || (ci->screen != c->screen)
-			|| (ci->vdesk != c->vdesk))
-			continue;
-		struct JBWMRectangle * restrict gi = &(ci->size);
-		if ((gi->y - c->size.height - c->size.y <= d.x) &&
-			(c->size.y - gi->height - gi->y <= d.x))
-			d.x = jbwm_snap_dim(c->size.x, c->size.width,
-				gi->x, gi->width, d.x);
-		if ((gi->x - c->size.width - c->size.x <= d.y) &&
-			(c->size.x - gi->width - gi->x <= d.y))
-			d.y = jbwm_snap_dim(c->size.y, c->size.height,
-				gi->y, gi->height, d.y);
+		if ((ci != c) && (ci->screen == c->screen)
+			&& (ci->vdesk == c->vdesk)) {
+			struct JBWMRectangle * restrict gi = &(ci->size);
+			if ((gi->y - c->size.height - c->size.y <= d.x) &&
+				(c->size.y - gi->height - gi->y <= d.x))
+				d.x = jbwm_snap_dim(c->size.x, c->size.width,
+					gi->x, gi->width, d.x);
+			if ((gi->x - c->size.width - c->size.x <= d.y) &&
+				(c->size.x - gi->width - gi->x <= d.y))
+				d.y = jbwm_snap_dim(c->size.y, c->size.height,
+					gi->y, gi->height, d.y);
+			}
 	}
 	return d;
 }
