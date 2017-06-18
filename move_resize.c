@@ -9,9 +9,10 @@
 #include "mwm.h"
 #include "shape.h"
 #include "title_bar.h"
-__attribute__((nonnull))
 static void jbwm_configure_client(struct JBWMClient * restrict c)
 {
+	if (!c) // prevent segmentation fault
+		return;
 	const Window w = c->window;
 	struct JBWMRectangle * restrict g = &c->size;
 	XSendEvent(c->display, w, true, StructureNotifyMask, (XEvent
