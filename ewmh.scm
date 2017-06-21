@@ -20,7 +20,7 @@
 (define write-ewmh-atoms-c (lambda ()
 	(let ((outf (open-output-file "ewmh_atoms.c")))
 	(set-current-output-port! outf)
-	(begin-array-definition "const char *" "jbwm_atom_names" outf)
+	(begin-array-definition "char *" "jbwm_atom_names" outf)
 	(print-all print-each-array-element outf)
 	(end-c-definition outf)
 	(close-port outf))))

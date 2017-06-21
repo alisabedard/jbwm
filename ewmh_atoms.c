@@ -1,4 +1,4 @@
-static const char * jbwm_atom_names [] = {
+static char * jbwm_atom_names [] = {
 	"_NET_SUPPORTED",
 	"_NET_CURRENT_DESKTOP",
 	"_NET_NUMBER_OF_DESKTOPS",
