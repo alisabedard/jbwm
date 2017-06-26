@@ -31,7 +31,7 @@ xcb_colormap_t jb_get_default_colormap(xcb_connection_t * xc);
 pixel_t jb_get_pixel(xcb_connection_t * x, const xcb_colormap_t cmap,
 	const char * color);
 pixel_t jb_get_rgb_pixel(xcb_connection_t * x, const xcb_colormap_t cm,
-	const int16_t r, const int16_t g, const int16_t b);
+	const uint16_t r, const uint16_t g, const uint16_t b);
 xcb_connection_t * jb_get_xcb_connection(const char * display, int * screen);
 xcb_screen_t * jb_get_xcb_screen(xcb_connection_t * x);
 bool jb_next_event_timed(xcb_connection_t * x,

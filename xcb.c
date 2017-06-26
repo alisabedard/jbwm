@@ -16,7 +16,7 @@ bool jb_xcb_cookie_has_error(xcb_connection_t * x, const xcb_void_cookie_t c)
 	free(e);
 	return true;
 }
-static void xerr(xcb_connection_t * x, const char * msg)
+static _Noreturn void xerr(xcb_connection_t * x, const char * msg)
 {
 	xcb_disconnect(x);
 	if (errno)
@@ -32,22 +32,16 @@ void jb_check_x(xcb_connection_t * x)
 		break;
 	case XCB_CONN_ERROR:
 		xerr(x, "X transport error, DISPLAY unavailable");
-		break;
 	case XCB_CONN_CLOSED_EXT_NOTSUPPORTED:
 		xerr(x, "Extension not supported");
-		break;
 	case XCB_CONN_CLOSED_MEM_INSUFFICIENT:
 		xerr(x, "Insufficient memory");
-		break;
 	case XCB_CONN_CLOSED_REQ_LEN_EXCEED:
 		xerr(x, "Request length exceeded");
-		break;
 	case XCB_CONN_CLOSED_PARSE_ERR:
 		xerr(x, "Invalid DISPLAY string");
-		break;
 	case XCB_CONN_CLOSED_INVALID_SCREEN:
 		xerr(x, "Invalid screen");
-		break;
 	}
 }
 xcb_connection_t * jb_get_xcb_connection(const char * display, int * screen)
@@ -65,7 +59,7 @@ pixel_t jb_get_pixel(xcb_connection_t * x, const xcb_colormap_t cmap,
 	const char * color)
 {
 	xcb_alloc_named_color_cookie_t c = xcb_alloc_named_color(x,
-		cmap, strlen(color), color);
+		cmap, jb_strlen(color), color);
 	xcb_alloc_named_color_reply_t * r
 		= xcb_alloc_named_color_reply(x, c, NULL);
 	if (jb_check(r, "Could not allocate color"))
@@ -75,7 +69,7 @@ pixel_t jb_get_pixel(xcb_connection_t * x, const xcb_colormap_t cmap,
 	return p;
 }
 pixel_t jb_get_rgb_pixel(xcb_connection_t * x, const xcb_colormap_t cm,
-	const int16_t r, const int16_t g, const int16_t b)
+	const uint16_t r, const uint16_t g, const uint16_t b)
 {
 	xcb_alloc_color_cookie_t c = xcb_alloc_color(x, cm, r, g, b);
 	xcb_alloc_color_reply_t * rpl = xcb_alloc_color_reply(x, c, NULL);
@@ -114,7 +108,7 @@ pixel_t jb_set_named_bg(xcb_connection_t * xc, const xcb_gcontext_t gc,
 xcb_atom_t jb_get_atom(xcb_connection_t * x, const char * name)
 {
 	xcb_intern_atom_reply_t * r = xcb_intern_atom_reply(x,
-		xcb_intern_atom(x, false, strlen(name), name), NULL);
+		xcb_intern_atom(x, false, jb_strlen(name), name), NULL);
 	const xcb_atom_t a = r->atom;
 	free(r);
 	return a;
@@ -187,7 +181,7 @@ bool jb_open_font(xcb_connection_t * xc, xcb_font_t fid,
 	const char * name)
 {
 	xcb_void_cookie_t c = xcb_open_font_checked(xc, fid,
-		strlen(name), name);
+		jb_strlen(name), name);
 	if (jb_xcb_cookie_has_error(xc, c)) {
 		LIBJB_WARN("Failed to load font: %s", name);
 		return false;
@@ -199,14 +193,14 @@ void jb_set_window_name(xcb_connection_t * xc, const xcb_window_t win,
 {
 	xcb_change_property(xc, XCB_PROP_MODE_REPLACE, win,
 		XCB_ATOM_WM_NAME, XCB_ATOM_STRING, 8,
-		strlen(name), name);
+		jb_strlen(name), name);
 }
 void jb_set_icon_name(xcb_connection_t * xc, const xcb_window_t win,
 	char * name)
 {
 	xcb_change_property(xc, XCB_PROP_MODE_REPLACE, win,
 		XCB_ATOM_WM_ICON_NAME, XCB_ATOM_STRING, 8,
-		strlen(name), name);
+		jb_strlen(name), name);
 }
 xcb_cursor_t jb_get_cursor(xcb_connection_t * xc,
 	const char * restrict name)

@@ -8,6 +8,12 @@
 #include <unistd.h> // include before sys/signal.h for NetBSD
 #include <sys/signal.h> // for FreeBSD
 #include <sys/wait.h>
+unsigned short jb_strlen(const char * restrict s)
+{
+	unsigned short i = 0;
+	while (s[++i]);
+	return i;
+}
 static void wait_cb(int sig __attribute((unused)))
 {
 	wait(NULL);
