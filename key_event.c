@@ -149,9 +149,11 @@ static struct JBWMClient * get_next_on_vdesk(struct JBWMClient * c)
 		c = c->next;
 	if (!c)
 		c = jbwm_get_current_client() ? jbwm_get_head_client() : NULL;
-	/* If we've reached the current client, then we've made a loop (it was
+	/* Non-NULL c indicates not yet being at the end of the linked list.
+	 * If we've reached the current client, then we've made a loop (it was
 	 * advanced past once in the first statement, c = c->next), so exit.
-	 * Thus we check c != jbwm_get_current_client()  */
+	 * Thus we check c != jbwm_get_current_client().  If c's vdesk does
+	 * not equal the screen's vdesk the advance to the next client.  */
 	return c && c != jbwm_get_current_client()
 		&& c->vdesk != jbwm_get_screens()[c->screen].vdesk
 		? get_next_on_vdesk(c) : c;
