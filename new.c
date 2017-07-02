@@ -54,7 +54,7 @@ static Window get_parent(struct JBWMClient * restrict c)
 			ButtonPressMask | EnterWindowMask
 	};
 	struct JBWMRectangle * g = &c->size;
-	return XCreateWindow(c->display, jbwm_get_root(c), g->x, g->y,
+	return XCreateWindow(c->display, jbwm_get_client_root(c), g->x, g->y,
 		g->width, g->height, c->border, CFP, CFP,
 		NULL, CW_VM, &(XSetWindowAttributes){
 		.override_redirect=true, .event_mask = WA_EM});

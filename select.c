@@ -51,7 +51,7 @@ static void set_active_window(struct JBWMClient * c)
 #ifdef JBWM_USE_EWMH
 	static Window w;
 	w = c->window;
-	jbwm_set_property(c->display, jbwm_get_root(c),
+	jbwm_set_property(c->display, jbwm_get_client_root(c),
 		EWMH_ATOM(ACTIVE_WINDOW), XA_WINDOW, &w, 1);
 #endif//JBWM_USE_EWMH
 	jbwm_set_current_client(c);
