@@ -9,6 +9,6 @@ Atom jbwm_get_wm_state(Display * d);
 void jbwm_send_wm_delete(struct JBWMClient * restrict c)
 	__attribute__((nonnull));
 // Set WM_STATE property
-void jbwm_set_wm_state(struct JBWMClient * restrict c,
+void jbwm_set_wm_state(const struct JBWMClient * restrict c,
 	const int8_t state);
 #endif//!JBWM_WM_STATE_H

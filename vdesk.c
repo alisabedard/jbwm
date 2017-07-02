@@ -12,7 +12,7 @@
 #include "ewmh.h"
 #include "log.h"
 #include "util.h"
-static void check_visibility(struct JBWMScreen * s, struct
+static void check_visibility(const struct JBWMScreen * s, struct
 	JBWMClient * restrict c, const uint8_t v)
 {
 	if (!c)
