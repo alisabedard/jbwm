@@ -148,8 +148,7 @@ static struct JBWMClient * get_next_on_vdesk(struct JBWMClient * c)
 	if (c)
 		c = c->next;
 	if (!c)
-		c = !jbwm_get_current_client() ? NULL
-			: jbwm_get_head_client();
+		c = jbwm_get_current_client() ? jbwm_get_head_client() : NULL;
 	return !c || c == jbwm_get_current_client()
 		|| (c->vdesk == jbwm_get_screens()[c->screen].vdesk)
 		? c : get_next_on_vdesk(c);
@@ -158,12 +157,12 @@ static void next(void)
 {
 	struct JBWMClient * restrict c =
 		get_next_on_vdesk(jbwm_get_current_client());
-	if (!c)
-		return;
-	jbwm_restore_client(c);
-	jbwm_select_client(c);
-	point(c, 0, 0);
-	point(c, c->size.width, c->size.height);
+	if (c) {
+		jbwm_restore_client(c);
+		jbwm_select_client(c);
+		point(c, 0, 0);
+		point(c, c->size.width, c->size.height);
+	}
 }
 static void cond_client_to_desk(Display * d, struct JBWMClient * c,
 	struct JBWMScreen * s, const uint8_t desktop, const bool mod)
