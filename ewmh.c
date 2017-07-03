@@ -13,6 +13,7 @@
 #include "client.h"
 #include "config.h"
 #include "font.h"
+#include "geometry.h"
 #include "log.h"
 #include "macros.h"
 #include "util.h"
@@ -92,8 +93,9 @@ static void init_desktops(Display * d, struct JBWMScreen * s)
 	static Window r;
 	r = RootWindow(d, id);
 	enum {INT=XA_CARDINAL, WIN=XA_WINDOW};
+	struct JBWMSize sz = jbwm_get_display_size(d, s->id);
 	wprop(d, r, JBWM_EWMH_DESKTOP_GEOMETRY, INT,
-		(int32_t[]){DisplayWidth(d, id), DisplayHeight(d, id)}, 2);
+		(int32_t[]){sz.width, sz.height}, 2);
 	wprop(d, r, JBWM_EWMH_CURRENT_DESKTOP, INT, &s->vdesk, 1);
 	wprop(d, r, JBWM_EWMH_NUMBER_OF_DESKTOPS, INT,
 		&(long){JBWM_MAX_DESKTOPS}, 1);

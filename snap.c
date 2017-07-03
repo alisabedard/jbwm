@@ -10,6 +10,7 @@
 #include "client.h"
 #include "config.h"
 #include "font.h"
+#include "geometry.h"
 #include "log.h"
 #include "screen.h"
 __attribute__ ((const, warn_unused_result))
@@ -20,12 +21,11 @@ static int sborder(const int xy, const int edge)
 void jbwm_snap_border(struct JBWMClient * restrict c)
 {
 	struct JBWMRectangle * restrict g = &(c->size);
+	const struct JBWMSize s = jbwm_get_display_size(c->display,
+		c->screen);
+	const uint8_t b = c->border << 1;
 	// snap to screen border
 	g->x = sborder(g->x, 0);
-	const uint8_t id = jbwm_get_screen(c)->id;
-	Display * d = c->display;
-	const struct JBWMSize s = {DisplayWidth(d, id), DisplayHeight(d, id)};
-	const uint8_t b = c->border * 2;
 	g->x = sborder(g->x, g->width - s.width + b);
 	g->y = sborder(g->y, c->opt.no_title_bar ? 0 :
 		- jbwm_get_font_height());

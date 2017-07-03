@@ -75,7 +75,7 @@ static void init_geometry_for_screen_size(struct GeometryData * g,
 		center(g->geometry, screen_size);
 }
 __attribute__((pure))
-static struct JBWMSize get_display_size(Display * d, const uint8_t screen)
+struct JBWMSize jbwm_get_display_size(Display * d, const uint8_t screen)
 {
 	return (struct JBWMSize) {DisplayWidth(d, screen),
 		DisplayHeight(d, screen)};
@@ -89,7 +89,7 @@ static void init_geometry_for_screen(struct JBWMClient * c,
 		init_geometry_for_screen_size(&(struct GeometryData){ .display
 			= d, .attribute = geometry_attribute, .geometry =
 			&c->size, .window = c->window},
-			get_display_size(d, s->id));
+			jbwm_get_display_size(d, s->id));
 	} else
 		c->size.x = c->size.y = 0;
 }
