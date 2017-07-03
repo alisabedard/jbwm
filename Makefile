@@ -18,7 +18,8 @@ objects+=button_event.o keys.o util.o max.o select.o snap.o display.o
 objects+=exec.o main.o move_resize.o key_masks.o key_event.o vdesk.o
 objects+=geometry.o command_line.o
 $(exe): $(objects)
-	$(CC) ${jbwm_ldflags} $(LDFLAGS) $(objects) -o $@
+	$(CC) ${CFLAGS} ${jbwm_cflags} ${jbwm_ldflags} \
+		$(LDFLAGS) $(objects) -o $@
 	strip $(exe) -o $(exe).tmp
 	ls -l $(exe).tmp >> sz.log
 	rm -f $(exe).tmp
