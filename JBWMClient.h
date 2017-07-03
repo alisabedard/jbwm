@@ -18,10 +18,11 @@ struct JBWMClient {
 	Colormap cmap;
 	Window window, parent;
 	struct JBWMClientOptions opt;
-	int8_t ignore_unmap:3;
-	uint8_t border:1;
-	uint8_t vdesk:4;
-	uint8_t screen;
 	struct JBWMRectangle size, old_size, before_fullscreen;
-} __attribute__((packed));
+	uint8_t border;
+	uint8_t screen;
+	uint8_t vdesk;
+	int8_t ignore_unmap;
+	int8_t __pad[2];
+};
 #endif /* JBWM_CLIENT_STRUCT_H */

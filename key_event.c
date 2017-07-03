@@ -34,6 +34,7 @@ static void commit_key_move(struct JBWMClient * restrict c)
 }
 struct KeyMoveFlags {
 	bool horz:1, pos:1, mod:1;
+	int8_t __pad:5;
 };
 static inline bool can_resize(struct JBWMClientOptions * restrict opt)
 {

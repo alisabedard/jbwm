@@ -17,5 +17,6 @@ struct JBWMScreen {
 #endif//JBWM_USE_EWMH
 	struct JBWMPixels pixels;
 	uint8_t id, vdesk;
-} __attribute__((packed));
+	const int8_t __pad[2];
+};
 #endif//!JBWM_JBWMSCREEN_H
