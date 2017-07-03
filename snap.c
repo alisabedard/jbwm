@@ -15,9 +15,7 @@
 __attribute__ ((const, warn_unused_result))
 static int sborder(const int xy, const int edge)
 {
-	if (abs(xy + edge) < JBWM_SNAP)
-		return - edge;
-	return xy;
+	return (abs(xy + edge) < JBWM_SNAP) ? -edge : xy;
 }
 void jbwm_snap_border(struct JBWMClient * restrict c)
 {
