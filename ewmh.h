@@ -22,6 +22,6 @@ void jbwm_set_frame_extents(struct JBWMClient * restrict c);
 #define jbwm_ewmh_init_screen(d, s)
 #define jbwm_ewmh_init(d)
 #define jbwm_ewmh_update_client_list(d)
-#define jbwm_set_frame_extents(d, c)
+#define jbwm_set_frame_extents(c)
 #endif//JBWM_USE_EWMH
 #endif//!JBWM_EWMH_H
