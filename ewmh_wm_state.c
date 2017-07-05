@@ -23,11 +23,11 @@
 static void set_state(struct JBWMClient * restrict c,
 	bool add, const enum JBWMAtomIndex t)
 {
+	if (!c)
+		return;
 	JBWM_LOG("set_state(c, add: %s, t: %d)", add ? "true" : "false",
 		(int) t);
 	jbwm_print_atom(c->display, jbwm_ewmh_get_atom(t), __FILE__, __LINE__);
-	if (!c)
-		return;
 	switch(t) {
 	case JBWM_EWMH_WM_STATE_FULLSCREEN:
 		(add?jbwm_set_fullscreen:jbwm_set_not_fullscreen)(c);
