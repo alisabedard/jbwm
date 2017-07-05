@@ -35,7 +35,8 @@ void jbwm_toggle_shade(struct JBWMClient * restrict c)
 	}
 	jbwm_move_resize(c);
 	jbwm_set_wm_state(c, state);
-	f(c->display, c->window, jbwm_ewmh_get_atom(JBWM_EWMH_WM_STATE_SHADED));
+	f(c->display, c->window,
+		jbwm_ewmh_get_atom(JBWM_EWMH_WM_STATE_SHADED));
 }
 static uint16_t mv(Display * d, const Window w, uint16_t x)
 {
