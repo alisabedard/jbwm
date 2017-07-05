@@ -32,26 +32,27 @@ static void commit_key_move(struct JBWMClient * restrict c)
 	jbwm_move_resize(c);
 	point(c, 1, 1);
 }
-struct KeyMoveFlags {
-	bool horz:1, pos:1, mod:1;
-	int8_t __pad:5;
+enum KeyMoveFlags {
+	KEY_MOVE_HORIZONTAL = 1,
+	KEY_MOVE_POSITIVE = 2,
+	KEY_MOVE_MODIFIER = 4
 };
 static inline bool can_resize(struct JBWMClientOptions * restrict opt)
 {
 	return !opt->shaped && !opt->no_resize;
 }
 __attribute__((nonnull))
-static void key_move(struct JBWMClient * restrict c,
-	const struct KeyMoveFlags f)
+static void key_move(struct JBWMClient * restrict c, const uint8_t flags)
 {
 	enum { I = JBWM_RESIZE_INCREMENT };
 	struct JBWMRectangle * restrict s = &c->size;
-	uint16_t * restrict wh = f.horz ? &s->width : &s->height;
-	const int8_t d = f.pos ? I : - I;
-	if(f.mod && (*wh > I << 1) && can_resize(&c->opt))
+	uint16_t * restrict wh = flags & KEY_MOVE_HORIZONTAL ? &s->width
+		: &s->height;
+	const int8_t d = flags & KEY_MOVE_POSITIVE ? I : - I;
+	if((flags & KEY_MOVE_MODIFIER) && (*wh > I << 1) && can_resize(&c->opt))
 		*wh += d;
 	else
-		*(f.horz ? &s->x : &s->y) += d;
+		*(flags & KEY_MOVE_HORIZONTAL ? &s->x : &s->y) += d;
 	commit_key_move(c);
 }
 static void handle_key_move(struct JBWMClient * restrict c,
@@ -60,18 +61,18 @@ static void handle_key_move(struct JBWMClient * restrict c,
 	/* These operations invalid when fullscreen.  */
 	if (c->opt.fullscreen)
 		return;
-	struct KeyMoveFlags f = {.mod = mod, .pos = true};
+	uint8_t flags = (mod ? KEY_MOVE_MODIFIER : 0) | KEY_MOVE_POSITIVE;
 	switch (k) {
 	case JBWM_KEY_LEFT:
-		f.pos = false;
+		flags &= ~KEY_MOVE_POSITIVE;
 		// FALLTHROUGH
 	case JBWM_KEY_RIGHT:
-		f.horz = true;
+		flags |= KEY_MOVE_HORIZONTAL;
 		break;
 	case JBWM_KEY_UP:
-		f.pos = false;
+		flags &= ~KEY_MOVE_POSITIVE;
 	}
-	key_move(c, f);
+	key_move(c, flags);
 }
 static void set_maximized(struct JBWMClient * restrict c)
 {
