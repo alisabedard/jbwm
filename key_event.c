@@ -66,12 +66,8 @@ static void key_move(struct JBWMClient * restrict c, const uint8_t flags)
 	*get_antecedent(c, flags) += d;
 	commit_key_move(c);
 }
-static void handle_key_move(struct JBWMClient * restrict c,
-	const KeySym k, const bool mod)
+static uint8_t get_move_flags(const KeySym k, const bool mod)
 {
-	/* These operations invalid when fullscreen.  */
-	if (c->opt.fullscreen)
-		return;
 	uint8_t flags = (mod ? KEY_MOVE_MODIFIER : 0) | KEY_MOVE_POSITIVE;
 	switch (k) {
 	case JBWM_KEY_LEFT:
@@ -83,7 +79,15 @@ static void handle_key_move(struct JBWMClient * restrict c,
 	case JBWM_KEY_UP:
 		flags &= ~KEY_MOVE_POSITIVE;
 	}
-	key_move(c, flags);
+	return flags;
+}
+static void handle_key_move(struct JBWMClient * restrict c,
+	const KeySym k, const bool mod)
+{
+	/* These operations invalid when fullscreen.  */
+	if (c->opt.fullscreen)
+		return;
+	key_move(c, get_move_flags(k, mod));
 }
 static void set_maximized(struct JBWMClient * restrict c)
 {
