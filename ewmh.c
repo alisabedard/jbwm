@@ -37,14 +37,14 @@ static inline void wprop(Display * d, const Window win,
 static Window * get_mixed_client_list(Display * d)
 {
 	enum {MAX_CLIENTS = 64};
-	static Window l[MAX_CLIENTS];
+	static Window window_list[MAX_CLIENTS];
 	uint8_t n = 0;
 	for (struct JBWMClient * i = jbwm_get_head_client();
 		i && n < MAX_CLIENTS; i = i->next)
-		l[n++] = i->window;
+		window_list[n++] = i->window;
 	wprop(d, DefaultRootWindow(d), JBWM_EWMH_CLIENT_LIST,
-		XA_WINDOW, l, n);
-	return l;
+		XA_WINDOW, window_list, n);
+	return window_list;
 }
 static unsigned int get_window_list(Display * d, const uint8_t max_clients,
 	Window * window_list)
