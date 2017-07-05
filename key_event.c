@@ -41,18 +41,29 @@ static inline bool can_resize(struct JBWMClientOptions * restrict opt)
 {
 	return !opt->shaped && !opt->no_resize;
 }
+static inline bool has_sufficient_size(const int value)
+{
+	return value > JBWM_RESIZE_INCREMENT << 1;
+}
+static int16_t * get_antecedent(struct JBWMClient * restrict c, const
+	uint8_t flags)
+{
+	int16_t * ret;
+	struct JBWMRectangle * restrict s = &c->size;
+	int16_t * wh = flags & KEY_MOVE_HORIZONTAL ? &s->width : &s->height;
+	if((flags & KEY_MOVE_MODIFIER) && has_sufficient_size(*wh)
+		&& can_resize(&c->opt))
+		ret = wh;
+	else
+		ret = (flags & KEY_MOVE_HORIZONTAL ? &s->x : &s->y);
+	return ret;
+}
 __attribute__((nonnull))
 static void key_move(struct JBWMClient * restrict c, const uint8_t flags)
 {
-	enum { I = JBWM_RESIZE_INCREMENT };
-	struct JBWMRectangle * restrict s = &c->size;
-	uint16_t * restrict wh = flags & KEY_MOVE_HORIZONTAL ? &s->width
-		: &s->height;
-	const int8_t d = flags & KEY_MOVE_POSITIVE ? I : - I;
-	if((flags & KEY_MOVE_MODIFIER) && (*wh > I << 1) && can_resize(&c->opt))
-		*wh += d;
-	else
-		*(flags & KEY_MOVE_HORIZONTAL ? &s->x : &s->y) += d;
+	const int8_t d = flags & KEY_MOVE_POSITIVE
+		? JBWM_RESIZE_INCREMENT : - JBWM_RESIZE_INCREMENT;
+	*get_antecedent(c, flags) += d;
 	commit_key_move(c);
 }
 static void handle_key_move(struct JBWMClient * restrict c,
