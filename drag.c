@@ -69,6 +69,14 @@ static void draw_outline(struct JBWMClient * restrict c)
 	XDrawRectangle(d, jbwm_get_client_root(c), DefaultGC(d, c->screen),
 		g->x, g->y - o, g->width + BORDER, g->height + BORDER + o);
 }
+// Returns true if we should continue the event loop
+static bool get_point(Display * d, int16_t * restrict p)
+{	XEvent e;
+	XMaskEvent(d, JBWMMouseMask, &e);
+	p[0] = e.xmotion.x;
+	p[1] = e.xmotion.y;
+	return e.type == MotionNotify;
+}
 static void drag_event_loop(struct JBWMClient * restrict c, const bool resize)
 {
 	const Window root = jbwm_get_client_root(c);
@@ -78,23 +86,15 @@ static void drag_event_loop(struct JBWMClient * restrict c, const bool resize)
 	query_pointer(d, root, start);
 	const uint8_t b = c->opt.border;
 	for (;;) {
-		{ // p scope
-			int16_t p[2];
-			{ // e scope
-				XEvent e;
-				XMaskEvent(d, JBWMMouseMask, &e);
-				if (e.type != MotionNotify)
-					break;
-				p[0] = e.xmotion.x;
-				p[1] = e.xmotion.y;
-			}
-			if (b)
-				draw_outline(c);
-			if (resize)
-				set_size(c, p);
-			else
-				set_position(c, original, start, p);
-		}
+		int16_t p[2];
+		if (!get_point(d, p))
+			break;
+		if (b)
+			draw_outline(c);
+		if (resize)
+			set_size(c, p);
+		else
+			set_position(c, original, start, p);
 		(b ? draw_outline : jbwm_move_resize)(c);
 	}
 }
