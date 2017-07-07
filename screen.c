@@ -14,17 +14,3 @@ void jbwm_set_screens(struct JBWMScreen * restrict s)
 {
 	screens = s;
 }
-Window jbwm_get_current_root(Display * dpy)
-{
-	Window w = DefaultRootWindow(dpy), r;
-	int i;
-	unsigned int ui;
-	XQueryPointer(dpy, w, &r, &w, &i, &i, &i, &i, &ui);
-	return r;
-}
-Screen * jbwm_get_current_xlib_screen(Display * dpy)
-{
-	XWindowAttributes a;
-	XGetWindowAttributes(dpy, jbwm_get_current_root(dpy), &a);
-	return a.screen;
-}

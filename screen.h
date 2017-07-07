@@ -6,8 +6,6 @@
 #define JBWM_SCREEN_H
 #include "JBWMClient.h"
 #include "JBWMScreen.h"
-Window jbwm_get_current_root(Display * dpy);
-Screen * jbwm_get_current_xlib_screen(Display * dpy);
 struct JBWMScreen * jbwm_get_screens(void);
 inline struct JBWMScreen * jbwm_get_screen(struct JBWMClient * restrict c)
 {
