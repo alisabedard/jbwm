@@ -95,10 +95,7 @@ static void drag_event_loop(struct JBWMClient * restrict c, const bool resize)
 			else
 				set_position(c, original, start, p);
 		}
-		if (b)
-			draw_outline(c);
-		else
-			jbwm_move_resize(c);
+		(b ? draw_outline : jbwm_move_resize)(c);
 	}
 }
 /* Drag the specified client.  Resize the client if resize is true.  */
