@@ -84,7 +84,7 @@ static void drag_event_loop(Display * d,
 				XEvent e;
 				XMaskEvent(d, JBWMMouseMask, &e);
 				if (e.type != MotionNotify)
-					return;
+					break;
 				p[0] = e.xmotion.x;
 				p[1] = e.xmotion.y;
 			}
