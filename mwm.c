@@ -13,10 +13,9 @@ static void process_flags(struct JBWMClient * c)
 {
 	struct JBWMClientOptions * o = &c->opt;
 	if (o->tearoff) {
-		o->no_border = o->no_resize = o->no_min = o->no_max
-			= o->no_title_bar = true;
+		o->no_resize = o->no_min = o->no_max = o->no_title_bar = true;
+		o->border = 0;
 	}
-	c->border = o->no_border ? 0 : 1;
 }
 static void do_functions(struct JBWMClientOptions * o,
 	const enum MwmFunctions f)
@@ -48,7 +47,7 @@ static void do_functions(struct JBWMClientOptions * o,
 static void do_decorations(struct JBWMClientOptions * o,
 	const enum MwmDecor f)
 {
-	o->no_border = !(f & MWM_DECOR_BORDER);
+	o->border = f & MWM_DECOR_BORDER ? 1 : 0;
 #ifdef ENABLE_NO_RESIZE
 	if (f & MWM_DECOR_RESIZEH) {
 		JBWM_LOG("decor resize");

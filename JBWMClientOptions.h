@@ -2,11 +2,12 @@
 #ifndef JBWM_JBWMCLIENTOPTIONS_H
 #define JBWM_JBWMCLIENTOPTIONS_H
 #include <stdbool.h>
+#include <stdint.h>
 struct JBWMClientOptions {
+	uint8_t border : 2;
 	bool fullscreen : 1;
 	bool max_horz : 1;
 	bool max_vert : 1;
-	bool no_border : 1;
 	bool no_close : 1;
 	bool no_max : 1;
 	bool no_min : 1;
@@ -18,6 +19,5 @@ struct JBWMClientOptions {
 	bool shaped : 1;
 	bool sticky : 1;
 	bool tearoff : 1;
-	bool __pad : 1;
 };
 #endif//!JBWM_JBWMCLIENTOPTIONS_H

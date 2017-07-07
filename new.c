@@ -55,7 +55,7 @@ static Window get_parent(struct JBWMClient * restrict c)
 	};
 	struct JBWMRectangle * g = &c->size;
 	return XCreateWindow(c->display, jbwm_get_client_root(c), g->x, g->y,
-		g->width, g->height, c->border, CFP, CFP,
+		g->width, g->height, c->opt.border, CFP, CFP,
 		NULL, CW_VM, &(XSetWindowAttributes){
 		.override_redirect=true, .event_mask = WA_EM});
 }
@@ -78,7 +78,8 @@ static struct JBWMClient * get_JBWMClient(const Window w,
 	struct JBWMScreen * s)
 {
 	struct JBWMClient * restrict c = malloc(sizeof(struct JBWMClient));
-	*c = (struct JBWMClient) {.screen = s->id, .window = w, .border = 1};
+	*c = (struct JBWMClient) {.screen = s->id, .window = w};
+	c->opt.border = 1;
 	return c;
 }
 // Grab input and setup JBWM_USE_EWMH for client window

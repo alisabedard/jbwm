@@ -19,10 +19,9 @@ struct JBWMClient {
 	Window window, parent;
 	struct JBWMClientOptions opt;
 	struct JBWMRectangle size, old_size, before_fullscreen;
-	uint8_t border;
 	uint8_t screen;
 	uint8_t vdesk;
 	int8_t ignore_unmap;
-	int8_t __pad[2];
+	int8_t __pad[3];
 };
 #endif /* JBWM_CLIENT_STRUCT_H */

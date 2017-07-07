@@ -76,7 +76,7 @@ static void drag_event_loop(Display * d,
 	const int16_t original[] = {c->size.x, c->size.y};
 	int16_t start[2];
 	query_pointer(d, root, start);
-	const uint8_t b = c->border;
+	const uint8_t b = c->opt.border;
 	for (;;) {
 		{ // p scope
 			int16_t p[2];
@@ -118,7 +118,7 @@ void jbwm_drag(struct JBWMClient * restrict c, const bool resize)
 	{ // gc scope
 		GC gc = DefaultGC(d, id);
 		drag_event_loop(d, c, r, gc, resize);
-		if (c->border)
+		if (c->opt.border)
 			draw_outline(d, r, gc, c);
 	}
 	XUngrabPointer(d, CurrentTime);

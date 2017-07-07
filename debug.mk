@@ -5,5 +5,5 @@ jbwm_cflags+=-pg
 # Enable all warnings
 jbwm_cflags+=-W -Wall -Wextra -Werror
 # Select compiler
-#include debug_clang.mk
-include debug_gcc.mk
+include debug_clang.mk
+#include debug_gcc.mk

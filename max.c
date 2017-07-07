@@ -40,7 +40,7 @@ void jbwm_set_horz(struct JBWMClient * restrict c)
 	jbwm_ewmh_add_state(c->display, c->window,
 		jbwm_ewmh_get_atom(JBWM_EWMH_WM_STATE_MAXIMIZED_HORZ));
 	set_horz(c, DisplayWidth(c->display, jbwm_get_screen(c)->id));
-	c->size.width -= c->border << 1;
+	c->size.width -= c->opt.border << 1;
 	jbwm_move_resize(c);
 }
 static void set_not_vert(struct JBWMClient * restrict c)
@@ -73,10 +73,11 @@ void jbwm_set_vert(struct JBWMClient * restrict c)
 		return;
 	set_vert(c);
 	// Offset to hide borders:
-	c->size.height -= c->border << 1;
+	const uint8_t b = c->opt.border;
+	c->size.height -= b << 1;
 	if (!c->opt.no_title_bar) {
-		c->size.y += jbwm_get_font_height() + c->border;
-		c->size.height -= jbwm_get_font_height() + (c->border << 1);
+		c->size.y += jbwm_get_font_height() + b;
+		c->size.height -= jbwm_get_font_height() + (b << 1);
 	}
 	jbwm_move_resize(c);
 }
@@ -85,7 +86,7 @@ static void set_not_fullscreen(struct JBWMClient * restrict c)
 	c->opt.fullscreen = false;
 	c->size = c->before_fullscreen;
 	Display * d = c->display;
-	XSetWindowBorderWidth(d, c->parent, c->border);
+	XSetWindowBorderWidth(d, c->parent, c->opt.border);
 	jbwm_ewmh_remove_state(d, c->window,
 		jbwm_ewmh_get_atom(JBWM_EWMH_WM_STATE_FULLSCREEN));
 	jbwm_update_title_bar(c);

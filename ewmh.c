@@ -177,8 +177,7 @@ void jbwm_set_frame_extents(struct JBWMClient * restrict c)
 	JBWM_LOG("jbwm_set_frame_extents()");
 	// Fields: left, right, top, bottom
 	static uint32_t f[4];
-	const uint8_t b = c->border;
-	f[0] = f[1] = f[2] = f[3] = b;
+	f[0] = f[1] = f[2] = f[3] = c->opt.border;
 	if (!c->opt.no_title_bar)
 		f[2] += jbwm_get_font_height();
 	set_property(c->display, c->parent, JBWM_EWMH_FRAME_EXTENTS,

@@ -19,7 +19,7 @@ static void jbwm_configure_client(struct JBWMClient * restrict c)
 		*) &(XConfigureEvent){.x = g->x, .y = g->y, .width = g->width,
 		.height = g->height, .type = ConfigureNotify, .event = w,
 		.window = w, .above = c->parent, .override_redirect = true,
-		.border_width = c->border});
+		.border_width = c->opt.border});
 }
 static void do_move(Display * d, const Window parent,
 	const Window window, struct JBWMRectangle * restrict sz,
