@@ -57,8 +57,7 @@ static void query_pointer(Display * dpy, Window w,
 	p[1] = y;
 }
 __attribute__((nonnull))
-static void draw_outline(Display * dpy, const Window root,
-	GC gc, struct JBWMClient * restrict c)
+static void draw_outline(struct JBWMClient * restrict c)
 {
 	static uint8_t fh;
 	if (!fh) // save the value
@@ -66,15 +65,16 @@ static void draw_outline(Display * dpy, const Window root,
 	const uint8_t o = c->opt.no_title_bar ? 0 : fh;
 	const struct JBWMRectangle * restrict g = &c->size;
 	enum { BORDER = 1 };
-	XDrawRectangle(dpy, root, gc, g->x, g->y - o,
-		g->width + BORDER, g->height + BORDER + o);
+	Display * d = c->display;
+	XDrawRectangle(d, jbwm_get_client_root(c), DefaultGC(d, c->screen),
+		g->x, g->y - o, g->width + BORDER, g->height + BORDER + o);
 }
-static void drag_event_loop(Display * d,
-	struct JBWMClient * restrict c, const Window root, GC gc,
-	const bool resize)
+static void drag_event_loop(struct JBWMClient * restrict c, const bool resize)
 {
+	const Window root = jbwm_get_client_root(c);
 	const int16_t original[] = {c->size.x, c->size.y};
 	int16_t start[2];
+	Display * d = c->display;
 	query_pointer(d, root, start);
 	const uint8_t b = c->opt.border;
 	for (;;) {
@@ -89,14 +89,14 @@ static void drag_event_loop(Display * d,
 				p[1] = e.xmotion.y;
 			}
 			if (b)
-				draw_outline(d, root, gc, c);
+				draw_outline(c);
 			if (resize)
 				set_size(c, p);
 			else
 				set_position(c, original, start, p);
 		}
 		if (b)
-			draw_outline(d, root, gc, c);
+			draw_outline(c);
 		else
 			jbwm_move_resize(c);
 	}
@@ -115,12 +115,9 @@ void jbwm_drag(struct JBWMClient * restrict c, const bool resize)
 		struct JBWMRectangle * restrict g = &c->size;
 		jbwm_warp(d, c->window, g->width, g->height);
 	}
-	{ // gc scope
-		GC gc = DefaultGC(d, id);
-		drag_event_loop(d, c, r, gc, resize);
-		if (c->opt.border)
-			draw_outline(d, r, gc, c);
-	}
+	drag_event_loop(c, resize);
+	if (c->opt.border)
+		draw_outline(c);
 	XUngrabPointer(d, CurrentTime);
 	jbwm_move_resize(c);
 }
