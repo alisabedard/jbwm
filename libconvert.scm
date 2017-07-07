@@ -1,5 +1,5 @@
 ; libconvert.scm
-; Simple colon-separated database parsing library for header generation
+; Simple colon-separated database parsing library for C header generation
 ; vim: sw=2
 (define copyright "// Copyright 2017, Jeffrey E. Bedard\n")
 ; lisp-like operations on colon-separated strings:
