@@ -10,14 +10,12 @@ struct JBWMClient;
 // Free client and destroy its windows and properties.
 void jbwm_client_free(struct JBWMClient * c);
 // Search for the JBWMClient matching the specified window
-struct JBWMClient * jbwm_get_client(Window w)
-	__attribute__((pure));
+struct JBWMClient * jbwm_get_client(Window w) __attribute__((pure));
 // Get the client with input focus.
 struct JBWMClient * jbwm_get_current_client(void);
 // Get the head of the JBWMClient linked list
 struct JBWMClient * jbwm_get_head_client(void);
-void jbwm_hide_client(const struct JBWMClient * restrict c)
-	__attribute__((nonnull));
+void jbwm_hide_client(const struct JBWMClient * restrict c);
 /* Set c as the new head client, linking its next element
    to the previous head */
 void jbwm_prepend_client(struct JBWMClient * restrict c);
@@ -25,11 +23,9 @@ void jbwm_prepend_client(struct JBWMClient * restrict c);
 void jbwm_relink_client_list(struct JBWMClient * restrict c);
 // Move the client to the specified virtual desktop
 void jbwm_set_client_vdesk(struct JBWMClient * restrict c,
-	const uint8_t desktop) __attribute((nonnull));
+	const uint8_t desktop);
 // Assign c as the current client
 void jbwm_set_current_client(struct JBWMClient * restrict c);
-void jbwm_toggle_sticky(struct JBWMClient * restrict c)
-	__attribute__((nonnull));
-void jbwm_restore_client(const struct JBWMClient * restrict c)
-	__attribute__((nonnull));
+void jbwm_toggle_sticky(struct JBWMClient * restrict c);
+void jbwm_restore_client(const struct JBWMClient * restrict c);
 #endif//!JBWM_CLIENT_H
