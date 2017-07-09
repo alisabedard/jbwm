@@ -1,6 +1,5 @@
 // Copyright 2017, Jeffrey E. Bedard
 #include "key_event.h"
-#include <stdlib.h>
 #include "JBWMKeys.h"
 #include "JBWMScreen.h"
 #include "client.h"
@@ -14,6 +13,7 @@
 #include "move_resize.h"
 #include "screen.h"
 #include "select.h"
+#include "shape.h"
 #include "snap.h"
 #include "title_bar.h"
 #include "vdesk.h"
@@ -22,8 +22,9 @@ __attribute__((nonnull))
 static void point(struct JBWMClient * restrict c,
 	const int16_t x, const int16_t y)
 {
-	XRaiseWindow(c->display, c->parent);
-	jbwm_warp(c->display, c->window, x, y);
+	Display * d = c->display;
+	XRaiseWindow(d, c->parent);
+	jbwm_warp(d, c->window, x, y);
 }
 __attribute__((nonnull))
 static void commit_key_move(struct JBWMClient * restrict c)
@@ -102,12 +103,11 @@ static void set_not_maximized(struct JBWMClient * restrict c)
 static void toggle_maximize(struct JBWMClient * restrict c)
 {
 	const struct JBWMClientOptions o = c->opt;
-	// Honor !MWM_FUNC_MAXIMIZE
-	// Maximizing shaped windows is buggy, so return.
-	if (o.shaped || o.no_max || o.fullscreen)
-		return;
-	(o.max_horz && o.max_vert
-	 ? set_not_maximized : set_maximized)(c);
+	// Honor mwm hints.  Do not maximize shaped windows.
+	// Ignore fullscreen windows.  Let the fullscreen code handle them.
+	if (!o.no_max && !o.fullscreen && !o.shaped)
+		(o.max_horz && o.max_vert
+			? set_not_maximized : set_maximized)(c);
 }
 __attribute__((nonnull))
 static void handle_client_key_event(struct JBWMClient * restrict c,
