@@ -4,7 +4,7 @@
 #include <stdlib.h> // for exit()
 #include <unistd.h> // for fork()
 #include "config.h" // for JBWM_ENV_TERM
-static void jbwm_exec(const char * command)
+void jbwm_exec(const char * command)
 {
 	if (fork() == 0) {
 		execl("/bin/sh", "sh", "-c", command, NULL);
