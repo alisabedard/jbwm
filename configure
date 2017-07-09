@@ -58,9 +58,6 @@ esac
 if $DEBUG; then
 	echo 'include debug.mk' >> $CF
 fi
-if $EWMH; then
-	echo 'include ewmh.mk' >> $CF
-fi
 if $SHAPE; then
 	echo 'include shape.mk' >> $CF
 fi

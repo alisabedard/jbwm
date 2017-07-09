@@ -18,7 +18,6 @@
 #include "select.h"
 #include "shape.h" // for jbwm_new_shaped_client
 #include "util.h"
-#ifdef JBWM_USE_EWMH
 static uint8_t wm_desktop(Display * d, const Window w, uint8_t vdesk)
 {
 	uint16_t n;
@@ -34,15 +33,9 @@ static uint8_t wm_desktop(Display * d, const Window w, uint8_t vdesk)
 	JBWM_LOG("wm_desktop(w: %d): vdesk is %d\n", (int) w, vdesk);
 	return vdesk;
 }
-#endif//JBWM_USE_EWMH
-__attribute__((nonnull))
-static void init_properties(struct JBWMClient * restrict c)
+static inline uint8_t get_vdesk(struct JBWMClient * restrict c)
 {
-	jbwm_handle_mwm_hints(c);
-	c->vdesk = jbwm_get_screen(c)->vdesk;
-#ifdef JBWM_USE_EWMH
-	c->vdesk = wm_desktop(c->display, c->window, c->vdesk);
-#endif//JBWM_USE_EWMH
+	return wm_desktop(c->display, c->window, jbwm_get_screen(c)->vdesk);
 }
 __attribute__((nonnull))
 static Window get_parent(struct JBWMClient * restrict c)
@@ -82,7 +75,7 @@ static struct JBWMClient * get_JBWMClient(const Window w,
 	c->opt.border = 1;
 	return c;
 }
-// Grab input and setup JBWM_USE_EWMH for client window
+// Grab input and setup ewmh hints for client window
 static void do_grabs(Display * d, const Window w)
 {
 	// jbwm_ewmh_set_allowed_actions must come before jbwm_grab_buttons.
@@ -100,7 +93,8 @@ void jbwm_new_client(Display * d, struct JBWMScreen * s, const Window w)
 	jbwm_prepend_client(c);
 	do_grabs(d, w);
 	jbwm_set_client_geometry(c);
-	init_properties(c);
+	jbwm_handle_mwm_hints(c);
+	c->vdesk = get_vdesk(c);
 	reparent(c);
 	jbwm_restore_client(c);
 	jbwm_select_client(c);

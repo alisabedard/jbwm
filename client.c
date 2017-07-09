@@ -86,13 +86,10 @@ void jbwm_toggle_sticky(struct JBWMClient * restrict c)
 	c->opt.sticky ^= true; // toggle
 	jbwm_select_client(c);
 	jbwm_update_title_bar(c);
-#ifdef JBWM_USE_EWMH
 	(c->opt.sticky ? jbwm_ewmh_add_state : jbwm_ewmh_remove_state)
 		(c->display, c->window,jbwm_ewmh_get_atom(
 		  JBWM_EWMH_WM_STATE_STICKY));
-#endif//JBWM_USE_EWMH
 }
-#ifdef JBWM_USE_EWMH
 static void delete_ewmh_properties(Display * d,
 	const Window w)
 {
@@ -100,9 +97,6 @@ static void delete_ewmh_properties(Display * d,
 	XDeleteProperty(d, w, jbwm_ewmh_get_atom(JBWM_EWMH_WM_STATE));
 	XDeleteProperty(d, w, jbwm_ewmh_get_atom(JBWM_EWMH_WM_DESKTOP));
 }
-#else//!JBWM_USE_EWMH
-#define delete_ewmh_properties(d, w)
-#endif//JBWM_USE_EWMH
 static void
 free_window(struct JBWMClient * restrict c)
 {

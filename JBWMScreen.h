@@ -12,9 +12,7 @@ struct JBWMScreen {
 	Screen * xlib;
 	XftDraw * xft;
 	XftColor font_color;
-#ifdef JBWM_USE_EWMH
 	Window supporting;
-#endif//JBWM_USE_EWMH
 	struct JBWMPixels pixels;
 	uint8_t id, vdesk;
 	const int8_t __pad[2];

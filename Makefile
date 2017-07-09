@@ -16,7 +16,8 @@ jbwm_cflags+=-D_XOPEN_SOURCE=700 -std=c99
 objects+=client.o events.o jbwm.o new.o screen.o mwm.o wm_state.o drag.o
 objects+=button_event.o keys.o util.o max.o select.o snap.o display.o
 objects+=exec.o main.o move_resize.o key_masks.o key_event.o vdesk.o
-objects+=geometry.o command_line.o
+objects+=geometry.o command_line.o ewmh.o ewmh_state.o ewmh_client.o
+objects+=ewmh_wm_state.o
 $(exe): $(objects)
 	$(CC) ${CFLAGS} ${jbwm_cflags} ${jbwm_ldflags} \
 		$(LDFLAGS) $(objects) -o $@

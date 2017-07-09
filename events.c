@@ -126,7 +126,6 @@ void jbwm_events_loop(Display * d)
 				jbwm_update_title_bar(c);
 			break;
 #endif//JBWM_USE_TITLE_BAR
-#ifdef JBWM_USE_EWMH
 		case CreateNotify:
 			JBWM_LOG("CreateNotify");
 			if (ev.xcreatewindow.override_redirect) // internal
@@ -137,7 +136,6 @@ void jbwm_events_loop(Display * d)
 			if (!c) // only bother if event was not on a client
 				jbwm_ewmh_update_client_list(d);
 			break;
-#endif//JBWM_USE_EWMH
 		case UnmapNotify:
 			JBWM_LOG("UnmapNotify");
 			if (c)
@@ -154,11 +152,9 @@ void jbwm_events_loop(Display * d)
 		case ColormapNotify:
 			handle_colormap_notify(c, &ev.xcolormap);
 			break;
-#ifdef JBWM_USE_EWMH
 		case ClientMessage:
 			jbwm_ewmh_handle_client_message(&ev.xclient, c);
 			break;
-#endif//JBWM_USE_EWMH
 #ifdef DEBUG
 		default:
 			JBWM_LOG("Unhandled event %d", ev.type);
