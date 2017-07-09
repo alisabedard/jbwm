@@ -120,12 +120,10 @@ void jbwm_events_loop(Display * d)
 			if (c && ev.xcrossing.window == c->parent)
 				jbwm_select_client(c);
 			break;
-#ifdef JBWM_USE_TITLE_BAR
 		case Expose:
 			if (c && !ev.xexpose.count)
 				jbwm_update_title_bar(c);
 			break;
-#endif//JBWM_USE_TITLE_BAR
 		case CreateNotify:
 			JBWM_LOG("CreateNotify");
 			if (ev.xcreatewindow.override_redirect) // internal

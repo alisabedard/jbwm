@@ -10,14 +10,17 @@ distname=$(exe)-$(version)
 PREFIX=/usr
 # Note that $(DESTDIR) is used by the Debian build process.
 dest=$(DESTDIR)$(PREFIX)
-jbwm_ldflags+=-lX11 
 jbwm_cflags+=-DVERSION=\"$(version)\" $(DEBIAN)
 jbwm_cflags+=-D_XOPEN_SOURCE=700 -std=c99
+# Titlebar Xft support:
+jbwm_cflags+=`pkg-config --cflags xft`
+jbwm_ldflags+=`pkg-config --libs xft`
+jbwm_ldflags+=-lX11 -lXext
 objects+=client.o events.o jbwm.o new.o screen.o mwm.o wm_state.o drag.o
 objects+=button_event.o keys.o util.o max.o select.o snap.o display.o
 objects+=exec.o main.o move_resize.o key_masks.o key_event.o vdesk.o
 objects+=geometry.o command_line.o ewmh.o ewmh_state.o ewmh_client.o
-objects+=ewmh_wm_state.o
+objects+=ewmh_wm_state.o title_bar.o font.o shape.o
 $(exe): $(objects)
 	$(CC) ${CFLAGS} ${jbwm_cflags} ${jbwm_ldflags} \
 		$(LDFLAGS) $(objects) -o $@

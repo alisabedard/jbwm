@@ -27,13 +27,11 @@ static void allocate_colors(Display * d, struct JBWMScreen * restrict s)
 	PIX(bg, ENV(BG));
 	PIX(fc, ENV(FC));
 	PIX(fg, ENV(FG));
-#ifdef JBWM_USE_TITLE_BAR
 	PIX(close, ENV(CLOSE));
 	PIX(resize, ENV(RESIZE));
 	PIX(shade, ENV(SHADE));
 	PIX(stick, ENV(STICK));
 	allocate_xft_color(d, s);
-#endif//JBWM_USE_TITLE_BAR
 #undef PIX
 }
 static bool check_redirect(Display * d, const Window w)
@@ -128,9 +126,7 @@ void jbwm_set_defaults(void)
 {
 #define SETENV(i) setenv(ENV(i), JBWM_DEF_##i, 0)
 	SETENV(FG); SETENV(FC); SETENV(BG); SETENV(TERM);
-#ifdef JBWM_USE_TITLE_BAR
 	SETENV(CLOSE); SETENV(RESIZE); SETENV(SHADE);
 	SETENV(STICK); SETENV(FONT);
-#endif//JBWM_USE_TITLE_BAR
 #undef SETENV
 }

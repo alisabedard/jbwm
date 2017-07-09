@@ -63,11 +63,7 @@ void jbwm_set_client_vdesk(struct JBWMClient * restrict c,
  *  future tests.  */
 static inline bool matches(struct JBWMClient * restrict i, const Window w)
 {
-#ifdef JBWM_USE_TITLE_BAR
 	return i->parent == w || i->window == w || i->tb.win == w;
-#else//!JBWM_USE_TITLE_BAR
-	return i->parent == w || i->window == w;
-#endif//JBWM_USE_TITLE_BAR
 }
 __attribute__((pure))
 static struct JBWMClient * search_client_for_window(

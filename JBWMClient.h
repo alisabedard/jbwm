@@ -12,9 +12,7 @@ struct JBWMScreen;
 struct JBWMClient {
 	struct JBWMClient * next;
 	Display * display;
-#ifdef JBWM_USE_TITLE_BAR
 	struct JBWMClientTitlebar tb;
-#endif//JBWM_USE_TITLE_BAR
 	Colormap cmap;
 	Window window, parent;
 	struct JBWMClientOptions opt;

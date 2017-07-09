@@ -8,20 +8,12 @@ echo "LDFLAGS=${LDFLAGS}" >> $CF
 echo "DESTDIR=${DESTDIR}" >> $CF
 echo "PREFIX=${PREFIX}" >> $CF
 DEBUG=false
-EWMH=true
-SHAPE=true
-TBAR=true
-while getopts 'adestx' opt; do
+while getopts 'd' opt; do
 	case $opt in
-	a) EWMH=false SHAPE=false TBAR=false ;;
 	d) DEBUG=true ;;
-	e) EWMH=false ;;
-	s) SHAPE=false ;;
-	t) TBAR=false ;;
-	?) for line in '-a disable all' \
-		'-d enable debugging' '-e disable EWMH' \
-		'-s disable SHAPE' '-t disable title bars'; \
-	do echo $line; done ;;
+	?) for line in '-d enable debugging' \
+		'-? show usage'; \
+		do echo $line; done ;;
 	esac
 done
 case $OS in
@@ -57,10 +49,4 @@ case $OS in
 esac
 if $DEBUG; then
 	echo 'include debug.mk' >> $CF
-fi
-if $SHAPE; then
-	echo 'include shape.mk' >> $CF
-fi
-if $TBAR; then
-	echo 'include title_bar.mk' >> $CF
 fi
