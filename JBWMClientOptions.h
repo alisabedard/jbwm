@@ -10,7 +10,7 @@ struct JBWMClientOptions {
 	bool max_vert : 1;
 	bool no_close : 1;
 	bool no_max : 1;
-	bool no_min : 1;
+	bool no_shade : 1;
 	bool no_move : 1;
 	bool no_resize : 1;
 	bool no_title_bar : 1;

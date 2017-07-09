@@ -13,7 +13,7 @@ static void process_flags(struct JBWMClient * c)
 {
 	struct JBWMClientOptions * o = &c->opt;
 	if (o->tearoff) {
-		o->no_resize = o->no_min = o->no_max = o->no_title_bar = true;
+		o->no_resize = o->no_shade = o->no_max = o->no_title_bar = true;
 		o->border = 0;
 	}
 }
@@ -30,7 +30,7 @@ static void do_functions(struct JBWMClientOptions * o,
 		o->no_resize = true;
 #endif//JBWM_ENABLE_NO_RESIZE_HINT
 	if (!(f & MWM_FUNC_MINIMIZE))
-		o->no_min = true;
+		o->no_shade = true;
 	if (!(f & MWM_FUNC_CLOSE))
 		o->no_close = true;
 #endif//JBWM_NO_QT_FIX
@@ -41,7 +41,7 @@ static void do_functions(struct JBWMClientOptions * o,
 	if (!(f & MWM_FUNC_MOVE))
 		o->no_move = true;
 	JBWM_LOG("MWM_HINTS_FUNCTIONS\topts: %d, %d, %d, %d, %d",
-		o->no_resize, o->no_close, o->no_min, o->no_max,
+		o->no_resize, o->no_close, o->no_shade, o->no_max,
 		o->no_move);
 }
 static void do_decorations(struct JBWMClientOptions * o,
@@ -58,10 +58,7 @@ static void do_decorations(struct JBWMClientOptions * o,
 		JBWM_LOG("decor close");
 		o->no_close = false;
 	}
-	if (f & MWM_DECOR_MINIMIZE) {
-		JBWM_LOG("decor min");
-		o->no_min = false;
-	}
+	o->no_shade = !(f & MWM_DECOR_MINIMIZE);
 #ifdef JBWM_ENABLE_TITLE_BAR_HINT
 	if (f & MWM_DECOR_TITLE) {
 		JBWM_LOG("decor title_bar");

@@ -22,7 +22,7 @@ static void handle_title_bar_button(XButtonEvent * e,
 		jbwm_send_wm_delete(c);
 	else if (e->subwindow == c->tb.resize && !o->no_resize)
 		jbwm_drag(c, !c->opt.no_resize);
-	else if (e->subwindow == c->tb.shade && !c->opt.no_min)
+	else if (e->subwindow == c->tb.shade && !o->no_shade)
 		jbwm_toggle_shade(c);
 	else if (e->subwindow == c->tb.stick)
 		jbwm_toggle_sticky(c);

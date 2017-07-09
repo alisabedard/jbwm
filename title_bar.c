@@ -18,7 +18,7 @@
 void jbwm_toggle_shade(struct JBWMClient * restrict c)
 {
 	// Honor !MJBWM_EWMH_WM_FUNC_MINIMIZE
-	if (c->opt.no_min || c->opt.fullscreen)
+	if (c->opt.no_shade || c->opt.fullscreen)
 		return;
 	const bool s = c->opt.shaded = !c->opt.shaded;
 	int8_t state = 0;
@@ -63,7 +63,7 @@ static void add_buttons(struct JBWMClient * restrict c,
 	Display * d = c->display;
 	c->tb.close = o->no_close ? 0 : get_win(d, t, p->close);
 	c->tb.resize = o->no_resize ? 0: get_win(d, t, p->resize);
-	c->tb.shade = o->no_min ? 0 : get_win(d, t, p->shade);
+	c->tb.shade = o->no_shade ? 0 : get_win(d, t, p->shade);
 	c->tb.stick = get_win(d, t, p->stick);
 }
 static void configure_title_bar(Display * d, const Window t)
