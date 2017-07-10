@@ -17,6 +17,8 @@
 #include "title_bar.h"
 #include "util.h"
 #include "wm_state.h"
+// Set log level for events
+#define JBWM_LOG_EVENTS 5
 static bool events_need_cleanup;
 static struct JBWMScreen * get_screen(const Window root, const int i)
 {
@@ -43,7 +45,9 @@ static void handle_property_change(XPropertyEvent * e,
 		jbwm_update_title_bar(c);
 	else {
 		Display * d = e->display;
+#if JBWM_LOG_EVENTS > 3
 		jbwm_print_atom(d, e->atom, __FILE__, __LINE__);
+#endif//JBWM_LOG_EVENTS > 3
 		if (e->atom == jbwm_get_wm_state(d))
 			jbwm_move_resize(c);
 	}
@@ -67,7 +71,7 @@ static void handle_map_request(XMapRequestEvent * e)
 	if (e->serial == serial)
 		return;
 	serial = e->serial;
-	JBWM_LOG("MapRequest, send_event:%d", e->send_event);
+	JBWM_LOG("handle_map_request(), send_event:%d", e->send_event);
 	jbwm_new_client(e->display, get_screen(e->parent, 0), e->window);
 }
 static inline void mark_removal(struct JBWMClient * restrict c)
@@ -78,7 +82,6 @@ static inline void mark_removal(struct JBWMClient * restrict c)
 static void handle_colormap_notify(struct JBWMClient * restrict c,
 	XColormapEvent * e)
 {
-	JBWM_LOG("ColormapNotify");
 	if (c && e->new)
 		XInstallColormap(e->display, c->cmap = e->colormap);
 }
@@ -89,6 +92,12 @@ void jbwm_events_loop(Display * d)
 		XNextEvent(d, &ev);
 		struct JBWMClient * c = jbwm_get_client(ev.xany.window);
 		switch (ev.type) {
+#if defined(JBWM_LOG_EVENTS) && JBWM_LOG_EVENTS > 0
+#define ELOG(level, ename) if (JBWM_LOG_EVENTS >= level) {\
+	JBWM_LOG("\tXEVENT: %s", ename);}
+#else//!JBWM_LOG_EVENTS
+#define ELOG(level, ename)
+#endif//JBWM_LOG_EVENTS
 		case ButtonRelease:
 		case KeyRelease:
 		case MapNotify:
@@ -98,61 +107,70 @@ void jbwm_events_loop(Display * d)
 			// ignore
 			break;
 		case ConfigureNotify:
+			ELOG(7, "ConfigureNotify");
 			if (c && !ev.xconfigure.override_redirect)
 				jbwm_move_resize(c);
 			break;
 		case ConfigureRequest:
+			ELOG(4, "ConfigureRequest");
 			handle_configure_request(&ev.xconfigurerequest);
 			XSync(d, false);
 			if (c)
 				jbwm_move_resize(c);
 			break;
 		case KeyPress:
-			JBWM_LOG("KeyPress");
+			ELOG(3, "KeyPress");
 			jbwm_handle_key_event(&ev.xkey);
 			break;
 		case ButtonPress:
-			JBWM_LOG("ButtonPress");
+			ELOG(4, "ButtonPress");
 			if(c)
 				jbwm_handle_button_event(&ev.xbutton, c);
 			break;
 		case EnterNotify:
+			ELOG(6, "EnterNotify");
 			if (c && ev.xcrossing.window == c->parent)
 				jbwm_select_client(c);
 			break;
 		case Expose:
+			ELOG(9, "Expose");
 			if (c && !ev.xexpose.count)
 				jbwm_update_title_bar(c);
 			break;
 		case CreateNotify:
-			JBWM_LOG("CreateNotify");
+			ELOG(3, "CreateNotify")
 			if (ev.xcreatewindow.override_redirect) // internal
 				jbwm_ewmh_update_client_list(d);
 			break;
 		case DestroyNotify:
-			JBWM_LOG("DestroyNotify");
+			ELOG(3, "DestroyNotify");
 			if (!c) // only bother if event was not on a client
 				jbwm_ewmh_update_client_list(d);
 			break;
 		case UnmapNotify:
-			JBWM_LOG("UnmapNotify");
+			ELOG(3, "UnmapNotify");
 			if (c)
 				mark_removal(c);
 			break;
 		case MapRequest:
+			ELOG(3, "MapRequest");
 			if (!c)
 				handle_map_request(&ev.xmaprequest);
 			break;
 		case PropertyNotify:
+			ELOG(8, "PropertyNotify");
 			if (c)
 				handle_property_change(&ev.xproperty, c);
 			break;
 		case ColormapNotify:
+			ELOG(5, "ColormapNotify");
 			handle_colormap_notify(c, &ev.xcolormap);
 			break;
 		case ClientMessage:
+			ELOG(3, "ClientMessage");
 			jbwm_ewmh_handle_client_message(&ev.xclient, c);
 			break;
+#undef ELOG
 #ifdef DEBUG
 		default:
 			JBWM_LOG("Unhandled event %d", ev.type);
