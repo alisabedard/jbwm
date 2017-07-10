@@ -14,29 +14,34 @@
 #include "screen.h"
 #include "util.h"
 #include "wm_state.h"
+int8_t set_shaded(struct JBWMClient * restrict c)
+{
+	c->old_size.height = c->size.height;
+	c->size.height = -1;
+	return IconicState;
+}
+int8_t set_not_shaded(struct JBWMClient * restrict c)
+{
+	c->size.height = c->old_size.height;
+	return NormalState;
+}
+static bool can_shade(struct JBWMClient * restrict c)
+{
+	// Honor mwm minimize hint.  Abort if fullscreen.
+	return !c->opt.no_shade && !c->opt.fullscreen;
+}
 // This implements window shading, a substitute for iconification.
 void jbwm_toggle_shade(struct JBWMClient * restrict c)
 {
-	// Honor !MJBWM_EWMH_WM_FUNC_MINIMIZE
-	if (c->opt.no_shade || c->opt.fullscreen)
+	if (!can_shade(c))
 		return;
 	const bool s = c->opt.shaded = !c->opt.shaded;
-	int8_t state = 0;
-	void (*f)(Display *, Window, Atom);
-	if (s) {
-		c->old_size.height = c->size.height;
-		c->size.height = -1;
-		state = IconicState;
-		f = &jbwm_ewmh_add_state;
-	} else {
-		c->size.height = c->old_size.height;
-		state = NormalState;
-		f = &jbwm_ewmh_remove_state;
-	}
+	const int8_t state = (s ? set_shaded : set_not_shaded)(c);
+	(state == IconicState ? jbwm_ewmh_add_state : jbwm_ewmh_remove_state)
+		(c->display, c->window,
+		 jbwm_ewmh_get_atom(JBWM_EWMH_WM_STATE_SHADED));
 	jbwm_move_resize(c);
 	jbwm_set_wm_state(c, state);
-	f(c->display, c->window,
-		jbwm_ewmh_get_atom(JBWM_EWMH_WM_STATE_SHADED));
 }
 static uint16_t mv(Display * d, const Window w, uint16_t x)
 {
@@ -99,12 +104,12 @@ static inline char * jbwm_get_title(Display * d, const Window w)
 static void draw_title(struct JBWMClient * restrict c)
 {
 	char * name = jbwm_get_title(c->display, c->window);
-	if(!name)
-		return; // No title could be loaded, abort
-	const int16_t p[] = {jbwm_get_font_height() + 4,
-		jbwm_get_font_ascent()};
-	draw_xft(c, p, name, strlen(name));
-	XFree(name);
+	if (name) {
+		const int16_t p[] = {jbwm_get_font_height() + 4,
+			jbwm_get_font_ascent()};
+		draw_xft(c, p, name, strlen(name));
+		XFree(name);
+	}
 }
 static void remove_title_bar(struct JBWMClient * restrict c)
 {
