@@ -18,6 +18,5 @@ int main(int argc, char **argv)
 	struct JBWMScreen s[ScreenCount(d)]; // remains in scope till exit.
 	jbwm_set_screens(s);
 	jbwm_init_screens(d, ScreenCount(d) - 1); // -1 for index
-	jbwm_events_loop(d);
-	return 0;
+	jbwm_events_loop(d); // does not return
 }
