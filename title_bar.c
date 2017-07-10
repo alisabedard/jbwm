@@ -49,11 +49,13 @@ static uint16_t mv(Display * d, const Window w, uint16_t x)
 		XMoveWindow(d, w, x -= jbwm_get_font_height(), 0);
 	return x;
 }
-static void move_buttons(Display * d,
+// Return of width allows chain-calling
+static uint16_t move_buttons(Display * d,
 	struct JBWMClientTitlebar * t,
 	const uint16_t width)
 {
 	mv(d, t->stick, mv(d, t->shade, mv(d, t->resize, width)));
+	return width;
 }
 static Window get_win(Display * d, const Window p,
 	const jbwm_pixel_t bg)
@@ -128,17 +130,11 @@ void jbwm_update_title_bar(struct JBWMClient * restrict c)
 	}
 	if (!w)
 		w = new_title_bar(c);
-	/* Expand/Contract the title bar width as necessary:  */
-	{ // * d scope
-		Display * d = c->display;
-		{ // width scope
-			const uint16_t width = c->size.width;
-			XResizeWindow(c->display, w, width,
-				jbwm_get_font_height());
-			move_buttons(d, &c->tb, width);
-		}
-		XClearWindow(d, w);
-	}
+	// Expand/Contract the title bar width as necessary:
+	Display * d = c->display;
+	XResizeWindow(d, w, move_buttons(d, &c->tb, c->size.width),
+		jbwm_get_font_height());
+	XClearWindow(d, w);
 	draw_title(c);
 	if (c->opt.no_title_bar)
 		remove_title_bar(c);
