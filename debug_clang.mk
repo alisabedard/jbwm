@@ -10,3 +10,6 @@ jbwm_cflags+=-Wpadded
 jbwm_cflags+=-Wredundant-decls -Wpointer-sign
 jbwm_cflags+=-fstrict-aliasing -Wstrict-aliasing=2
 jbwm_cflags+=-Wformat=2
+jbwm_cflags+=-Weverything
+jbwm_cflags+=-Wno-shorten-64-to-32 -Wno-conversion -Wno-vla
+jbwm_cflags+=-Wno-switch-enum
