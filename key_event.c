@@ -188,8 +188,10 @@ static void next(void)
 static void cond_client_to_desk(Display * d, struct JBWMClient * c,
 	struct JBWMScreen * s, const uint8_t desktop, const bool mod)
 {
-	mod && c ? jbwm_set_client_vdesk(c, desktop)
-		: jbwm_set_vdesk(d, s, desktop);
+	if (mod && c)
+		jbwm_set_client_vdesk(c, desktop);
+	else
+		jbwm_set_vdesk(d, s, desktop);
 }
 void jbwm_handle_key_event(XKeyEvent * e)
 {
