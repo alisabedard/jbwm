@@ -14,13 +14,13 @@
 #include "screen.h"
 #include "util.h"
 #include "wm_state.h"
-int8_t set_shaded(struct JBWMClient * restrict c)
+static int8_t set_shaded(struct JBWMClient * restrict c)
 {
 	c->old_size.height = c->size.height;
 	c->size.height = -1;
 	return IconicState;
 }
-int8_t set_not_shaded(struct JBWMClient * restrict c)
+static int8_t set_not_shaded(struct JBWMClient * restrict c)
 {
 	c->size.height = c->old_size.height;
 	return NormalState;
