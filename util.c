@@ -25,9 +25,9 @@ jbwm_pixel_t jbwm_get_pixel(Display * dpy,
 {
 	jbwm_pixel_t r;
 	if (name) { // sanitize input to avoid segfault
-		XColor c;
+		XColor c, d;
 		XAllocNamedColor(dpy, DefaultColormap(dpy, screen),
-			name, &c, &(XColor){});
+			name, &c, &d);
 		r = c.pixel;
 	} else
 		r = 0;
