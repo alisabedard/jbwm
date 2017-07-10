@@ -7,9 +7,8 @@
 #include "log.h"
 #include "mwmproto.h"
 #include "util.h"
-static void process_flags(struct JBWMClient * c)
+static void process_flags(struct JBWMClientOptions * restrict o)
 {
-	struct JBWMClientOptions * o = &c->opt;
 	if (o->tearoff) {
 		o->no_resize = o->no_shade = o->no_max
 			= o->no_title_bar = true;
@@ -40,25 +39,26 @@ static Atom get_mwm_hints_atom(Display * d)
 	static Atom a;
 	return a ? a : (a = XInternAtom(d, "_MOTIF_WM_HINTS", false));
 }
-void jbwm_handle_mwm_hints(struct JBWMClient * c)
+void jbwm_handle_mwm_hints(struct JBWMClient * restrict c)
 {
 	Display * d = c->display;
 	const Atom mwm_hints = get_mwm_hints_atom(d);
 	struct JBWMMwm * m = jbwm_get_property(d, c->window,
 		mwm_hints, &(uint16_t){0});
 	if (m) { // property successfully retrieved
+		struct JBWMClientOptions * restrict o = &c->opt;
 		if (!((c->opt.tearoff = m->flags
 			& MWM_HINTS_STATUS && m->status &
 			MWM_TEAROFF_WINDOW))) {
 			// skip the following if tear-off window
 			if (m->flags & MWM_HINTS_FUNCTIONS
 				&& !(m->functions & MWM_FUNC_ALL))
-				do_functions(&c->opt, m->functions);
+				do_functions(o, m->functions);
 			if (m->flags & MWM_HINTS_DECORATIONS
 				&& !(m->decor & MWM_DECOR_ALL))
-				do_decorations(&c->opt, m->decor);
+				do_decorations(o, m->decor);
 		}
 		XFree(m);
-		process_flags(c);
+		process_flags(o);
 	}
 }
