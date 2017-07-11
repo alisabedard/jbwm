@@ -2,9 +2,20 @@
 ; Simple colon-separated database parsing library for C header generation
 ; vim: sw=2
 (define copyright "// Copyright 2017, Jeffrey E. Bedard\n")
+
+
+; Flatten per https://rosettacode.org/wiki/Flatten_a_list#Scheme
+(define flatten
+ (lambda (x)
+  (cond ((null? x) '())
+   ((not (pair? x)) (list x))
+   (else (append (flatten (car x))
+	  (flatten (cdr x)))))))
+
 ; lisp-like operations on colon-separated strings:
 (define get-string-divider
  (lambda (str) (string-find-next-char str #\:)))
+
 
 ; returns original string if not a list
 (define string-car
