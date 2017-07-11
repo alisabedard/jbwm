@@ -17,14 +17,14 @@
 	       (parse i o)))))
 	   (format
 	    (lambda (data out_port)
-	     (if (pair? data)
-	      (let* ((this (car data))
-		     (next (cdr data)))
-	       (if this
-		(let ((key (car this)) (value (cdr this)))
-		 (display (string-append "\tJBWM_KEY_" key
-			   " = XK_" value ",\n") o)
-		 (format next out_port))))))))
+	     (and-let* (((pair? data))
+		(this (car data))
+		(next (cdr data))
+		(key (car this))
+		(value (cdr this)))
+		(display (string-append "\tJBWM_KEY_" key
+		 " = XK_" value ",\n") o)
+		 (format next out_port)))))
 	(begin-include guard o)
 	(display-c-include "<X11/keysym.h>" o)
 	(display "enum JBWMKeys {\n" o)
