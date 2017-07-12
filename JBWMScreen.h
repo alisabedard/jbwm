@@ -4,9 +4,7 @@
 // See README for license and other details.
 #ifndef JBWM_JBWMSCREEN_H
 #define JBWM_JBWMSCREEN_H
-#include <stdint.h>
 #include <X11/Xft/Xft.h>
-#include <X11/Xlib.h>
 #include "JBWMPixels.h"
 struct JBWMScreen {
 	Screen * xlib;
