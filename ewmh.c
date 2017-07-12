@@ -4,9 +4,8 @@
 // See README for license and other details.
 //#undef DEBUG
 #include "ewmh.h"
-#include <X11/Xatom.h>
-#include <string.h>
 #include <unistd.h>
+#include <X11/Xatom.h>
 #include "JBWMAtomIndex.h"
 #include "JBWMClient.h"
 #include "JBWMScreen.h"
