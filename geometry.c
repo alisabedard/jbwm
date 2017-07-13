@@ -34,9 +34,10 @@ static void check_dimensions(struct JBWMRectangle * restrict g,
 	g->height = JB_MIN(g->height, screen.height);
 }
 __attribute__((const))
-static int16_t get_center(const uint16_t wh, const uint16_t swh)
+static int16_t get_center(const int16_t window_size,
+	const int16_t screen_size)
 {
-	return (swh - wh) >> 1;
+	return (screen_size - window_size) >> 1;
 }
 static void center(struct JBWMRectangle * restrict g,
 	const struct JBWMSize s)
