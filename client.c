@@ -114,7 +114,7 @@ void jbwm_client_free(struct JBWMClient * restrict c)
 	jbwm_relink_client_list(c);
 	free(c);
 }
-static void showing(const struct JBWMClient * restrict c,
+static void set_showing(const struct JBWMClient * restrict c,
 	int (* mapping)(Display *, Window),
 	const int8_t wm_state)
 {
@@ -123,9 +123,9 @@ static void showing(const struct JBWMClient * restrict c,
 }
 void jbwm_hide_client(const struct JBWMClient * restrict c)
 {
-	showing(c, XUnmapWindow, IconicState);
+	set_showing(c, XUnmapWindow, IconicState);
 }
 void jbwm_restore_client(const struct JBWMClient * restrict c)
 {
-	showing(c, XMapWindow, NormalState);
+	set_showing(c, XMapWindow, NormalState);
 }
