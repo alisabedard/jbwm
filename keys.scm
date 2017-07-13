@@ -15,14 +15,18 @@
 		    (value (string-cdr line)))
 	       (set! data (cons (cons key value) data))
 	       (parse i o)))))
-	   (format-cell
+	   (format-cell ; function to pass to map
 	    (lambda (datum out_port)
 		(display (string-append "\tJBWM_KEY_" (car datum)
-		 " = XK_" (cdr datum) ",\n") out_port))))
+		 " = XK_" (cdr datum) ",\n") out_port)))
+	   (compare-cell ; function to pass to sort
+	    (lambda (a b) ; compare the keys:
+	     (string<? (car a) (car b)))))
 	(begin-include guard o)
 	(display-c-include "<X11/keysym.h>" o)
 	(display "enum JBWMKeys {\n" o)
 	(parse i o)
+	(set! data (sort data compare-cell))
 	(display data)
 	(map (lambda (n) (format-cell n o)) data)
 	(display "};\n" o)
