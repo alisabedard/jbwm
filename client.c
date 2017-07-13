@@ -13,6 +13,7 @@
 #include "title_bar.h"
 #include "vdesk.h"
 #include "wm_state.h"
+#define EWMH_ATOM(suffix) jbwm_ewmh_get_atom(JBWM_EWMH_##suffix)
 static struct JBWMClient * current, * head;
 struct JBWMClient * jbwm_get_current_client(void)
 {
@@ -83,34 +84,21 @@ void jbwm_toggle_sticky(struct JBWMClient * restrict c)
 	jbwm_select_client(c);
 	jbwm_update_title_bar(c);
 	(c->opt.sticky ? jbwm_ewmh_add_state : jbwm_ewmh_remove_state)
-		(c->display, c->window,jbwm_ewmh_get_atom(
-		  JBWM_EWMH_WM_STATE_STICKY));
-}
-static void delete_ewmh_properties(Display * d,
-	const Window w)
-{
-	// Per ICCCM + wm-spec
-	XDeleteProperty(d, w, jbwm_ewmh_get_atom(JBWM_EWMH_WM_STATE));
-	XDeleteProperty(d, w, jbwm_ewmh_get_atom(JBWM_EWMH_WM_DESKTOP));
-}
-static void
-free_window(struct JBWMClient * restrict c)
-{
-	const Window w = c->window;
-	Display * d = c->display;
-	delete_ewmh_properties(d, w);
-	{ // * p scope
-		struct JBWMRectangle * restrict p = &c->size;
-		XReparentWindow(d, w, jbwm_get_client_root(c), p->x, p->y);
-	}
-	XRemoveFromSaveSet(d, w);
+		(c->display, c->window, EWMH_ATOM(WM_STATE_STICKY));
 }
 // Free client and destroy its windows and properties.
 void jbwm_client_free(struct JBWMClient * restrict c)
 {
-	free_window(c);
-	if(c->parent)
-		XDestroyWindow(c->display, c->parent);
+	const Window w = c->window, parent = c->parent;
+	const struct JBWMRectangle * restrict p = &c->size;
+	Display * d = c->display;
+	// Per ICCCM + wm-spec
+	XDeleteProperty(d, w, EWMH_ATOM(WM_STATE));
+	XDeleteProperty(d, w, EWMH_ATOM(WM_DESKTOP));
+	XReparentWindow(d, w, jbwm_get_client_root(c), p->x, p->y);
+	XRemoveFromSaveSet(d, w);
+	if(parent)
+		XDestroyWindow(d, parent);
 	jbwm_relink_client_list(c);
 	free(c);
 }
