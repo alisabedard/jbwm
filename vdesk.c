@@ -15,17 +15,17 @@
 static void check_visibility(const struct JBWMScreen * s, struct
 	JBWMClient * restrict c, const uint8_t v)
 {
-	if (!c)
-		return;
-	if (c->screen == s->id) {
-		if (c->vdesk == v || c->opt.sticky) {
-			// allow moving windows by sticking
-			c->vdesk = v;
-			jbwm_restore_client(c);
-		} else
-			jbwm_hide_client(c);
+	if (c) {
+		if (c->screen == s->id) {
+			if (c->vdesk == v || c->opt.sticky) {
+				// allow moving windows by sticking
+				c->vdesk = v;
+				jbwm_restore_client(c);
+			} else
+				jbwm_hide_client(c);
+		}
+		check_visibility(s, c->next, v);
 	}
-	check_visibility(s, c->next, v);
 }
 uint8_t jbwm_set_vdesk(Display * d, struct JBWMScreen * s, uint8_t v)
 {
