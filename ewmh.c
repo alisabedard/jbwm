@@ -160,7 +160,7 @@ void jbwm_ewmh_init_screen(Display * d, struct JBWMScreen * s)
 	if (!jbwm_ewmh[0])
 		jbwm_ewmh_init(d);
 	static Window r;
-	r = RootWindow(d, s->id);
+	r = RootWindowOfScreen(s->xlib);
 	set_property(d, r, JBWM_EWMH_SUPPORTED, XA_ATOM, jbwm_ewmh,
 		JBWM_EWMH_ATOMS_COUNT);
 	set_name(d, r);
