@@ -187,11 +187,9 @@ static void init_desktops(Display * d, struct JBWMScreen * s)
 {
 	struct PropertyData p = {d, NULL, RootWindowOfScreen(s->xlib),
 		0, 2, XA_CARDINAL};
-	JBWM_LOG("SIZEOF PROPERTYDATA IS %lu", sizeof (struct PropertyData));
-	JBWM_LOG("SIZEOF JBWMEWMH IS %lu", sizeof (jbwm_ewmh));
 	set_desktop_geometry(&p, s->id);
 	set_desktop_viewport(&p);
-	p.size = 1;
+	p.size = 1; // single dimension data follows
 	set_number_of_desktops(&p);
 	set_current_desktop(&p, &s->vdesk);
 	set_virtual_roots(&p);
