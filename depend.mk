@@ -17,12 +17,12 @@ events.o: events.c events.h button_event.h client.h ewmh.h ewmh_client.h \
 ewmh.o: ewmh.c ewmh.h JBWMAtomIndex.h JBWMClient.h JBWMClientOptions.h \
  JBWMClientTitlebar.h JBWMRectangle.h JBWMScreen.h JBWMPixels.h pixel_t.h \
  client.h config.h font.h geometry.h JBWMSize.h log.h macros.h util.h \
- ewmh_atoms.c
-ewmh_atoms.o: ewmh_atoms.c
+ ewmh_init.c
 ewmh_client.o: ewmh_client.c ewmh_client.h JBWMAtomIndex.h client.h \
  config.h drag.h ewmh.h ewmh_wm_state.h screen.h JBWMClient.h \
  JBWMClientOptions.h JBWMClientTitlebar.h JBWMRectangle.h JBWMScreen.h \
  JBWMPixels.h pixel_t.h select.h util.h vdesk.h wm_state.h
+ewmh_init.o: ewmh_init.c
 ewmh_state.o: ewmh_state.c ewmh_state.h JBWMAtomIndex.h client.h drag.h \
  ewmh.h jbwm.h log.h max.h screen.h JBWMClient.h JBWMClientOptions.h \
  JBWMClientTitlebar.h JBWMRectangle.h JBWMScreen.h JBWMPixels.h pixel_t.h \
@@ -78,7 +78,7 @@ title_bar.o: title_bar.c title_bar.h JBWMAtomIndex.h config.h ewmh.h \
 util.o: util.c util.h pixel_t.h
 vdesk.o: vdesk.c vdesk.h JBWMAtomIndex.h JBWMClient.h JBWMClientOptions.h \
  JBWMClientTitlebar.h JBWMRectangle.h JBWMScreen.h JBWMPixels.h pixel_t.h \
- client.h config.h ewmh.h log.h util.h
+ client.h config.h ewmh.h util.h
 wm_state.o: wm_state.c wm_state.h JBWMClient.h JBWMClientOptions.h \
  JBWMClientTitlebar.h JBWMRectangle.h JBWMAtomIndex.h ewmh.h ewmh_state.h \
  log.h util.h pixel_t.h

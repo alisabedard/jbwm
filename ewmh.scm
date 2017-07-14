@@ -24,32 +24,36 @@
     (map (lambda (cat)
 	  (print-each function cat out_port))
      (list net wm wm-action wm-state))))
-  ; Generate "ewmh_atoms.c"
-  (write-ewmh-atoms-c
+  ; Generate "ewmh_init.c"
+  (write-ewmh-init-c
    (lambda ()
-    (let ((outf (open-output-file "ewmh_atoms.c")))
+    (let ((outf (open-output-file "ewmh_init.c")))
      (set-current-output-port! outf)
+     (display "static void jbwm_ewmh_init(Display * d)\n{\n" outf)
      (begin-array-definition "char *" "jbwm_atom_names" outf)
      (print-all print-each-array-element outf)
      (end-c-definition outf)
+     (display (string-append "\tXInternAtoms(d, jbwm_atom_names,"
+	" JBWM_EWMH_ATOMS_COUNT,\n\t\tfalse, jbwm_ewmh);\n}") outf)
      (close-port outf))))
+  ; Generate "ewmh_allowed.c"
   ; Generate "JBWMAtomIndex.h"
-(write-jbwmatomindex-h
- (lambda ()
-  (let ((outf (open-output-file "JBWMAtomIndex.h"))
-	(ig "JBWM_JBWMATOMINDEX"))
-   (set-current-output-port! outf)
-   (begin-include ig outf)
-   (begin-enum-definition "JBWMAtomIndex" outf)
-   (set! master-prefix "JBWM_EWMH_")
-   (print-all print-each-enum outf)
-   (display "\t// The following entry must be last:\n")
-   (print-enum-line "" "ATOMS_COUNT" outf)
-   (end-c-definition outf)
-   (end-include ig outf)
-   (close-port outf)))))
+  (write-jbwmatomindex-h
+   (lambda ()
+    (let ((outf (open-output-file "JBWMAtomIndex.h"))
+	  (ig "JBWM_JBWMATOMINDEX"))
+     (set-current-output-port! outf)
+     (begin-include ig outf)
+     (begin-enum-definition "JBWMAtomIndex" outf)
+     (set! master-prefix "JBWM_EWMH_")
+     (print-all print-each-enum outf)
+     (display "\t// The following entry must be last:\n")
+     (print-enum-line "" "ATOMS_COUNT" outf)
+     (end-c-definition outf)
+     (end-include ig outf)
+     (close-port outf)))))
   ; Execution:
-(write-ewmh-atoms-c)
-(write-jbwmatomindex-h)
-  ; Restore normal output:
-(set-current-output-port! console-i/o-port))
+  (write-ewmh-init-c)
+  (write-jbwmatomindex-h)
+    ; Restore normal output:
+  (set-current-output-port! console-i/o-port))

@@ -21,12 +21,15 @@
 #define ACTION(a) EWMHWM(ACTION_##a)
 static Atom jbwm_ewmh[JBWM_EWMH_ATOMS_COUNT];
 static bool jbwm_ewmh_init_done;
+#include "ewmh_init.c"
+#if 0
 static void jbwm_ewmh_init(Display * d)
 {
 #include "ewmh_atoms.c"
 	XInternAtoms(d, jbwm_atom_names,
 		JBWM_EWMH_ATOMS_COUNT, false, jbwm_ewmh);
 }
+#endif
 static void check_ewmh_init(Display * d)
 {
 	if (!jbwm_ewmh_init_done) {
