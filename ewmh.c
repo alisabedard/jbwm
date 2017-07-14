@@ -17,19 +17,9 @@
 #include "macros.h"
 #include "util.h"
 #define EWMH(a_name) JBWM_EWMH_##a_name
-#define EWMHWM(a) jbwm_ewmh[EWMH(WM_##a)]
-#define ACTION(a) EWMHWM(ACTION_##a)
 static Atom jbwm_ewmh[JBWM_EWMH_ATOMS_COUNT];
 static bool jbwm_ewmh_init_done;
 #include "ewmh_init.c"
-#if 0
-static void jbwm_ewmh_init(Display * d)
-{
-#include "ewmh_atoms.c"
-	XInternAtoms(d, jbwm_atom_names,
-		JBWM_EWMH_ATOMS_COUNT, false, jbwm_ewmh);
-}
-#endif
 static void check_ewmh_init(Display * d)
 {
 	if (!jbwm_ewmh_init_done) {
@@ -137,12 +127,7 @@ void jbwm_ewmh_set_allowed_actions(Display * d,
 	const Window w)
 {
 	check_ewmh_init(d);
-	Atom a[] = {
-		EWMHWM(ALLOWED_ACTIONS),
-		ACTION(MOVE), ACTION(RESIZE), ACTION(CLOSE), ACTION(SHADE),
-		ACTION(FULLSCREEN), ACTION(CHANGE_DESKTOP), ACTION(ABOVE),
-		ACTION(BELOW), ACTION(MAXIMIZE_HORZ), ACTION(MAXIMIZE_VERT)
-	};
+#include "ewmh_allowed.c"
 	jbwm_set_property(d, w, a[0], XA_ATOM, &a, sizeof(a) / sizeof(Atom));
 }
 static void set_desktop_geometry(struct PropertyData * restrict p,

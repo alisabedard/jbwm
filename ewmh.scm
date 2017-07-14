@@ -37,17 +37,26 @@
 	" JBWM_EWMH_ATOMS_COUNT,\n\t\tfalse, jbwm_ewmh);\n}") outf)
      (close-port outf))))
   ; Generate "ewmh_allowed.c"
+  (write-jbwm-ewmh-allowed-c
+   (lambda ()
+    (let ((outf (open-output-file "ewmh_allowed.c"))
+	(act (cdr wm-action)))
+	(display "\tAtom a[] = {\n" outf)
+	(map (lambda (x) (display (string-append "\t\tjbwm_ewmh["
+		"JBWM_EWMH_WM_ACTION_" x "],\n") outf)) act)
+	(display "\t};\n" outf)
+	(close-port outf))))
   ; Generate "JBWMAtomIndex.h"
   (write-jbwmatomindex-h
    (lambda ()
     (let ((outf (open-output-file "JBWMAtomIndex.h"))
 	  (ig "JBWM_JBWMATOMINDEX"))
-     (set-current-output-port! outf)
+ ;    (set-current-output-port! outf)
      (begin-include ig outf)
      (begin-enum-definition "JBWMAtomIndex" outf)
      (set! master-prefix "JBWM_EWMH_")
      (print-all print-each-enum outf)
-     (display "\t// The following entry must be last:\n")
+     (display "\t// The following entry must be last:\n" outf)
      (print-enum-line "" "ATOMS_COUNT" outf)
      (end-c-definition outf)
      (end-include ig outf)
@@ -55,5 +64,6 @@
   ; Execution:
   (write-ewmh-init-c)
   (write-jbwmatomindex-h)
+  (write-jbwm-ewmh-allowed-c))
     ; Restore normal output:
-  (set-current-output-port! console-i/o-port))
+;k  (set-current-output-port! console-i/o-port))
