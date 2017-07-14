@@ -150,22 +150,24 @@ static void set_desktop_viewport(struct PropertyData * restrict p)
 	p->data = viewport_data;
 	set_property(p);
 }
+static void set_number_of_desktops(struct PropertyData * restrict p)
+{
+	int32_t data = JBWM_MAX_DESKTOPS;
+	p->property = EWMH(NUMBER_OF_DESKTOPS);
+	p->data = &data;
+	set_property(p);
+}
 static void init_desktops(Display * d, struct JBWMScreen * s)
 {
 	struct PropertyData p = {d, NULL, RootWindowOfScreen(s->xlib),
 		0, 2, XA_CARDINAL};
 	set_desktop_geometry(&p, s->id);
 	set_desktop_viewport(&p);
+	set_number_of_desktops(&p);
 	p.property = EWMH(CURRENT_DESKTOP);
 	p.data = &s->vdesk;
 	p.size = 1;
 	set_property(&p);
-	p.property = EWMH(NUMBER_OF_DESKTOPS);
-	{ // data scope
-		int32_t data = JBWM_MAX_DESKTOPS;
-		p.data = &data;
-		set_property(&p);
-	}
 	p.property = EWMH(VIRTUAL_ROOTS);
 	p.type = XA_WINDOW;
 	{ // r scope
