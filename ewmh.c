@@ -20,15 +20,23 @@
 #define EWMHWM(a) jbwm_ewmh[EWMH(WM_##a)]
 #define ACTION(a) EWMHWM(ACTION_##a)
 static Atom jbwm_ewmh[JBWM_EWMH_ATOMS_COUNT];
-Atom jbwm_ewmh_get_atom(const uint8_t index)
-{
-	return jbwm_ewmh[index];
-}
+static bool jbwm_ewmh_init_done;
 static void jbwm_ewmh_init(Display * d)
 {
 #include "ewmh_atoms.c"
 	XInternAtoms(d, jbwm_atom_names,
 		JBWM_EWMH_ATOMS_COUNT, false, jbwm_ewmh);
+}
+static void check_ewmh_init(Display * d)
+{
+	if (!jbwm_ewmh_init_done) {
+		jbwm_ewmh_init(d);
+		jbwm_ewmh_init_done = true;
+	}
+}
+Atom jbwm_ewmh_get_atom(const uint8_t index)
+{
+	return jbwm_ewmh[index];
 }
 struct PropertyData {
 	Display * display;
@@ -125,6 +133,7 @@ void jbwm_ewmh_update_client_list(Display * d)
 void jbwm_ewmh_set_allowed_actions(Display * d,
 	const Window w)
 {
+	check_ewmh_init(d);
 	Atom a[] = {
 		EWMHWM(ALLOWED_ACTIONS),
 		ACTION(MOVE), ACTION(RESIZE), ACTION(CLOSE), ACTION(SHADE),
@@ -157,26 +166,35 @@ static void set_number_of_desktops(struct PropertyData * restrict p)
 	p->data = &data;
 	set_property(p);
 }
+static void set_current_desktop(struct PropertyData * restrict p,
+	void * restrict data)
+{
+	p->property = EWMH(CURRENT_DESKTOP);
+	p->data = data;
+	set_property(p);
+}
+static void set_virtual_roots(struct PropertyData * restrict p)
+{
+	// Declared r static to keep scope
+	static Window r;
+	p->property = EWMH(VIRTUAL_ROOTS);
+	p->type = XA_WINDOW;
+	r = p->target;
+	p->data = &r;
+	set_property(p);
+}
 static void init_desktops(Display * d, struct JBWMScreen * s)
 {
 	struct PropertyData p = {d, NULL, RootWindowOfScreen(s->xlib),
 		0, 2, XA_CARDINAL};
+	JBWM_LOG("SIZEOF PROPERTYDATA IS %lu", sizeof (struct PropertyData));
+	JBWM_LOG("SIZEOF JBWMEWMH IS %lu", sizeof (jbwm_ewmh));
 	set_desktop_geometry(&p, s->id);
 	set_desktop_viewport(&p);
-	set_number_of_desktops(&p);
-	p.property = EWMH(CURRENT_DESKTOP);
-	p.data = &s->vdesk;
 	p.size = 1;
-	set_property(&p);
-	p.property = EWMH(VIRTUAL_ROOTS);
-	p.type = XA_WINDOW;
-	{ // r scope
-		// Declared r static to keep scope
-		static Window r;
-		r = p.target;
-		p.data = &r;
-	}
-	set_property(&p);
+	set_number_of_desktops(&p);
+	set_current_desktop(&p, &s->vdesk);
+	set_virtual_roots(&p);
 }
 static void set_name(Display * d, const Window w)
 {
@@ -200,8 +218,7 @@ static Window init_supporting(Display * d, const Window r)
 }
 void jbwm_ewmh_init_screen(Display * d, struct JBWMScreen * s)
 {
-	if (!jbwm_ewmh[0])
-		jbwm_ewmh_init(d);
+	check_ewmh_init(d);
 	static Window r;
 	r = RootWindowOfScreen(s->xlib);
 	set_ewmh_property(d, r, JBWM_EWMH_SUPPORTED, XA_ATOM, jbwm_ewmh,
@@ -216,6 +233,7 @@ void jbwm_ewmh_init_screen(Display * d, struct JBWMScreen * s)
 // Required by wm-spec:
 void jbwm_set_frame_extents(struct JBWMClient * restrict c)
 {
+	check_ewmh_init(c->display);
 	JBWM_LOG("jbwm_set_frame_extents()");
 	// Fields: left, right, top, bottom
 	static uint32_t f[4];
