@@ -16,6 +16,9 @@
 #include "log.h"
 #include "macros.h"
 #include "util.h"
+#define EWMH(a_name) JBWM_EWMH_##a_name
+#define EWMHWM(a) jbwm_ewmh[EWMH(WM_##a)]
+#define ACTION(a) EWMHWM(ACTION_##a)
 static Atom jbwm_ewmh[JBWM_EWMH_ATOMS_COUNT];
 Atom jbwm_ewmh_get_atom(const uint8_t index)
 {
@@ -27,17 +30,30 @@ static void jbwm_ewmh_init(Display * d)
 	XInternAtoms(d, jbwm_atom_names,
 		JBWM_EWMH_ATOMS_COUNT, false, jbwm_ewmh);
 }
-static inline void set_property(Display * d, const Window win,
+struct PropertyData {
+	Display * display;
+	void * data;
+	Window target;
+	enum JBWMAtomIndex property;
+	uint16_t size, type;
+};
+static inline void set_property(struct PropertyData * restrict p)
+{
+	jbwm_set_property(p->display, p->target, jbwm_ewmh[p->property],
+		p->type, p->data, p->size);
+}
+static inline void set_ewmh_property(Display * d, const Window win,
 	const enum JBWMAtomIndex i, const Atom type,
 	void * data, const uint16_t size)
 {
-	jbwm_set_property(d, win, jbwm_ewmh[i], type, data, size);
+	set_property(&(struct PropertyData){.display = d, .data = data,
+		.target = win, .property = i, .size = size, .type = type});
 }
 static inline void set_root_property(Display * d,
 	const enum JBWMAtomIndex i, const Atom type,
 	void * data, const uint16_t size)
 {
-	set_property(d, DefaultRootWindow(d), i, type, data, size);
+	set_ewmh_property(d, DefaultRootWindow(d), i, type, data, size);
 }
 // returns number of elements in window list
 static int get_client_list_r(Window ** list, Display * d,
@@ -70,7 +86,8 @@ static Window * get_mixed_client_list(Display * d)
 		free(window_list);
 		window_list = NULL;
 	}
-	int n = get_client_list_r(&window_list, d, jbwm_get_head_client(), 0);
+	int n = get_client_list_r(&window_list, d,
+		jbwm_get_head_client(), 0);
 	set_root_property(d, JBWM_EWMH_CLIENT_LIST, XA_WINDOW,
 		window_list, n);
 	debug_window_list(n, window_list);
@@ -91,7 +108,7 @@ static unsigned int get_window_list(Display * d, const uint8_t max_clients,
 }
 static Window * get_ordered_client_list(Display * d)
 {
-	enum {MAX_CLIENTS= 64};
+	enum {MAX_CLIENTS = 64};
 	static Window window_list[MAX_CLIENTS];
 	// get ordered list of all windows on default screen:
 	const unsigned int n = get_window_list(d, MAX_CLIENTS, window_list);
@@ -108,8 +125,6 @@ void jbwm_ewmh_update_client_list(Display * d)
 void jbwm_ewmh_set_allowed_actions(Display * d,
 	const Window w)
 {
-#define EWMHWM(a) jbwm_ewmh[JBWM_EWMH_WM_##a]
-#define ACTION(a) EWMHWM(ACTION_##a)
 	Atom a[] = {
 		EWMHWM(ALLOWED_ACTIONS),
 		ACTION(MOVE), ACTION(RESIZE), ACTION(CLOSE), ACTION(SHADE),
@@ -118,39 +133,65 @@ void jbwm_ewmh_set_allowed_actions(Display * d,
 	};
 	jbwm_set_property(d, w, a[0], XA_ATOM, &a, sizeof(a) / sizeof(Atom));
 }
+static void set_desktop_geometry(struct PropertyData * restrict p,
+	const uint8_t screen_id)
+{
+	const struct JBWMSize sz = jbwm_get_display_size(p->display,
+		screen_id);
+	int32_t geometry_data[] = {sz.width, sz.height};
+	p->property = EWMH(DESKTOP_GEOMETRY);
+	p->data = geometry_data;
+	set_property(p);
+}
+static void set_desktop_viewport(struct PropertyData * restrict p)
+{
+	int32_t viewport_data[] = {0, 0};
+	p->property = EWMH(DESKTOP_VIEWPORT);
+	p->data = viewport_data;
+	set_property(p);
+}
 static void init_desktops(Display * d, struct JBWMScreen * s)
 {
-	const uint8_t id = s->id;
-	static Window r;
-	r = RootWindow(d, id);
-	enum {INT=XA_CARDINAL, WIN=XA_WINDOW};
-	struct JBWMSize sz = jbwm_get_display_size(d, s->id);
-	set_property(d, r, JBWM_EWMH_DESKTOP_GEOMETRY, INT,
-		(int32_t[]){sz.width, sz.height}, 2);
-	set_property(d, r, JBWM_EWMH_CURRENT_DESKTOP, INT, &s->vdesk, 1);
-	set_property(d, r, JBWM_EWMH_NUMBER_OF_DESKTOPS, INT,
-		&(long){JBWM_MAX_DESKTOPS}, 1);
-	set_property(d, r, JBWM_EWMH_DESKTOP_VIEWPORT, INT,
-		&(long[]){0, 0}, 2);
-	// Declared r static to keep scope
-	set_property(d, r, JBWM_EWMH_VIRTUAL_ROOTS, WIN, &r, 1);
+	struct PropertyData p = {d, NULL, RootWindowOfScreen(s->xlib),
+		0, 2, XA_CARDINAL};
+	set_desktop_geometry(&p, s->id);
+	set_desktop_viewport(&p);
+	p.property = EWMH(CURRENT_DESKTOP);
+	p.data = &s->vdesk;
+	p.size = 1;
+	set_property(&p);
+	p.property = EWMH(NUMBER_OF_DESKTOPS);
+	{ // data scope
+		int32_t data = JBWM_MAX_DESKTOPS;
+		p.data = &data;
+		set_property(&p);
+	}
+	p.property = EWMH(VIRTUAL_ROOTS);
+	p.type = XA_WINDOW;
+	{ // r scope
+		// Declared r static to keep scope
+		static Window r;
+		r = p.target;
+		p.data = &r;
+	}
+	set_property(&p);
 }
 static void set_name(Display * d, const Window w)
 {
-	set_property(d, w, JBWM_EWMH_WM_NAME, XA_STRING, JBWM_NAME,
+	set_ewmh_property(d, w, JBWM_EWMH_WM_NAME, XA_STRING, JBWM_NAME,
 		sizeof(JBWM_NAME));
 }
 static void set_supporting(Display * d, const Window w,
 	Window * s)
 {
-	set_property(d, w, JBWM_EWMH_SUPPORTING_WM_CHECK, XA_WINDOW, s, 1);
+	set_ewmh_property(d, w, JBWM_EWMH_SUPPORTING_WM_CHECK, XA_WINDOW, s, 1);
 }
 static Window init_supporting(Display * d, const Window r)
 {
 	Window w = XCreateSimpleWindow(d, r, 0, 0, 1, 1, 0, 0, 0);
 	set_supporting(d, r, &w);
 	set_supporting(d, w, &w);
-	set_property(d, w, JBWM_EWMH_WM_PID, XA_CARDINAL,
+	set_ewmh_property(d, w, JBWM_EWMH_WM_PID, XA_CARDINAL,
 		&(pid_t){getpid()}, 1);
 	set_name(d, w);
 	return w;
@@ -161,12 +202,12 @@ void jbwm_ewmh_init_screen(Display * d, struct JBWMScreen * s)
 		jbwm_ewmh_init(d);
 	static Window r;
 	r = RootWindowOfScreen(s->xlib);
-	set_property(d, r, JBWM_EWMH_SUPPORTED, XA_ATOM, jbwm_ewmh,
+	set_ewmh_property(d, r, JBWM_EWMH_SUPPORTED, XA_ATOM, jbwm_ewmh,
 		JBWM_EWMH_ATOMS_COUNT);
 	set_name(d, r);
 	/* Set this to the root window until we have some clients.
 	 * Declared r static so we don't lose scope.  */
-	set_property(d, r, JBWM_EWMH_CLIENT_LIST, XA_WINDOW, &r, 1);
+	set_ewmh_property(d, r, JBWM_EWMH_CLIENT_LIST, XA_WINDOW, &r, 1);
 	init_desktops(d, s);
 	s->supporting = init_supporting(d, r);
 }
@@ -179,6 +220,6 @@ void jbwm_set_frame_extents(struct JBWMClient * restrict c)
 	f[0] = f[1] = f[2] = f[3] = c->opt.border;
 	if (!c->opt.no_title_bar)
 		f[2] += jbwm_get_font_height();
-	set_property(c->display, c->parent, JBWM_EWMH_FRAME_EXTENTS,
+	set_ewmh_property(c->display, c->parent, JBWM_EWMH_FRAME_EXTENTS,
 		XA_CARDINAL, f, 4);
 }
