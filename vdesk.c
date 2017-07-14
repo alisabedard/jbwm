@@ -34,8 +34,10 @@ uint8_t jbwm_set_vdesk(Display * d, struct JBWMScreen * s, uint8_t v)
 		return s->vdesk;
 	check_visibility(s, jbwm_get_head_client(), v);
 	s->vdesk = v;
-	jbwm_set_property(d, RootWindow(d, s->id),
+	/* Send anonymous variable of type uint32_t in order
+	   to avoid potentially invalid data.  */
+	jbwm_set_property(d, RootWindowOfScreen(s->xlib),
 		jbwm_ewmh_get_atom(JBWM_EWMH_CURRENT_DESKTOP),
-		XA_CARDINAL, &v, 1);
+		XA_CARDINAL, &(uint32_t){v}, 1);
 	return s->vdesk;
 }
