@@ -51,7 +51,6 @@
    (lambda ()
     (let ((outf (open-output-file "JBWMAtomIndex.h"))
 	  (ig "JBWM_JBWMATOMINDEX"))
- ;    (set-current-output-port! outf)
      (begin-include ig outf)
      (begin-enum-definition "JBWMAtomIndex" outf)
      (set! master-prefix "JBWM_EWMH_")
@@ -65,5 +64,3 @@
   (write-ewmh-init-c)
   (write-jbwmatomindex-h)
   (write-jbwm-ewmh-allowed-c))
-    ; Restore normal output:
-;k  (set-current-output-port! console-i/o-port))
