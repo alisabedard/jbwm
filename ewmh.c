@@ -94,12 +94,19 @@ static Window * get_mixed_client_list(Display * d)
 	debug_window_list(n, window_list);
 	return window_list;
 }
+static inline bool query_tree(Display * d, Window ** children_return,
+	unsigned int * restrict nchildren_return)
+{
+	Window nil; // dummy variable
+	return XQueryTree(d, DefaultRootWindow(d), &nil, &nil, children_return,
+		nchildren_return);
+}
 static unsigned int get_window_list(Display * d, const uint8_t max_clients,
 	Window * window_list)
 {
-	Window * wl, nil;
+	Window * wl;
 	unsigned int n;
-	if (XQueryTree(d, DefaultRootWindow(d), &nil, &nil, &wl, &n)) {
+	if (query_tree(d, &wl, &n)) {
 		n = JB_MIN(n, max_clients); // limit to MAX_CLIENTS
 		memcpy(window_list, wl, n * sizeof(Window));
 		debug_window_list(n, wl);
