@@ -39,8 +39,13 @@ void jbwm_move_resize(struct JBWMClient * restrict c)
 		jbwm_handle_mwm_hints(c);
 		jbwm_update_title_bar(c);
 	} // Skip shaped and fullscreen clients.
-	do_move(c->display, c->parent, c->window, &c->size, offset);
-	jbwm_set_shape(c);
+	struct JBWMRectangle * restrict s = &c->size;
+	do_move(c->display, c->parent, c->window, s, offset);
+	uint16_t szsum = s->width ^ s->height;
+	if (szsum != c->szsum) {
+		c->szsum = szsum;
+		jbwm_set_shape(c);
+	}
 	jbwm_configure_client(c);
 }
 

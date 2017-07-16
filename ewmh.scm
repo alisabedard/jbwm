@@ -33,8 +33,8 @@
      (begin-array-definition "char *" "jbwm_atom_names" outf)
      (print-all print-each-array-element outf)
      (end-c-definition outf)
-     (display (string-append "\tXInternAtoms(d, jbwm_atom_names,"
-	       " JBWM_EWMH_ATOMS_COUNT,\n\t\tfalse, jbwm_ewmh);\n}") outf)
+     (display "\tXInternAtoms(d, jbwm_atom_names, " outf)
+     (display "JBWM_EWMH_ATOMS_COUNT,\n\t\tfalse, jbwm_ewmh);\n}\n") outf)
      (close-port outf))))
   ; Generate "ewmh_allowed.c"
   (write-jbwm-ewmh-allowed-c
