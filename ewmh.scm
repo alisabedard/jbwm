@@ -34,18 +34,19 @@
      (print-all print-each-array-element outf)
      (end-c-definition outf)
      (display (string-append "\tXInternAtoms(d, jbwm_atom_names,"
-	" JBWM_EWMH_ATOMS_COUNT,\n\t\tfalse, jbwm_ewmh);\n}") outf)
+	       " JBWM_EWMH_ATOMS_COUNT,\n\t\tfalse, jbwm_ewmh);\n}") outf)
      (close-port outf))))
   ; Generate "ewmh_allowed.c"
   (write-jbwm-ewmh-allowed-c
    (lambda ()
     (let ((outf (open-output-file "ewmh_allowed.c"))
-	(act (cdr wm-action)))
-	(display "\tAtom a[] = {\n" outf)
-	(map (lambda (x) (display (string-append "\t\tjbwm_ewmh["
-		"JBWM_EWMH_WM_ACTION_" x "],\n") outf)) act)
-	(display "\t};\n" outf)
-	(close-port outf))))
+	  (act (cdr wm-action)))
+     (display "\tAtom a[] = {\n" outf)
+     (map (lambda (x)
+	   (display (string-append "\t\tjbwm_ewmh[JBWM_EWMH_WM_ACTION_" x
+		     "],\n") outf)) act)
+     (display "\t};\n" outf)
+     (close-port outf))))
   ; Generate "JBWMAtomIndex.h"
   (write-jbwmatomindex-h
    (lambda ()
