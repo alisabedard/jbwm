@@ -12,7 +12,7 @@ static void grab_r(Display * d, KeySym * restrict k, const Window r,
 	if (*k) { // Terminate at KeySym 0
 		XGrabKey(d, XKeysymToKeycode(d, *k), mask, r, True,
 			GrabModeAsync, GrabModeAsync);
-		grab_r(d, ++k, r, mask);
+		grab_r(d, k + 1, r, mask);
 	}
 }
 void jbwm_grab_root_keys(Display * d, const Window root)
