@@ -1,5 +1,5 @@
 ; Copyright 2017, Jeffrey E. Bedard
-(load "libconvert.scm")
+(load "libjb/libconvert.scm")
 (define convert_keys
  (lambda (in_filename out_filename)
   (letrec ((i (open-input-file in_filename))

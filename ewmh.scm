@@ -1,7 +1,7 @@
 ; Copyright 2017, Jeffrey E. Bedard
 ; ewmh atom name to index enum correlation utility
 ; vim: sw=2
-(load "libconvert.scm")
+(load "libjb/libconvert.scm")
 ; Store the prefix as the first element in these lists:
 (letrec
  ((net '("" "SUPPORTED" "CURRENT_DESKTOP" "NUMBER_OF_DESKTOPS"
