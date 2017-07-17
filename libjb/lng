@@ -1,0 +1,20 @@
+#!/usr/bin/gawk -f
+# Copyright 2017, Jeffrey E. Bedard
+# Simple utility to show source code lines that are too long.
+BEGIN {
+	FS="\t";
+	maxc=80;
+	line=0;
+}
+FILENAME != _ofn {
+	_ofn = FILENAME;
+	line = 0;
+}
+{
+	++line;
+	ntabs=NF-1;
+	tlen=length($(NF)) + ntabs * 8;
+	if (tlen >= maxc)
+		print("(" FILENAME ": line " line \
+		      ": length " tlen ")\n\t" $(NF));
+}
