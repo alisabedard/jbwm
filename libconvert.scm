@@ -3,7 +3,7 @@
 ; vim: sw=2
 (define copyright "// Copyright 2017, Jeffrey E. Bedard\n")
 
-(define __libconvert-indentation 1)
+(define __libconvert-indentation 0)
 (define set-indent (lambda (x) (set! __libconvert-indentation x)))
 (define get-indent
  (lambda () (make-string __libconvert-indentation #\tab)))
