@@ -199,7 +199,8 @@ static void set_name(Display * d, const Window w)
 static void set_supporting(Display * d, const Window w,
 	Window * s)
 {
-	set_ewmh_property(d, w, JBWM_EWMH_SUPPORTING_WM_CHECK, XA_WINDOW, s, 1);
+	set_ewmh_property(d, w, JBWM_EWMH_SUPPORTING_WM_CHECK,
+		XA_WINDOW, s, 1);
 }
 static Window init_supporting(Display * d, const Window r)
 {
