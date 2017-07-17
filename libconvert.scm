@@ -62,17 +62,14 @@
  (lambda (prefix elements out_port)
   (map (lambda (item) (print-enum-line prefix item out_port)) elements)))
 
-(define get-guard (lambda (name) (string-append name "_H\n")))
-
 (define print-each
  (lambda (function data out_port)
   (function (car data) (cdr data) out_port)))
 
 (define begin-include
- (lambda (guard_tag out)
-  (display (string-append copyright "#ifndef " (get-guard guard_tag)
-	    "#define " (get-guard guard_tag)) out)))
+ (lambda (guard_tag out) (display (string-append copyright "#ifndef "
+ guard_tag "\n#define " guard_tag "\n") out)))
 
 (define end-include
  (lambda (guard_tag out)
-  (display (string-append "#endif//!" (get-guard guard_tag)) out)))
+  (display (string-append "#endif//!" guard_tag "\n") out)))

@@ -4,7 +4,7 @@
  (lambda (in_filename out_filename)
   (letrec ((i (open-input-file in_filename))
 	   (o (open-output-file out_filename))
-	   (guard "JBWM_JBWMKEYS")
+	   (guard "JBWM_JBWMKEYS_H")
 	   (data '())
 	   (parse
 	    (lambda (i o)

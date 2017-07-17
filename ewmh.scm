@@ -34,7 +34,7 @@
      (print-all print-each-array-element outf)
      (end-c-definition outf)
      (display "\tXInternAtoms(d, jbwm_atom_names, " outf)
-     (display "JBWM_EWMH_ATOMS_COUNT,\n\t\tfalse, jbwm_ewmh);\n}\n") outf)
+     (display "JBWM_EWMH_ATOMS_COUNT,\n\t\tfalse, jbwm_ewmh);\n}\n" outf)
      (close-port outf))))
   ; Generate "ewmh_allowed.c"
   (write-jbwm-ewmh-allowed-c
@@ -51,7 +51,7 @@
   (write-jbwmatomindex-h
    (lambda ()
     (let ((outf (open-output-file "JBWMAtomIndex.h"))
-	  (ig "JBWM_JBWMATOMINDEX"))
+	  (ig "JBWM_JBWMATOMINDEX_H"))
      (begin-include ig outf)
      (begin-enum-definition "JBWMAtomIndex" outf)
      (set! master-prefix "JBWM_EWMH_")
