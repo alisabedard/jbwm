@@ -3,6 +3,10 @@
 ; vim: sw=2
 (define copyright "// Copyright 2017, Jeffrey E. Bedard\n")
 
+(define __libconvert-indentation 1)
+(define set-indent (lambda (x) (set! __libconvert-indentation x)))
+(define get-indent
+ (lambda () (make-string __libconvert-indentation #\tab)))
 
 ; Flatten per https://rosettacode.org/wiki/Flatten_a_list#Scheme
 (define flatten
@@ -34,17 +38,19 @@
 
 (define begin-array-definition
  (lambda (type name out)
-  (display (string-append "\tstatic " type " " name " [] = {\n") out)))
+  (display (string-append (get-indent) "static " type " " name " [] = {\n")
+  out)))
 
 (define begin-enum-definition
  (lambda (name out)
-  (display (string-append "\tenum " name " {\n") out)))
+  (display (string-append (get-indent) "enum " name " {\n") out)))
 
-(define end-c-definition (lambda (out) (display "\t};\n" out)))
+(define end-c-definition (lambda (out) (display
+ (string-append (get-indent) "};\n") out)))
 
 (define get-array-line
  (lambda (prefix item)
-  (string-append "\t\t\"" master-prefix prefix item "\",\n")))
+  (string-append (get-indent) "\t\"" master-prefix prefix item "\",\n")))
 
 (define print-each-array-element
  (lambda (prefix elements out_port)
@@ -52,7 +58,8 @@
 	(display (get-array-line prefix item) out_port)) elements)))
 
 (define get-enum-line
- (lambda (prefix item) (string-append "\t" master-prefix prefix item ",\n")))
+ (lambda (prefix item) (string-append (get-indent) master-prefix
+  prefix item ",\n")))
 
 (define print-enum-line
  (lambda (prefix item out_port)
