@@ -23,14 +23,14 @@
 	    (lambda (a b) ; compare the keys:
 	     (string<? (car a) (car b)))))
 	(begin-include guard o)
-	(display-c-include "<X11/keysym.h>" o)
-	(display "enum JBWMKeys {\n" o)
+	(display (string-append "#include <X11/keysym.h>\n"
+		"enum JBWMKeys {\n") o)
 	(parse i o)
 	(set! data (sort data compare-cell))
 	(display data)
 	(map (lambda (n) (format-cell n o)) data)
 	(display "};\n" o)
-	(display-c-include "\"key_combos.h\"" o)
+	(display "#include \"key_combos.h\"\n" o)
 	(end-include guard o)
 	(close-port i)
 	(close-port o))))

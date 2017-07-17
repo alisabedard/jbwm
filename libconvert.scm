@@ -68,12 +68,6 @@
  (lambda (function data out_port)
   (function (car data) (cdr data) out_port)))
 
-(define add-c-include
- (lambda (name) (string-append "#include " name "\n")))
-
-(define display-c-include
- (lambda (name out) (display (add-c-include name) out)))
-
 (define begin-include
  (lambda (guard_tag out)
   (display (string-append copyright "#ifndef " (get-guard guard_tag)
