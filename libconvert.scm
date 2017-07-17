@@ -2,9 +2,20 @@
 ; Simple colon-separated database parsing library for C header generation
 ; vim: sw=2
 (define copyright "// Copyright 2017, Jeffrey E. Bedard\n")
+
+
+; Flatten per https://rosettacode.org/wiki/Flatten_a_list#Scheme
+(define flatten
+ (lambda (x)
+  (cond ((null? x) '())
+   ((not (pair? x)) (list x))
+   (else (append (flatten (car x))
+	  (flatten (cdr x)))))))
+
 ; lisp-like operations on colon-separated strings:
 (define get-string-divider
  (lambda (str) (string-find-next-char str #\:)))
+
 
 ; returns original string if not a list
 (define string-car
@@ -23,17 +34,17 @@
 
 (define begin-array-definition
  (lambda (type name out)
-  (display (string-append "static " type " " name " [] = {\n") out)))
+  (display (string-append "\tstatic " type " " name " [] = {\n") out)))
 
 (define begin-enum-definition
  (lambda (name out)
-  (display (string-append "enum " name " {\n") out)))
+  (display (string-append "\tenum " name " {\n") out)))
 
-(define end-c-definition (lambda (out) (display "};\n" out)))
+(define end-c-definition (lambda (out) (display "\t};\n" out)))
 
 (define get-array-line
  (lambda (prefix item)
-  (string-append "\t\"" master-prefix prefix item "\",\n")))
+  (string-append "\t\t\"" master-prefix prefix item "\",\n")))
 
 (define print-each-array-element
  (lambda (prefix elements out_port)
@@ -56,12 +67,6 @@
 (define print-each
  (lambda (function data out_port)
   (function (car data) (cdr data) out_port)))
-
-(define add-c-include
- (lambda (name) (string-append "#include " name "\n")))
-
-(define display-c-include
- (lambda (name out) (display (add-c-include name) out)))
 
 (define begin-include
  (lambda (guard_tag out)
