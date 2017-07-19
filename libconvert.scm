@@ -9,7 +9,7 @@
 
 ; Indentation level storage and accessors
 (define __libconvert-indentation 0)
-(define set-indent (lambda (x) (set! __libconvert-indentation x)))
+(define (set-indent x) (set! __libconvert-indentation x))
 (define get-indent
  (lambda () (make-string __libconvert-indentation #\tab)))
 
