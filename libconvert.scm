@@ -3,6 +3,11 @@
 ; vim: sw=2
 (define copyright "// Copyright 2017, Jeffrey E. Bedard\n")
 
+; Field separator character storage and accessor
+(define __libconvert-field-separator #\:)
+(define (set-field-separator c) (set! __libconvert-field-separator c))
+
+; Indentation level storage and accessors
 (define __libconvert-indentation 0)
 (define set-indent (lambda (x) (set! __libconvert-indentation x)))
 (define get-indent
@@ -16,10 +21,9 @@
    (else (append (flatten (car x))
 	  (flatten (cdr x)))))))
 
-; lisp-like operations on colon-separated strings:
+; lisp-like operations on character-separated strings:
 (define get-string-divider
- (lambda (str) (string-find-next-char str #\:)))
-
+ (lambda (str) (string-find-next-char str __libconvert-field-separator)))
 
 ; returns original string if not a list
 (define string-car
