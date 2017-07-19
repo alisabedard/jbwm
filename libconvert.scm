@@ -23,7 +23,20 @@
 
 ; lisp-like operations on character-separated strings:
 (define get-string-divider
- (lambda (str) (string-find-next-char str __libconvert-field-separator)))
+ (lambda (str)
+  (let ((i (string-find-next-char
+	    str __libconvert-field-separator)))
+   (if i
+    (let ((esc (- i 1))
+	  (len (string-length str)))
+     ; This allows escaping the field separator with \
+     (if (char=? (string-ref str esc) #\\)
+      (begin (substring-move-left! str i len str esc)
+       ; truncate the hole left at the end with space
+       (string-set! str (- len 1) #\space)
+       ; return next instance of filed separator
+       (get-string-divider (string-head str esc)))
+      i)) #f)))) 
 
 ; returns original string if not a list
 (define string-car
