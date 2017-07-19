@@ -3,6 +3,15 @@
 ; vim: sw=2
 (define copyright "// Copyright 2017, Jeffrey E. Bedard\n")
 
+; Field separator character storage and accessor
+(define __libconvert-field-separator #\:)
+(define (set-field-separator c) (set! __libconvert-field-separator c))
+
+; Indentation level storage and accessors
+(define __libconvert-indentation 0)
+(define (set-indent x) (set! __libconvert-indentation x))
+(define get-indent
+ (lambda () (make-string __libconvert-indentation #\tab)))
 
 ; Flatten per https://rosettacode.org/wiki/Flatten_a_list#Scheme
 (define flatten
@@ -12,10 +21,9 @@
    (else (append (flatten (car x))
 	  (flatten (cdr x)))))))
 
-; lisp-like operations on colon-separated strings:
+; lisp-like operations on character-separated strings:
 (define get-string-divider
- (lambda (str) (string-find-next-char str #\:)))
-
+ (lambda (str) (string-find-next-char str __libconvert-field-separator)))
 
 ; returns original string if not a list
 (define string-car
@@ -34,17 +42,19 @@
 
 (define begin-array-definition
  (lambda (type name out)
-  (display (string-append "\tstatic " type " " name " [] = {\n") out)))
+  (display (string-append (get-indent) "static " type " " name " [] = {\n")
+  out)))
 
 (define begin-enum-definition
  (lambda (name out)
-  (display (string-append "\tenum " name " {\n") out)))
+  (display (string-append (get-indent) "enum " name " {\n") out)))
 
-(define end-c-definition (lambda (out) (display "\t};\n" out)))
+(define end-c-definition (lambda (out) (display
+ (string-append (get-indent) "};\n") out)))
 
 (define get-array-line
  (lambda (prefix item)
-  (string-append "\t\t\"" master-prefix prefix item "\",\n")))
+  (string-append (get-indent) "\t\"" master-prefix prefix item "\",\n")))
 
 (define print-each-array-element
  (lambda (prefix elements out_port)
@@ -52,7 +62,8 @@
 	(display (get-array-line prefix item) out_port)) elements)))
 
 (define get-enum-line
- (lambda (prefix item) (string-append "\t" master-prefix prefix item ",\n")))
+ (lambda (prefix item) (string-append (get-indent) master-prefix
+  prefix item ",\n")))
 
 (define print-enum-line
  (lambda (prefix item out_port)
