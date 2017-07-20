@@ -21,6 +21,7 @@
    (c-add-include "<X11/keysym.h>" o)
    (begin-enum-definition "JBWMKeys" o)
    (map (lambda (n) (format-cell n o)) data)
+   (display data)
    (display "};\n" o)
    (c-add-include "\"key_combos.h\"" o)
    (end-include guard o)
