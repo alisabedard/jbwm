@@ -90,6 +90,10 @@
  (lambda (function data out_port)
   (function (car data) (cdr data) out_port)))
 
+(define c-add-include
+ (lambda (file out-port) (display (string-append "#include "
+				   file "\n") out-port)))
+
 (define begin-include
  (lambda (guard_tag out) (display (string-append copyright "#ifndef "
  guard_tag "\n#define " guard_tag "\n") out)))
