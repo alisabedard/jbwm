@@ -15,7 +15,7 @@
 	 (lambda (datum out_port)
 	  (display (string-append "\tJBWM_KEY_" (car datum)
 		    " = XK_" (cdr datum) ",\n") out_port)))
-	  (compare-cell (lambda (a b) (string<? (car a) (car b)))))
+	(compare-cell (lambda (a b) (string<? (car a) (car b)))))
    (define keys-data (sort (parse-keys i o) compare-cell))
    (begin-include guard o)
    (c-add-include "<X11/keysym.h>" o)
