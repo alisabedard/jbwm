@@ -56,7 +56,7 @@
   (let ((i (get-string-divider line)))
    (if i (cons 
 	  (string-head line i)
-	  (strl (string-tail line (+ 1 i))))
+	  (string-list (string-tail line (+ 1 i))))
     line))))
 
 ; The following prefix is applied to each entry
