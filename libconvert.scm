@@ -9,7 +9,7 @@
 
 ; Indentation level storage and accessors
 (define __libconvert-indentation 0)
-(define (set-indent x) (set! __libconvert-indentation x))
+(define (set-indent-level x) (set! __libconvert-indentation x))
 (define get-indent
  (lambda () (make-string __libconvert-indentation #\tab)))
 
@@ -89,6 +89,10 @@
 (define print-each
  (lambda (function data out_port)
   (function (car data) (cdr data) out_port)))
+
+(define c-add-include
+ (lambda (file out-port) (display (string-append "#include "
+				   file "\n") out-port)))
 
 (define begin-include
  (lambda (guard_tag out) (display (string-append copyright "#ifndef "
