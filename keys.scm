@@ -1,12 +1,12 @@
 ; Copyright 2017, Jeffrey E. Bedard
 (load "libjb/libconvert.scm")
-(define convert_keys
+(define convert-keys
  (lambda (in_filename out_filename)
-  (define parse ; convert each line to a cons cell
+  (define parse-keys ; convert each line to a cons cell
    (lambda (i o) (and-let* ((line (read-line i)) ((not (eof-object? line)))
 			    ((> (string-length line) 1)))
 		  (let* ((key (string-car line)) (value (string-cdr line))
-			 (next (parse i o)) (cell (cons key value)))
+			 (next (parse-keys i o)) (cell (cons key value)))
 		   (if (eq? #f next) (cons cell '()) (cons cell next))))))
   (let ((i (open-input-file in_filename))
 	(o (open-output-file out_filename))
@@ -16,16 +16,16 @@
 	  (display (string-append "\tJBWM_KEY_" (car datum)
 		    " = XK_" (cdr datum) ",\n") out_port)))
 	  (compare-cell (lambda (a b) (string<? (car a) (car b)))))
-   (define data (sort (parse i o) compare-cell))
+   (define keys-data (sort (parse-keys i o) compare-cell))
    (begin-include guard o)
    (c-add-include "<X11/keysym.h>" o)
    (begin-enum-definition "JBWMKeys" o)
-   (map (lambda (n) (format-cell n o)) data)
-   (display data)
+   (map (lambda (n) (format-cell n o)) keys-data)
+   (display keys-data)
    (display "};\n" o)
    (c-add-include "\"key_combos.h\"" o)
    (end-include guard o)
    (close-port i)
    (close-port o))))
 
-	(convert_keys "keys.txt" "JBWMKeys.h")
+	(convert-keys "keys.txt" "JBWMKeys.h")

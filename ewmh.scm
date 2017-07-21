@@ -4,7 +4,7 @@
 (load "libjb/libconvert.scm")
 (set-indent-level 1)
   ; Store the prefix as the first element in these lists:
-  (define data ; ewmh atom association list broken into prefix categories
+  (define ewmh-data ; atom association list broken into prefix categories
    '((net "" "SUPPORTED" "CURRENT_DESKTOP" "NUMBER_OF_DESKTOPS"
    "DESKTOP_VIEWPORT" "DESKTOP_GEOMETRY"
    "SUPPORTING_WM_CHECK" "ACTIVE_WINDOW"
@@ -20,7 +20,7 @@
     "SHADED" "HIDDEN" "FULLSCREEN" "ABOVE" "BELOW" "FOCUSED")))
 
 
-(define element (lambda (e) (cdr (assq e data))))
+(define element (lambda (e) (cdr (assq e ewmh-data))))
 
 (define print-all
  (lambda (function out_port)
@@ -33,7 +33,6 @@
 (define write-ewmh-init-c
  (lambda ()
   (let ((outf (open-output-file "ewmh_init.c")))
-   (set-current-output-port! outf)
    (display "static void jbwm_ewmh_init(Display * d)\n{\n" outf)
    (begin-array-definition "char *" "jbwm_atom_names" outf)
    (print-all print-each-array-element outf)
