@@ -19,7 +19,8 @@
    (wm-state "WM_STATE_" "STICKY" "MAXIMIZED_VERT" "MAXIMIZED_HORZ"
     "SHADED" "HIDDEN" "FULLSCREEN" "ABOVE" "BELOW" "FOCUSED")))
 
-(define element (lambda (e) (cdr (assoc e data))))
+
+(define element (lambda (e) (cdr (assq e data))))
 
 (define print-all
  (lambda (function out_port)
