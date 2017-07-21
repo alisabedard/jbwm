@@ -4,7 +4,7 @@
 (load "libjb/libconvert.scm")
 (set-indent-level 1)
   ; Store the prefix as the first element in these lists:
-  (define data
+  (define data ; ewmh atom association list broken into prefix categories
    '((net "" "SUPPORTED" "CURRENT_DESKTOP" "NUMBER_OF_DESKTOPS"
    "DESKTOP_VIEWPORT" "DESKTOP_GEOMETRY"
    "SUPPORTING_WM_CHECK" "ACTIVE_WINDOW"
