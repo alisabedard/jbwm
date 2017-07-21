@@ -60,15 +60,14 @@
     (cons line '())))))
 
 (define string-list-fixed
-	(lambda (line size)
-	(let ((out_v (make-vector size ""))
-		(in_l (string-list line))
-		(i 0))
-		(let ((in_v (list->vector in_l)))
-		  (map (lambda (item) (if (< i size) (begin
+ (lambda (line size)
+  (let ((out_v (make-vector size "")) (in_l (string-list line)) (i 0))
+   (let ((in_v (list->vector in_l)))
+    (map (lambda (item)
+	  (if (< i size) (begin
 			  (vector-set! out_v i (vector-ref in_v i))
 			  (set! i (+ 1 i))))) in_l))
-			  (vector->list out_v))))
+   (vector->list out_v))))
 
 ; The following prefix is applied to each entry
 (define master-prefix "_NET_")
