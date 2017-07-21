@@ -1,5 +1,5 @@
 ; libconvert.scm
-; Simple colon-separated database parsing library for C header generation
+; Simple text database parsing library for C header generation
 ; vim: sw=2
 (define copyright "// Copyright 2017, Jeffrey E. Bedard\n")
 
@@ -49,6 +49,15 @@
  (lambda (str)
   (let ((i (get-string-divider str)))
    (if i (string-tail str (+ 1 i)) ""))))
+
+; returns a list of strings split by the field separator
+(define string-list
+ (lambda (line)
+  (let ((i (get-string-divider line)))
+   (if i (cons 
+	  (string-head line i)
+	  (strl (string-tail line (+ 1 i))))
+    line))))
 
 ; The following prefix is applied to each entry
 (define master-prefix "_NET_")
