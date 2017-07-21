@@ -30,7 +30,7 @@
     (let ((esc (- i 1))
 	  (len (string-length str)))
      ; This allows escaping the field separator with \
-     (if (char=? (string-ref str esc) #\\)
+     (if (and (>= esc 0) (char=? (string-ref str esc) #\\))
       (begin (substring-move-left! str i len str esc)
        ; truncate the hole left at the end with space
        (string-set! str (- len 1) #\space)
