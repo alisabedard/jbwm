@@ -96,19 +96,15 @@
 
 (define get-enum-line
  (lambda args
-  (define line (string-append "\t" (get-indent)))
+  (define line (string-append (get-indent)))
   (map (lambda (x) (set! line (string-append line x))) args)
   (set! line (string-append line ",\n"))
   line))
 
-(define print-enum-line
- (lambda (key value out_port)
-  (define separator (if (< 0 (string-length value)) " = " ""))
-  (display (get-enum-line key separator value) out_port)))
-
 (define print-each-enum
  (lambda (prefix elements out_port)
-  (map (lambda (item) (print-enum-line prefix item out_port)) elements)))
+  (map (lambda (item) (display (get-enum-line master-prefix prefix item)
+		       out_port)) elements)))
 
 (define print-each
  (lambda (function data out_port)

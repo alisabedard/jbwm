@@ -62,9 +62,8 @@
    (begin-enum-definition "JBWMAtomIndex" outf)
    (set! master-prefix "JBWM_EWMH_")
    (print-all print-each-enum outf)
-   (display "\t// The following entry must be last:\n" outf)
-   (print-enum-line "" "ATOMS_COUNT" outf)
-   (end-c-definition outf)
+   (display (string-append "\t// The following entry must be last:\n"
+	"\tJBWM_EWMH_ATOMS_COUNT\n\t};\n") outf)
    (end-include ig outf)
    (close-port outf))))
 
