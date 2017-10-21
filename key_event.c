@@ -184,7 +184,7 @@ static void next(void)
 		point(c, c->size.width, c->size.height);
 	}
 }
-static void cond_client_to_desk(Display * d, struct JBWMClient * c,
+static void cond_set_vdesk(Display * d, struct JBWMClient * c,
 	struct JBWMScreen * s, const uint8_t desktop, const bool mod)
 {
 	if (mod && c)
@@ -218,14 +218,14 @@ void jbwm_handle_key_event(XKeyEvent * e)
 	case XK_1: case XK_2: case XK_3: case XK_4: case XK_5:
 	case XK_6: case XK_7: case XK_8: case XK_9:
 		// First desktop 0, per wm-spec
-		cond_client_to_desk(e->display, c, s, opt.zero
+		cond_set_vdesk(e->display, c, s, opt.zero
 			? 10 : key - XK_1, opt.mod);
 		break;
 	case JBWM_KEY_PREVDESK:
-		cond_client_to_desk(e->display, c, s, s->vdesk - 1, opt.mod);
+		cond_set_vdesk(e->display, c, s, s->vdesk - 1, opt.mod);
 		break;
 	case JBWM_KEY_NEXTDESK:
-		cond_client_to_desk(e->display, c, s, s->vdesk + 1, opt.mod);
+		cond_set_vdesk(e->display, c, s, s->vdesk + 1, opt.mod);
 		break;
 	default:
 		if (c)
