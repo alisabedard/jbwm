@@ -105,9 +105,7 @@ void jbwm_drag(struct JBWMClient * restrict c, const bool resize)
 	XRaiseWindow(d, c->parent);
 	if (resize && (c->opt.no_resize || c->opt.shaded))
 		return;
-	const uint8_t id = jbwm_get_screen(c)->id;
-	const Window r = RootWindow(d, id);
-	grab_pointer(d, r);
+	grab_pointer(d, RootWindow(d, c->screen));
 	if (resize) {
 		struct JBWMRectangle * restrict g = &c->size;
 		jbwm_warp(d, c->window, g->width, g->height);
