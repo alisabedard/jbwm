@@ -51,7 +51,7 @@ static uint16_t mv(Display * d, const Window w, uint16_t x)
 }
 // Return of width allows chain-calling
 static uint16_t move_buttons(Display * d,
-	struct JBWMClientTitlebar * t,
+	struct JBWMClientTitleBar * t,
 	const uint16_t width)
 {
 	mv(d, t->stick, mv(d, t->shade, mv(d, t->resize, width)));
@@ -119,6 +119,13 @@ static void remove_title_bar(struct JBWMClient * restrict c)
 	XDestroyWindow(c->display, c->tb.win);
 	c->tb.win = 0;
 }
+static void resize_title_bar(Display * d, const Window win,
+	struct JBWMClientTitleBar * restrict tb, const uint16_t new_width)
+{
+	// Expand/Contract the title bar width as necessary:
+	XResizeWindow(d, win, move_buttons(d, tb, new_width),
+		jbwm_get_font_height());
+}
 void jbwm_update_title_bar(struct JBWMClient * restrict c)
 {
 	if (c->opt.shaped)
@@ -130,10 +137,8 @@ void jbwm_update_title_bar(struct JBWMClient * restrict c)
 	}
 	if (!w)
 		w = new_title_bar(c);
-	// Expand/Contract the title bar width as necessary:
 	Display * d = c->display;
-	XResizeWindow(d, w, move_buttons(d, &c->tb, c->size.width),
-		jbwm_get_font_height());
+	resize_title_bar(d, w, &c->tb, c->size.width);
 	XClearWindow(d, w);
 	draw_title(c);
 	if (c->opt.no_title_bar)

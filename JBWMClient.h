@@ -6,13 +6,13 @@
 #define JBWM_CLIENT_STRUCT_H
 #include <X11/Xlib.h>
 #include "JBWMClientOptions.h"
-#include "JBWMClientTitlebar.h"
+#include "JBWMClientTitleBar.h"
 #include "JBWMRectangle.h"
 struct JBWMScreen;
 struct JBWMClient {
 	struct JBWMClient * next;
 	Display * display;
-	struct JBWMClientTitlebar tb;
+	struct JBWMClientTitleBar tb;
 	Colormap cmap;
 	Window window, parent;
 	struct JBWMClientOptions opt;
