@@ -52,8 +52,8 @@ static void query_pointer(Display * dpy, Window w,
 {
 	int x, y;
 	{ // d, u scope
-		int d;
-		unsigned int u;
+		int d; // dummy integer
+		unsigned int u; // dummy unsigned integer
 		XQueryPointer(dpy, w, &w, &w, &d, &d, &x, &y, &u);
 	}
 	p[0] = x;
