@@ -63,41 +63,55 @@ static void handle_configure_request(XConfigureRequestEvent * e)
 		.border_width = e->border_width,
 		.sibling = e->above, .stack_mode = e->detail});
 }
-static void handle_map_request(XMapRequestEvent * e)
+static void jbwm_handle_MapRequest(XEvent * ev, struct JBWMClient * c)
 {
-	/* This check fixes a race condition in old libreoffice and certain
-	   Motif dialogs where an attempt is made to request mapping twice: */
-	static unsigned long serial;
-	if (e->serial == serial)
-		return;
-	serial = e->serial;
-	JBWM_LOG("handle_map_request(), send_event:%d", e->send_event);
-	jbwm_new_client(e->display, get_screen(e->parent, 0), e->window);
+	if (!c) {
+		XMapRequestEvent * restrict e = &ev->xmaprequest;
+		/* This check fixes a race condition in old libreoffice and
+		 * certain Motif dialogs where an attempt is made to
+		 * request mapping twice: */
+		static unsigned long serial;
+		if (e->serial == serial)
+			return;
+		serial = e->serial;
+		JBWM_LOG("jbwm_handle_MapRequest(), send_event:%d",
+			e->send_event);
+		jbwm_new_client(e->display, get_screen(e->parent, 0),
+			e->window);
+	}
 }
 static inline void mark_removal(struct JBWMClient * restrict c)
 {
 	JBWM_LOG("mark_removal(): ignore_unmap is %d", c->ignore_unmap);
 	c->opt.remove = events_need_cleanup = (c->ignore_unmap--<1);
 }
-static void handle_colormap_notify(struct JBWMClient * restrict c,
-	XColormapEvent * e)
+static void jbwm_handle_ColormapNotify(XEvent * ev, struct JBWMClient * c)
 {
+	XColormapEvent * restrict e = &ev->xcolormap;
 	if (c && e->new)
 		XInstallColormap(e->display, c->cmap = e->colormap);
 }
-static void jbwm_handle_ConfigureNotify(Display * d __attribute__((unused)),
-	XEvent * ev, struct JBWMClient * c)
+static void jbwm_handle_ConfigureNotify(XEvent * ev, struct JBWMClient * c)
 {
 	if (c && !ev->xconfigure.override_redirect)
 		jbwm_move_resize(c);
 }
-static void jbwm_handle_ConfigureRequest(Display * d, XEvent * ev,
-	struct JBWMClient * c)
+static void jbwm_handle_ConfigureRequest(XEvent * ev, struct JBWMClient * c)
 {
 	handle_configure_request(&ev->xconfigurerequest);
-	XSync(d, false);
+	XSync(ev->xany.display, false);
 	if (c)
 		jbwm_move_resize(c);
+}
+static void jbwm_handle_EnterNotify(XEvent * ev, struct JBWMClient * c)
+{
+	if (c && ev->xcrossing.window == c->parent)
+		jbwm_select_client(c);
+}
+static void jbwm_handle_Expose(XEvent * ev, struct JBWMClient * c)
+{
+	if (c && !ev->xexpose.count)
+		jbwm_update_title_bar(c);
 }
 void jbwm_events_loop(Display * d)
 {
@@ -107,7 +121,7 @@ void jbwm_events_loop(Display * d)
 		struct JBWMClient * c = jbwm_get_client(ev.xany.window);
 		switch (ev.type) {
 #define ECASE(name) case name: JBWM_LOG("\tXEVENT: %s", #name);\
-			jbwm_handle_##name(d, &ev, c); break;
+			jbwm_handle_##name(&ev, c); break;
 		case ButtonRelease:
 		case KeyRelease:
 		case MapNotify:
@@ -125,14 +139,8 @@ void jbwm_events_loop(Display * d)
 			if(c)
 				jbwm_handle_button_event(&ev.xbutton, c);
 			break;
-		case EnterNotify:
-			if (c && ev.xcrossing.window == c->parent)
-				jbwm_select_client(c);
-			break;
-		case Expose:
-			if (c && !ev.xexpose.count)
-				jbwm_update_title_bar(c);
-			break;
+		ECASE(EnterNotify);
+		ECASE(Expose);
 		case CreateNotify:
 			if (ev.xcreatewindow.override_redirect) // internal
 				jbwm_ewmh_update_client_list(d);
@@ -145,17 +153,12 @@ void jbwm_events_loop(Display * d)
 			if (c)
 				mark_removal(c);
 			break;
-		case MapRequest:
-			if (!c)
-				handle_map_request(&ev.xmaprequest);
-			break;
+		ECASE(MapRequest);
 		case PropertyNotify:
 			if (c)
 				handle_property_change(&ev.xproperty, c);
 			break;
-		case ColormapNotify:
-			handle_colormap_notify(c, &ev.xcolormap);
-			break;
+		ECASE(ColormapNotify);
 		case ClientMessage:
 			jbwm_ewmh_handle_client_message(&ev.xclient, c);
 			break;
