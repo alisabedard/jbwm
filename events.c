@@ -36,20 +36,22 @@ static void cleanup(Display * d, struct JBWMClient * i)
 		jbwm_client_free(i);
 	cleanup(d, next);
 }
-static void handle_property_change(XPropertyEvent * e,
-	struct JBWMClient * restrict c)
+static void jbwm_handle_PropertyNotify(XEvent * ev, struct JBWMClient * c)
 {
-	if (e->state != PropertyNewValue)
-		return;
-	if (e->atom == XA_WM_NAME)
-		jbwm_update_title_bar(c);
-	else {
-		Display * d = e->display;
+	if (c) {
+		XPropertyEvent * restrict e = &ev->xproperty;
+		if (e->state != PropertyNewValue)
+			return;
+		if (e->atom == XA_WM_NAME)
+			jbwm_update_title_bar(c);
+		else {
+			Display * d = e->display;
 #if JBWM_LOG_EVENTS > 3
-		jbwm_print_atom(d, e->atom, __FILE__, __LINE__);
+			jbwm_print_atom(d, e->atom, __FILE__, __LINE__);
 #endif//JBWM_LOG_EVENTS > 3
-		if (e->atom == jbwm_get_wm_state(d))
-			jbwm_move_resize(c);
+			if (e->atom == jbwm_get_wm_state(d))
+				jbwm_move_resize(c);
+		}
 	}
 }
 static void handle_configure_request(XConfigureRequestEvent * e)
@@ -154,10 +156,7 @@ void jbwm_events_loop(Display * d)
 				mark_removal(c);
 			break;
 		ECASE(MapRequest);
-		case PropertyNotify:
-			if (c)
-				handle_property_change(&ev.xproperty, c);
-			break;
+		ECASE(PropertyNotify);
 		ECASE(ColormapNotify);
 		case ClientMessage:
 			jbwm_ewmh_handle_client_message(&ev.xclient, c);
