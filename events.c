@@ -54,17 +54,6 @@ static void jbwm_handle_PropertyNotify(XEvent * ev, struct JBWMClient * c)
 		}
 	}
 }
-static void handle_configure_request(XConfigureRequestEvent * e)
-{
-	JBWM_LOG("handle_configure_request():"
-		"x: %d, y: %d, w: %d, h: %d, b: %d",
-		e->x, e->y, e->width, e->height, e->border_width);
-	XConfigureWindow(e->display, e->window, e->value_mask,
-		&(XWindowChanges){ .x = e->x, .y = e->y,
-		.width = e->width, .height = e->height,
-		.border_width = e->border_width,
-		.sibling = e->above, .stack_mode = e->detail});
-}
 static void jbwm_handle_MapRequest(XEvent * ev, struct JBWMClient * c)
 {
 	if (!c) {
@@ -100,8 +89,16 @@ static void jbwm_handle_ConfigureNotify(XEvent * ev, struct JBWMClient * c)
 }
 static void jbwm_handle_ConfigureRequest(XEvent * ev, struct JBWMClient * c)
 {
-	handle_configure_request(&ev->xconfigurerequest);
-	XSync(ev->xany.display, false);
+	XConfigureRequestEvent * restrict e = &ev->xconfigurerequest;
+	JBWM_LOG("handle_configure_request():"
+		"x: %d, y: %d, w: %d, h: %d, b: %d",
+		e->x, e->y, e->width, e->height, e->border_width);
+	XConfigureWindow(e->display, e->window, e->value_mask,
+		&(XWindowChanges){ .x = e->x, .y = e->y,
+		.width = e->width, .height = e->height,
+		.border_width = e->border_width,
+		.sibling = e->above, .stack_mode = e->detail});
+	XSync(e->display, false);
 	if (c)
 		jbwm_move_resize(c);
 }
