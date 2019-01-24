@@ -10,13 +10,13 @@
 /* Default fonts */
 #define JBWM_DEF_FONT "Sans:size=10:aspect=1.2"
 /* Default colors */
-#define JBWM_DEF_FG "#ddd"
-#define JBWM_DEF_FC "#8f8"
-#define JBWM_DEF_BG "#111"
-#define JBWM_DEF_CLOSE "#867"
-#define JBWM_DEF_RESIZE "#66a"
-#define JBWM_DEF_SHADE "#555"
-#define JBWM_DEF_STICK "#6a7"
+#define JBWM_DEF_FG "#bad0ff"
+#define JBWM_DEF_FC "#00ff2f"
+#define JBWM_DEF_BG "#3b4352"
+#define JBWM_DEF_CLOSE "#ff2600"
+#define JBWM_DEF_RESIZE "#00a1ff"
+#define JBWM_DEF_SHADE "#ffe200"
+#define JBWM_DEF_STICK "#5bf662"
 // Environment
 #define JBWM_ENV_BG "JBWM_BG"
 #define JBWM_ENV_DISPLAY "DISPLAY"
