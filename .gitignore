@@ -1,7 +1,8 @@
-/*.o
-/tags
-/jbwm
-/*.dbg
-/.*.swp
-/*.log
-/config.mk
+*.o
+tags
+jbwm
+*.dbg
+.*.swp
+*.log
+config.mk
+gmon.out
