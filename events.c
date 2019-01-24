@@ -24,7 +24,9 @@ static struct JBWMScreen * get_screen(const Window root, const int i)
 {
 	struct JBWMScreen * s = jbwm_get_screens();
 	return RootWindowOfScreen(s[i].xlib) == root ? s
-		: get_screen(root, i + 1);
+	// Check that the next iteration is not outside array bounds, using
+	// suppporting field as validation
+		: s[i + 1].supporting ? get_screen(root, i + 1) : s;
 }
 static void cleanup(Display * d, struct JBWMClient * i)
 {
