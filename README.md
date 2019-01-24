@@ -34,6 +34,11 @@ Edit configuration options in Makefile and config.h, then build:
 	# make install
 ```
 
+## REQUIREMENTS
+* pkgconf
+* freetype2
+* libX11
+
 ## ACKNOWLEDGMENTS
 
 evilwm, by Ciaran Anscomb <evilwm@6809.org.uk>.  http://www.6809.org.uk/evilwm/
