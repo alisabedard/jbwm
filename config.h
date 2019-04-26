@@ -6,7 +6,7 @@
 #define JBWM_CONFIG_H
 #include <X11/X.h> // for keymasks
 /* Note:  Also, adjust the values in JBWMDefaults.h as necessary.  */
-#define JBWM_DEF_TERM "jbxvt"
+#define JBWM_DEF_TERM "xterm"
 /* Default fonts */
 #define JBWM_DEF_FONT "Sans:size=10:aspect=1.2"
 /* Default colors */
