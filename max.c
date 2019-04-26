@@ -1,4 +1,4 @@
-// Copyright 2017, Jeffrey E. Bedard
+// Copyright 2017-2019, Jeffrey E. Bedard
 #include "max.h"
 #include "JBWMAtomIndex.h"
 #include "ewmh.h"
