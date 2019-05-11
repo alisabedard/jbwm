@@ -73,7 +73,7 @@ static int get_client_list_r(Window ** list, Display * d,
 #ifdef DEBUG
 static void debug_window_list(int n, Window * window_list)
 {
-	if (n >= 0) {
+	if (n > 0) {
 		JBWM_LOG("window_list[%d] is 0x%x",
 			n, (int)window_list[n]);
 		debug_window_list(n - 1, window_list);
