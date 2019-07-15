@@ -1,5 +1,5 @@
 // jbwm - Minimalist Window Manager for X
-// Copyright 2008-2017, Jeffrey E. Bedard <jefbed@gmail.com>
+// Copyright 2008-2019, Jeffrey E. Bedard <jefbed@gmail.com>
 // Copyright 1999-2015, Ciaran Anscomb <jbwm@6809.org.uk>
 // See README for license and other details.
 #include "title_bar.h"
@@ -17,7 +17,7 @@
 static int8_t set_shaded(struct JBWMClient * restrict c)
 {
 	c->old_size.height = c->size.height;
-	c->size.height = -1;
+	c->size.height = 1;
 	return IconicState;
 }
 static int8_t set_not_shaded(struct JBWMClient * restrict c)
