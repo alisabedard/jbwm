@@ -23,7 +23,7 @@ void jbwm_prepend_client(struct JBWMClient * restrict c);
 void jbwm_relink_client_list(struct JBWMClient * restrict c);
 // Move the client to the specified virtual desktop
 void jbwm_set_client_vdesk(struct JBWMClient * restrict c,
-	const uint8_t desktop);
+    const uint8_t desktop);
 // Assign c as the current client
 void jbwm_set_current_client(struct JBWMClient * restrict c);
 void jbwm_toggle_sticky(struct JBWMClient * restrict c);

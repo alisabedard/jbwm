@@ -7,12 +7,12 @@
 #include <X11/Xft/Xft.h>
 #include "JBWMPixels.h"
 struct JBWMScreen {
-	Screen * xlib;
-	XftDraw * xft;
-	XftColor font_color;
-	Window supporting;
-	struct JBWMPixels pixels;
-	uint8_t id, vdesk;
-	const int8_t __pad[2];
+    Screen * xlib;
+    XftDraw * xft;
+    XftColor font_color;
+    Window supporting;
+    struct JBWMPixels pixels;
+    uint8_t id, vdesk;
+    const int8_t __pad[2];
 };
 #endif//!JBWM_JBWMSCREEN_H

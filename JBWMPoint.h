@@ -3,6 +3,6 @@
 #define JBWM_JBWMPOINT_H
 #include <stdint.h>
 struct JBWMPoint {
-	int16_t x, y;
+    int16_t x, y;
 };
 #endif//!JBWM_JBWMPOINT_H

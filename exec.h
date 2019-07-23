@@ -6,6 +6,6 @@
 void jbwm_exec(const char * command);
 inline void jbwm_start_terminal(void)
 {
-	jbwm_exec(getenv(JBWM_ENV_TERM));
+    jbwm_exec(getenv(JBWM_ENV_TERM));
 }
 #endif//!JBWM_EXEC_H

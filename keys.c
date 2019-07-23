@@ -7,18 +7,18 @@
 #include "key_masks.h"
 __attribute__((nonnull(1,2)))
 static void grab_r(Display * d, const KeySym * restrict k,
-	const Window r, const uint32_t mask)
+    const Window r, const uint32_t mask)
 {
-	if (*k) { // Terminate at KeySym 0
-		XGrabKey(d, XKeysymToKeycode(d, *k), mask, r, True,
-			GrabModeAsync, GrabModeAsync);
-		grab_r(d, k + 1, r, mask);
-	}
+    if (*k) { // Terminate at KeySym 0
+        XGrabKey(d, XKeysymToKeycode(d, *k), mask, r, True,
+            GrabModeAsync, GrabModeAsync);
+        grab_r(d, k + 1, r, mask);
+    }
 }
 void jbwm_grab_root_keys(Display * d, const Window root)
 {
-	const uint32_t m = jbwm_get_grab_mask();
-	grab_r(d, (KeySym[]){JBWM_KEYS_TO_GRAB}, root, m);
-	grab_r(d, (KeySym[]){JBWM_ALT_KEYS_TO_GRAB}, root,
-		m | jbwm_get_mod_mask());
+    const uint32_t m = jbwm_get_grab_mask();
+    grab_r(d, (KeySym[]){JBWM_KEYS_TO_GRAB}, root, m);
+    grab_r(d, (KeySym[]){JBWM_ALT_KEYS_TO_GRAB}, root,
+        m | jbwm_get_mod_mask());
 }

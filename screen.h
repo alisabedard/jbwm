@@ -9,11 +9,11 @@
 struct JBWMScreen * jbwm_get_screens(void);
 inline struct JBWMScreen * jbwm_get_screen(struct JBWMClient * restrict c)
 {
-	return jbwm_get_screens() + c->screen;
+    return jbwm_get_screens() + c->screen;
 }
 inline Window jbwm_get_client_root(struct JBWMClient * restrict c)
 {
-	return RootWindow(c->display, c->screen);
+    return RootWindow(c->display, c->screen);
 }
 void jbwm_set_screens(struct JBWMScreen * restrict s);
 #endif /* JBWM_SCREEN_H */

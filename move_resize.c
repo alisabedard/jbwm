@@ -11,43 +11,43 @@
 #include "title_bar.h"
 static void jbwm_configure_client(struct JBWMClient * restrict c)
 {
-	if (!c) // prevent segmentation fault
-		return;
-	const Window w = c->window;
-	struct JBWMRectangle * restrict g = &c->size;
-	XSendEvent(c->display, w, true, StructureNotifyMask, (XEvent
-		*) &(XConfigureEvent){.x = g->x, .y = g->y, .width = g->width,
-		.height = g->height, .type = ConfigureNotify, .event = w,
-		.window = w, .above = c->parent, .override_redirect = true,
-		.border_width = c->opt.border});
+    if (!c) // prevent segmentation fault
+        return;
+    const Window w = c->window;
+    struct JBWMRectangle * restrict g = &c->size;
+    XSendEvent(c->display, w, true, StructureNotifyMask, (XEvent
+            *) &(XConfigureEvent){.x = g->x, .y = g->y, .width = g->width,
+        .height = g->height, .type = ConfigureNotify, .event = w,
+        .window = w, .above = c->parent, .override_redirect = true,
+        .border_width = c->opt.border});
 }
 static void do_move(Display * d, const Window parent,
-	const Window window, struct JBWMRectangle * restrict sz,
-	const uint8_t offset)
+    const Window window, struct JBWMRectangle * restrict sz,
+    const uint8_t offset)
 {
-	XMoveResizeWindow(d, parent, sz->x, sz->y - offset,
-		sz->width, sz->height + offset);
-	XMoveResizeWindow(d, window, 0, offset,
-		sz->width, sz->height);
+    XMoveResizeWindow(d, parent, sz->x, sz->y - offset,
+        sz->width, sz->height + offset);
+    XMoveResizeWindow(d, window, 0, offset,
+        sz->width, sz->height);
 }
 void jbwm_move_resize(struct JBWMClient * restrict c)
 {
-	struct JBWMClientOptions * restrict o = &c->opt;
-	const uint8_t offset = o->no_title_bar || o->fullscreen
-		? 0 : jbwm_get_font_height();
-	if(offset) { // Leave braces in case title bar support was disabled.
-		jbwm_handle_mwm_hints(c);
-		jbwm_update_title_bar(c);
-	} // Skip shaped and fullscreen clients.
-	struct JBWMRectangle * restrict s = &c->size;
-	do_move(c->display, c->parent, c->window, s, offset);
-	/* Use the XOR of the dimension to track changes, thus avoiding
-	 * excessive updates. */
-	uint16_t szsum = s->width ^ s->height;
-	if (szsum != c->szsum) {
-		c->szsum = szsum;
-		jbwm_set_shape(c);
-	}
-	jbwm_configure_client(c);
+    struct JBWMClientOptions * restrict o = &c->opt;
+    const uint8_t offset = o->no_title_bar || o->fullscreen
+    ? 0 : jbwm_get_font_height();
+    if(offset) { // Leave braces in case title bar support was disabled.
+        jbwm_handle_mwm_hints(c);
+        jbwm_update_title_bar(c);
+    } // Skip shaped and fullscreen clients.
+    struct JBWMRectangle * restrict s = &c->size;
+    do_move(c->display, c->parent, c->window, s, offset);
+    /* Use the XOR of the dimension to track changes, thus avoiding
+     * excessive updates. */
+    uint16_t szsum = s->width ^ s->height;
+    if (szsum != c->szsum) {
+        c->szsum = szsum;
+        jbwm_set_shape(c);
+    }
+    jbwm_configure_client(c);
 }
 

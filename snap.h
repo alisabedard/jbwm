@@ -6,7 +6,7 @@
 #define JBWM_SNAP_H
 struct JBWMClient;
 void jbwm_snap_border(struct JBWMClient * restrict c)
-	__attribute__((nonnull));
+__attribute__((nonnull));
 void jbwm_snap_client(struct JBWMClient * restrict c)
-	__attribute__((nonnull));
+__attribute__((nonnull));
 #endif//JBWM_SNAP_H

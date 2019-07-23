@@ -6,22 +6,22 @@
 static XftFont * jbwm_font;
 void jbwm_open_font(Display * d)
 {
-	if (jbwm_font)
-		return; // already created
-	char * font = getenv(JBWM_ENV_FONT);
-	jbwm_font = XftFontOpenName(d, DefaultScreen(d), font);
-	if (!jbwm_font)
-		jbwm_error(JBWM_ENV_FONT);
+    if (jbwm_font)
+        return; // already created
+    char * font = getenv(JBWM_ENV_FONT);
+    jbwm_font = XftFontOpenName(d, DefaultScreen(d), font);
+    if (!jbwm_font)
+        jbwm_error(JBWM_ENV_FONT);
 }
 void * jbwm_get_font(void)
 {
-	return jbwm_font;
+    return jbwm_font;
 }
 uint8_t jbwm_get_font_ascent(void)
 {
-	return jbwm_font->ascent;
+    return jbwm_font->ascent;
 }
 uint8_t jbwm_get_font_height(void)
 {
-	return jbwm_font->ascent + jbwm_font->descent;
+    return jbwm_font->ascent + jbwm_font->descent;
 }

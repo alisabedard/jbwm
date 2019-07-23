@@ -8,9 +8,9 @@ extern inline struct JBWMScreen * jbwm_get_screen(struct JBWMClient * c);
 static struct JBWMScreen * screens;
 struct JBWMScreen * jbwm_get_screens(void)
 {
-	return screens;
+    return screens;
 }
 void jbwm_set_screens(struct JBWMScreen * restrict s)
 {
-	screens = s;
+    screens = s;
 }

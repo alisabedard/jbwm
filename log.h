@@ -8,8 +8,8 @@
 #include <stdio.h>
 #define JBWM_LOG(...)\
 {\
-	fprintf(stderr, __VA_ARGS__);\
-	fprintf(stderr, " @ %s:%d\n", __FILE__, __LINE__);\
+    fprintf(stderr, __VA_ARGS__);\
+    fprintf(stderr, " @ %s:%d\n", __FILE__, __LINE__);\
 }
 #else//!DEBUG
 #define JBWM_LOG(...)
