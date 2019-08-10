@@ -11,7 +11,7 @@ static void process_flags(struct JBWMClientOptions * restrict o)
 {
     if (o->tearoff) {
         o->no_resize = o->no_shade = o->no_max
-        = o->no_title_bar = true;
+            = o->no_title_bar = true;
         o->border = 0;
     }
 }

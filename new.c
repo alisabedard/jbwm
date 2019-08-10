@@ -44,7 +44,7 @@ static Window get_parent(struct JBWMClient * restrict c)
         CFP = CopyFromParent,
         CW_VM = CWOverrideRedirect | CWEventMask,
         WA_EM = SubstructureRedirectMask | SubstructureNotifyMask |
-        ButtonPressMask | EnterWindowMask
+            ButtonPressMask | EnterWindowMask
     };
     struct JBWMRectangle * g = &c->size;
     return XCreateWindow(c->display, jbwm_get_client_root(c), g->x, g->y,

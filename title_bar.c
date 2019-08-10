@@ -38,8 +38,8 @@ void jbwm_toggle_shade(struct JBWMClient * restrict c)
     const bool s = c->opt.shaded = !c->opt.shaded;
     const int8_t state = (s ? set_shaded : set_not_shaded)(c);
     (state == IconicState ? jbwm_ewmh_add_state : jbwm_ewmh_remove_state)
-    (c->display, c->window,
-        jbwm_ewmh_get_atom(JBWM_EWMH_WM_STATE_SHADED));
+        (c->display, c->window,
+            jbwm_ewmh_get_atom(JBWM_EWMH_WM_STATE_SHADED));
     jbwm_move_resize(c);
     jbwm_set_wm_state(c, state);
 }

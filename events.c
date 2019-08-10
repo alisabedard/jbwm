@@ -24,9 +24,9 @@ static struct JBWMScreen * get_screen(const Window root, const int i)
 {
     struct JBWMScreen * s = jbwm_get_screens();
     return RootWindowOfScreen(s[i].xlib) == root ? s
-    // Check that the next iteration is not outside array bounds, using
-    // suppporting field as validation
-    : s[i + 1].supporting ? get_screen(root, i + 1) : s;
+        // Check that the next iteration is not outside array bounds, using
+        // suppporting field as validation
+        : s[i + 1].supporting ? get_screen(root, i + 1) : s;
 }
 static void cleanup(Display * d, struct JBWMClient * i)
 {
@@ -129,40 +129,40 @@ void jbwm_events_loop(Display * d)
         case MappingNotify:
         case MotionNotify:
         case ReparentNotify:
-        // ignore
-        break;
-        ECASE(ConfigureNotify);
-        ECASE(ConfigureRequest);
+            // ignore
+            break;
+            ECASE(ConfigureNotify);
+            ECASE(ConfigureRequest);
         case KeyPress:
-        jbwm_handle_key_event(&ev.xkey);
-        break;
+            jbwm_handle_key_event(&ev.xkey);
+            break;
         case ButtonPress:
-        if(c)
-            jbwm_handle_button_event(&ev.xbutton, c);
-        break;
-        ECASE(EnterNotify);
-        ECASE(Expose);
+            if(c)
+                jbwm_handle_button_event(&ev.xbutton, c);
+            break;
+            ECASE(EnterNotify);
+            ECASE(Expose);
         case CreateNotify:
-        if (ev.xcreatewindow.override_redirect) // internal
-            jbwm_ewmh_update_client_list(d);
-        break;
+            if (ev.xcreatewindow.override_redirect) // internal
+                jbwm_ewmh_update_client_list(d);
+            break;
         case DestroyNotify:
-        if (!c) // only bother if event was not on a client
-            jbwm_ewmh_update_client_list(d);
-        break;
+            if (!c) // only bother if event was not on a client
+                jbwm_ewmh_update_client_list(d);
+            break;
         case UnmapNotify:
-        if (c)
-            mark_removal(c);
-        break;
-        ECASE(MapRequest);
-        ECASE(PropertyNotify);
-        ECASE(ColormapNotify);
+            if (c)
+                mark_removal(c);
+            break;
+            ECASE(MapRequest);
+            ECASE(PropertyNotify);
+            ECASE(ColormapNotify);
         case ClientMessage:
-        jbwm_ewmh_handle_client_message(&ev.xclient, c);
-        break;
+            jbwm_ewmh_handle_client_message(&ev.xclient, c);
+            break;
 #ifdef DEBUG
         default:
-        JBWM_LOG("Unhandled event %d", ev.type);
+            JBWM_LOG("Unhandled event %d", ev.type);
 #endif//DEBUG
         }
         if (events_need_cleanup) {

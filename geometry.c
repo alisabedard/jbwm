@@ -67,7 +67,7 @@ static void init_geometry_for_screen_size(struct GeometryData * g,
     const long flags = handle_wm_normal_hints(g);
     const bool user_specified_position = flags & USPosition;
     const bool nonzero_position = g->attribute->x ||
-    g->attribute->y;
+        g->attribute->y;
     if (user_specified_position && nonzero_position) {
         JBWM_LOG("\t\tPosition is set by hints.");
         g->geometry->x = g->attribute->x;
@@ -89,8 +89,8 @@ static void init_geometry_for_screen(struct JBWMClient * c,
         Display * d = c->display;
         init_geometry_for_screen_size(&(struct GeometryData){ .display
             = d, .attribute = geometry_attribute, .geometry =
-            &c->size, .window = c->window},
-            jbwm_get_display_size(d, s->id));
+                &c->size, .window = c->window},
+                jbwm_get_display_size(d, s->id));
     } else
         c->size.x = c->size.y = 0;
 }

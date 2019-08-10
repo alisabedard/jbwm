@@ -20,14 +20,14 @@ static int handle_xerror(Display * d __attribute__((unused)),
 {
     switch (e->error_code) {
     case BadAccess:
-    if (e->request_code == X_ChangeWindowAttributes)
-        jbwm_error("Cannot access the root window");
-    break;
+        if (e->request_code == X_ChangeWindowAttributes)
+            jbwm_error("Cannot access the root window");
+        break;
     case BadWindow:
-    cleanup(e->resourceid);
-    return 0;
+        cleanup(e->resourceid);
+        return 0;
     case BadAtom:
-    return 0;
+        return 0;
     }
     JBWM_LOG("XError type:%d xid:%lu serial:%lu"
         " err:%d req:%d min:%d\n",

@@ -20,20 +20,20 @@ static uint16_t parse_modifiers(char * arg)
     if (s > 3) { // switch based on the 4th character
         switch(arg[3]) {
         case 'f': // shift
-        return ShiftMask;
+            return ShiftMask;
         case 'k': // lock
-        return LockMask;
+            return LockMask;
         case 't': // control
         case 'l': // ctrl
-        return ControlMask;
+            return ControlMask;
         case '2': // mod2
-        return Mod2Mask;
+            return Mod2Mask;
         case '3': // mod3
-        return Mod3Mask;
+            return Mod3Mask;
         case '4': // mod4
-        return Mod4Mask;
+            return Mod4Mask;
         case '5': // mod5
-        return Mod5Mask;
+            return Mod5Mask;
         }
     }
     // everything else becomes mod1
@@ -48,33 +48,33 @@ void jbwm_parse_command_line(const int argc, char **argv)
     while((opt = getopt(argc, argv, optstring)) != -1)
         switch (opt) {
         case '1':
-        jbwm_set_grab_mask(parse_modifiers(optarg));
-        break;
+            jbwm_set_grab_mask(parse_modifiers(optarg));
+            break;
         case '2':
-        jbwm_set_mod_mask(parse_modifiers(optarg));
-        break;
+            jbwm_set_mod_mask(parse_modifiers(optarg));
+            break;
         case 'b':
-        OVERRIDE(BG);
-        break;
+            OVERRIDE(BG);
+            break;
         case 'd':
-        OVERRIDE(DISPLAY);
-        break;
+            OVERRIDE(DISPLAY);
+            break;
         case 'F':
-        OVERRIDE(FONT);
-        break;
+            OVERRIDE(FONT);
+            break;
         case 'f':
-        OVERRIDE(FG);
-        break;
+            OVERRIDE(FG);
+            break;
         case 's':
-        OVERRIDE(FC);
-        break;
+            OVERRIDE(FC);
+            break;
         case 'V':
         case 'v':
-        printf("%s version %s\n", argv[0], VERSION);
-        exit(0);
+            printf("%s version %s\n", argv[0], VERSION);
+            exit(0);
         default:
-        printf("%s -[%s]\n", argv[0], optstring);
-        exit(1);
+            printf("%s -[%s]\n", argv[0], optstring);
+            exit(1);
         }
 }
 

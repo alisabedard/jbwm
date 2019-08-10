@@ -30,28 +30,28 @@ static void set_state(struct JBWMClient * restrict c,
     jbwm_print_atom(c->display, jbwm_ewmh_get_atom(t), __FILE__, __LINE__);
     switch(t) {
     case JBWM_EWMH_WM_STATE_FULLSCREEN:
-    (add?jbwm_set_fullscreen:jbwm_set_not_fullscreen)(c);
-    break;
+        (add?jbwm_set_fullscreen:jbwm_set_not_fullscreen)(c);
+        break;
     case JBWM_EWMH_WM_STATE_STICKY:
-    c->opt.sticky=add;
-    break;
+        c->opt.sticky=add;
+        break;
     case JBWM_EWMH_WM_STATE_ABOVE:
-    add = !add; // fall through
+        add = !add; // fall through
     case JBWM_EWMH_WM_STATE_BELOW:
-    (add ? XRaiseWindow : XLowerWindow)(c->display, c->parent);
-    break;
+        (add ? XRaiseWindow : XLowerWindow)(c->display, c->parent);
+        break;
     case JBWM_EWMH_WM_STATE_HIDDEN:
-    (add ? jbwm_hide_client : jbwm_restore_client)(c);
-    break;
+        (add ? jbwm_hide_client : jbwm_restore_client)(c);
+        break;
     case JBWM_EWMH_WM_STATE_MAXIMIZED_VERT:
-    (add ? jbwm_set_vert : jbwm_set_not_vert)(c);
-    break;
+        (add ? jbwm_set_vert : jbwm_set_not_vert)(c);
+        break;
     case JBWM_EWMH_WM_STATE_MAXIMIZED_HORZ:
-    (add ? jbwm_set_horz : jbwm_set_not_horz)(c);
-    break;
+        (add ? jbwm_set_horz : jbwm_set_not_horz)(c);
+        break;
     default:
-    JBWM_LOG("\tWARNING:  Unhandled state");
-    break;
+        JBWM_LOG("\tWARNING:  Unhandled state");
+        break;
     }
 }
 __attribute__((nonnull))
@@ -69,19 +69,19 @@ static void check_state(XClientMessageEvent * e,	// event data
     switch (e->data.l[0]) {
     default:
     case 0:	// remove
-    set_state(c, false, t);
-    jbwm_ewmh_remove_state(d, e->window, state);
-    break;
+        set_state(c, false, t);
+        jbwm_ewmh_remove_state(d, e->window, state);
+        break;
     case 1:	// add
-    set_state(c, true, t);
-    jbwm_ewmh_add_state(d, e->window, state);
-    break;
+        set_state(c, true, t);
+        jbwm_ewmh_add_state(d, e->window, state);
+        break;
     case 2: { // toggle
         const bool add = !jbwm_ewmh_get_state(e->display,
             e->window, state);
         set_state(c, add, t);
         (add ? jbwm_ewmh_add_state : jbwm_ewmh_remove_state)
-        (d, e->window, state);
+            (d, e->window, state);
     }
     }
 }

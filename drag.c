@@ -8,7 +8,7 @@
 #include "snap.h"
 enum {
     JBWMMouseMask = ButtonPressMask | ButtonReleaseMask
-    | PointerMotionMask
+        | PointerMotionMask
 };
 extern inline void jbwm_warp(Display * dpy, const Window w, const short x,
     const short y);

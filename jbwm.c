@@ -80,14 +80,14 @@ static inline void setup_gc(Display * d, struct JBWMScreen * s)
         GCLineWidth | GCForeground | GCBackground,
         &(XGCValues){.foreground = s->pixels.fg, .background =
             s->pixels.bg, .function = GXxor, .subwindow_mode =
-            IncludeInferiors, .line_width = 1});
+                IncludeInferiors, .line_width = 1});
 }
 static inline void setup_event_listeners(Display * d, const Window root)
 {
     enum {
         EMASK = SubstructureRedirectMask | SubstructureNotifyMask |
-        EnterWindowMask | PropertyChangeMask
-        | ColormapChangeMask
+            EnterWindowMask | PropertyChangeMask
+            | ColormapChangeMask
     };
     XChangeWindowAttributes(d, root, CWEventMask,
         &(XSetWindowAttributes){.event_mask = EMASK });

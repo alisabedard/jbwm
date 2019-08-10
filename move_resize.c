@@ -34,7 +34,7 @@ void jbwm_move_resize(struct JBWMClient * restrict c)
 {
     struct JBWMClientOptions * restrict o = &c->opt;
     const uint8_t offset = o->no_title_bar || o->fullscreen
-    ? 0 : jbwm_get_font_height();
+        ? 0 : jbwm_get_font_height();
     if(offset) { // Leave braces in case title bar support was disabled.
         jbwm_handle_mwm_hints(c);
         jbwm_update_title_bar(c);

@@ -37,24 +37,24 @@ void jbwm_handle_button_event(XButtonEvent * e,
     Display * d = e->display;
     switch (e->button) {
     case Button1:
-    if (fs)
-        XRaiseWindow(d, c->parent);
-    else
-        handle_title_bar_button(e, c);
-    break;
+        if (fs)
+            XRaiseWindow(d, c->parent);
+        else
+            handle_title_bar_button(e, c);
+        break;
     case Button2:
-    XLowerWindow(d, c->parent);
-    break;
-    case Button3:
-    /* Resize operations more useful here,
-       rather than for third button, for laptop
-       users especially, where it is difficult
-       to register a middle button press, even
-       with X Emulate3Buttons enabled.  */
-    if (fs)
         XLowerWindow(d, c->parent);
-    else
-        jbwm_drag(c, !c->opt.shaded);
-    break;
+        break;
+    case Button3:
+        /* Resize operations more useful here,
+           rather than for third button, for laptop
+           users especially, where it is difficult
+           to register a middle button press, even
+           with X Emulate3Buttons enabled.  */
+        if (fs)
+            XLowerWindow(d, c->parent);
+        else
+            jbwm_drag(c, !c->opt.shaded);
+        break;
     }
 }

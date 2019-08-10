@@ -84,7 +84,7 @@ void jbwm_toggle_sticky(struct JBWMClient * restrict c)
     jbwm_select_client(c);
     jbwm_update_title_bar(c);
     (c->opt.sticky ? jbwm_ewmh_add_state : jbwm_ewmh_remove_state)
-    (c->display, c->window, EWMH_ATOM(WM_STATE_STICKY));
+        (c->display, c->window, EWMH_ATOM(WM_STATE_STICKY));
 }
 // Free client and destroy its windows and properties.
 void jbwm_client_free(struct JBWMClient * restrict c)
