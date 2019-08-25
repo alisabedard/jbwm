@@ -159,30 +159,20 @@ static void handle_client_key_event(struct JBWMClient * restrict c,
         break;
     }
 }
-static struct JBWMClient * get_next_on_vdesk(struct JBWMClient * c)
-{
-    if (c)
-        c = c->next;
-    if (!c)
-        c = jbwm_get_current_client() ? jbwm_get_head_client() : NULL;
-    /* Non-NULL c indicates not yet being at the end of the linked list.
-     * If we've reached the current client, then we've made a loop (it was
-     * advanced past once in the first statement, c = c->next), so exit.
-     * Thus we check c != jbwm_get_current_client().  If c's vdesk does
-     * not equal the screen's vdesk the advance to the next client.  */
-    return c && c != jbwm_get_current_client()
-        && c->vdesk != jbwm_get_screens()[c->screen].vdesk
-        ? get_next_on_vdesk(c) : c;
+static void warp_to(struct JBWMClient * restrict c){
+    point(c, 0, 0);
+    point(c, c->size.width-1, c->size.height-1);
+    jbwm_select_client(c);
 }
-static void next(void)
-{
-    struct JBWMClient * restrict c =
-        get_next_on_vdesk(jbwm_get_current_client());
-    if (c) {
-        jbwm_select_client(c);
-        point(c, 0, 0);
-        point(c, c->size.width, c->size.height);
-    }
+static void next(struct JBWMClient *c,uint8_t const v){
+    if(!c->next)
+        c=jbwm_get_head_client();
+    else
+        c=c->next;
+    if(c->vdesk != v)
+        next(c,v);
+    else
+        warp_to(c);
 }
 static void cond_set_vdesk(Display * d, struct JBWMClient * c,
     struct JBWMScreen * s, const uint8_t desktop, const bool mod)
@@ -210,7 +200,8 @@ void jbwm_handle_key_event(XKeyEvent * e)
     case JBWM_KEY_QUIT:
         exit(0);
     case JBWM_KEY_NEXT:
-        next();
+        if(c)
+            next(c,c->vdesk);
         break;
     case XK_0:
         opt.zero = true;
