@@ -1,3 +1,4 @@
+*~
 *.o
 tags
 jbwm
@@ -6,3 +7,4 @@ jbwm
 *.log
 config.mk
 gmon.out
+jbwm.size_log
