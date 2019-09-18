@@ -197,7 +197,8 @@ static void set_supporting(Display * d, const Window w,
 }
 static Window init_supporting(Display * d, const Window r)
 {
-    Window w = XCreateSimpleWindow(d, r, 0, 0, 1, 1, 0, 0, 0);
+    Window w;
+    w = XCreateSimpleWindow(d, r, 0, 0, 1, 1, 0, 0, 0);
     set_supporting(d, r, &w);
     set_supporting(d, w, &w);
     set_ewmh_property(d, w, JBWM_EWMH_WM_PID, XA_CARDINAL,
@@ -207,8 +208,8 @@ static Window init_supporting(Display * d, const Window r)
 }
 void jbwm_ewmh_init_screen(Display * d, struct JBWMScreen * s)
 {
-    check_ewmh_init(d);
     static Window r;
+    check_ewmh_init(d);
     r = RootWindowOfScreen(s->xlib);
     set_ewmh_property(d, r, JBWM_EWMH_SUPPORTED, XA_ATOM, jbwm_ewmh,
         JBWM_EWMH_ATOMS_COUNT);
@@ -222,10 +223,10 @@ void jbwm_ewmh_init_screen(Display * d, struct JBWMScreen * s)
 // Required by wm-spec:
 void jbwm_set_frame_extents(struct JBWMClient * restrict c)
 {
+    static uint32_t f[4];
     check_ewmh_init(c->display);
     JBWM_LOG("jbwm_set_frame_extents()");
     // Fields: left, right, top, bottom
-    static uint32_t f[4];
     f[0] = f[1] = f[2] = f[3] = c->opt.border;
     if (!c->opt.no_title_bar)
         f[2] += jbwm_get_font_height();
