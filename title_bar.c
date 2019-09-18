@@ -92,8 +92,10 @@ static Window new_title_bar(struct JBWMClient * restrict c)
 static void draw_xft(struct JBWMClient * restrict c,
     const int16_t * restrict p, char * restrict name, const size_t l)
 {
-    struct JBWMScreen * scr = jbwm_get_screen(c);
-    XftDraw * restrict xd = scr->xft;
+    struct JBWMScreen * scr;
+    XftDraw *xd;
+    scr = jbwm_get_screen(c);
+    xd = scr->xft;
     XftDrawChange(xd, c->tb.win); // set target
     XftDrawStringUtf8(xd, &scr->font_color, jbwm_get_font(),
         p[0], p[1], (XftChar8 *)name, l);
@@ -105,7 +107,8 @@ static inline char * jbwm_get_title(Display * d, const Window w)
 }
 static void draw_title(struct JBWMClient * restrict c)
 {
-    char * name = jbwm_get_title(c->display, c->window);
+    char *name;
+    name = jbwm_get_title(c->display, c->window);
     if (name) {
         const int16_t p[] = {jbwm_get_font_height() + 4,
             jbwm_get_font_ascent()};
@@ -128,19 +131,23 @@ static void resize_title_bar(Display * d, const Window win,
 }
 void jbwm_update_title_bar(struct JBWMClient * restrict c)
 {
-    if (c->opt.shaped)
-        return;
-    Window w = c->tb.win;
-    if (c->opt.fullscreen && w) {
-        remove_title_bar(c);
-        return;
+    if (!c->opt.shaped){
+        Window w;
+        w = c->tb.win;
+        if (c->opt.fullscreen && w) {
+            remove_title_bar(c);
+        }else{
+            if (!w)
+                w = new_title_bar(c);
+            {
+                Display *d;
+                d = c->display;
+                resize_title_bar(d, w, &c->tb, c->size.width);
+                XClearWindow(d, w);
+            }
+            draw_title(c);
+            if (c->opt.no_title_bar)
+                remove_title_bar(c);
+        }
     }
-    if (!w)
-        w = new_title_bar(c);
-    Display * d = c->display;
-    resize_title_bar(d, w, &c->tb, c->size.width);
-    XClearWindow(d, w);
-    draw_title(c);
-    if (c->opt.no_title_bar)
-        remove_title_bar(c);
 }
