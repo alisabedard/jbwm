@@ -78,11 +78,12 @@ static void debug_window_list(int n, Window * window_list)
 static Window * get_mixed_client_list(Display * d)
 {
     static Window * window_list;
+    int n;
     if (window_list) {
         free(window_list);
         window_list = NULL;
     }
-    int n = get_client_list_r(&window_list, d,
+    n = get_client_list_r(&window_list, d,
         jbwm_get_head_client(), 0);
     set_root_property(d, JBWM_EWMH_CLIENT_LIST, XA_WINDOW,
         window_list, n);
@@ -151,9 +152,8 @@ static void set_desktop_viewport(struct PropertyData * restrict p)
 }
 static void set_number_of_desktops(struct PropertyData * restrict p)
 {
-    int32_t data = JBWM_MAX_DESKTOPS;
     p->property = EWMH(NUMBER_OF_DESKTOPS);
-    p->data = &data;
+    p->data=&(int32_t){JBWM_MAX_DESKTOPS};
     set_property(p);
 }
 static void set_current_desktop(struct PropertyData * restrict p,
