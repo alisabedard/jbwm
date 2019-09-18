@@ -6,7 +6,6 @@
 #include "ewmh.h"
 #include <unistd.h>
 #include <X11/Xatom.h>
-#include "JBWMAtomIndex.h"
 #include "JBWMClient.h"
 #include "JBWMScreen.h"
 #include "client.h"
@@ -15,6 +14,7 @@
 #include "geometry.h"
 #include "log.h"
 #include "macros.h"
+#include "PropertyData.h"
 #include "util.h"
 #define EWMH(a_name) JBWM_EWMH_##a_name
 static Atom jbwm_ewmh[JBWM_EWMH_ATOMS_COUNT];
@@ -31,13 +31,6 @@ Atom jbwm_ewmh_get_atom(const uint8_t index)
 {
     return jbwm_ewmh[index];
 }
-struct PropertyData {
-    Display * display;
-    void * data;
-    Window target;
-    enum JBWMAtomIndex property;
-    uint16_t size, type;
-};
 static inline void set_property(struct PropertyData * restrict p)
 {
     jbwm_set_property(p->display, p->target, jbwm_ewmh[p->property],
