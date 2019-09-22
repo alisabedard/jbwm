@@ -206,17 +206,23 @@ static Window init_supporting(Display * d, const Window r)
     set_name(d, w);
     return w;
 }
+static void set_ewmh_client_list(Display *d, Window *r){
+    /* Set this to the root window until we have some clients.
+     * Declared r static so we don't lose scope.  */
+    set_ewmh_property(d, *r, JBWM_EWMH_CLIENT_LIST, XA_WINDOW, r, 1);
+}
+static void set_ewmh_supported(Display *d, Window const r){
+    set_ewmh_property(d, r, JBWM_EWMH_SUPPORTED, XA_ATOM, jbwm_ewmh,
+        JBWM_EWMH_ATOMS_COUNT);
+}
 void jbwm_ewmh_init_screen(Display * d, struct JBWMScreen * s)
 {
     static Window r;
     check_ewmh_init(d);
     r = RootWindowOfScreen(s->xlib);
-    set_ewmh_property(d, r, JBWM_EWMH_SUPPORTED, XA_ATOM, jbwm_ewmh,
-        JBWM_EWMH_ATOMS_COUNT);
+    set_ewmh_supported(d,r);
     set_name(d, r);
-    /* Set this to the root window until we have some clients.
-     * Declared r static so we don't lose scope.  */
-    set_ewmh_property(d, r, JBWM_EWMH_CLIENT_LIST, XA_WINDOW, &r, 1);
+    set_ewmh_client_list(d,&r);
     init_desktops(d, s);
     s->supporting = init_supporting(d, r);
 }
