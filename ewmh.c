@@ -18,10 +18,10 @@
 #include "util.h"
 #define EWMH(a_name) JBWM_EWMH_##a_name
 static Atom jbwm_ewmh[JBWM_EWMH_ATOMS_COUNT];
-static bool jbwm_ewmh_init_done;
 #include "ewmh_init.c"
 static void check_ewmh_init(Display * d)
 {
+    static bool jbwm_ewmh_init_done;
     if (!jbwm_ewmh_init_done) {
         jbwm_ewmh_init(d);
         jbwm_ewmh_init_done = true;
