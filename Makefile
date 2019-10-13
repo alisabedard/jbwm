@@ -8,6 +8,7 @@ exe=jbwm
 distname=$(exe)-$(version)
 # Edit/override this line if you don't want jbwm to install under /usr.
 PREFIX=/usr
+SCHEME=mit-scheme
 # Note that $(DESTDIR) is used by the Debian build process.
 dest=$(DESTDIR)$(PREFIX)
 jbwm_cflags+=-DVERSION=\"$(version)\" $(DEBIAN)
@@ -21,7 +22,7 @@ objects+=button_event.o keys.o util.o max.o select.o snap.o display.o
 objects+=exec.o main.o move_resize.o key_masks.o key_event.o vdesk.o
 objects+=geometry.o command_line.o ewmh.o ewmh_state.o ewmh_client.o
 objects+=ewmh_wm_state.o title_bar.o font.o shape.o
-$(exe): $(objects)
+$(exe): depend.mk $(objects)
 	$(CC) ${CFLAGS} ${jbwm_cflags} ${jbwm_ldflags} \
 		$(LDFLAGS) $(objects) -o $@
 	strip $(exe) -o $(exe).tmp
@@ -80,13 +81,12 @@ small: clean
 	tail small.log
 clang: clean
 	make -f Makefile.clang
-#depend:
-#	bmkdep -f depend.mk -- ${CFLAGS} \
-#		-I/usr/include/freetype2 *.c
-#depend:
-#	cc -E -MM *.c > depend.mk
-depend:
-	cc -I/usr/include/freetype2 -E -MM *.c > depend.mk
+
+keys.h: keys.scm keys.txt
+	${SCHEME}<keys.scm
+	touch keys.h
+depend.mk: *.c *.h
+	makedepend -f depend.mk -- ${jbwm_cflags} -- *.c
 cppcheck:
 	cppcheck --enable=all -j 4 -DDEBUG --inline-suppr \
 		--inconclusive --std=c11 *.c \
