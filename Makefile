@@ -6,11 +6,11 @@ version=1.58
 include config.mk
 exe=jbwm
 distname=$(exe)-$(version)
-# Edit/override this line if you don't want jbwm to install under /usr.
-PREFIX=/usr
+# Edit/override this line if you don't want jbwm to install under /usr/local.
+PREFIX=/usr/local
 SCHEME=mit-scheme
 # Note that $(DESTDIR) is used by the Debian build process.
-dest=$(DESTDIR)$(PREFIX)
+dest=${DESTDIR}${PREFIX}
 jbwm_cflags+=-DVERSION=\"$(version)\" $(DEBIAN)
 jbwm_cflags+=-D_XOPEN_SOURCE=700 -std=c99
 # Titlebar Xft support:
@@ -86,7 +86,7 @@ keys.h: keys.scm keys.txt
 	${SCHEME}<keys.scm
 	touch keys.h
 depend.mk: *.c *.h
-	makedepend -f depend.mk -- ${jbwm_cflags} -- *.c
+	./mkdep.sh
 cppcheck:
 	cppcheck --enable=all -j 4 -DDEBUG --inline-suppr \
 		--inconclusive --std=c11 *.c \
