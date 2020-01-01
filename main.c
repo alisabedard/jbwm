@@ -10,7 +10,6 @@
 #include "screen.h"
 int main(int argc, char **argv)
 {
-    jbwm_set_defaults();
     jbwm_parse_command_line(argc, argv);
     Display * d = jbwm_open_display();
     jbwm_open_font(d);

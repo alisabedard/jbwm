@@ -5,7 +5,5 @@
 #ifndef JBWM_JBWM_H
 #define JBWM_JBWM_H
 #include <X11/Xlib.h>
-// Initialize SCREENS amount of screens.
 void jbwm_init_screens(Display * d, const short screens);
-void jbwm_set_defaults(void);
 #endif /* not JBWM_JBWM_H */

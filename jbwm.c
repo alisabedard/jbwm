@@ -122,11 +122,3 @@ void jbwm_init_screens(Display * d, const short screens)
     jbwm_ewmh_init_screen(d, s);
     jbwm_init_screens(d, screens - 1);
 }
-void jbwm_set_defaults(void)
-{
-#define SETENV(i) setenv(ENV(i), JBWM_DEF_##i, 0)
-    SETENV(FG); SETENV(FC); SETENV(BG); SETENV(TERM);
-    SETENV(CLOSE); SETENV(RESIZE); SETENV(SHADE);
-    SETENV(STICK); SETENV(FONT);
-#undef SETENV
-}
