@@ -8,10 +8,9 @@ void jbwm_open_font(Display * d)
 {
     if (jbwm_font)
         return; // already created
-    char * font = getenv(JBWM_ENV_FONT);
-    jbwm_font = XftFontOpenName(d, DefaultScreen(d), font);
+    jbwm_font = XftFontOpenName(d, DefaultScreen(d), JBWM_FONT);
     if (!jbwm_font)
-        jbwm_error(JBWM_ENV_FONT);
+        jbwm_error(JBWM_FONT);
 }
 void * jbwm_get_font(void)
 {

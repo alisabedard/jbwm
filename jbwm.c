@@ -12,25 +12,23 @@
 #include "new.h"
 #include "screen.h"
 #include "util.h"
-// Macros:
-#define ENV(e) JBWM_ENV_##e
 static void allocate_xft_color(Display * d, struct JBWMScreen * s)
 {
     XftColorAllocName(d, DefaultVisualOfScreen(s->xlib),
-        DefaultColormapOfScreen(s->xlib), getenv(ENV(FG)),
+        DefaultColormapOfScreen(s->xlib), JBWM_FG,
         &s->font_color);
 }
 static void allocate_colors(Display * d, struct JBWMScreen * restrict s)
 {
     const uint8_t n = s->id;
-#define PIX(field, env) s->pixels.field = jbwm_get_pixel(d, n, getenv(env));
-    PIX(bg, ENV(BG));
-    PIX(fc, ENV(FC));
-    PIX(fg, ENV(FG));
-    PIX(close, ENV(CLOSE));
-    PIX(resize, ENV(RESIZE));
-    PIX(shade, ENV(SHADE));
-    PIX(stick, ENV(STICK));
+#define PIX(field, color) s->pixels.field = jbwm_get_pixel(d, n, color);
+    PIX(bg, JBWM_BG);
+    PIX(fc, JBWM_FC);
+    PIX(fg, JBWM_FG);
+    PIX(close, JBWM_CLOSE);
+    PIX(resize, JBWM_RESIZE);
+    PIX(shade, JBWM_SHADE);
+    PIX(stick, JBWM_STICK);
     allocate_xft_color(d, s);
 #undef PIX
 }

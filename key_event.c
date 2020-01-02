@@ -195,7 +195,7 @@ void jbwm_handle_key_event(XKeyEvent * e)
     } opt = {s->vdesk, e->state & jbwm_get_mod_mask(), 0};
     switch (key) {
     case JBWM_KEY_NEW:
-        jbwm_start_terminal();
+        jbwm_exec(JBWM_TERM);
         break;
     case JBWM_KEY_QUIT:
         exit(0);

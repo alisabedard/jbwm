@@ -63,7 +63,6 @@ distclean: clean
 	rm -f *~ *.out .*.swp .*.swn *.orig .*~ *~~
 archive: distclean
 	cd ..;  tar cJf $(exe)-$(version).tar.xz $(exe)
- 
 tags:
 	ctags *
 indent:

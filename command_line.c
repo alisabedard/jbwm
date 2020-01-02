@@ -42,9 +42,8 @@ static uint16_t parse_modifiers(char * arg)
 void jbwm_parse_command_line(const int argc, char **argv)
 {
     JBWM_LOG("parse_argv(%d,%s...)", argc, argv[0]);
-    static const char optstring[] = "1:2:b:d:F:f:hs:Vv";
+    static const char optstring[] = "1:2:v";
     int8_t opt;
-#define OVERRIDE(x) setenv(JBWM_ENV_##x, optarg, 1);
     while((opt = getopt(argc, argv, optstring)) != -1)
         switch (opt) {
         case '1':
@@ -53,22 +52,6 @@ void jbwm_parse_command_line(const int argc, char **argv)
         case '2':
             jbwm_set_mod_mask(parse_modifiers(optarg));
             break;
-        case 'b':
-            OVERRIDE(BG);
-            break;
-        case 'd':
-            OVERRIDE(DISPLAY);
-            break;
-        case 'F':
-            OVERRIDE(FONT);
-            break;
-        case 'f':
-            OVERRIDE(FG);
-            break;
-        case 's':
-            OVERRIDE(FC);
-            break;
-        case 'V':
         case 'v':
             printf("%s version %s\n", argv[0], VERSION);
             exit(0);

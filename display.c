@@ -39,13 +39,9 @@ Display * jbwm_open_display(void)
 {
     Display * display;
     errno = ECONNREFUSED; // Default error message
-    if (!(display = XOpenDisplay(NULL))) {
-        enum { SZ = 128 };
-        char buf[SZ];
-        snprintf(buf, SZ, "Cannot open DISPLAY %s",
-            getenv(JBWM_ENV_DISPLAY));
-        jbwm_error(buf);
-    }
+    display=XOpenDisplay(NULL);
+    if(!display)
+        jbwm_error(getenv("DISPLAY"));
     XSetErrorHandler(handle_xerror);
     return display;
 }
