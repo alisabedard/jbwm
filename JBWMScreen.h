@@ -7,6 +7,7 @@
 #include <X11/Xft/Xft.h>
 #include "JBWMPixels.h"
 struct JBWMScreen {
+    Display *display;
     Screen * xlib;
     XftDraw * xft;
     XftColor font_color;

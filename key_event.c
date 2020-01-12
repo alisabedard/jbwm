@@ -11,7 +11,6 @@
 #include "log.h"
 #include "max.h"
 #include "move_resize.h"
-#include "screen.h"
 #include "select.h"
 #include "snap.h"
 #include "title_bar.h"
@@ -182,12 +181,11 @@ static void cond_set_vdesk(Display * d, struct JBWMClient * c,
     else
         jbwm_set_vdesk(d, s, desktop);
 }
-void jbwm_handle_key_event(XKeyEvent * e)
+void jbwm_handle_key_event(struct JBWMScreen *s, XKeyEvent * e)
 {
     JBWM_LOG("jbwm_handle_key_event");
     const KeySym key = XLookupKeysym(e, 0);
     struct JBWMClient * restrict c = jbwm_get_current_client();
-    struct JBWMScreen * s = c ? jbwm_get_screen(c) : jbwm_get_screens();
     struct {
         uint8_t vdesk:6;
         bool mod:1;

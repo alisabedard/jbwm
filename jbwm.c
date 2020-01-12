@@ -4,22 +4,23 @@
 // See README for license and other details.
 //#undef DEBUG
 #include "jbwm.h"
-#include "JBWMScreen.h"
 #include "config.h"
 #include "ewmh.h"
+#include "JBWMScreen.h"
 #include "keys.h"
 #include "log.h"
 #include "new.h"
-#include "screen.h"
+#include <stdbool.h>
 #include "util.h"
 static void allocate_xft_color(Display * d, struct JBWMScreen * s)
 {
     XftColorAllocName(d, DefaultVisualOfScreen(s->xlib),
-        DefaultColormapOfScreen(s->xlib), JBWM_FG,
-        &s->font_color);
+            DefaultColormapOfScreen(s->xlib), JBWM_FG,
+            &s->font_color);
 }
-static void allocate_colors(Display * d, struct JBWMScreen * restrict s)
+static void allocate_colors(struct JBWMScreen * restrict s)
 {
+    Display * d=s->display;
     const uint8_t n = s->id;
 #define PIX(field, color) s->pixels.field = jbwm_get_pixel(d, n, color);
     PIX(bg, JBWM_BG);
@@ -37,15 +38,15 @@ static bool check_redirect(Display * d, const Window w)
     XWindowAttributes a;
     XGetWindowAttributes(d, w, &a);
     JBWM_LOG("check_redirect(0x%x): override_redirect: %s, "
-        "map_state: %s", (int)w,
-        a.override_redirect ? "true" : "false",
-        a.map_state == IsViewable ? "IsViewable"
-        : "not IsViewable");
+            "map_state: %s", (int)w,
+            a.override_redirect ? "true" : "false",
+            a.map_state == IsViewable ? "IsViewable"
+            : "not IsViewable");
     return (!a.override_redirect && (a.map_state == IsViewable));
 }
 // Free returned data with XFree()
 static Window * get_windows(Display * dpy, const Window root,
-    uint16_t * win_count)
+        uint16_t * win_count)
 {
     Window * w, d;
     unsigned int n;
@@ -68,10 +69,10 @@ static void setup_clients(Display * d, struct JBWMScreen * s)
 static inline void setup_gc(Display * d, struct JBWMScreen * s)
 {
     XChangeGC(d, DefaultGC(d, s->id), GCFunction | GCSubwindowMode |
-        GCLineWidth | GCForeground | GCBackground,
-        &(XGCValues){.foreground = s->pixels.fg, .background =
+            GCLineWidth | GCForeground | GCBackground,
+            &(XGCValues){.foreground = s->pixels.fg, .background =
             s->pixels.bg, .function = GXxor, .subwindow_mode =
-                IncludeInferiors, .line_width = 1});
+            IncludeInferiors, .line_width = 1});
 }
 static inline void setup_event_listeners(Display * d, const Window root)
 {
@@ -81,35 +82,35 @@ static inline void setup_event_listeners(Display * d, const Window root)
             | ColormapChangeMask
     };
     XChangeWindowAttributes(d, root, CWEventMask,
-        &(XSetWindowAttributes){.event_mask = EMASK });
+            &(XSetWindowAttributes){.event_mask = EMASK });
 }
 /* Create a unique XftDraw for each screen to properly handle colormaps and
  * screen limitations.  */
 static XftDraw * new_xft_draw(Screen * s)
 {
     return XftDrawCreate(DisplayOfScreen(s), RootWindowOfScreen(s),
-        DefaultVisualOfScreen(s), DefaultColormapOfScreen(s));
+            DefaultVisualOfScreen(s), DefaultColormapOfScreen(s));
 }
 // Initialize SCREENS amount of screens.
-void jbwm_init_screens(Display * d, const short screens)
+void jbwm_init_screens(Display *d, struct JBWMScreen *s, const short screens)
 {
-    if (screens < 0)
-        return;
-    JBWM_LOG("jbwm_init_screen(d, screens), screens is %d", screens);
-    struct JBWMScreen * restrict s = &jbwm_get_screens()[screens];
-    s->id = screens;
-    s->vdesk = 0;
-    s->xlib = ScreenOfDisplay(d, screens);
-    s->xft = new_xft_draw(s->xlib);
-    allocate_colors(d, s);
-    setup_gc(d, s);
-    { // r scope
-        const Window r = RootWindow(d, screens);
-        setup_event_listeners(d, r);
-        jbwm_grab_root_keys(d, r);
+    if(screens>=0){
+        JBWM_LOG("jbwm_init_screen(d, screens), screens is %d", screens);
+        s->display=d;
+        s->id = screens;
+        s->vdesk = 0;
+        s->xlib = ScreenOfDisplay(d, screens);
+        s->xft = new_xft_draw(s->xlib);
+        allocate_colors(s);
+        setup_gc(d, s);
+        { // r scope
+            const Window r = RootWindow(d, screens);
+            setup_event_listeners(d, r);
+            jbwm_grab_root_keys(d, r);
+        }
+        /* scan all the windows on this screen */
+        setup_clients(d, s);
+        jbwm_ewmh_init_screen(d, s);
+        jbwm_init_screens(d, s, screens - 1);
     }
-    /* scan all the windows on this screen */
-    setup_clients(d, s);
-    jbwm_ewmh_init_screen(d, s);
-    jbwm_init_screens(d, screens - 1);
 }

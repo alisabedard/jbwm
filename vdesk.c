@@ -15,7 +15,7 @@ static void check_visibility(const struct JBWMScreen * s, struct
     JBWMClient * restrict c, const uint8_t v)
 {
     if (c) {
-        if (c->screen == s->id) {
+        if (c->screen->id == s->id) {
             if (c->vdesk == v || c->opt.sticky) {
                 // allow moving windows by sticking
                 c->vdesk = v;

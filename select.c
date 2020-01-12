@@ -5,17 +5,17 @@
 #include "select.h"
 #include <X11/Xatom.h>
 #include <X11/Xlib.h>
-#include "JBWMAtomIndex.h"
 #include "client.h"
 #include "ewmh.h"
 #include "ewmh_state.h"
-#include "screen.h"
+#include "JBWMAtomIndex.h"
+#include "JBWMClient.h"
 #include "util.h"
 #define EWMH_ATOM(a) jbwm_ewmh_get_atom(JBWM_EWMH_##a)
 #define WM_STATE(a) EWMH_ATOM(WM_STATE_##a)
 static inline jbwm_pixel_t get_bg(struct JBWMClient * c)
 {
-    return jbwm_get_screen(c)->pixels.bg;
+    return c->screen->pixels.bg;
 }
 static void set_state_not_focused(struct JBWMClient * c)
 {
@@ -30,7 +30,7 @@ static void unselect_current(struct JBWMClient * c)
 }
 static void set_border(struct JBWMClient * c)
 {
-    struct JBWMPixels * restrict p = &jbwm_get_screen(c)->pixels;
+    struct JBWMPixels * restrict p = &c->screen->pixels;
     XSetWindowBorder(c->display, c->parent,
         c->opt.sticky ? p->fc : p->fg);
 }
@@ -50,7 +50,7 @@ static void set_active_window(struct JBWMClient * c)
      * cause a segmentation fault.  */
     static Window w;
     w = c->window;
-    jbwm_set_property(c->display, jbwm_get_client_root(c),
+    jbwm_set_property(c->display, c->screen->xlib->root,
         EWMH_ATOM(ACTIVE_WINDOW), XA_WINDOW, &w, 1);
     jbwm_set_current_client(c);
 }

@@ -8,11 +8,11 @@
 #include "client.h"
 #include "ewmh.h"
 #include "ewmh_client.h"
+#include "JBWMScreen.h"
 #include "key_event.h"
 #include "log.h"
 #include "move_resize.h"
 #include "new.h"
-#include "screen.h"
 #include "select.h"
 #include "title_bar.h"
 #include "util.h"
@@ -20,13 +20,12 @@
 // Set log level for events
 #define JBWM_LOG_EVENTS 5
 static bool events_need_cleanup;
-static struct JBWMScreen * get_screen(const Window root, const int i)
-{
-    struct JBWMScreen * s = jbwm_get_screens();
+static struct JBWMScreen * get_screen(struct JBWMScreen *s,
+    const Window root, const int i) {
     return RootWindowOfScreen(s[i].xlib) == root ? s
         // Check that the next iteration is not outside array bounds, using
         // suppporting field as validation
-        : s[i + 1].supporting ? get_screen(root, i + 1) : s;
+        : s[i + 1].supporting ? get_screen(s,root, i + 1) : s;
 }
 static void cleanup(Display * d, struct JBWMClient * i)
 {
@@ -56,8 +55,8 @@ static void jbwm_handle_PropertyNotify(XEvent * ev, struct JBWMClient * c)
         }
     }
 }
-static void jbwm_handle_MapRequest(XEvent * ev, struct JBWMClient * c)
-{
+static void jbwm_handle_MapRequest(XEvent * ev, struct JBWMClient * c,
+    struct JBWMScreen * s) {
     if (!c) {
         XMapRequestEvent * restrict e = &ev->xmaprequest;
         /* This check fixes a race condition in old libreoffice and
@@ -69,7 +68,7 @@ static void jbwm_handle_MapRequest(XEvent * ev, struct JBWMClient * c)
         serial = e->serial;
         JBWM_LOG("jbwm_handle_MapRequest(), send_event:%d",
             e->send_event);
-        jbwm_new_client(e->display, get_screen(e->parent, 0),
+        jbwm_new_client(e->display, get_screen(s, e->parent, 0),
             e->window);
     }
 }
@@ -114,12 +113,16 @@ static void jbwm_handle_Expose(XEvent * ev, struct JBWMClient * c)
     if (c && !ev->xexpose.count)
         jbwm_update_title_bar(c);
 }
-void jbwm_events_loop(Display * d)
+void jbwm_events_loop(struct JBWMScreen * s)
 {
+    Display *d;
+    d=s->display;
     for (;;) {
         XEvent ev;
         XNextEvent(d, &ev);
         struct JBWMClient * c = jbwm_get_client(ev.xany.window);
+        if(c)
+            s=c->screen; // refer to the client's local screen
         switch (ev.type) {
 #define ECASE(name) case name: JBWM_LOG("\tXEVENT: %s", #name);\
             jbwm_handle_##name(&ev, c); break;
@@ -134,7 +137,7 @@ void jbwm_events_loop(Display * d)
             ECASE(ConfigureNotify);
             ECASE(ConfigureRequest);
         case KeyPress:
-            jbwm_handle_key_event(&ev.xkey);
+            jbwm_handle_key_event(c?c->screen:s,&ev.xkey);
             break;
         case ButtonPress:
             if(c)
@@ -154,11 +157,13 @@ void jbwm_events_loop(Display * d)
             if (c)
                 mark_removal(c);
             break;
-            ECASE(MapRequest);
+        case MapRequest:
+            jbwm_handle_MapRequest(&ev,c,s);
+            break;
             ECASE(PropertyNotify);
             ECASE(ColormapNotify);
         case ClientMessage:
-            jbwm_ewmh_handle_client_message(&ev.xclient, c);
+            jbwm_ewmh_handle_client_message(&ev.xclient, c, s);
             break;
 #ifdef DEBUG
         default:

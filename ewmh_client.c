@@ -6,7 +6,6 @@
 #include "drag.h"
 #include "ewmh.h"
 #include "ewmh_wm_state.h"
-#include "screen.h"
 #include "select.h"
 #include "util.h"
 #include "vdesk.h"
@@ -71,16 +70,14 @@ static void debug_client_message(XClientMessageEvent * e)
 #define debug_client_message(e)
 #endif//JBWM_DEBUG_EWMH_STATE&&DEBUG
 void jbwm_ewmh_handle_client_message(XClientMessageEvent * e,
-    struct JBWMClient * restrict c)
+    struct JBWMClient * c, struct JBWMScreen *s)
 {
     const Atom t = e->message_type;
     debug_client_message(e);
     if(c && client_specific_message(e, c, t))
         return;
     if (t == jbwm_ewmh_get_atom(JBWM_EWMH_CURRENT_DESKTOP)) {
-        const uint8_t i = c ? c->screen : 0;
-        jbwm_set_vdesk(e->display, jbwm_get_screens() + i,
-            e->data.l[0]);
+        jbwm_set_vdesk(e->display, s, e->data.l[0]);
     } else if (t == jbwm_ewmh_get_atom(JBWM_EWMH_MOVERESIZE_WINDOW)) {
         // If something else moves the window:
         handle_moveresize(e);

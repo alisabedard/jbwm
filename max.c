@@ -1,11 +1,11 @@
 // Copyright 2017-2019, Jeffrey E. Bedard
 #include "max.h"
-#include "JBWMAtomIndex.h"
 #include "ewmh.h"
 #include "ewmh_state.h"
 #include "font.h"
+#include "JBWMAtomIndex.h"
+#include "JBWMClient.h"
 #include "move_resize.h"
-#include "screen.h"
 #include "title_bar.h"
 /* In this file, the static companion functions perform the requested option
    directly, while the global functions call the corresponding static
@@ -39,7 +39,7 @@ void jbwm_set_horz(struct JBWMClient * restrict c)
         return;
     jbwm_ewmh_add_state(c->display, c->window,
         jbwm_ewmh_get_atom(JBWM_EWMH_WM_STATE_MAXIMIZED_HORZ));
-    set_horz(c, DisplayWidth(c->display, jbwm_get_screen(c)->id));
+    set_horz(c, DisplayWidth(c->display, c->screen->id));
     c->size.width -= c->opt.border << 1;
     jbwm_move_resize(c);
 }
@@ -63,7 +63,7 @@ static void set_vert(struct JBWMClient * restrict c)
     c->old_size.y = c->size.y;
     c->old_size.height = c->size.height;
     c->size.y = 0;
-    c->size.height = DisplayHeight(c->display, jbwm_get_screen(c)->id);
+    c->size.height = DisplayHeight(c->display, c->screen->id);
     jbwm_ewmh_add_state(c->display, c->window,
         jbwm_ewmh_get_atom(JBWM_EWMH_WM_STATE_MAXIMIZED_VERT));
 }
@@ -102,7 +102,7 @@ static void set_fullscreen(struct JBWMClient * restrict c)
     c->opt.fullscreen = true;
     c->before_fullscreen = c->size;
     c->size.x = c->size.y = 0;
-    const uint8_t id = jbwm_get_screen(c)->id;
+    const uint8_t id = c->screen->id;
     Display * d = c->display;
     c->size.width = DisplayWidth(d, id);
     c->size.height = DisplayHeight(d, id);

@@ -9,7 +9,6 @@
 #include "jbwm.h"
 #include "log.h"
 #include "max.h"
-#include "screen.h"
 #include "select.h"
 #include "util.h"
 #include "wm_state.h"

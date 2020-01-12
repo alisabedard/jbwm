@@ -5,5 +5,6 @@
 #ifndef JBWM_JBWM_H
 #define JBWM_JBWM_H
 #include <X11/Xlib.h>
-void jbwm_init_screens(Display * d, const short screens);
+struct JBWMScreen;
+void jbwm_init_screens(Display *d, struct JBWMScreen *s, const short screens);
 #endif /* not JBWM_JBWM_H */

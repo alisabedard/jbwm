@@ -11,7 +11,6 @@
 #include "ewmh_state.h"
 #include "font.h"
 #include "move_resize.h"
-#include "screen.h"
 #include "util.h"
 #include "wm_state.h"
 static int8_t set_shaded(struct JBWMClient * restrict c)
@@ -82,7 +81,7 @@ static void configure_title_bar(Display * d, const Window t)
 }
 static Window new_title_bar(struct JBWMClient * restrict c)
 {
-    const struct JBWMPixels * p = &jbwm_get_screen(c)->pixels;
+    const struct JBWMPixels * p = &c->screen->pixels;
     Display * d = c->display;
     const Window t = c->tb.win = get_win(d, c->parent, p->bg);
     add_buttons(c, p, t);
@@ -94,7 +93,7 @@ static void draw_xft(struct JBWMClient * restrict c,
 {
     struct JBWMScreen * scr;
     XftDraw *xd;
-    scr = jbwm_get_screen(c);
+    scr = c->screen;
     xd = scr->xft;
     XftDrawChange(xd, c->tb.win); // set target
     XftDrawStringUtf8(xd, &scr->font_color, jbwm_get_font(),

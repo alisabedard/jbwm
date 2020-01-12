@@ -5,14 +5,14 @@
 //#undef DEBUG
 #include "snap.h"
 #include <stdlib.h>
-#include "JBWMPoint.h"
-#include "JBWMSize.h"
 #include "client.h"
 #include "config.h"
 #include "font.h"
 #include "geometry.h"
+#include "JBWMClient.h"
+#include "JBWMPoint.h"
+#include "JBWMSize.h"
 #include "log.h"
-#include "screen.h"
 __attribute__ ((const, warn_unused_result))
 static int sborder(const int xy, const int edge)
 {
@@ -21,8 +21,8 @@ static int sborder(const int xy, const int edge)
 void jbwm_snap_border(struct JBWMClient * restrict c)
 {
     struct JBWMRectangle * restrict g = &(c->size);
-    const struct JBWMSize s = jbwm_get_display_size(c->display,
-        c->screen);
+    const struct JBWMSize s = {c->screen->xlib->width,
+        c->screen->xlib->height};
     const uint8_t b = c->opt.border << 1;
     // snap to screen border
     g->x = sborder(g->x, 0);

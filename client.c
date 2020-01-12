@@ -8,7 +8,6 @@
 #include "JBWMAtomIndex.h"
 #include "ewmh.h"
 #include "ewmh_state.h"
-#include "screen.h"
 #include "select.h"
 #include "title_bar.h"
 #include "vdesk.h"
@@ -56,9 +55,8 @@ void jbwm_set_client_vdesk(struct JBWMClient * restrict c,
     const uint8_t p = c->vdesk; // save previous
     c->vdesk = desktop;
     // use jbwm_set_vdesk to validate desktop:
-    struct JBWMScreen * s = &jbwm_get_screens()[c->screen];
-    c->vdesk = jbwm_set_vdesk(c->display, s, desktop);
-    jbwm_set_vdesk(c->display, s, p);
+    c->vdesk = jbwm_set_vdesk(c->display, c->screen, desktop);
+    jbwm_set_vdesk(c->display, c->screen, p);
 }
 /*  This is the third most called function.  Show restraint in adding any
  *  future tests.  */
@@ -95,7 +93,7 @@ void jbwm_client_free(struct JBWMClient * restrict c)
     // Per ICCCM + wm-spec
     XDeleteProperty(d, w, EWMH_ATOM(WM_STATE));
     XDeleteProperty(d, w, EWMH_ATOM(WM_DESKTOP));
-    XReparentWindow(d, w, jbwm_get_client_root(c), p->x, p->y);
+    XReparentWindow(d, w, c->screen->xlib->root, p->x, p->y);
     XRemoveFromSaveSet(d, w);
     if(parent)
         XDestroyWindow(d, parent);

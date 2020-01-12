@@ -1,11 +1,11 @@
 // Copyright 2017, Jeffrey E. Bedard <jefbed@gmail.com>
 #include "drag.h"
-#include <X11/cursorfont.h>
-#include <stdlib.h>
 #include "font.h"
+#include "JBWMClient.h"
 #include "move_resize.h"
-#include "screen.h"
 #include "snap.h"
+#include <stdlib.h>
+#include <X11/cursorfont.h>
 enum {
     JBWMMouseMask = ButtonPressMask | ButtonReleaseMask
         | PointerMotionMask
@@ -69,7 +69,7 @@ static void draw_outline(struct JBWMClient * restrict c)
     const struct JBWMRectangle * restrict g = &c->size;
     enum { BORDER = 1 };
     Display * d = c->display;
-    XDrawRectangle(d, jbwm_get_client_root(c), DefaultGC(d, c->screen),
+    XDrawRectangle(d, c->screen->xlib->root, c->screen->xlib->default_gc,
         g->x, g->y - o, g->width + BORDER, g->height + BORDER + o);
 }
 // Returns true if we should continue the event loop
@@ -82,7 +82,7 @@ static bool get_point(Display * d, int16_t * restrict p)
 }
 static void drag_event_loop(struct JBWMClient * restrict c, const bool resize)
 {
-    const Window root = jbwm_get_client_root(c);
+    const Window root = c->screen->xlib->root;
     const int16_t original[] = {c->size.x, c->size.y};
     int16_t start[2];
     Display * d = c->display;
@@ -108,7 +108,7 @@ void jbwm_drag(struct JBWMClient * restrict c, const bool resize)
     XRaiseWindow(d, c->parent);
     if (resize && (c->opt.no_resize || c->opt.shaded))
         return;
-    grab_pointer(d, RootWindow(d, c->screen));
+    grab_pointer(d, c->screen->xlib->root);
     if (resize) {
         struct JBWMRectangle * restrict g = &c->size;
         jbwm_warp(d, c->window, g->width, g->height);

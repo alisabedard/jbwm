@@ -14,7 +14,6 @@
 #include "key_masks.h"
 #include "log.h" // for JBWM_LOG
 #include "mwm.h" // for jbwm_handle_mwm_hints
-#include "screen.h"
 #include "select.h"
 #include "shape.h" // for jbwm_new_shaped_client
 #include "util.h"
@@ -35,7 +34,7 @@ static uint8_t wm_desktop(Display * d, const Window w, uint8_t vdesk)
 }
 static inline uint8_t get_vdesk(struct JBWMClient * restrict c)
 {
-    return wm_desktop(c->display, c->window, jbwm_get_screen(c)->vdesk);
+    return wm_desktop(c->display, c->window, c->screen->id);
 }
 __attribute__((nonnull))
 static Window get_parent(struct JBWMClient * restrict c)
@@ -47,7 +46,7 @@ static Window get_parent(struct JBWMClient * restrict c)
             ButtonPressMask | EnterWindowMask
     };
     struct JBWMRectangle * g = &c->size;
-    return XCreateWindow(c->display, jbwm_get_client_root(c), g->x, g->y,
+    return XCreateWindow(c->display, c->screen->xlib->root, g->x, g->y,
         g->width, g->height, c->opt.border, CFP, CFP,
         NULL, CW_VM, &(XSetWindowAttributes){
             .override_redirect=true, .event_mask = WA_EM});
@@ -71,7 +70,7 @@ static struct JBWMClient * get_JBWMClient(const Window w,
     struct JBWMScreen * s)
 {
     struct JBWMClient * restrict c = malloc(sizeof(struct JBWMClient));
-    *c = (struct JBWMClient) {.screen = s->id, .window = w};
+    *c = (struct JBWMClient) {.screen = s, .window = w};
     c->opt.border = 1;
     return c;
 }

@@ -94,12 +94,13 @@ static Window * get_mixed_client_list(Display * d)
 static inline bool query_tree(Display * d, Window ** children_return,
     unsigned int * restrict nchildren_return)
 {
-    Window nil; // dummy variable
-    nil=0;
+    Window parent,root;
+    parent=0;
+    root=0;
     assert(d);
     assert(children_return);
     assert(nchildren_return);
-    return XQueryTree(d, DefaultRootWindow(d), &nil, &nil, children_return,
+    return XQueryTree(d, DefaultRootWindow(d), &parent, &root, children_return,
         nchildren_return);
 }
 static unsigned int get_window_list(Display * d, const uint8_t max_clients,
@@ -139,13 +140,10 @@ void jbwm_ewmh_set_allowed_actions(Display * d,
     jbwm_set_property(d, w, a[0], XA_ATOM, &a, sizeof(a) / sizeof(Atom));
 }
 static void set_desktop_geometry(struct PropertyData * restrict p,
-    const uint8_t screen_id)
+    struct JBWMScreen *s)
 {
-    const struct JBWMSize sz = jbwm_get_display_size(p->display,
-        screen_id);
-    int32_t geometry_data[] = {sz.width, sz.height};
     p->property = EWMH(DESKTOP_GEOMETRY);
-    p->data = geometry_data;
+    p->data = (int32_t[]){s->xlib->width,s->xlib->height};
     set_property(p);
 }
 static void set_desktop_viewport(struct PropertyData * restrict p)
@@ -182,7 +180,7 @@ static void init_desktops(Display * d, struct JBWMScreen * s)
 {
     struct PropertyData p = {d, NULL, RootWindowOfScreen(s->xlib),
         0, 2, XA_CARDINAL};
-    set_desktop_geometry(&p, s->id);
+    set_desktop_geometry(&p, s);
     set_desktop_viewport(&p);
     p.size = 1; // single dimension data follows
     set_number_of_desktops(&p);

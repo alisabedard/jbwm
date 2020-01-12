@@ -2,5 +2,6 @@
 #ifndef JBWM_KEY_EVENT_H
 #define JBWM_KEY_EVENT_H
 #include <X11/Xlib.h>
-void jbwm_handle_key_event(XKeyEvent * e);
+struct JBWMScreen;
+void jbwm_handle_key_event(struct JBWMScreen *s, XKeyEvent * e);
 #endif//!JBWM_KEY_EVENT_H

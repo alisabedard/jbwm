@@ -8,9 +8,11 @@
 #include "JBWMClientOptions.h"
 #include "JBWMClientTitleBar.h"
 #include "JBWMRectangle.h"
+#include "JBWMScreen.h"
 struct JBWMScreen;
 struct JBWMClient {
     struct JBWMClient * next;
+    struct JBWMScreen * screen;
     Display * display;
     struct JBWMClientTitleBar tb;
     Colormap cmap;
@@ -18,7 +20,6 @@ struct JBWMClient {
     struct JBWMClientOptions opt;
     struct JBWMRectangle size, old_size, before_fullscreen;
     uint16_t szsum; // used to check size changes for shape setting
-    uint8_t screen;
     uint8_t vdesk;
     int8_t ignore_unmap;
     int8_t __pad[1];
