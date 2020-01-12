@@ -4,6 +4,7 @@
 // See README for license and other details.
 //#undef DEBUG
 #include "ewmh.h"
+#include <assert.h>
 #include <unistd.h>
 #include <X11/Xatom.h>
 #include "JBWMClient.h"
@@ -94,6 +95,10 @@ static inline bool query_tree(Display * d, Window ** children_return,
     unsigned int * restrict nchildren_return)
 {
     Window nil; // dummy variable
+    nil=0;
+    assert(d);
+    assert(children_return);
+    assert(nchildren_return);
     return XQueryTree(d, DefaultRootWindow(d), &nil, &nil, children_return,
         nchildren_return);
 }
