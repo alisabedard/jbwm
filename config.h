@@ -10,6 +10,16 @@
 /* Default fonts */
 #define JBWM_FONT "Sans:size=10:aspect=1.2"
 /* Default colors */
+#ifndef USE_OLD_THEME
+#define JBWM_FG "#bbf"
+#define JBWM_FC "#7f7"
+#define JBWM_BG "#357"
+#define JBWM_CLOSE "#f77"
+#define JBWM_RESIZE "#7af"
+#define JBWM_SHADE "#fe7"
+#define JBWM_STICK "#7f7"
+#define JBWM_NAME "jbwm"
+#else//USE_OLD_THEME
 #define JBWM_FG "#bad0ff"
 #define JBWM_FC "#00ff2f"
 #define JBWM_BG "#3b4352"
@@ -18,6 +28,7 @@
 #define JBWM_SHADE "#ffe200"
 #define JBWM_STICK "#5bf662"
 #define JBWM_NAME "jbwm"
+#endif//!USE_OLD_THEME
 /* Compile-time defaults of an integer type shall be stored here.  */
 enum {
     JBWM_KEYMASK_GRAB = Mod4Mask,
