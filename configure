@@ -8,9 +8,11 @@ echo "LDFLAGS=${LDFLAGS}" >> $CF
 echo "DESTDIR=${DESTDIR}" >> $CF
 echo "PREFIX=${PREFIX}" >> $CF
 DEBUG=false
-while getopts 'd' opt; do
+USE_GDB=false
+while getopts 'gd' opt; do
 	case $opt in
 	d) DEBUG=true ;;
+	g) USE_GDB=true ;;
 	?) for line in '-d enable debugging' \
 		'-? show usage'; \
 		do echo $line; done ;;
@@ -48,5 +50,10 @@ case $OS in
 		;;
 esac
 if $DEBUG; then
-	echo 'include debug.mk' >> $CF
+    echo DEBUG
+    echo 'include debug.mk' >> $CF
+elif $USE_GDB; then
+    echo USE_GDB
+    echo 'jbwm_cflags+=-ggdb -O0' >> $CF
+    echo 'include debug_gcc.mk' >> $CF
 fi
