@@ -53,22 +53,15 @@ static Window * get_windows(Display * dpy, const Window root,
     *win_count = n;
     return (Window *)w;
 }
-static void set_up_next_window(const int n, Display * d,
-    struct JBWMScreen * restrict s, const Window * restrict w)
-{
-    if (n >= 0) {
-        if (check_redirect(d, w[n]))
-            jbwm_new_client(d, s, w[n]);
-        set_up_next_window(n - 1, d, s, w);
-    }
-}
 static void setup_clients(Display * d, struct JBWMScreen * s)
 {
     uint16_t n;
     Window * w = get_windows(d, RootWindow(d, s->id), &n);
     JBWM_LOG("Started with %d clients", n);
     if (w) { // Avoid segmentation fault on empty list.
-        set_up_next_window(n, d, s, w);
+        while(n--)
+            if(check_redirect(d,w[n]))
+                jbwm_new_client(d,s,w[n]);
         XFree(w);
     }
 }
