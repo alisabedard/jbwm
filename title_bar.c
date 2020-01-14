@@ -3,18 +3,21 @@
 // Copyright 1999-2015, Ciaran Anscomb <jbwm@6809.org.uk>
 // See README for license and other details.
 #include "title_bar.h"
-#include <X11/Xatom.h>
-#include <X11/Xft/Xft.h>
 #include "JBWMAtomIndex.h"
 #include "config.h"
 #include "ewmh.h"
 #include "ewmh_state.h"
 #include "font.h"
 #include "move_resize.h"
+#include <string.h>
 #include "util.h"
 #include "wm_state.h"
-static int8_t set_shaded(struct JBWMClient * restrict c)
-{
+#include <X11/Xatom.h>
+#ifdef JBWM_USE_XFT
+#include <X11/Xft/Xft.h>
+#endif//JBWM_USE_XFT
+#include <X11/Xutil.h>
+static int8_t set_shaded(struct JBWMClient * restrict c) {
     c->old_size.height = c->size.height;
     c->size.height = 1;
     return IconicState;
@@ -88,16 +91,20 @@ static Window new_title_bar(struct JBWMClient * restrict c)
     configure_title_bar(d, t);
     return t;
 }
-static void draw_xft(struct JBWMClient * restrict c,
+static void draw_text(struct JBWMClient * restrict c,
     const int16_t * restrict p, char * restrict name, const size_t l)
 {
     struct JBWMScreen * scr;
-    XftDraw *xd;
     scr = c->screen;
+#ifdef JBWM_USE_XFT
+    XftDraw *xd;
     xd = scr->xft;
     XftDrawChange(xd, c->tb.win); // set target
     XftDrawStringUtf8(xd, &scr->font_color, jbwm_get_font(),
         p[0], p[1], (XftChar8 *)name, l);
+#else//!JBWM_USE_XFT
+    XDrawString(c->display,c->tb.win,scr->gc,p[0],p[1],name,l);
+#endif//JBWM_USE_XFT
 }
 // Free result with XFree if not NULL
 static inline char * jbwm_get_title(Display * d, const Window w)
@@ -111,7 +118,7 @@ static void draw_title(struct JBWMClient * restrict c)
     if (name) {
         const int16_t p[] = {jbwm_get_font_height() + 4,
             jbwm_get_font_ascent()};
-        draw_xft(c, p, name, strlen(name));
+        draw_text(c, p, name, strlen(name));
         XFree(name);
     }
 }

@@ -8,16 +8,21 @@
 /* Note:  Also, adjust the values in JBWMDefaults.h as necessary.  */
 #define JBWM_TERM "xterm"
 /* Default fonts */
+#ifdef JBWM_USE_XFT
 #define JBWM_FONT "Sans:size=10:aspect=1.2"
+#else//!JBWM_USE_XFT
+#define JBWM_FONT "fixed"
+#endif//JBWM_USE_XFT
 /* Default colors */
 #ifndef USE_OLD_THEME
-#define JBWM_FG "#bbf"
-#define JBWM_FC "#7f7"
-#define JBWM_BG "#357"
-#define JBWM_CLOSE "#f77"
-#define JBWM_RESIZE "#7af"
-#define JBWM_SHADE "#fe7"
-#define JBWM_STICK "#7f7"
+//#define JBWM_FG "#bbf"
+#define JBWM_FG "grey"
+#define JBWM_FC "green1"
+#define JBWM_BG "black"
+#define JBWM_CLOSE "green4"
+#define JBWM_RESIZE "green4"
+#define JBWM_SHADE "green3"
+#define JBWM_STICK "green4"
 #define JBWM_NAME "jbwm"
 #else//USE_OLD_THEME
 #define JBWM_FG "#bad0ff"

@@ -6,18 +6,21 @@
 #include "jbwm.h"
 #include "config.h"
 #include "ewmh.h"
+#include "font.h"
 #include "JBWMScreen.h"
 #include "keys.h"
 #include "log.h"
 #include "new.h"
 #include <stdbool.h>
 #include "util.h"
+#ifdef JBWM_USE_XFT
 static void allocate_xft_color(Display * d, struct JBWMScreen * s)
 {
     XftColorAllocName(d, DefaultVisualOfScreen(s->xlib),
             DefaultColormapOfScreen(s->xlib), JBWM_FG,
             &s->font_color);
 }
+#endif//JBWM_USE_XFT
 static void allocate_colors(struct JBWMScreen * restrict s)
 {
     Display * d=s->display;
@@ -30,8 +33,10 @@ static void allocate_colors(struct JBWMScreen * restrict s)
     PIX(resize, JBWM_RESIZE);
     PIX(shade, JBWM_SHADE);
     PIX(stick, JBWM_STICK);
-    allocate_xft_color(d, s);
 #undef PIX
+#ifdef JBWM_USE_XFT
+    allocate_xft_color(d, s);
+#endif//JBWM_USE_XFT
 }
 static bool check_redirect(Display * d, const Window w)
 {
@@ -68,11 +73,23 @@ static void setup_clients(Display * d, struct JBWMScreen * s)
 }
 static inline void setup_gc(Display * d, struct JBWMScreen * s)
 {
-    XChangeGC(d, DefaultGC(d, s->id), GCFunction | GCSubwindowMode |
-            GCLineWidth | GCForeground | GCBackground,
-            &(XGCValues){.foreground = s->pixels.fg, .background =
-            s->pixels.bg, .function = GXxor, .subwindow_mode =
-            IncludeInferiors, .line_width = 1});
+    XGCValues v={
+        .foreground = s->pixels.fg,
+        .background = s->pixels.bg,
+        .subwindow_mode = IncludeInferiors,
+        .line_width = 1
+    };
+    unsigned long mask = GCSubwindowMode | GCLineWidth
+        | GCForeground | GCBackground;
+#ifndef JBWM_USE_XFT
+    v.font=s->font->fid;
+    mask|=GCFont; 
+#endif//JBWM_USE_XFT
+    s->gc=DefaultGC(d,s->id);
+    XChangeGC(d,s->gc,mask,&v);
+    s->border_gc=XCreateGC(d,s->xlib->root,GCFunction,
+        &(XGCValues){.function=GXxor});
+    XCopyGC(d,s->gc,mask,s->border_gc);
 }
 static inline void setup_event_listeners(Display * d, const Window root)
 {
@@ -84,6 +101,7 @@ static inline void setup_event_listeners(Display * d, const Window root)
     XChangeWindowAttributes(d, root, CWEventMask,
             &(XSetWindowAttributes){.event_mask = EMASK });
 }
+#ifdef JBWM_USE_XFT
 /* Create a unique XftDraw for each screen to properly handle colormaps and
  * screen limitations.  */
 static XftDraw * new_xft_draw(Screen * s)
@@ -91,6 +109,7 @@ static XftDraw * new_xft_draw(Screen * s)
     return XftDrawCreate(DisplayOfScreen(s), RootWindowOfScreen(s),
             DefaultVisualOfScreen(s), DefaultColormapOfScreen(s));
 }
+#endif//JBWM_USE_XFT
 // Initialize SCREENS amount of screens.
 void jbwm_init_screens(Display *d, struct JBWMScreen *s, const short screens)
 {
@@ -100,7 +119,11 @@ void jbwm_init_screens(Display *d, struct JBWMScreen *s, const short screens)
         s->id = screens;
         s->vdesk = 0;
         s->xlib = ScreenOfDisplay(d, screens);
+#ifdef JBWM_USE_XFT
         s->xft = new_xft_draw(s->xlib);
+#else//!JBWM_USE_XFT
+        s->font = jbwm_get_font();
+#endif//JBWM_USE_XFT
         allocate_colors(s);
         setup_gc(d, s);
         { // r scope

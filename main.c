@@ -8,10 +8,10 @@
 #include "font.h"
 #include "JBWMClient.h"
 #include "jbwm.h"
+#include <string.h>
 int main(int argc, char **argv)
 {
     Display * d;
-    d=NULL;
     jbwm_parse_command_line(argc, argv);
     d = jbwm_open_display();
     jbwm_open_font(d);

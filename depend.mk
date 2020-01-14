@@ -13,7 +13,7 @@ ewmh_wm_state.o: ewmh_wm_state.c ewmh_wm_state.h JBWMAtomIndex.h JBWMClient.h cl
 exec.o: exec.c exec.h
 font.o: font.c font.h config.h util.h
 geometry.o: geometry.c geometry.h JBWMClient.h JBWMScreen.h JBWMSize.h log.h macros.h
-jbwm.o: jbwm.c jbwm.h config.h ewmh.h JBWMScreen.h keys.h log.h new.h util.h
+jbwm.o: jbwm.c jbwm.h config.h ewmh.h font.h JBWMScreen.h keys.h log.h new.h util.h
 key_event.o: key_event.c key_event.h JBWMKeys.h JBWMScreen.h client.h drag.h exec.h keys.h key_masks.h log.h max.h move_resize.h select.h snap.h title_bar.h vdesk.h wm_state.h
 key_masks.o: key_masks.c key_masks.h config.h
 keys.o: keys.c keys.h JBWMKeys.h key_masks.h

@@ -5,6 +5,7 @@
 #include "JBWMSize.h"
 #include "log.h"
 #include "macros.h"
+#include <X11/Xutil.h>
 struct GeometryData {
     Display * display;
     struct JBWMRectangle * restrict attribute;

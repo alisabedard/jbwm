@@ -69,7 +69,7 @@ static void draw_outline(struct JBWMClient * restrict c)
     const struct JBWMRectangle * restrict g = &c->size;
     enum { BORDER = 1 };
     Display * d = c->display;
-    XDrawRectangle(d, c->screen->xlib->root, c->screen->xlib->default_gc,
+    XDrawRectangle(d, c->screen->xlib->root, c->screen->border_gc,
         g->x, g->y - o, g->width + BORDER, g->height + BORDER + o);
 }
 // Returns true if we should continue the event loop

@@ -4,16 +4,23 @@
 // See README for license and other details.
 #ifndef JBWM_JBWMSCREEN_H
 #define JBWM_JBWMSCREEN_H
-#include <X11/Xft/Xft.h>
 #include "JBWMPixels.h"
+#include <X11/Xlib.h>
+#ifdef JBWM_USE_XFT
+#include <X11/Xft/Xft.h>
+#endif//JBWM_USE_XFT
 struct JBWMScreen {
     Display *display;
     Screen * xlib;
+#ifdef JBWM_USE_XFT
     XftDraw * xft;
     XftColor font_color;
+#else//!JBWM_USE_XFT
+    XFontStruct *font;
+#endif//JBWM_USE_XFT
     Window supporting;
     struct JBWMPixels pixels;
     uint8_t id, vdesk;
-    const int8_t __pad[2];
+    GC gc,border_gc;
 };
 #endif//!JBWM_JBWMSCREEN_H

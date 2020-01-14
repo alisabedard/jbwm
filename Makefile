@@ -14,8 +14,7 @@ dest=${DESTDIR}${PREFIX}
 jbwm_cflags+=-DVERSION=\"$(version)\" $(DEBIAN)
 jbwm_cflags+=-D_XOPEN_SOURCE=700 -std=c99
 # Titlebar Xft support:
-jbwm_cflags+=`pkg-config --cflags xft`
-jbwm_ldflags+=`pkg-config --libs xft`
+#include xft.mk
 jbwm_ldflags+=-lX11 -lXext
 objects+=client.o events.o jbwm.o new.o mwm.o wm_state.o drag.o
 objects+=button_event.o keys.o util.o max.o select.o snap.o display.o

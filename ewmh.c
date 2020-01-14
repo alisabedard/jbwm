@@ -5,8 +5,6 @@
 //#undef DEBUG
 #include "ewmh.h"
 #include <assert.h>
-#include <unistd.h>
-#include <X11/Xatom.h>
 #include "JBWMClient.h"
 #include "JBWMScreen.h"
 #include "client.h"
@@ -16,7 +14,11 @@
 #include "log.h"
 #include "macros.h"
 #include "PropertyData.h"
+#include <stdlib.h>
+#include <string.h>
+#include <unistd.h>
 #include "util.h"
+#include <X11/Xatom.h>
 #define EWMH(a_name) JBWM_EWMH_##a_name
 static Atom jbwm_ewmh[JBWM_EWMH_ATOMS_COUNT];
 #include "ewmh_init.c"
