@@ -13,7 +13,8 @@ while getopts 'gd' opt; do
 	case $opt in
 	d) DEBUG=true ;;
 	g) USE_GDB=true ;;
-	?) for line in '-d enable debugging' \
+	?) for line in '-d enable debugging with verbose log output' \
+                '-g enable debug symbols' \
 		'-? show usage'; \
 		do echo $line; done ;;
 	esac
