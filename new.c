@@ -34,7 +34,7 @@ static uint8_t wm_desktop(Display * d, const Window w, uint8_t vdesk)
 }
 static inline uint8_t get_vdesk(struct JBWMClient * restrict c)
 {
-    return wm_desktop(c->display, c->window, c->screen->id);
+    return wm_desktop(c->display, c->window, c->screen->vdesk);
 }
 __attribute__((nonnull))
 static Window get_parent(struct JBWMClient * restrict c)
