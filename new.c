@@ -17,18 +17,19 @@
 #include "select.h"
 #include "shape.h" // for jbwm_new_shaped_client
 #include "util.h"
+#include "vdesk.h"
 static uint8_t wm_desktop(Display * d, const Window w, uint8_t vdesk)
 {
     uint16_t n;
     const Atom a = jbwm_ewmh_get_atom(JBWM_EWMH_WM_DESKTOP);
     unsigned long *lprop = jbwm_get_property(d, w, a, &n);
-    if (lprop) {
+    if (lprop) { // See if client has a preferred desktop (as on restart)
         if (n && lprop[0] < JBWM_MAX_DESKTOPS) // is valid
-            vdesk = lprop[0]; // Set vdesk to property value
-        else // Set to a valid desktop number:
-            jbwm_set_property(d, w, a, XA_CARDINAL, &vdesk, 1);
+            vdesk = (uint8_t)lprop[0]; // Set vdesk to property value
         XFree(lprop);
     }
+    // Set the property in any case to ensure it exists henceforth.
+    jbwm_set_property(d, w, a, XA_CARDINAL, &(int32_t){vdesk}, 1);
     JBWM_LOG("wm_desktop(w: %d): vdesk is %d\n", (int) w, vdesk);
     return vdesk;
 }
@@ -97,4 +98,6 @@ void jbwm_new_client(Display * d, struct JBWMScreen * s, const Window w)
     reparent(c);
     jbwm_restore_client(c);
     jbwm_select_client(c);
+    if(c->screen->vdesk!=c->vdesk)
+        jbwm_hide_client(c);
 }

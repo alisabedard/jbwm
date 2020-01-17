@@ -12,7 +12,7 @@
 #include "ewmh.h"
 #include "util.h"
 static void check_visibility(const struct JBWMScreen * s, struct
-    JBWMClient * restrict c, const uint8_t v)
+        JBWMClient * restrict c, const uint8_t v)
 {
     if (c) {
         if (c->screen->id == s->id) {
@@ -34,8 +34,8 @@ uint8_t jbwm_set_vdesk(Display * d, struct JBWMScreen * s, uint8_t v)
         /* Send anonymous variable of type uint32_t in order
            to avoid potentially invalid data.  */
         jbwm_set_property(d, RootWindowOfScreen(s->xlib),
-            jbwm_ewmh_get_atom(JBWM_EWMH_CURRENT_DESKTOP),
-            XA_CARDINAL, &(uint32_t){v}, 1);
+                jbwm_ewmh_get_atom(JBWM_EWMH_CURRENT_DESKTOP),
+                XA_CARDINAL, &(uint32_t){v}, 1);
     }
     return s->vdesk;
 }

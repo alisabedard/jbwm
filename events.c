@@ -19,7 +19,6 @@
 #include "wm_state.h"
 // Set log level for events
 #define JBWM_LOG_EVENTS 5
-static bool events_need_cleanup;
 static struct JBWMScreen * get_screen(struct JBWMScreen *s,
     const Window root, const int i) {
     return RootWindowOfScreen(s[i].xlib) == root ? s
@@ -72,10 +71,10 @@ static void jbwm_handle_MapRequest(XEvent * ev, struct JBWMClient * c,
             e->window);
     }
 }
-static inline void mark_removal(struct JBWMClient * restrict c)
+static inline bool mark_removal(struct JBWMClient * restrict c)
 {
     JBWM_LOG("mark_removal(): ignore_unmap is %d", c->ignore_unmap);
-    c->opt.remove = events_need_cleanup = (c->ignore_unmap--<1);
+    return c->opt.remove = (c->ignore_unmap--<1);
 }
 static void jbwm_handle_ColormapNotify(XEvent * ev, struct JBWMClient * c)
 {
@@ -115,6 +114,7 @@ static void jbwm_handle_Expose(XEvent * ev, struct JBWMClient * c)
 }
 void jbwm_events_loop(struct JBWMScreen * s)
 {
+    static bool need_cleanup;
     Display *d;
     d=s->display;
     for (;;) {
@@ -155,7 +155,7 @@ void jbwm_events_loop(struct JBWMScreen * s)
             break;
         case UnmapNotify:
             if (c)
-                mark_removal(c);
+                need_cleanup=mark_removal(c);
             break;
         case MapRequest:
             jbwm_handle_MapRequest(&ev,c,s);
@@ -170,9 +170,9 @@ void jbwm_events_loop(struct JBWMScreen * s)
             JBWM_LOG("Unhandled event %d", ev.type);
 #endif//DEBUG
         }
-        if (events_need_cleanup) {
+        if (need_cleanup) {
             cleanup(d, jbwm_get_head_client());
-            events_need_cleanup = false;
+            need_cleanup = false;
         }
     }
 }

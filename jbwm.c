@@ -3,6 +3,7 @@
 // Copyright 1999-2015, Ciaran Anscomb <evilwm@6809.org.uk>
 // See README for license and other details.
 //#undef DEBUG
+#include "JBWMAtomIndex.h"
 #include "jbwm.h"
 #include "config.h"
 #include "ewmh.h"
@@ -114,11 +115,15 @@ static XftDraw * new_xft_draw(Screen * s)
 void jbwm_init_screens(Display *d, struct JBWMScreen *s, const short screens)
 {
     if(screens>=0){
+        uint16_t n;
+        unsigned long *lprop;
         JBWM_LOG("jbwm_init_screen(d, screens), screens is %d", screens);
         s->display=d;
         s->id = screens;
-        s->vdesk = 0;
         s->xlib = ScreenOfDisplay(d, screens);
+        lprop=jbwm_get_property(d,s->xlib->root,jbwm_ewmh_get_atom(
+            JBWM_EWMH_CURRENT_DESKTOP),&n);
+        s->vdesk=n&&lprop&&lprop[0]<JBWM_MAX_DESKTOPS?lprop[0]:0;
 #ifdef JBWM_USE_XFT
         s->xft = new_xft_draw(s->xlib);
 #else//!JBWM_USE_XFT

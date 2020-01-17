@@ -9,6 +9,7 @@
 #include "JBWMClient.h"
 #include "jbwm.h"
 #include <string.h>
+#include "vdesk.h"
 int main(int argc, char **argv)
 {
     Display * d;

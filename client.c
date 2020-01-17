@@ -3,15 +3,17 @@
 // Copyright 1999-2015, Ciaran Anscomb <evilwm@6809.org.uk>
 // See README for license and other details.
 #include "client.h"
-#include <X11/Xutil.h>
 #include <stdlib.h>
 #include "JBWMAtomIndex.h"
 #include "ewmh.h"
 #include "ewmh_state.h"
 #include "select.h"
 #include "title_bar.h"
+#include "util.h"
 #include "vdesk.h"
 #include "wm_state.h"
+#include <X11/Xatom.h>
+#include <X11/Xutil.h>
 #define EWMH_ATOM(suffix) jbwm_ewmh_get_atom(JBWM_EWMH_##suffix)
 static struct JBWMClient * current, * head;
 struct JBWMClient * jbwm_get_current_client(void)
@@ -52,11 +54,13 @@ void jbwm_relink_client_list(struct JBWMClient * restrict c)
 void jbwm_set_client_vdesk(struct JBWMClient * restrict c,
     const uint8_t desktop)
 {
-    const uint8_t p = c->vdesk; // save previous
-    c->vdesk = desktop;
-    // use jbwm_set_vdesk to validate desktop:
-    c->vdesk = jbwm_set_vdesk(c->display, c->screen, desktop);
-    jbwm_set_vdesk(c->display, c->screen, p);
+    const Atom a = jbwm_ewmh_get_atom(JBWM_EWMH_WM_DESKTOP);
+    c->vdesk=desktop;
+    // Save in an atomic property, useful for restart and deskbars.
+    jbwm_set_property(c->display, c->window, a, XA_CARDINAL,
+        &(int32_t){desktop}, 1);
+    if(c->screen->vdesk!=c->vdesk)
+        jbwm_hide_client(c);
 }
 /*  This is the third most called function.  Show restraint in adding any
  *  future tests.  */
