@@ -8,7 +8,8 @@ exe=jbwm
 distname=$(exe)-$(version)
 # Edit/override this line if you don't want jbwm to install under /usr/local.
 PREFIX=/usr/local
-SCHEME=mit-scheme
+#SCHEME=mit-scheme
+SCHEME=echo
 # Note that $(DESTDIR) is used by the Debian build process.
 dest=${DESTDIR}${PREFIX}
 jbwm_cflags+=-DVERSION=\"$(version)\" $(DEBIAN)
@@ -84,6 +85,7 @@ keys.h: keys.scm keys.txt
 	${SCHEME}<keys.scm
 	touch keys.h
 depend.mk: *.c *.h
+	chmod 755 mkdep.sh
 	./mkdep.sh
 cppcheck:
 	cppcheck --enable=all -j 4 -DDEBUG --inline-suppr \
