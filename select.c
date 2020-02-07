@@ -1,5 +1,5 @@
 // jbwm - Minimalist Window Manager for X
-// Copyright 2008-2017, Jeffrey E. Bedard <jefbed@gmail.com>
+// Copyright 2008-2020, Jeffrey E. Bedard <jefbed@gmail.com>
 // Copyright 1999-2015, Ciaran Anscomb <jbwm@6809.org.uk>
 // See README for license and other details.
 #include "select.h"
@@ -11,7 +11,6 @@
 #include "JBWMAtomIndex.h"
 #include "JBWMClient.h"
 #include "util.h"
-#define EWMH_ATOM(a) jbwm_ewmh_get_atom(JBWM_EWMH_##a)
 #define WM_STATE(a) EWMH_ATOM(WM_STATE_##a)
 static inline jbwm_pixel_t get_bg(struct JBWMClient * c)
 {
@@ -19,8 +18,10 @@ static inline jbwm_pixel_t get_bg(struct JBWMClient * c)
 }
 static void set_state_not_focused(struct JBWMClient * c)
 {
-    XSetWindowBorder(c->display, c->parent, get_bg(c));
-    jbwm_ewmh_remove_state(c->display, c->window, WM_STATE(FOCUSED));
+    Display *d=c->display;
+    XSetWindowBorder(d, c->parent, get_bg(c));
+    jbwm_ewmh_remove_state(d, c->window, XInternAtom(d,
+            "_NET_WM_STATE_FOCUSED",false));
 }
 static void unselect_current(struct JBWMClient * c)
 {
@@ -40,7 +41,7 @@ static void set_focused(struct JBWMClient * c)
     XInstallColormap(d, c->cmap);
     const Window w = c->window;
     XSetInputFocus(d, w, RevertToPointerRoot, CurrentTime);
-    jbwm_ewmh_add_state(d, w, WM_STATE(FOCUSED));
+    jbwm_ewmh_add_state(d, w, XInternAtom(d,"_NET_WM_STATE_FOCUSED",false));
 }
 static void set_active_window(struct JBWMClient * c)
 {
@@ -49,9 +50,11 @@ static void set_active_window(struct JBWMClient * c)
      * If the property is read after the client is freed, it will
      * cause a segmentation fault.  */
     static Window w;
+    Display *d;
     w = c->window;
-    jbwm_set_property(c->display, c->screen->xlib->root,
-        EWMH_ATOM(ACTIVE_WINDOW), XA_WINDOW, &w, 1);
+    d=c->display;
+    jbwm_set_property(d, c->screen->xlib->root,
+        XInternAtom(d,"_NET_ACTIVE_WINDOW",false), XA_WINDOW, &w, 1);
     jbwm_set_current_client(c);
 }
 void jbwm_select_client(struct JBWMClient * c)

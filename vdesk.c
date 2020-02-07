@@ -34,7 +34,7 @@ uint8_t jbwm_set_vdesk(Display * d, struct JBWMScreen * s, uint8_t v)
         /* Send anonymous variable of type uint32_t in order
            to avoid potentially invalid data.  */
         jbwm_set_property(d, RootWindowOfScreen(s->xlib),
-                jbwm_ewmh_get_atom(JBWM_EWMH_CURRENT_DESKTOP),
+                XInternAtom(d,"_NET_CURRENT_DESKTOP",false),
                 XA_CARDINAL, &(uint32_t){v}, 1);
     }
     return s->vdesk;

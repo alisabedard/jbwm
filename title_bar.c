@@ -35,15 +35,16 @@ static bool can_shade(struct JBWMClient * restrict c)
 // This implements window shading, a substitute for iconification.
 void jbwm_toggle_shade(struct JBWMClient * restrict c)
 {
-    if (!can_shade(c))
-        return;
-    const bool s = c->opt.shaded = !c->opt.shaded;
-    const int8_t state = (s ? set_shaded : set_not_shaded)(c);
-    (state == IconicState ? jbwm_ewmh_add_state : jbwm_ewmh_remove_state)
-        (c->display, c->window,
-            jbwm_ewmh_get_atom(JBWM_EWMH_WM_STATE_SHADED));
-    jbwm_move_resize(c);
-    jbwm_set_wm_state(c, state);
+    if (can_shade(c)){
+        Display *d;
+        const bool s = c->opt.shaded = !c->opt.shaded;
+        const int8_t state = (s ? set_shaded : set_not_shaded)(c);
+        d=c->display;
+        (state == IconicState ? jbwm_ewmh_add_state : jbwm_ewmh_remove_state)
+            (d, c->window, XInternAtom(d,"_NET_WM_STATE_SHADED",false));
+        jbwm_move_resize(c);
+        jbwm_set_wm_state(c, state);
+    }
 }
 static uint16_t mv(Display * d, const Window w, uint16_t x)
 {

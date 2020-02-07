@@ -8,7 +8,6 @@
 #include <stdint.h>
 struct JBWMClient;
 struct JBWMScreen;
-Atom jbwm_ewmh_get_atom(const uint8_t index);
 void jbwm_ewmh_update_client_list(Display * d);
 void jbwm_ewmh_set_allowed_actions(Display * d,
     const Window w) __attribute__((nonnull));

@@ -14,7 +14,6 @@
 #include "wm_state.h"
 #include <X11/Xatom.h>
 #include <X11/Xutil.h>
-#define EWMH_ATOM(suffix) jbwm_ewmh_get_atom(JBWM_EWMH_##suffix)
 static struct JBWMClient * current, * head;
 struct JBWMClient * jbwm_get_current_client(void)
 {
@@ -54,13 +53,18 @@ void jbwm_relink_client_list(struct JBWMClient * restrict c)
 void jbwm_set_client_vdesk(struct JBWMClient * restrict c,
     const uint8_t desktop)
 {
-    const Atom a = jbwm_ewmh_get_atom(JBWM_EWMH_WM_DESKTOP);
+    Display *d;
+    Atom a;
+    if(c){
+    d=c->display;
+    a=XInternAtom(d,"_NET_WM_DESKTOP",false);
     c->vdesk=desktop;
     // Save in an atomic property, useful for restart and deskbars.
     jbwm_set_property(c->display, c->window, a, XA_CARDINAL,
         &(int32_t){desktop}, 1);
     if(c->screen->vdesk!=c->vdesk)
         jbwm_hide_client(c);
+    }
 }
 /*  This is the third most called function.  Show restraint in adding any
  *  future tests.  */
@@ -82,11 +86,15 @@ struct JBWMClient * jbwm_get_client(const Window w)
 }
 void jbwm_toggle_sticky(struct JBWMClient * restrict c)
 {
-    c->opt.sticky ^= true; // toggle
-    jbwm_select_client(c);
-    jbwm_update_title_bar(c);
-    (c->opt.sticky ? jbwm_ewmh_add_state : jbwm_ewmh_remove_state)
-        (c->display, c->window, EWMH_ATOM(WM_STATE_STICKY));
+    if(c){
+        Display *d=c->display;
+        c->opt.sticky ^= true; // toggle
+        jbwm_select_client(c);
+        jbwm_update_title_bar(c);
+        (c->opt.sticky ? jbwm_ewmh_add_state : jbwm_ewmh_remove_state)
+            (c->display, c->window,
+                XInternAtom(d,"_NET_WM_STATE_STICKY",false));
+    }
 }
 // Free client and destroy its windows and properties.
 void jbwm_client_free(struct JBWMClient * restrict c)
@@ -95,8 +103,8 @@ void jbwm_client_free(struct JBWMClient * restrict c)
     const struct JBWMRectangle * restrict p = &c->size;
     Display * d = c->display;
     // Per ICCCM + wm-spec
-    XDeleteProperty(d, w, EWMH_ATOM(WM_STATE));
-    XDeleteProperty(d, w, EWMH_ATOM(WM_DESKTOP));
+    XDeleteProperty(d, w, XInternAtom(d,"_NET_WM_STATE",false));
+    XDeleteProperty(d, w, XInternAtom(d,"_NET_WM_DESKTOP",false));
     XReparentWindow(d, w, c->screen->xlib->root, p->x, p->y);
     XRemoveFromSaveSet(d, w);
     if(parent)

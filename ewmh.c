@@ -75,10 +75,6 @@ static void check_ewmh_init(Display * d)
         jbwm_ewmh_init_done = true;
     }
 }
-Atom jbwm_ewmh_get_atom(const uint8_t index)
-{
-    return jbwm_ewmh[index];
-}
 static inline void set_property(struct PropertyData * restrict p)
 {
     jbwm_set_property(p->display, p->target, jbwm_ewmh[p->property],

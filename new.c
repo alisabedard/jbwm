@@ -21,7 +21,7 @@
 static uint8_t wm_desktop(Display * d, const Window w, uint8_t vdesk)
 {
     uint16_t n;
-    const Atom a = jbwm_ewmh_get_atom(JBWM_EWMH_WM_DESKTOP);
+    const Atom a = XInternAtom(d,"_NET_WM_DESKTOP",false);
     unsigned long *lprop = jbwm_get_property(d, w, a, &n);
     if (lprop) { // See if client has a preferred desktop (as on restart)
         if (n && lprop[0] < JBWM_MAX_DESKTOPS) // is valid

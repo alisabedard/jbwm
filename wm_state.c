@@ -43,7 +43,7 @@ void jbwm_set_wm_state(const struct JBWMClient * restrict c,
     jbwm_set_property(d, w, jbwm_get_wm_state(d), XA_CARDINAL,
         &(uint32_t){state}, 1);
     (state == IconicState ? jbwm_ewmh_add_state : jbwm_ewmh_remove_state)
-        (d, w, jbwm_ewmh_get_atom(JBWM_EWMH_WM_STATE_HIDDEN));
+        (d, w, XInternAtom(d,"_NET_WM_STATE_HIDDEN",false));
 }
 static bool find_delete_proto(const int i, const Atom * restrict p,
     Display * d)
