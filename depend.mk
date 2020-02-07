@@ -4,7 +4,7 @@ command_line.o: command_line.c command_line.h config.h key_masks.h log.h
 display.o: display.c display.h client.h config.h log.h util.h
 drag.o: drag.c drag.h font.h JBWMClient.h move_resize.h snap.h
 events.o: events.c events.h button_event.h client.h ewmh.h ewmh_client.h JBWMScreen.h key_event.h log.h move_resize.h new.h select.h title_bar.h util.h wm_state.h
-ewmh.o: ewmh.c ewmh.h JBWMClient.h JBWMScreen.h client.h config.h font.h geometry.h log.h macros.h PropertyData.h util.h ewmh_init.c
+ewmh.o: ewmh.c ewmh.h JBWMClient.h JBWMScreen.h client.h config.h font.h geometry.h log.h macros.h PropertyData.h util.h
 ewmh_client.o: ewmh_client.c ewmh_client.h JBWMAtomIndex.h client.h config.h drag.h ewmh.h ewmh_wm_state.h select.h util.h vdesk.h wm_state.h
 ewmh_init.o: ewmh_init.c
 ewmh_state.o: ewmh_state.c ewmh_state.h JBWMAtomIndex.h client.h drag.h ewmh.h jbwm.h log.h max.h select.h util.h wm_state.h
