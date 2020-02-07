@@ -6,7 +6,7 @@ struct PropertyData {
     Display * display;
     void * data;
     Window target;
-    enum JBWMAtomIndex property;
+    Atom property;
     uint16_t size, type;
 };
 #endif//!JBWM_PROPERTYDATA_H
