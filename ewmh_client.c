@@ -40,17 +40,17 @@ static bool client_specific_message(XClientMessageEvent * e,
 {
     Display * d = e->display;
     jbwm_print_atom(d, t, __FILE__, __LINE__);
-    if (t == jbwm_ewmh_get_atom(JBWM_EWMH_WM_DESKTOP))
+    if (t == XInternAtom(d,"_NET_WM_DESKTOP",false))
         jbwm_set_client_vdesk(c, e->data.l[0]);
     // If user moves window (client-side title bars):
-    else if (t == jbwm_ewmh_get_atom(JBWM_EWMH_WM_MOVERESIZE)) {
+    else if (t == XInternAtom(d,"_NET_WM_MOVERESIZE",false)) {
         XRaiseWindow(d, c->parent);
         jbwm_drag(c, false);
-    } else if (t == jbwm_ewmh_get_atom(JBWM_EWMH_WM_STATE))
+    } else if (t == XInternAtom(d,"_NET_WM_STATE",false))
         jbwm_ewmh_handle_wm_state_changes(e, c);
-    else if (t == jbwm_ewmh_get_atom(JBWM_EWMH_ACTIVE_WINDOW))
+    else if (t == XInternAtom(d,"_NET_ACTIVE_WINDOW",false))
         jbwm_select_client(c);
-    else if (t == jbwm_ewmh_get_atom(JBWM_EWMH_CLOSE_WINDOW))
+    else if (t == XInternAtom(d,"_NET_CLOSE_WINDOW",false))
         jbwm_send_wm_delete(c);
     else
         return false;
@@ -72,13 +72,14 @@ static void debug_client_message(XClientMessageEvent * e)
 void jbwm_ewmh_handle_client_message(XClientMessageEvent * e,
     struct JBWMClient * c, struct JBWMScreen *s)
 {
+    Display *d=e->display;
     const Atom t = e->message_type;
     debug_client_message(e);
     if(c && client_specific_message(e, c, t))
         return;
-    if (t == jbwm_ewmh_get_atom(JBWM_EWMH_CURRENT_DESKTOP)) {
-        jbwm_set_vdesk(e->display, s, e->data.l[0]);
-    } else if (t == jbwm_ewmh_get_atom(JBWM_EWMH_MOVERESIZE_WINDOW)) {
+    if (t == XInternAtom(d,"_NET_CURRENT_DESKTOP",false)) {
+        jbwm_set_vdesk(d, s, e->data.l[0]);
+    } else if (t == XInternAtom(d,"_NET_MOVERESIZE_WINDOW",false)) {
         // If something else moves the window:
         handle_moveresize(e);
     }

@@ -21,67 +21,59 @@
         data.l[3] = source indication
         other data.l[] elements = 0 */
 static void set_state(struct JBWMClient * restrict c,
-    bool add, const enum JBWMAtomIndex t)
+    bool add, Atom const atom)
 {
+    Display *d;
     if (!c)
         return;
-    JBWM_LOG("set_state(c, add: %s, t: %d)", add ? "true" : "false",
+    JBWM_LOG("set_state(c,add: %s,atom: %d)", add ? "true" : "false",
         (int) t);
-    jbwm_print_atom(c->display, jbwm_ewmh_get_atom(t), __FILE__, __LINE__);
-    switch(t) {
-    case JBWM_EWMH_WM_STATE_FULLSCREEN:
+    d=c->display;
+    jbwm_print_atom(d, atom, __FILE__, __LINE__);
+    if(atom==XInternAtom(d,"_NET_WM_STATE_FULLSCREEN",false))
         (add?jbwm_set_fullscreen:jbwm_set_not_fullscreen)(c);
-        break;
-    case JBWM_EWMH_WM_STATE_STICKY:
+    else if(atom==XInternAtom(d,"_NET_WM_STATE_STICKY",false))
         c->opt.sticky=add;
-        break;
-    case JBWM_EWMH_WM_STATE_ABOVE:
+    else if(atom==XInternAtom(d,"_NET_WM_STATE_ABOVE",false))
         add = !add; // fall through
-    case JBWM_EWMH_WM_STATE_BELOW:
+    else if(atom==XInternAtom(d,"_NET_WM_STATE_BELOW",false))
         (add ? XRaiseWindow : XLowerWindow)(c->display, c->parent);
-        break;
-    case JBWM_EWMH_WM_STATE_HIDDEN:
+    else if(atom==XInternAtom(d,"_NET_WM_STATE_HIDDEN",false))
         (add ? jbwm_hide_client : jbwm_restore_client)(c);
-        break;
-    case JBWM_EWMH_WM_STATE_MAXIMIZED_VERT:
+    else if(atom==XInternAtom(d,"_NET_WM_STATE_MAXIMIZED_VERT",false))
         (add ? jbwm_set_vert : jbwm_set_not_vert)(c);
-        break;
-    case JBWM_EWMH_WM_STATE_MAXIMIZED_HORZ:
+    else if(atom==XInternAtom(d,"_NET_WM_STATE_MAXIMIZED_HORZ",false))
         (add ? jbwm_set_horz : jbwm_set_not_horz)(c);
-        break;
-    default:
+    else
         JBWM_LOG("\tWARNING:  Unhandled state");
-        break;
-    }
 }
 __attribute__((nonnull))
 static void check_state(XClientMessageEvent * e,	// event data
-    const enum JBWMAtomIndex t,	// state to test
+    Atom const atom, // state to test
     struct JBWMClient * restrict c)
 {
-    const Atom state = jbwm_ewmh_get_atom(t);
     // 2 atoms can be set at once
     long * l = &e->data.l[0];
-    const bool set = l[1] == (long)state || l[2] == (long)state;
+    const bool set = l[1] == (long)atom || l[2] == (long)atom;
     if(!set)
         return;
     Display * d = e->display;
     switch (e->data.l[0]) {
     default:
     case 0:	// remove
-        set_state(c, false, t);
-        jbwm_ewmh_remove_state(d, e->window, state);
-        break;
+    set_state(c, false, atom);
+    jbwm_ewmh_remove_state(d, e->window, atom);
+    break;
     case 1:	// add
-        set_state(c, true, t);
-        jbwm_ewmh_add_state(d, e->window, state);
-        break;
+    set_state(c,true,atom);
+    jbwm_ewmh_add_state(d, e->window, atom);
+    break;
     case 2: { // toggle
         const bool add = !jbwm_ewmh_get_state(e->display,
-            e->window, state);
-        set_state(c, add, t);
+            e->window, atom);
+        set_state(c,add,atom);
         (add ? jbwm_ewmh_add_state : jbwm_ewmh_remove_state)
-            (d, e->window, state);
+        (d, e->window, atom);
     }
     }
 }

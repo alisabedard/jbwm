@@ -1,5 +1,5 @@
 # jbwm - Minimalist Window Manager for X
-# Copyright 2008-2017, Jeffrey E. Bedard <jefbed@gmail.com> 
+# Copyright 2008-2020, Jeffrey E. Bedard <jefbed@gmail.com> 
 # Copyright 1999-2015, Ciaran Anscomb <jbwm@6809.org.uk>
 # See README for license and other details.
 version=1.58
@@ -80,10 +80,6 @@ small: clean
 	tail small.log
 clang: clean
 	make -f Makefile.clang
-
-keys.h: keys.scm keys.txt
-	${SCHEME}<keys.scm
-	touch keys.h
 depend.mk: *.c *.h
 	chmod 755 mkdep.sh
 	./mkdep.sh

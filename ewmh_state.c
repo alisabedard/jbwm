@@ -18,7 +18,7 @@ void jbwm_ewmh_remove_state(Display * d,
     const Window w, const Atom state)
 {
     uint16_t n;
-    const Atom ws = jbwm_ewmh_get_atom(JBWM_EWMH_WM_STATE);
+    const Atom ws = XInternAtom(d,"_NET_WM_STATE",false);
     Atom *a = jbwm_get_property(d, w, ws, &n);
     if(a){ // found property
         uint16_t i;
@@ -38,7 +38,7 @@ bool jbwm_ewmh_get_state(Display * d,
 {
     uint16_t n;
     Atom *a = jbwm_get_property(d, w,
-        jbwm_ewmh_get_atom(JBWM_EWMH_WM_STATE), &n);
+        XInternAtom(d,"_NET_WM_STATE",false), &n);
     bool found = false;
     if (a) {
         found = find_state(state, n, a);
@@ -49,7 +49,7 @@ bool jbwm_ewmh_get_state(Display * d,
 void jbwm_ewmh_add_state(Display * d, const Window w,
     Atom state)
 {
-    XChangeProperty(d, w, jbwm_ewmh_get_atom(JBWM_EWMH_WM_STATE),
+    XChangeProperty(d, w, XInternAtom(d,"_NET_WM_STATE",false),
         XA_ATOM, 32, PropModePrepend,
         (unsigned char *)&state, 1);
 }
