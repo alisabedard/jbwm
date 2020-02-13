@@ -20,37 +20,33 @@
         data.l[3] = source indication
         other data.l[] elements = 0 */
 static void set_state(struct JBWMClient * restrict c,
-    bool add, Atom const atom)
-{
+    bool add, Atom const atom){
     Display *d;
-    if (!c)
-        return;
-    JBWM_LOG("set_state(c,add: %s,atom: %d)", add ? "true" : "false",
-        (int) t);
-    d=c->screen->display;
-    jbwm_print_atom(d, atom, __FILE__, __LINE__);
-    if(atom==XInternAtom(d,"_NET_WM_STATE_FULLSCREEN",false))
-        (add?jbwm_set_fullscreen:jbwm_set_not_fullscreen)(c);
-    else if(atom==XInternAtom(d,"_NET_WM_STATE_STICKY",false))
-        c->opt.sticky=add;
-    else if(atom==XInternAtom(d,"_NET_WM_STATE_ABOVE",false))
-        add = !add; // fall through
-    else if(atom==XInternAtom(d,"_NET_WM_STATE_BELOW",false))
-        (add ? XRaiseWindow : XLowerWindow)(c->screen->display, c->parent);
-    else if(atom==XInternAtom(d,"_NET_WM_STATE_HIDDEN",false))
-        (add ? jbwm_hide_client : jbwm_restore_client)(c);
-    else if(atom==XInternAtom(d,"_NET_WM_STATE_MAXIMIZED_VERT",false))
-        (add ? jbwm_set_vert : jbwm_set_not_vert)(c);
-    else if(atom==XInternAtom(d,"_NET_WM_STATE_MAXIMIZED_HORZ",false))
-        (add ? jbwm_set_horz : jbwm_set_not_horz)(c);
-    else
-        JBWM_LOG("\tWARNING:  Unhandled state");
+    if (c){
+        d=c->screen->display;
+        jbwm_print_atom(d, atom, __FILE__, __LINE__);
+        if(atom==XInternAtom(d,"_NET_WM_STATE_FULLSCREEN",false))
+            (add?jbwm_set_fullscreen:jbwm_set_not_fullscreen)(c);
+        else if(atom==XInternAtom(d,"_NET_WM_STATE_STICKY",false))
+            c->opt.sticky=add;
+        else if(atom==XInternAtom(d,"_NET_WM_STATE_ABOVE",false))
+            add = !add; // fall through
+        else if(atom==XInternAtom(d,"_NET_WM_STATE_BELOW",false))
+            (add ? XRaiseWindow : XLowerWindow)(c->screen->display, c->parent);
+        else if(atom==XInternAtom(d,"_NET_WM_STATE_HIDDEN",false))
+            (add ? jbwm_hide_client : jbwm_restore_client)(c);
+        else if(atom==XInternAtom(d,"_NET_WM_STATE_MAXIMIZED_VERT",false))
+            (add ? jbwm_set_vert : jbwm_set_not_vert)(c);
+        else if(atom==XInternAtom(d,"_NET_WM_STATE_MAXIMIZED_HORZ",false))
+            (add ? jbwm_set_horz : jbwm_set_not_horz)(c);
+        else
+            JBWM_LOG("\tWARNING:  Unhandled state");
+    }
 }
 __attribute__((nonnull))
 static void check_state(XClientMessageEvent * e,	// event data
     Atom const atom, // state to test
-    struct JBWMClient * restrict c)
-{
+    struct JBWMClient * restrict c){
     // 2 atoms can be set at once
     long * l = &e->data.l[0];
     const bool set = l[1] == (long)atom || l[2] == (long)atom;
@@ -77,8 +73,7 @@ static void check_state(XClientMessageEvent * e,	// event data
     }
 }
 void jbwm_ewmh_handle_wm_state_changes(XClientMessageEvent * e,
-    struct JBWMClient * restrict c)
-{
+    struct JBWMClient * restrict c){
     Display *d;
     d=e->display;
     check_state(e, XInternAtom(d,"_NET_WM_STATE_ABOVE",false), c);
