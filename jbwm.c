@@ -3,7 +3,6 @@
 // Copyright 1999-2015, Ciaran Anscomb <evilwm@6809.org.uk>
 // See README for license and other details.
 //#undef DEBUG
-#include "JBWMAtomIndex.h"
 #include "jbwm.h"
 #include "config.h"
 #include "ewmh.h"

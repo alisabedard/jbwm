@@ -1,6 +1,5 @@
 // Copyright 2017, Jeffrey E. Bedard
 #include "ewmh_wm_state.h"
-#include "JBWMAtomIndex.h"
 #include "JBWMClient.h"
 #include "client.h"
 #include "ewmh.h"
@@ -80,10 +79,12 @@ static void check_state(XClientMessageEvent * e,	// event data
 void jbwm_ewmh_handle_wm_state_changes(XClientMessageEvent * e,
     struct JBWMClient * restrict c)
 {
-    check_state(e, JBWM_EWMH_WM_STATE_ABOVE, c);
-    check_state(e, JBWM_EWMH_WM_STATE_BELOW, c);
-    check_state(e, JBWM_EWMH_WM_STATE_FULLSCREEN, c);
-    check_state(e, JBWM_EWMH_WM_STATE_MAXIMIZED_HORZ, c);
-    check_state(e, JBWM_EWMH_WM_STATE_MAXIMIZED_VERT, c);
-    check_state(e, JBWM_EWMH_WM_STATE_STICKY, c);
+    Display *d;
+    d=e->display;
+    check_state(e, XInternAtom(d,"_NET_WM_STATE_ABOVE",false), c);
+    check_state(e, XInternAtom(d,"_NET_WM_STATE_BELOW",false), c);
+    check_state(e, XInternAtom(d,"_NET_WM_STATE_FULLSCREEN",false), c);
+    check_state(e, XInternAtom(d,"_NET_WM_STATE_MAXIMIZED_HORZ",false), c);
+    check_state(e, XInternAtom(d,"_NET_WM_STATE_MAXIMIZED_VERT",false), c);
+    check_state(e, XInternAtom(d,"_NET_WM_STATE_STICKY",false), c);
 }

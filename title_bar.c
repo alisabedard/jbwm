@@ -3,7 +3,6 @@
 // Copyright 1999-2015, Ciaran Anscomb <jbwm@6809.org.uk>
 // See README for license and other details.
 #include "title_bar.h"
-#include "JBWMAtomIndex.h"
 #include "config.h"
 #include "ewmh.h"
 #include "ewmh_state.h"

@@ -4,7 +4,6 @@
 // See README for license and other details.
 #include "client.h"
 #include <stdlib.h>
-#include "JBWMAtomIndex.h"
 #include "ewmh.h"
 #include "ewmh_state.h"
 #include "select.h"

@@ -8,7 +8,6 @@
 #include "client.h"
 #include "ewmh.h"
 #include "ewmh_state.h"
-#include "JBWMAtomIndex.h"
 #include "JBWMClient.h"
 #include "util.h"
 #define WM_STATE(a) EWMH_ATOM(WM_STATE_##a)

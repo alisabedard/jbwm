@@ -5,7 +5,6 @@
 #include "new.h"
 #include <X11/Xatom.h> // for XA_CARDINAL
 #include <stdlib.h>
-#include "JBWMAtomIndex.h"
 #include "JBWMClient.h"
 #include "client.h"
 #include "config.h" // for JBWM_MAX_DESKTOPS
