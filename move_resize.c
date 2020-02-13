@@ -15,7 +15,7 @@ static void jbwm_configure_client(struct JBWMClient * restrict c)
         return;
     const Window w = c->window;
     struct JBWMRectangle * restrict g = &c->size;
-    XSendEvent(c->display, w, true, StructureNotifyMask, (XEvent
+    XSendEvent(c->screen->display, w, true, StructureNotifyMask, (XEvent
             *) &(XConfigureEvent){.x = g->x, .y = g->y, .width = g->width,
         .height = g->height, .type = ConfigureNotify, .event = w,
         .window = w, .above = c->parent, .override_redirect = true,
@@ -40,7 +40,7 @@ void jbwm_move_resize(struct JBWMClient * restrict c)
         jbwm_update_title_bar(c);
     } // Skip shaped and fullscreen clients.
     struct JBWMRectangle * restrict s = &c->size;
-    do_move(c->display, c->parent, c->window, s, offset);
+    do_move(c->screen->display, c->parent, c->window, s, offset);
     /* Use the XOR of the dimension to track changes, thus avoiding
      * excessive updates. */
     uint16_t szsum = s->width ^ s->height;

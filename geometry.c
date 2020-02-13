@@ -50,7 +50,7 @@ static bool get_window_attributes(struct JBWMClient * restrict c,
         struct JBWMRectangle * restrict geometry_attribute)
 {
     XWindowAttributes a;
-    Display * d = c->display;
+    Display * d = c->screen->display;
     XGetWindowAttributes(d, c->window, &a);
     JBWM_LOG("XGetWindowAttributes() win: 0x%x,"
             "x: %d, y: %d, w: %d, h: %d",
@@ -64,7 +64,7 @@ static void init_geometry_for_screen(struct JBWMClient * c,
         struct JBWMRectangle * restrict geometry_attribute)
 {
     struct JBWMScreen *s=c->screen;
-    Display * d = c->display;
+    Display * d = c->screen->display;
     struct JBWMSize screen_size={s->xlib->width,s->xlib->height};
     struct GeometryData g={ .display=d, .attribute = geometry_attribute,
         .geometry = &c->size, .window = c->window};

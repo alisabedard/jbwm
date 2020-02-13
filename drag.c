@@ -68,7 +68,7 @@ static void draw_outline(struct JBWMClient * restrict c)
     const uint8_t o = c->opt.no_title_bar ? 0 : fh;
     const struct JBWMRectangle * restrict g = &c->size;
     enum { BORDER = 1 };
-    Display * d = c->display;
+    Display * d = c->screen->display;
     XDrawRectangle(d, c->screen->xlib->root, c->screen->border_gc,
         g->x, g->y - o, g->width + BORDER, g->height + BORDER + o);
 }
@@ -85,7 +85,7 @@ static void drag_event_loop(struct JBWMClient * restrict c, const bool resize)
     const Window root = c->screen->xlib->root;
     const int16_t original[] = {c->size.x, c->size.y};
     int16_t start[2];
-    Display * d = c->display;
+    Display * d = c->screen->display;
     query_pointer(d, root, start);
     const uint8_t b = c->opt.border;
     for (;;) {
@@ -104,7 +104,7 @@ static void drag_event_loop(struct JBWMClient * restrict c, const bool resize)
 /* Drag the specified client.  Resize the client if resize is true.  */
 void jbwm_drag(struct JBWMClient * restrict c, const bool resize)
 {
-    Display * d = c->display;
+    Display * d = c->screen->display;
     XRaiseWindow(d, c->parent);
     if (resize && (c->opt.no_resize || c->opt.shaded))
         return;

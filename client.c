@@ -55,14 +55,14 @@ void jbwm_set_client_vdesk(struct JBWMClient * restrict c,
     Display *d;
     Atom a;
     if(c){
-    d=c->display;
-    a=XInternAtom(d,"_NET_WM_DESKTOP",false);
-    c->vdesk=desktop;
-    // Save in an atomic property, useful for restart and deskbars.
-    jbwm_set_property(c->display, c->window, a, XA_CARDINAL,
-        &(int32_t){desktop}, 1);
-    if(c->screen->vdesk!=c->vdesk)
-        jbwm_hide_client(c);
+        d=c->screen->display;
+        a=XInternAtom(d,"_NET_WM_DESKTOP",false);
+        c->vdesk=desktop;
+        // Save in an atomic property, useful for restart and deskbars.
+        jbwm_set_property(d, c->window, a, XA_CARDINAL,
+            &(int32_t){desktop}, 1);
+        if(c->screen->vdesk!=c->vdesk)
+            jbwm_hide_client(c);
     }
 }
 /*  This is the third most called function.  Show restraint in adding any
@@ -86,21 +86,25 @@ struct JBWMClient * jbwm_get_client(const Window w)
 void jbwm_toggle_sticky(struct JBWMClient * restrict c)
 {
     if(c){
-        Display *d=c->display;
         c->opt.sticky ^= true; // toggle
         jbwm_select_client(c);
         jbwm_update_title_bar(c);
-        (c->opt.sticky ? jbwm_ewmh_add_state : jbwm_ewmh_remove_state)
-            (c->display, c->window,
+        {
+            Display *d;
+            d=c->screen->display;
+            (c->opt.sticky ? jbwm_ewmh_add_state : jbwm_ewmh_remove_state)
+            (d, c->window,
                 XInternAtom(d,"_NET_WM_STATE_STICKY",false));
+        }
     }
 }
 // Free client and destroy its windows and properties.
 void jbwm_client_free(struct JBWMClient * restrict c)
 {
+    Display *d;
     const Window w = c->window, parent = c->parent;
     const struct JBWMRectangle * restrict p = &c->size;
-    Display * d = c->display;
+    d = c->screen->display;
     // Per ICCCM + wm-spec
     XDeleteProperty(d, w, XInternAtom(d,"_NET_WM_STATE",false));
     XDeleteProperty(d, w, XInternAtom(d,"_NET_WM_DESKTOP",false));
@@ -115,7 +119,7 @@ static void set_showing(const struct JBWMClient * restrict c,
     int (* mapping)(Display *, Window),
     const int8_t wm_state)
 {
-    mapping(c->display, c->parent);
+    mapping(c->screen->display, c->parent);
     jbwm_set_wm_state(c, wm_state);
 }
 void jbwm_hide_client(const struct JBWMClient * restrict c)

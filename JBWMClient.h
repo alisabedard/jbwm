@@ -13,7 +13,6 @@ struct JBWMScreen;
 struct JBWMClient {
     struct JBWMClient * next;
     struct JBWMScreen * screen;
-    Display * display;
     struct JBWMClientTitleBar tb;
     Colormap cmap;
     Window window, parent;
@@ -22,6 +21,5 @@ struct JBWMClient {
     uint16_t szsum; // used to check size changes for shape setting
     uint8_t vdesk;
     int8_t ignore_unmap;
-    int8_t __pad[1];
 };
 #endif /* JBWM_CLIENT_STRUCT_H */

@@ -38,7 +38,7 @@ void jbwm_set_wm_state(const struct JBWMClient * restrict c,
     const int8_t state)
 {
     const Window w = c->window;
-    Display * d = c->display;
+    Display * d = c->screen->display;
     jbwm_set_property(d, w, jbwm_get_wm_state(d), XA_CARDINAL,
         &(uint32_t){state}, 1);
     (state == IconicState ? jbwm_ewmh_add_state : jbwm_ewmh_remove_state)
@@ -66,7 +66,7 @@ static bool has_delete_proto(const Window w, Display * d)
 void jbwm_send_wm_delete(struct JBWMClient * restrict c)
 {
     const Window w = c->window;
-    Display * d = c->display;
+    Display * d = c->screen->display;
     if (c->opt.remove)
         // this allows a second click to force a kill
         XKillClient(d, w);

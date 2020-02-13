@@ -41,7 +41,7 @@ static Atom get_mwm_hints_atom(Display * d)
 }
 void jbwm_handle_mwm_hints(struct JBWMClient * restrict c)
 {
-    Display * d = c->display;
+    Display * d = c->screen->display;
     const Atom mwm_hints = get_mwm_hints_atom(d);
     struct JBWMMwm * m = jbwm_get_property(d, c->window,
         mwm_hints, &(uint16_t){0});

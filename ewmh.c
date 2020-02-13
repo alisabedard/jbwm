@@ -276,12 +276,12 @@ void jbwm_ewmh_init_screen(Display * d,struct JBWMScreen * s)
 void jbwm_set_frame_extents(struct JBWMClient * restrict c)
 {
     static uint32_t f[4];
-    Display *d=c->display;
+    Display *d=c->screen->display;
     JBWM_LOG("jbwm_set_frame_extents()");
     // Fields: left,right,top,bottom
     f[0]=f[1]=f[2]=f[3]=c->opt.border;
     if (!c->opt.no_title_bar)
         f[2] += jbwm_get_font_height();
-    set_ewmh_property(c->display,c->parent,XInternAtom(d,
+    set_ewmh_property(c->screen->display,c->parent,XInternAtom(d,
             "_NET_FRAME_EXTENTS",false),XA_CARDINAL,f,4);
 }

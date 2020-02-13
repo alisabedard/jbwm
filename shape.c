@@ -19,7 +19,7 @@ void jbwm_set_shape(struct JBWMClient * c)
 {
     if(c->opt.shaped) {
         JBWM_LOG("XShapeCombineShape: %d", (int)c->window);
-        Display * d = c->display;
+        Display * d = c->screen->display;
         XFlush(d);
         XShapeCombineShape(d, c->parent, ShapeBounding,
             1, 1, c->window, ShapeBounding, ShapeSet);
@@ -27,7 +27,7 @@ void jbwm_set_shape(struct JBWMClient * c)
 }
 void jbwm_new_shaped_client(struct JBWMClient * c)
 {
-    if (is_shaped(c->display, c->window)) {
+    if (is_shaped(c->screen->display, c->window)) {
         JBWM_LOG("Window %d is shaped", (int)c->window);
         struct JBWMClientOptions * restrict o = &c->opt;
         o->no_title_bar = o->shaped = true;

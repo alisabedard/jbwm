@@ -27,7 +27,7 @@ static void set_state(struct JBWMClient * restrict c,
         return;
     JBWM_LOG("set_state(c,add: %s,atom: %d)", add ? "true" : "false",
         (int) t);
-    d=c->display;
+    d=c->screen->display;
     jbwm_print_atom(d, atom, __FILE__, __LINE__);
     if(atom==XInternAtom(d,"_NET_WM_STATE_FULLSCREEN",false))
         (add?jbwm_set_fullscreen:jbwm_set_not_fullscreen)(c);
@@ -36,7 +36,7 @@ static void set_state(struct JBWMClient * restrict c,
     else if(atom==XInternAtom(d,"_NET_WM_STATE_ABOVE",false))
         add = !add; // fall through
     else if(atom==XInternAtom(d,"_NET_WM_STATE_BELOW",false))
-        (add ? XRaiseWindow : XLowerWindow)(c->display, c->parent);
+        (add ? XRaiseWindow : XLowerWindow)(c->screen->display, c->parent);
     else if(atom==XInternAtom(d,"_NET_WM_STATE_HIDDEN",false))
         (add ? jbwm_hide_client : jbwm_restore_client)(c);
     else if(atom==XInternAtom(d,"_NET_WM_STATE_MAXIMIZED_VERT",false))
