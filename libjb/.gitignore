@@ -1,9 +1,0 @@
-*.o
-*.a
-*.so.*
-sz.log
-.gitignore.*
-*.swp
-*.swo
-a.out
-
