@@ -39,8 +39,9 @@ static void set_state(struct JBWMClient * restrict c,
             (add ? jbwm_set_vert : jbwm_set_not_vert)(c);
         else if(atom==XInternAtom(d,"_NET_WM_STATE_MAXIMIZED_HORZ",false))
             (add ? jbwm_set_horz : jbwm_set_not_horz)(c);
-        else
+        else{
             JBWM_LOG("\tWARNING:  Unhandled state");
+        }
     }
 }
 __attribute__((nonnull))
