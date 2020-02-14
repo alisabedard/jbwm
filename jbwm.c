@@ -122,7 +122,11 @@ void jbwm_init_screens(Display *d, struct JBWMScreen *s, const short screens)
         s->xlib = ScreenOfDisplay(d, screens);
         lprop=jbwm_get_property(d,s->xlib->root,
             XInternAtom(d,"_NET_CURRENT_DESKTOP",false),&n);
-        s->vdesk=n&&lprop&&lprop[0]<JBWM_MAX_DESKTOPS?lprop[0]:0;
+        if(lprop){
+            s->vdesk=lprop[0]<JBWM_MAX_DESKTOPS?lprop[0]:0;
+            XFree(lprop);
+        }else
+            s->vdesk=0;
 #ifdef JBWM_USE_XFT
         s->xft = new_xft_draw(s->xlib);
 #else//!JBWM_USE_XFT
