@@ -1,7 +1,7 @@
 # Debug
 CC=gcc
 # Profile
-jbwm_cflags+=-pg
+jbwm_cflags+=-pg -no-pie
 # Enable all warnings
 jbwm_cflags+=-W -Wall -Wextra -Werror
 jbwm_cflags+=-Wuninitialized -Wstrict-overflow=5
