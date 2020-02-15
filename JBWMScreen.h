@@ -20,7 +20,7 @@ struct JBWMScreen {
 #endif//JBWM_USE_XFT
     Window supporting;
     struct JBWMPixels pixels;
-    uint8_t id, vdesk;
     GC gc,border_gc;
+    uint8_t id, vdesk, font_height;
 };
 #endif//!JBWM_JBWMSCREEN_H

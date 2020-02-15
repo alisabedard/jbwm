@@ -132,6 +132,7 @@ void jbwm_init_screens(Display *d, struct JBWMScreen *s, const short screens)
 #else//!JBWM_USE_XFT
         s->font = jbwm_get_font();
 #endif//JBWM_USE_XFT
+        s->font_height=jbwm_get_font_height();
         allocate_colors(s);
         setup_gc(d, s);
         { // r scope

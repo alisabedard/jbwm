@@ -20,15 +20,15 @@ static int sborder(const int xy, const int edge)
 }
 void jbwm_snap_border(struct JBWMClient * restrict c)
 {
+    struct JBWMScreen *scr = c->screen;
     struct JBWMRectangle * restrict g = &(c->size);
-    const struct JBWMSize s = {c->screen->xlib->width,
-        c->screen->xlib->height};
+    const struct JBWMSize s = {scr->xlib->width,
+        scr->xlib->height};
     const uint8_t b = c->opt.border << 1;
     // snap to screen border
     g->x = sborder(g->x, 0);
     g->x = sborder(g->x, g->width - s.width + b);
-    g->y = sborder(g->y, c->opt.no_title_bar ? 0 :
-        - jbwm_get_font_height());
+    g->y = sborder(g->y, c->opt.no_title_bar ? 0 :-scr->font_height);
     g->y = sborder(g->y, g->height - s.height + b);
 }
 /* Definition of this as an inline function guarantees no side-effects

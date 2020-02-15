@@ -62,9 +62,7 @@ static void query_pointer(Display * dpy, Window w,
 __attribute__((nonnull))
 static void draw_outline(struct JBWMClient * restrict c)
 {
-    static uint8_t fh;
-    if (!fh) // save the value
-        fh = jbwm_get_font_height();
+    const uint8_t fh=c->screen->font_height;
     const uint8_t o = c->opt.no_title_bar ? 0 : fh;
     const struct JBWMRectangle * restrict g = &c->size;
     enum { BORDER = 1 };

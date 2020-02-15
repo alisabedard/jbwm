@@ -16,17 +16,17 @@
 #include <X11/Xft/Xft.h>
 #endif//JBWM_USE_XFT
 #include <X11/Xutil.h>
-static int8_t set_shaded(struct JBWMClient * restrict c) {
+static inline int8_t set_shaded(struct JBWMClient * restrict c) {
     c->old_size.height = c->size.height;
     c->size.height = 1;
     return IconicState;
 }
-static int8_t set_not_shaded(struct JBWMClient * restrict c)
+static inline int8_t set_not_shaded(struct JBWMClient * restrict c)
 {
     c->size.height = c->old_size.height;
     return NormalState;
 }
-static bool can_shade(struct JBWMClient * restrict c)
+static inline bool can_shade(struct JBWMClient * restrict c)
 {
     // Honor mwm minimize hint.  Abort if fullscreen.
     return !c->opt.no_shade && !c->opt.fullscreen;
@@ -45,35 +45,37 @@ void jbwm_toggle_shade(struct JBWMClient * restrict c)
         jbwm_set_wm_state(c, state);
     }
 }
-static uint16_t mv(Display * d, const Window w, uint16_t x)
-{
+static inline uint16_t mv(Display * const d, Window const w, 
+    uint8_t const font_height, uint16_t x) {
     if (w)
-        XMoveWindow(d, w, x -= jbwm_get_font_height(), 0);
+        XMoveWindow(d, w, x -= font_height, 0);
     return x;
 }
 // Return of width allows chain-calling
 static uint16_t move_buttons(Display * d,
     struct JBWMClientTitleBar * t,
-    const uint16_t width)
+    const uint16_t width, uint8_t const font_height)
 {
-    mv(d, t->stick, mv(d, t->shade, mv(d, t->resize, width)));
+    mv(d, t->stick, font_height,
+        mv(d, t->shade, font_height,
+            mv(d, t->resize, font_height, width)));
     return width;
 }
-static Window get_win(Display * d, const Window p,
-    const jbwm_pixel_t bg)
+static inline Window get_win(Display * d, const Window p,
+    const jbwm_pixel_t bg, uint8_t const font_height)
 {
-    uint8_t h = jbwm_get_font_height();
-    return XCreateSimpleWindow(d, p, 0, 0, h, h, 0, 0, bg);
+    return XCreateSimpleWindow(d, p, 0, 0, font_height, font_height, 0, 0, bg);
 }
-static void add_buttons(struct JBWMClient * restrict c,
+static void add_buttons(struct JBWMClient * c,
     const struct JBWMPixels * restrict p, const Window t)
 {
     struct JBWMClientOptions * o = &c->opt;
     Display * d = c->screen->display;
-    c->tb.close = o->no_close ? 0 : get_win(d, t, p->close);
-    c->tb.resize = o->no_resize ? 0: get_win(d, t, p->resize);
-    c->tb.shade = o->no_shade ? 0 : get_win(d, t, p->shade);
-    c->tb.stick = get_win(d, t, p->stick);
+    uint8_t const h = c->screen->font_height;
+    c->tb.close = o->no_close ? 0 : get_win(d, t, p->close, h);
+    c->tb.resize = o->no_resize ? 0: get_win(d, t, p->resize, h);
+    c->tb.shade = o->no_shade ? 0 : get_win(d, t, p->shade, h);
+    c->tb.stick = get_win(d, t, p->stick, h);
 }
 static void configure_title_bar(Display * d, const Window t)
 {
@@ -84,9 +86,11 @@ static void configure_title_bar(Display * d, const Window t)
 }
 static Window new_title_bar(struct JBWMClient * restrict c)
 {
-    const struct JBWMPixels * p = &c->screen->pixels;
-    Display * d = c->screen->display;
-    const Window t = c->tb.win = get_win(d, c->parent, p->bg);
+    struct JBWMScreen *s = c->screen;
+    const struct JBWMPixels * p = &s->pixels;
+    Display * d = s->display;
+    const Window t = c->tb.win = get_win(d, c->parent, p->bg,
+        s->font_height);
     add_buttons(c, p, t);
     configure_title_bar(d, t);
     return t;
@@ -116,7 +120,7 @@ static void draw_title(struct JBWMClient * restrict c)
     char *name;
     name = jbwm_get_title(c->screen->display, c->window);
     if (name) {
-        const int16_t p[] = {jbwm_get_font_height() + 4,
+        const int16_t p[] = {c->screen->font_height + 4,
             jbwm_get_font_ascent()};
         draw_text(c, p, name, strlen(name));
         XFree(name);
@@ -128,12 +132,12 @@ static void remove_title_bar(struct JBWMClient * restrict c)
     XDestroyWindow(c->screen->display, c->tb.win);
     c->tb.win = 0;
 }
-static void resize_title_bar(Display * d, const Window win,
-    struct JBWMClientTitleBar * restrict tb, const uint16_t new_width)
-{
+static inline void resize_title_bar(Display * d, const Window win,
+    struct JBWMClientTitleBar * restrict tb, const uint16_t new_width,
+        uint8_t const font_height) {
     // Expand/Contract the title bar width as necessary:
-    XResizeWindow(d, win, move_buttons(d, tb, new_width),
-        jbwm_get_font_height());
+    XResizeWindow(d, win, move_buttons(d, tb, new_width, font_height),
+        font_height);
 }
 void jbwm_update_title_bar(struct JBWMClient * restrict c)
 {
@@ -147,8 +151,9 @@ void jbwm_update_title_bar(struct JBWMClient * restrict c)
                 w = new_title_bar(c);
             {
                 Display *d;
-                d = c->screen->display;
-                resize_title_bar(d, w, &c->tb, c->size.width);
+                struct JBWMScreen *s = c->screen;
+                d = s->display;
+                resize_title_bar(d, w, &c->tb, c->size.width,s->font_height);
                 XClearWindow(d, w);
             }
             draw_title(c);

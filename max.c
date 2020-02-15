@@ -83,8 +83,9 @@ void jbwm_set_vert(struct JBWMClient * restrict c)
     const uint8_t b = c->opt.border;
     c->size.height -= b << 1;
     if (!c->opt.no_title_bar) {
-        c->size.y += jbwm_get_font_height() + b;
-        c->size.height -= jbwm_get_font_height() + (b << 1);
+        uint8_t const fh=c->screen->font_height;
+        c->size.y += fh + b;
+        c->size.height -= fh + (b << 1);
     }
     jbwm_move_resize(c);
 }
