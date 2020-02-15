@@ -46,10 +46,21 @@ case $OS in
 		jbwm_ldflags+=-L/usr/X11R6/lib
 		EOF
 		;;
-	Linux|?) cat >> $CF <<- EOF
+	Linux|?)
+                cat >> $CF <<- EOF
 		EOF
 		;;
 esac
+if [ -d /usr/X11R6/lib ]; then
+    echo 'jbwm_ldflags+=-L/usr/X11R6/lib' >> $CF
+fi
+if [ -d /usr/lib64 ]; then
+    echo 'jbwm_ldflags+=-L/usr/lib64' >> $CF
+fi
+if [ -d /opt/X11/lib ]; then
+    echo 'jbwm_ldflags+=-L/opt/X11/lib' >> $CF
+fi
+
 if $DEBUG; then
     echo DEBUG
     echo 'include debug.mk' >> $CF
