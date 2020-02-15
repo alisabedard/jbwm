@@ -1,4 +1,4 @@
-// Copyright 2017, Jeffrey E. Bedard
+// Copyright 2020, Jeffrey E. Bedard
 #ifndef JBWM_JBWMPIXELS_H
 #define JBWM_JBWMPIXELS_H
 #include "pixel_t.h"

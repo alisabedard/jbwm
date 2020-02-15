@@ -1,4 +1,4 @@
-// Copyright 2017, Jeffrey E. Bedard <jefbed@gmail.com>
+// Copyright 2020, Jeffrey E. Bedard <jefbed@gmail.com>
 #include "exec.h"
 #include <signal.h> // for signal()
 #include <unistd.h> // for fork(), execl()

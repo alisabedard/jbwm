@@ -1,4 +1,4 @@
-// Copyright 2017, Jeffrey E. Bedard
+// Copyright 2020, Jeffrey E. Bedard
 #include "ewmh_wm_state.h"
 #include "JBWMClient.h"
 #include "client.h"

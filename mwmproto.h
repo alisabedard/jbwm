@@ -1,5 +1,5 @@
 // jbwm - Minimalist Window Manager for X
-// Copyright 2017, Jeffrey E. Bedard <jefbed@gmail.com>
+// Copyright 2020, Jeffrey E. Bedard <jefbed@gmail.com>
 #ifndef JBWM_MWMPROTO_H
 #define JBWM_MWMPROTO_H
 // These are MWM-specific hints

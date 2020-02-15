@@ -1,4 +1,4 @@
-// Copyright 2017, Jeffrey E. Bedard
+// Copyright 2020, Jeffrey E. Bedard
 #include "key_masks.h"
 #include "config.h"
 static uint16_t grab_mask = JBWM_KEYMASK_GRAB,

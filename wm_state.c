@@ -1,4 +1,4 @@
-// Copyright 2017, Jeffrey E. Bedard
+// Copyright 2020, Jeffrey E. Bedard
 #include "wm_state.h"
 #include <X11/Xatom.h>
 #include <X11/Xutil.h>

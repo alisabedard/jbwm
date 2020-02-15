@@ -1,4 +1,4 @@
-// Copyright 2017, Jeffrey E. Bedard
+// Copyright 2020, Jeffrey E. Bedard
 #include "font.h"
 #ifdef JBWM_USE_XFT
 #include <X11/Xft/Xft.h>

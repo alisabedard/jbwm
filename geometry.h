@@ -1,4 +1,4 @@
-// Copyright 2017, Jeffrey E. Bedard
+// Copyright 2020, Jeffrey E. Bedard
 #ifndef JBWM_GEOMETRY_H
 #define JBWM_GEOMETRY_H
 #include <stdint.h>

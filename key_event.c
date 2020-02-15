@@ -1,4 +1,4 @@
-// Copyright 2017, Jeffrey E. Bedard
+// Copyright 2020, Jeffrey E. Bedard
 #include "key_event.h"
 #include <stdbool.h>
 #include "JBWMKeys.h"

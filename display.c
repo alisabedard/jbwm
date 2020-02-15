@@ -1,4 +1,4 @@
-// Copyright 2017, Jeffrey E. Bedard
+// Copyright 2020, Jeffrey E. Bedard
 #include "display.h"
 #include <X11/Xproto.h>
 #include <errno.h>

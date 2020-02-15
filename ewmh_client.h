@@ -1,4 +1,4 @@
-// Copyright 2017, Jeffrey E. Bedard
+// Copyright 2020, Jeffrey E. Bedard
 #ifndef JBWM_EWMH_CLIENT_H
 #define JBWM_EWMH_CLIENT_H
 #include <X11/Xlib.h>
