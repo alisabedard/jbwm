@@ -87,4 +87,9 @@ cppcheck:
 	cppcheck --enable=all -j 4 -DDEBUG --inline-suppr \
 		--inconclusive --std=c11 *.c \
 		> /dev/null
+check: small
+	strip jbwm
+	ls -l jbwm
+distcheck: archive
+	ls -l | grep jbwm
 #EOF
