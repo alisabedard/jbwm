@@ -51,6 +51,9 @@ case $OS in
 		EOF
 		;;
 esac
+if [ -n "`which pkg-config`" ]; then
+    echo "jbwm_ldflags+=`pkg-config --libs-only-L x11`" >> $CF
+fi
 if [ -d /usr/X11R6/lib ]; then
     echo 'jbwm_ldflags+=-L/usr/X11R6/lib' >> $CF
 fi
@@ -60,7 +63,6 @@ fi
 if [ -d /opt/X11/lib ]; then
     echo 'jbwm_ldflags+=-L/opt/X11/lib' >> $CF
 fi
-
 if $DEBUG; then
     echo DEBUG
     echo 'include debug.mk' >> $CF
