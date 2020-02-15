@@ -1,0 +1,743 @@
+Flat profile:
+
+Each sample counts as 0.01 seconds.
+ no time accumulated
+
+  %   cumulative   self              self     total           
+ time   seconds   seconds    calls  Ts/call  Ts/call  name    
+  0.00      0.00     0.00      167     0.00     0.00  matches
+  0.00      0.00     0.00       68     0.00     0.00  jbwm_get_font_height
+  0.00      0.00     0.00       66     0.00     0.00  jbwm_get_client
+  0.00      0.00     0.00       66     0.00     0.00  search_client_for_window
+  0.00      0.00     0.00       38     0.00     0.00  jbwm_set_property
+  0.00      0.00     0.00       32     0.00     0.00  jbwm_handle_PropertyNotify
+  0.00      0.00     0.00       30     0.00     0.00  mv
+  0.00      0.00     0.00       28     0.00     0.00  jbwm_get_property
+  0.00      0.00     0.00       21     0.00     0.00  set_property
+  0.00      0.00     0.00       17     0.00     0.00  get_atom
+  0.00      0.00     0.00       17     0.00     0.00  jbwm_get_wm_state
+  0.00      0.00     0.00       16     0.00     0.00  set_ewmh_property
+  0.00      0.00     0.00       10     0.00     0.00  draw_text
+  0.00      0.00     0.00       10     0.00     0.00  draw_title
+  0.00      0.00     0.00       10     0.00     0.00  get_win
+  0.00      0.00     0.00       10     0.00     0.00  jbwm_get_font_ascent
+  0.00      0.00     0.00       10     0.00     0.00  jbwm_get_title
+  0.00      0.00     0.00       10     0.00     0.00  jbwm_update_title_bar
+  0.00      0.00     0.00       10     0.00     0.00  move_buttons
+  0.00      0.00     0.00       10     0.00     0.00  resize_title_bar
+  0.00      0.00     0.00        9     0.00     0.00  get_mwm_hints_atom
+  0.00      0.00     0.00        9     0.00     0.00  jbwm_handle_mwm_hints
+  0.00      0.00     0.00        7     0.00     0.00  do_move
+  0.00      0.00     0.00        7     0.00     0.00  jbwm_configure_client
+  0.00      0.00     0.00        7     0.00     0.00  jbwm_get_pixel
+  0.00      0.00     0.00        7     0.00     0.00  jbwm_move_resize
+  0.00      0.00     0.00        6     0.00     0.00  jbwm_handle_ConfigureNotify
+  0.00      0.00     0.00        6     0.00     0.00  set_root_property
+  0.00      0.00     0.00        5     0.00     0.00  jbwm_ewmh_remove_state
+  0.00      0.00     0.00        5     0.00     0.00  jbwm_grab_button
+  0.00      0.00     0.00        4     0.00     0.00  jbwm_get_current_client
+  0.00      0.00     0.00        4     0.00     0.00  jbwm_get_grab_mask
+  0.00      0.00     0.00        4     0.00     0.00  jbwm_handle_Expose
+  0.00      0.00     0.00        3     0.00     0.00  check_redirect
+  0.00      0.00     0.00        3     0.00     0.00  do_grabs
+  0.00      0.00     0.00        3     0.00     0.00  get_JBWMClient
+  0.00      0.00     0.00        3     0.00     0.00  get_client_list_r
+  0.00      0.00     0.00        3     0.00     0.00  get_mixed_client_list
+  0.00      0.00     0.00        3     0.00     0.00  get_ordered_client_list
+  0.00      0.00     0.00        3     0.00     0.00  get_parent
+  0.00      0.00     0.00        3     0.00     0.00  get_vdesk
+  0.00      0.00     0.00        3     0.00     0.00  get_window_attributes
+  0.00      0.00     0.00        3     0.00     0.00  get_window_list
+  0.00      0.00     0.00        3     0.00     0.00  is_shaped
+  0.00      0.00     0.00        3     0.00     0.00  jbwm_ewmh_add_state
+  0.00      0.00     0.00        3     0.00     0.00  jbwm_ewmh_set_allowed_actions
+  0.00      0.00     0.00        3     0.00     0.00  jbwm_ewmh_update_client_list
+  0.00      0.00     0.00        3     0.00     0.00  jbwm_get_head_client
+  0.00      0.00     0.00        3     0.00     0.00  jbwm_new_client
+  0.00      0.00     0.00        3     0.00     0.00  jbwm_new_shaped_client
+  0.00      0.00     0.00        3     0.00     0.00  jbwm_prepend_client
+  0.00      0.00     0.00        3     0.00     0.00  jbwm_restore_client
+  0.00      0.00     0.00        3     0.00     0.00  jbwm_select_client
+  0.00      0.00     0.00        3     0.00     0.00  jbwm_set_client_geometry
+  0.00      0.00     0.00        3     0.00     0.00  jbwm_set_current_client
+  0.00      0.00     0.00        3     0.00     0.00  jbwm_set_frame_extents
+  0.00      0.00     0.00        3     0.00     0.00  jbwm_set_wm_state
+  0.00      0.00     0.00        3     0.00     0.00  query_tree
+  0.00      0.00     0.00        3     0.00     0.00  reparent
+  0.00      0.00     0.00        3     0.00     0.00  reparent_window
+  0.00      0.00     0.00        3     0.00     0.00  set_active_window
+  0.00      0.00     0.00        3     0.00     0.00  set_border
+  0.00      0.00     0.00        3     0.00     0.00  set_focused
+  0.00      0.00     0.00        3     0.00     0.00  set_showing
+  0.00      0.00     0.00        3     0.00     0.00  unselect_current
+  0.00      0.00     0.00        3     0.00     0.00  wm_desktop
+  0.00      0.00     0.00        2     0.00     0.00  add_buttons
+  0.00      0.00     0.00        2     0.00     0.00  configure_title_bar
+  0.00      0.00     0.00        2     0.00     0.00  get_bg
+  0.00      0.00     0.00        2     0.00     0.00  grab_r
+  0.00      0.00     0.00        2     0.00     0.00  jbwm_get_mod_mask
+  0.00      0.00     0.00        2     0.00     0.00  new_title_bar
+  0.00      0.00     0.00        2     0.00     0.00  set_name
+  0.00      0.00     0.00        2     0.00     0.00  set_state_not_focused
+  0.00      0.00     0.00        2     0.00     0.00  set_supporting
+  0.00      0.00     0.00        1     0.00     0.00  allocate_colors
+  0.00      0.00     0.00        1     0.00     0.00  get_windows
+  0.00      0.00     0.00        1     0.00     0.00  init_desktops
+  0.00      0.00     0.00        1     0.00     0.00  init_supporting
+  0.00      0.00     0.00        1     0.00     0.00  jbwm_events_loop
+  0.00      0.00     0.00        1     0.00     0.00  jbwm_ewmh_init_screen
+  0.00      0.00     0.00        1     0.00     0.00  jbwm_get_font
+  0.00      0.00     0.00        1     0.00     0.00  jbwm_grab_root_keys
+  0.00      0.00     0.00        1     0.00     0.00  jbwm_handle_key_event
+  0.00      0.00     0.00        1     0.00     0.00  jbwm_init_screens
+  0.00      0.00     0.00        1     0.00     0.00  jbwm_open_display
+  0.00      0.00     0.00        1     0.00     0.00  jbwm_open_font
+  0.00      0.00     0.00        1     0.00     0.00  jbwm_parse_command_line
+  0.00      0.00     0.00        1     0.00     0.00  jbwm_set_shape
+  0.00      0.00     0.00        1     0.00     0.00  set_current_desktop
+  0.00      0.00     0.00        1     0.00     0.00  set_desktop_geometry
+  0.00      0.00     0.00        1     0.00     0.00  set_desktop_viewport
+  0.00      0.00     0.00        1     0.00     0.00  set_ewmh_client_list
+  0.00      0.00     0.00        1     0.00     0.00  set_ewmh_supported
+  0.00      0.00     0.00        1     0.00     0.00  set_number_of_desktops
+  0.00      0.00     0.00        1     0.00     0.00  set_virtual_roots
+  0.00      0.00     0.00        1     0.00     0.00  setup_clients
+  0.00      0.00     0.00        1     0.00     0.00  setup_event_listeners
+  0.00      0.00     0.00        1     0.00     0.00  setup_gc
+
+ %         the percentage of the total running time of the
+time       program used by this function.
+
+cumulative a running sum of the number of seconds accounted
+ seconds   for by this function and those listed above it.
+
+ self      the number of seconds accounted for by this
+seconds    function alone.  This is the major sort for this
+           listing.
+
+calls      the number of times this function was invoked, if
+           this function is profiled, else blank.
+
+ self      the average number of milliseconds spent in this
+ms/call    function per call, if this function is profiled,
+	   else blank.
+
+ total     the average number of milliseconds spent in this
+ms/call    function and its descendents per call, if this
+	   function is profiled, else blank.
+
+name       the name of the function.  This is the minor sort
+           for this listing. The index shows the location of
+	   the function in the gprof listing. If the index is
+	   in parenthesis it shows where it would appear in
+	   the gprof listing if it were to be printed.
+
+Copyright (C) 2012-2017 Free Software Foundation, Inc.
+
+Copying and distribution of this file, with or without modification,
+are permitted in any medium without royalty provided the copyright
+notice and this notice are preserved.
+
+		     Call graph (explanation follows)
+
+
+granularity: each sample hit covers 2 byte(s) no time propagated
+
+index % time    self  children    called     name
+                0.00    0.00     167/167         search_client_for_window [4]
+[1]      0.0    0.00    0.00     167         matches [1]
+-----------------------------------------------
+                0.00    0.00       2/68          jbwm_set_frame_extents [56]
+                0.00    0.00       6/68          jbwm_move_resize [26]
+                0.00    0.00      10/68          get_win [15]
+                0.00    0.00      10/68          draw_title [14]
+                0.00    0.00      10/68          resize_title_bar [20]
+                0.00    0.00      30/68          mv [7]
+[2]      0.0    0.00    0.00      68         jbwm_get_font_height [2]
+-----------------------------------------------
+                0.00    0.00      66/66          jbwm_events_loop [80]
+[3]      0.0    0.00    0.00      66         jbwm_get_client [3]
+                0.00    0.00      66/66          search_client_for_window [4]
+-----------------------------------------------
+                                 135             search_client_for_window [4]
+                0.00    0.00      66/66          jbwm_get_client [3]
+[4]      0.0    0.00    0.00      66+135     search_client_for_window [4]
+                0.00    0.00     167/167         matches [1]
+                                 135             search_client_for_window [4]
+-----------------------------------------------
+                0.00    0.00       3/38          wm_desktop [66]
+                0.00    0.00       3/38          jbwm_set_wm_state [57]
+                0.00    0.00       3/38          set_active_window [61]
+                0.00    0.00       3/38          jbwm_ewmh_set_allowed_actions [46]
+                0.00    0.00       5/38          jbwm_ewmh_remove_state [29]
+                0.00    0.00      21/38          set_property [9]
+[5]      0.0    0.00    0.00      38         jbwm_set_property [5]
+-----------------------------------------------
+                0.00    0.00      32/32          jbwm_events_loop [80]
+[6]      0.0    0.00    0.00      32         jbwm_handle_PropertyNotify [6]
+                0.00    0.00      14/17          jbwm_get_wm_state [11]
+                0.00    0.00       3/7           jbwm_move_resize [26]
+-----------------------------------------------
+                0.00    0.00      30/30          move_buttons [19]
+[7]      0.0    0.00    0.00      30         mv [7]
+                0.00    0.00      30/68          jbwm_get_font_height [2]
+-----------------------------------------------
+                0.00    0.00       1/28          jbwm_init_screens [85]
+                0.00    0.00       3/28          wm_desktop [66]
+                0.00    0.00       5/28          jbwm_ewmh_remove_state [29]
+                0.00    0.00       9/28          jbwm_handle_mwm_hints [22]
+                0.00    0.00      10/28          jbwm_get_title [17]
+[8]      0.0    0.00    0.00      28         jbwm_get_property [8]
+-----------------------------------------------
+                0.00    0.00       1/21          set_desktop_geometry [91]
+                0.00    0.00       1/21          set_desktop_viewport [92]
+                0.00    0.00       1/21          set_number_of_desktops [95]
+                0.00    0.00       1/21          set_current_desktop [90]
+                0.00    0.00       1/21          set_virtual_roots [96]
+                0.00    0.00      16/21          set_ewmh_property [12]
+[9]      0.0    0.00    0.00      21         set_property [9]
+                0.00    0.00      21/38          jbwm_set_property [5]
+-----------------------------------------------
+                0.00    0.00      17/17          jbwm_get_wm_state [11]
+[10]     0.0    0.00    0.00      17         get_atom [10]
+-----------------------------------------------
+                0.00    0.00       3/17          jbwm_set_wm_state [57]
+                0.00    0.00      14/17          jbwm_handle_PropertyNotify [6]
+[11]     0.0    0.00    0.00      17         jbwm_get_wm_state [11]
+                0.00    0.00      17/17          get_atom [10]
+-----------------------------------------------
+                0.00    0.00       1/16          init_supporting [79]
+                0.00    0.00       1/16          set_ewmh_client_list [93]
+                0.00    0.00       1/16          set_ewmh_supported [94]
+                0.00    0.00       2/16          set_name [73]
+                0.00    0.00       2/16          set_supporting [75]
+                0.00    0.00       3/16          jbwm_set_frame_extents [56]
+                0.00    0.00       6/16          set_root_property [28]
+[12]     0.0    0.00    0.00      16         set_ewmh_property [12]
+                0.00    0.00      16/21          set_property [9]
+-----------------------------------------------
+                0.00    0.00      10/10          draw_title [14]
+[13]     0.0    0.00    0.00      10         draw_text [13]
+-----------------------------------------------
+                0.00    0.00      10/10          jbwm_update_title_bar [18]
+[14]     0.0    0.00    0.00      10         draw_title [14]
+                0.00    0.00      10/10          jbwm_get_title [17]
+                0.00    0.00      10/68          jbwm_get_font_height [2]
+                0.00    0.00      10/10          jbwm_get_font_ascent [16]
+                0.00    0.00      10/10          draw_text [13]
+-----------------------------------------------
+                0.00    0.00       2/10          new_title_bar [72]
+                0.00    0.00       8/10          add_buttons [67]
+[15]     0.0    0.00    0.00      10         get_win [15]
+                0.00    0.00      10/68          jbwm_get_font_height [2]
+-----------------------------------------------
+                0.00    0.00      10/10          draw_title [14]
+[16]     0.0    0.00    0.00      10         jbwm_get_font_ascent [16]
+-----------------------------------------------
+                0.00    0.00      10/10          draw_title [14]
+[17]     0.0    0.00    0.00      10         jbwm_get_title [17]
+                0.00    0.00      10/28          jbwm_get_property [8]
+-----------------------------------------------
+                0.00    0.00       4/10          jbwm_handle_Expose [33]
+                0.00    0.00       6/10          jbwm_move_resize [26]
+[18]     0.0    0.00    0.00      10         jbwm_update_title_bar [18]
+                0.00    0.00      10/10          resize_title_bar [20]
+                0.00    0.00      10/10          draw_title [14]
+                0.00    0.00       2/2           new_title_bar [72]
+-----------------------------------------------
+                0.00    0.00      10/10          resize_title_bar [20]
+[19]     0.0    0.00    0.00      10         move_buttons [19]
+                0.00    0.00      30/30          mv [7]
+-----------------------------------------------
+                0.00    0.00      10/10          jbwm_update_title_bar [18]
+[20]     0.0    0.00    0.00      10         resize_title_bar [20]
+                0.00    0.00      10/68          jbwm_get_font_height [2]
+                0.00    0.00      10/10          move_buttons [19]
+-----------------------------------------------
+                0.00    0.00       9/9           jbwm_handle_mwm_hints [22]
+[21]     0.0    0.00    0.00       9         get_mwm_hints_atom [21]
+-----------------------------------------------
+                0.00    0.00       3/9           jbwm_new_client [49]
+                0.00    0.00       6/9           jbwm_move_resize [26]
+[22]     0.0    0.00    0.00       9         jbwm_handle_mwm_hints [22]
+                0.00    0.00       9/9           get_mwm_hints_atom [21]
+                0.00    0.00       9/28          jbwm_get_property [8]
+-----------------------------------------------
+                0.00    0.00       7/7           jbwm_move_resize [26]
+[23]     0.0    0.00    0.00       7         do_move [23]
+-----------------------------------------------
+                0.00    0.00       7/7           jbwm_move_resize [26]
+[24]     0.0    0.00    0.00       7         jbwm_configure_client [24]
+-----------------------------------------------
+                0.00    0.00       7/7           allocate_colors [76]
+[25]     0.0    0.00    0.00       7         jbwm_get_pixel [25]
+-----------------------------------------------
+                0.00    0.00       3/7           jbwm_handle_PropertyNotify [6]
+                0.00    0.00       4/7           jbwm_handle_ConfigureNotify [27]
+[26]     0.0    0.00    0.00       7         jbwm_move_resize [26]
+                0.00    0.00       7/7           do_move [23]
+                0.00    0.00       7/7           jbwm_configure_client [24]
+                0.00    0.00       6/68          jbwm_get_font_height [2]
+                0.00    0.00       6/10          jbwm_update_title_bar [18]
+                0.00    0.00       6/9           jbwm_handle_mwm_hints [22]
+                0.00    0.00       1/1           jbwm_set_shape [89]
+-----------------------------------------------
+                0.00    0.00       6/6           jbwm_events_loop [80]
+[27]     0.0    0.00    0.00       6         jbwm_handle_ConfigureNotify [27]
+                0.00    0.00       4/7           jbwm_move_resize [26]
+-----------------------------------------------
+                0.00    0.00       3/6           get_mixed_client_list [38]
+                0.00    0.00       3/6           get_ordered_client_list [39]
+[28]     0.0    0.00    0.00       6         set_root_property [28]
+                0.00    0.00       6/16          set_ewmh_property [12]
+-----------------------------------------------
+                0.00    0.00       2/5           set_state_not_focused [74]
+                0.00    0.00       3/5           jbwm_set_wm_state [57]
+[29]     0.0    0.00    0.00       5         jbwm_ewmh_remove_state [29]
+                0.00    0.00       5/28          jbwm_get_property [8]
+                0.00    0.00       5/38          jbwm_set_property [5]
+-----------------------------------------------
+                0.00    0.00       2/5           configure_title_bar [68]
+                0.00    0.00       3/5           do_grabs [35]
+[30]     0.0    0.00    0.00       5         jbwm_grab_button [30]
+-----------------------------------------------
+                0.00    0.00       1/4           jbwm_handle_key_event [84]
+                0.00    0.00       3/4           unselect_current [65]
+[31]     0.0    0.00    0.00       4         jbwm_get_current_client [31]
+-----------------------------------------------
+                0.00    0.00       1/4           jbwm_grab_root_keys [83]
+                0.00    0.00       3/4           do_grabs [35]
+[32]     0.0    0.00    0.00       4         jbwm_get_grab_mask [32]
+-----------------------------------------------
+                0.00    0.00       4/4           jbwm_events_loop [80]
+[33]     0.0    0.00    0.00       4         jbwm_handle_Expose [33]
+                0.00    0.00       4/10          jbwm_update_title_bar [18]
+-----------------------------------------------
+                0.00    0.00       3/3           setup_clients [97]
+[34]     0.0    0.00    0.00       3         check_redirect [34]
+-----------------------------------------------
+                0.00    0.00       3/3           jbwm_new_client [49]
+[35]     0.0    0.00    0.00       3         do_grabs [35]
+                0.00    0.00       3/3           jbwm_ewmh_set_allowed_actions [46]
+                0.00    0.00       3/4           jbwm_get_grab_mask [32]
+                0.00    0.00       3/5           jbwm_grab_button [30]
+-----------------------------------------------
+                0.00    0.00       3/3           jbwm_new_client [49]
+[36]     0.0    0.00    0.00       3         get_JBWMClient [36]
+-----------------------------------------------
+                                   9             get_client_list_r [37]
+                0.00    0.00       3/3           get_mixed_client_list [38]
+[37]     0.0    0.00    0.00       3+9       get_client_list_r [37]
+                                   9             get_client_list_r [37]
+-----------------------------------------------
+                0.00    0.00       3/3           jbwm_ewmh_update_client_list [47]
+[38]     0.0    0.00    0.00       3         get_mixed_client_list [38]
+                0.00    0.00       3/3           jbwm_get_head_client [48]
+                0.00    0.00       3/3           get_client_list_r [37]
+                0.00    0.00       3/6           set_root_property [28]
+-----------------------------------------------
+                0.00    0.00       3/3           jbwm_ewmh_update_client_list [47]
+[39]     0.0    0.00    0.00       3         get_ordered_client_list [39]
+                0.00    0.00       3/3           get_window_list [43]
+                0.00    0.00       3/6           set_root_property [28]
+-----------------------------------------------
+                0.00    0.00       3/3           reparent [59]
+[40]     0.0    0.00    0.00       3         get_parent [40]
+-----------------------------------------------
+                0.00    0.00       3/3           jbwm_new_client [49]
+[41]     0.0    0.00    0.00       3         get_vdesk [41]
+                0.00    0.00       3/3           wm_desktop [66]
+-----------------------------------------------
+                0.00    0.00       3/3           jbwm_set_client_geometry [54]
+[42]     0.0    0.00    0.00       3         get_window_attributes [42]
+-----------------------------------------------
+                0.00    0.00       3/3           get_ordered_client_list [39]
+[43]     0.0    0.00    0.00       3         get_window_list [43]
+                0.00    0.00       3/3           query_tree [58]
+-----------------------------------------------
+                0.00    0.00       3/3           jbwm_new_shaped_client [50]
+[44]     0.0    0.00    0.00       3         is_shaped [44]
+-----------------------------------------------
+                0.00    0.00       3/3           set_focused [63]
+[45]     0.0    0.00    0.00       3         jbwm_ewmh_add_state [45]
+-----------------------------------------------
+                0.00    0.00       3/3           do_grabs [35]
+[46]     0.0    0.00    0.00       3         jbwm_ewmh_set_allowed_actions [46]
+                0.00    0.00       3/38          jbwm_set_property [5]
+-----------------------------------------------
+                0.00    0.00       3/3           jbwm_events_loop [80]
+[47]     0.0    0.00    0.00       3         jbwm_ewmh_update_client_list [47]
+                0.00    0.00       3/3           get_ordered_client_list [39]
+                0.00    0.00       3/3           get_mixed_client_list [38]
+-----------------------------------------------
+                0.00    0.00       3/3           get_mixed_client_list [38]
+[48]     0.0    0.00    0.00       3         jbwm_get_head_client [48]
+-----------------------------------------------
+                0.00    0.00       3/3           setup_clients [97]
+[49]     0.0    0.00    0.00       3         jbwm_new_client [49]
+                0.00    0.00       3/3           get_JBWMClient [36]
+                0.00    0.00       3/3           jbwm_prepend_client [51]
+                0.00    0.00       3/3           do_grabs [35]
+                0.00    0.00       3/9           jbwm_handle_mwm_hints [22]
+                0.00    0.00       3/3           jbwm_set_client_geometry [54]
+                0.00    0.00       3/3           get_vdesk [41]
+                0.00    0.00       3/3           reparent [59]
+                0.00    0.00       3/3           jbwm_restore_client [52]
+                0.00    0.00       3/3           jbwm_select_client [53]
+-----------------------------------------------
+                0.00    0.00       3/3           reparent [59]
+[50]     0.0    0.00    0.00       3         jbwm_new_shaped_client [50]
+                0.00    0.00       3/3           is_shaped [44]
+-----------------------------------------------
+                0.00    0.00       3/3           jbwm_new_client [49]
+[51]     0.0    0.00    0.00       3         jbwm_prepend_client [51]
+-----------------------------------------------
+                0.00    0.00       3/3           jbwm_new_client [49]
+[52]     0.0    0.00    0.00       3         jbwm_restore_client [52]
+                0.00    0.00       3/3           set_showing [64]
+-----------------------------------------------
+                0.00    0.00       3/3           jbwm_new_client [49]
+[53]     0.0    0.00    0.00       3         jbwm_select_client [53]
+                0.00    0.00       3/3           unselect_current [65]
+                0.00    0.00       3/3           set_focused [63]
+                0.00    0.00       3/3           set_border [62]
+                0.00    0.00       3/3           set_active_window [61]
+-----------------------------------------------
+                0.00    0.00       3/3           jbwm_new_client [49]
+[54]     0.0    0.00    0.00       3         jbwm_set_client_geometry [54]
+                0.00    0.00       3/3           get_window_attributes [42]
+-----------------------------------------------
+                0.00    0.00       3/3           set_active_window [61]
+[55]     0.0    0.00    0.00       3         jbwm_set_current_client [55]
+-----------------------------------------------
+                0.00    0.00       3/3           reparent [59]
+[56]     0.0    0.00    0.00       3         jbwm_set_frame_extents [56]
+                0.00    0.00       3/16          set_ewmh_property [12]
+                0.00    0.00       2/68          jbwm_get_font_height [2]
+-----------------------------------------------
+                0.00    0.00       3/3           set_showing [64]
+[57]     0.0    0.00    0.00       3         jbwm_set_wm_state [57]
+                0.00    0.00       3/17          jbwm_get_wm_state [11]
+                0.00    0.00       3/38          jbwm_set_property [5]
+                0.00    0.00       3/5           jbwm_ewmh_remove_state [29]
+-----------------------------------------------
+                0.00    0.00       3/3           get_window_list [43]
+[58]     0.0    0.00    0.00       3         query_tree [58]
+-----------------------------------------------
+                0.00    0.00       3/3           jbwm_new_client [49]
+[59]     0.0    0.00    0.00       3         reparent [59]
+                0.00    0.00       3/3           jbwm_new_shaped_client [50]
+                0.00    0.00       3/3           get_parent [40]
+                0.00    0.00       3/3           reparent_window [60]
+                0.00    0.00       3/3           jbwm_set_frame_extents [56]
+-----------------------------------------------
+                0.00    0.00       3/3           reparent [59]
+[60]     0.0    0.00    0.00       3         reparent_window [60]
+-----------------------------------------------
+                0.00    0.00       3/3           jbwm_select_client [53]
+[61]     0.0    0.00    0.00       3         set_active_window [61]
+                0.00    0.00       3/3           jbwm_set_current_client [55]
+                0.00    0.00       3/38          jbwm_set_property [5]
+-----------------------------------------------
+                0.00    0.00       3/3           jbwm_select_client [53]
+[62]     0.0    0.00    0.00       3         set_border [62]
+-----------------------------------------------
+                0.00    0.00       3/3           jbwm_select_client [53]
+[63]     0.0    0.00    0.00       3         set_focused [63]
+                0.00    0.00       3/3           jbwm_ewmh_add_state [45]
+-----------------------------------------------
+                0.00    0.00       3/3           jbwm_restore_client [52]
+[64]     0.0    0.00    0.00       3         set_showing [64]
+                0.00    0.00       3/3           jbwm_set_wm_state [57]
+-----------------------------------------------
+                0.00    0.00       3/3           jbwm_select_client [53]
+[65]     0.0    0.00    0.00       3         unselect_current [65]
+                0.00    0.00       3/4           jbwm_get_current_client [31]
+                0.00    0.00       2/2           set_state_not_focused [74]
+-----------------------------------------------
+                0.00    0.00       3/3           get_vdesk [41]
+[66]     0.0    0.00    0.00       3         wm_desktop [66]
+                0.00    0.00       3/28          jbwm_get_property [8]
+                0.00    0.00       3/38          jbwm_set_property [5]
+-----------------------------------------------
+                0.00    0.00       2/2           new_title_bar [72]
+[67]     0.0    0.00    0.00       2         add_buttons [67]
+                0.00    0.00       8/10          get_win [15]
+-----------------------------------------------
+                0.00    0.00       2/2           new_title_bar [72]
+[68]     0.0    0.00    0.00       2         configure_title_bar [68]
+                0.00    0.00       2/5           jbwm_grab_button [30]
+-----------------------------------------------
+                0.00    0.00       2/2           set_state_not_focused [74]
+[69]     0.0    0.00    0.00       2         get_bg [69]
+-----------------------------------------------
+                                  47             grab_r [70]
+                0.00    0.00       2/2           jbwm_grab_root_keys [83]
+[70]     0.0    0.00    0.00       2+47      grab_r [70]
+                                  47             grab_r [70]
+-----------------------------------------------
+                0.00    0.00       1/2           jbwm_grab_root_keys [83]
+                0.00    0.00       1/2           jbwm_handle_key_event [84]
+[71]     0.0    0.00    0.00       2         jbwm_get_mod_mask [71]
+-----------------------------------------------
+                0.00    0.00       2/2           jbwm_update_title_bar [18]
+[72]     0.0    0.00    0.00       2         new_title_bar [72]
+                0.00    0.00       2/10          get_win [15]
+                0.00    0.00       2/2           add_buttons [67]
+                0.00    0.00       2/2           configure_title_bar [68]
+-----------------------------------------------
+                0.00    0.00       1/2           init_supporting [79]
+                0.00    0.00       1/2           jbwm_ewmh_init_screen [81]
+[73]     0.0    0.00    0.00       2         set_name [73]
+                0.00    0.00       2/16          set_ewmh_property [12]
+-----------------------------------------------
+                0.00    0.00       2/2           unselect_current [65]
+[74]     0.0    0.00    0.00       2         set_state_not_focused [74]
+                0.00    0.00       2/2           get_bg [69]
+                0.00    0.00       2/5           jbwm_ewmh_remove_state [29]
+-----------------------------------------------
+                0.00    0.00       2/2           init_supporting [79]
+[75]     0.0    0.00    0.00       2         set_supporting [75]
+                0.00    0.00       2/16          set_ewmh_property [12]
+-----------------------------------------------
+                0.00    0.00       1/1           jbwm_init_screens [85]
+[76]     0.0    0.00    0.00       1         allocate_colors [76]
+                0.00    0.00       7/7           jbwm_get_pixel [25]
+-----------------------------------------------
+                0.00    0.00       1/1           setup_clients [97]
+[77]     0.0    0.00    0.00       1         get_windows [77]
+-----------------------------------------------
+                0.00    0.00       1/1           jbwm_ewmh_init_screen [81]
+[78]     0.0    0.00    0.00       1         init_desktops [78]
+                0.00    0.00       1/1           set_desktop_viewport [92]
+                0.00    0.00       1/1           set_desktop_geometry [91]
+                0.00    0.00       1/1           set_number_of_desktops [95]
+                0.00    0.00       1/1           set_current_desktop [90]
+                0.00    0.00       1/1           set_virtual_roots [96]
+-----------------------------------------------
+                0.00    0.00       1/1           jbwm_ewmh_init_screen [81]
+[79]     0.0    0.00    0.00       1         init_supporting [79]
+                0.00    0.00       2/2           set_supporting [75]
+                0.00    0.00       1/16          set_ewmh_property [12]
+                0.00    0.00       1/2           set_name [73]
+-----------------------------------------------
+                0.00    0.00       1/1           main [174]
+[80]     0.0    0.00    0.00       1         jbwm_events_loop [80]
+                0.00    0.00      66/66          jbwm_get_client [3]
+                0.00    0.00      32/32          jbwm_handle_PropertyNotify [6]
+                0.00    0.00       6/6           jbwm_handle_ConfigureNotify [27]
+                0.00    0.00       4/4           jbwm_handle_Expose [33]
+                0.00    0.00       3/3           jbwm_ewmh_update_client_list [47]
+                0.00    0.00       1/1           jbwm_handle_key_event [84]
+-----------------------------------------------
+                0.00    0.00       1/1           jbwm_init_screens [85]
+[81]     0.0    0.00    0.00       1         jbwm_ewmh_init_screen [81]
+                0.00    0.00       1/1           set_ewmh_supported [94]
+                0.00    0.00       1/2           set_name [73]
+                0.00    0.00       1/1           set_ewmh_client_list [93]
+                0.00    0.00       1/1           init_desktops [78]
+                0.00    0.00       1/1           init_supporting [79]
+-----------------------------------------------
+                0.00    0.00       1/1           jbwm_init_screens [85]
+[82]     0.0    0.00    0.00       1         jbwm_get_font [82]
+-----------------------------------------------
+                0.00    0.00       1/1           jbwm_init_screens [85]
+[83]     0.0    0.00    0.00       1         jbwm_grab_root_keys [83]
+                0.00    0.00       2/2           grab_r [70]
+                0.00    0.00       1/4           jbwm_get_grab_mask [32]
+                0.00    0.00       1/2           jbwm_get_mod_mask [71]
+-----------------------------------------------
+                0.00    0.00       1/1           jbwm_events_loop [80]
+[84]     0.0    0.00    0.00       1         jbwm_handle_key_event [84]
+                0.00    0.00       1/4           jbwm_get_current_client [31]
+                0.00    0.00       1/2           jbwm_get_mod_mask [71]
+-----------------------------------------------
+                                   1             jbwm_init_screens [85]
+                0.00    0.00       1/1           main [174]
+[85]     0.0    0.00    0.00       1+1       jbwm_init_screens [85]
+                0.00    0.00       1/28          jbwm_get_property [8]
+                0.00    0.00       1/1           jbwm_get_font [82]
+                0.00    0.00       1/1           allocate_colors [76]
+                0.00    0.00       1/1           setup_gc [99]
+                0.00    0.00       1/1           setup_event_listeners [98]
+                0.00    0.00       1/1           jbwm_grab_root_keys [83]
+                0.00    0.00       1/1           setup_clients [97]
+                0.00    0.00       1/1           jbwm_ewmh_init_screen [81]
+                                   1             jbwm_init_screens [85]
+-----------------------------------------------
+                0.00    0.00       1/1           main [174]
+[86]     0.0    0.00    0.00       1         jbwm_open_display [86]
+-----------------------------------------------
+                0.00    0.00       1/1           main [174]
+[87]     0.0    0.00    0.00       1         jbwm_open_font [87]
+-----------------------------------------------
+                0.00    0.00       1/1           main [174]
+[88]     0.0    0.00    0.00       1         jbwm_parse_command_line [88]
+-----------------------------------------------
+                0.00    0.00       1/1           jbwm_move_resize [26]
+[89]     0.0    0.00    0.00       1         jbwm_set_shape [89]
+-----------------------------------------------
+                0.00    0.00       1/1           init_desktops [78]
+[90]     0.0    0.00    0.00       1         set_current_desktop [90]
+                0.00    0.00       1/21          set_property [9]
+-----------------------------------------------
+                0.00    0.00       1/1           init_desktops [78]
+[91]     0.0    0.00    0.00       1         set_desktop_geometry [91]
+                0.00    0.00       1/21          set_property [9]
+-----------------------------------------------
+                0.00    0.00       1/1           init_desktops [78]
+[92]     0.0    0.00    0.00       1         set_desktop_viewport [92]
+                0.00    0.00       1/21          set_property [9]
+-----------------------------------------------
+                0.00    0.00       1/1           jbwm_ewmh_init_screen [81]
+[93]     0.0    0.00    0.00       1         set_ewmh_client_list [93]
+                0.00    0.00       1/16          set_ewmh_property [12]
+-----------------------------------------------
+                0.00    0.00       1/1           jbwm_ewmh_init_screen [81]
+[94]     0.0    0.00    0.00       1         set_ewmh_supported [94]
+                0.00    0.00       1/16          set_ewmh_property [12]
+-----------------------------------------------
+                0.00    0.00       1/1           init_desktops [78]
+[95]     0.0    0.00    0.00       1         set_number_of_desktops [95]
+                0.00    0.00       1/21          set_property [9]
+-----------------------------------------------
+                0.00    0.00       1/1           init_desktops [78]
+[96]     0.0    0.00    0.00       1         set_virtual_roots [96]
+                0.00    0.00       1/21          set_property [9]
+-----------------------------------------------
+                0.00    0.00       1/1           jbwm_init_screens [85]
+[97]     0.0    0.00    0.00       1         setup_clients [97]
+                0.00    0.00       3/3           check_redirect [34]
+                0.00    0.00       3/3           jbwm_new_client [49]
+                0.00    0.00       1/1           get_windows [77]
+-----------------------------------------------
+                0.00    0.00       1/1           jbwm_init_screens [85]
+[98]     0.0    0.00    0.00       1         setup_event_listeners [98]
+-----------------------------------------------
+                0.00    0.00       1/1           jbwm_init_screens [85]
+[99]     0.0    0.00    0.00       1         setup_gc [99]
+-----------------------------------------------
+
+ This table describes the call tree of the program, and was sorted by
+ the total amount of time spent in each function and its children.
+
+ Each entry in this table consists of several lines.  The line with the
+ index number at the left hand margin lists the current function.
+ The lines above it list the functions that called this function,
+ and the lines below it list the functions this one called.
+ This line lists:
+     index	A unique number given to each element of the table.
+		Index numbers are sorted numerically.
+		The index number is printed next to every function name so
+		it is easier to look up where the function is in the table.
+
+     % time	This is the percentage of the `total' time that was spent
+		in this function and its children.  Note that due to
+		different viewpoints, functions excluded by options, etc,
+		these numbers will NOT add up to 100%.
+
+     self	This is the total amount of time spent in this function.
+
+     children	This is the total amount of time propagated into this
+		function by its children.
+
+     called	This is the number of times the function was called.
+		If the function called itself recursively, the number
+		only includes non-recursive calls, and is followed by
+		a `+' and the number of recursive calls.
+
+     name	The name of the current function.  The index number is
+		printed after it.  If the function is a member of a
+		cycle, the cycle number is printed between the
+		function's name and the index number.
+
+
+ For the function's parents, the fields have the following meanings:
+
+     self	This is the amount of time that was propagated directly
+		from the function into this parent.
+
+     children	This is the amount of time that was propagated from
+		the function's children into this parent.
+
+     called	This is the number of times this parent called the
+		function `/' the total number of times the function
+		was called.  Recursive calls to the function are not
+		included in the number after the `/'.
+
+     name	This is the name of the parent.  The parent's index
+		number is printed after it.  If the parent is a
+		member of a cycle, the cycle number is printed between
+		the name and the index number.
+
+ If the parents of the function cannot be determined, the word
+ `<spontaneous>' is printed in the `name' field, and all the other
+ fields are blank.
+
+ For the function's children, the fields have the following meanings:
+
+     self	This is the amount of time that was propagated directly
+		from the child into the function.
+
+     children	This is the amount of time that was propagated from the
+		child's children to the function.
+
+     called	This is the number of times the function called
+		this child `/' the total number of times the child
+		was called.  Recursive calls by the child are not
+		listed in the number after the `/'.
+
+     name	This is the name of the child.  The child's index
+		number is printed after it.  If the child is a
+		member of a cycle, the cycle number is printed
+		between the name and the index number.
+
+ If there are any cycles (circles) in the call graph, there is an
+ entry for the cycle-as-a-whole.  This entry shows who called the
+ cycle (as parents) and the members of the cycle (as children.)
+ The `+' recursive calls entry shows the number of function calls that
+ were internal to the cycle, and the calls entry for each member shows,
+ for that member, how many times it was called from other members of
+ the cycle.
+
+Copyright (C) 2012-2017 Free Software Foundation, Inc.
+
+Copying and distribution of this file, with or without modification,
+are permitted in any medium without royalty provided the copyright
+notice and this notice are preserved.
+
+Index by function name
+
+  [67] add_buttons (title_bar.c) [31] jbwm_get_current_client [57] jbwm_set_wm_state
+  [76] allocate_colors (jbwm.c) [82] jbwm_get_font        [18] jbwm_update_title_bar
+  [34] check_redirect (jbwm.c) [16] jbwm_get_font_ascent   [1] matches (client.c)
+  [68] configure_title_bar (title_bar.c) [2] jbwm_get_font_height [19] move_buttons (title_bar.c)
+  [35] do_grabs (new.c)       [32] jbwm_get_grab_mask      [7] mv (title_bar.c)
+  [23] do_move (move_resize.c) [48] jbwm_get_head_client  [72] new_title_bar (title_bar.c)
+  [13] draw_text (title_bar.c) [71] jbwm_get_mod_mask     [58] query_tree (ewmh.c)
+  [14] draw_title (title_bar.c) [25] jbwm_get_pixel       [59] reparent (new.c)
+  [36] get_JBWMClient (new.c)  [8] jbwm_get_property      [60] reparent_window (new.c)
+  [10] get_atom (wm_state.c)  [17] jbwm_get_title (title_bar.c) [20] resize_title_bar (title_bar.c)
+  [69] get_bg (select.c)      [11] jbwm_get_wm_state       [4] search_client_for_window (client.c)
+  [37] get_client_list_r (ewmh.c) [30] jbwm_grab_button   [61] set_active_window (select.c)
+  [38] get_mixed_client_list (ewmh.c) [83] jbwm_grab_root_keys [62] set_border (select.c)
+  [21] get_mwm_hints_atom (mwm.c) [27] jbwm_handle_ConfigureNotify (events.c) [90] set_current_desktop (ewmh.c)
+  [39] get_ordered_client_list (ewmh.c) [33] jbwm_handle_Expose (events.c) [91] set_desktop_geometry (ewmh.c)
+  [40] get_parent (new.c)      [6] jbwm_handle_PropertyNotify (events.c) [92] set_desktop_viewport (ewmh.c)
+  [41] get_vdesk (new.c)      [84] jbwm_handle_key_event  [93] set_ewmh_client_list (ewmh.c)
+  [15] get_win (title_bar.c)  [22] jbwm_handle_mwm_hints  [12] set_ewmh_property (ewmh.c)
+  [42] get_window_attributes (geometry.c) [85] jbwm_init_screens [94] set_ewmh_supported (ewmh.c)
+  [43] get_window_list (ewmh.c) [26] jbwm_move_resize     [63] set_focused (select.c)
+  [77] get_windows (jbwm.c)   [49] jbwm_new_client        [73] set_name (ewmh.c)
+  [70] grab_r (keys.c)        [50] jbwm_new_shaped_client [95] set_number_of_desktops (ewmh.c)
+  [78] init_desktops (ewmh.c) [86] jbwm_open_display       [9] set_property (ewmh.c)
+  [79] init_supporting (ewmh.c) [87] jbwm_open_font       [28] set_root_property (ewmh.c)
+  [44] is_shaped (shape.c)    [88] jbwm_parse_command_line [64] set_showing (client.c)
+  [24] jbwm_configure_client (move_resize.c) [51] jbwm_prepend_client [74] set_state_not_focused (select.c)
+  [80] jbwm_events_loop       [52] jbwm_restore_client    [75] set_supporting (ewmh.c)
+  [45] jbwm_ewmh_add_state    [53] jbwm_select_client     [96] set_virtual_roots (ewmh.c)
+  [81] jbwm_ewmh_init_screen  [54] jbwm_set_client_geometry [97] setup_clients (jbwm.c)
+  [29] jbwm_ewmh_remove_state [55] jbwm_set_current_client [98] setup_event_listeners (jbwm.c)
+  [46] jbwm_ewmh_set_allowed_actions [56] jbwm_set_frame_extents [99] setup_gc (jbwm.c)
+  [47] jbwm_ewmh_update_client_list [5] jbwm_set_property [65] unselect_current (select.c)
+   [3] jbwm_get_client        [89] jbwm_set_shape         [66] wm_desktop (new.c)
