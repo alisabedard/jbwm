@@ -18,7 +18,7 @@ __attribute__ ((const, warn_unused_result))
 static inline int sborder(const int xy, const int edge)
 {
     int r;
-#if __i386__ || __x86_64__
+#if defined(__i386__) || defined(__x86_64__)
     __asm__(
         "movl %%ebx, %%eax\n\t" // copy xy
         "addl %%ecx, %%eax\n\t" //xy + edge, preserve ecx for later
@@ -57,7 +57,7 @@ __attribute__ ((const, warn_unused_result))
 static inline int absmin(int const a, int const b)
 {
     int r;
-#if __i386__ || __x86_64__
+#if defined(__i386__) || defined(__x86_64__)
     __asm__(
         "movl %%eax, %%ebx\n\t" // save
         "negl %%eax\n\t" // negate
