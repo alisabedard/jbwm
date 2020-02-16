@@ -7,13 +7,14 @@
 #include <stdlib.h>
 #include "client.h"
 #include "config.h"
-#include "font.h"
 #include "geometry.h"
 #include "JBWMClient.h"
 #include "JBWMPoint.h"
 #include "JBWMSize.h"
 #include "log.h"
+#ifdef JBWM_DEBUG_ABSMIN
 #include <stdio.h>
+#endif//JBWM_DEBUG_ABSMIN
 __attribute__ ((const, warn_unused_result))
 static inline int sborder(const int xy, const int edge)
 {
