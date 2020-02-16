@@ -17,29 +17,23 @@
 __attribute__ ((const, warn_unused_result))
 static inline int sborder(const int xy, const int edge)
 {
-    volatile int r;
+    int r;
 #if __i386__ || __x86_64__
     __asm__(
-        //"mov %%ecx, %%eax\n\t"
-        "mov %%ebx, %%edx\n\t" // save xy
-        "add %%ecx, %%ebx\n\t" //xy + edge
-        "mov %%ebx, %%eax\n\t" // begin abs
-        "neg %%eax\n\t"
-        "cmovl %%ebx, %%eax\n\t" // finish abs
-        "cmp %1, %%eax\n\t"
-        "jge ge\n\t"
-        "neg %%ecx\n\t"
-        "mov %%ecx, %%eax\n\t"
-        "jmp ecmp\n\t"
-        "ge:\n\t"
-        "mov %%edx, %%eax\n\t" // restore xy
-        "ecmp:\n\t"
-        : "=a" (r)
+        "movl %%ebx, %%eax\n\t" // copy xy
+        "addl %%ecx, %%eax\n\t" //xy + edge, preserve ecx for later
+        "movl %%eax, %%edx\n\t" // copy result
+        "negl %%eax\n\t" // negate copy
+        "cmovll %%edx, %%eax\n\t" // if negative copy, restore src - abs
+        "neg %%ecx\n\t" // -edge
+        "cmpl %1, %%eax\n\t" // note reversed at&t operation order
+        "cmovgel %%ebx,%%ecx\n\t" // result is xy if >=
+        : "=c" (r)
         : "i" (JBWM_SNAP), "b" (xy), "c" (edge)
-        : "%edx"
+        : "%eax", "%edx" // scratch
     );
 #else// Portable version:
-    r=abs(xy + edge) < JBWM_SNAP ? -edge : xy;
+    r = abs(xy + edge) < JBWM_SNAP ? -edge : xy;
 #endif
     return r;
 }
@@ -65,19 +59,25 @@ static inline int absmin(int const a, int const b)
     int r;
 #if __i386__ || __x86_64__
     __asm__(
-        "mov %%ebx, %%eax\n\t"
-        "neg %%eax\n\t"
-        "cmovl %%ebx, %%eax\n\t"
-        "mov %%edx, %%ecx\n\t"
-        "neg %%ecx\n\t"
-        "cmovl %%edx, %%ecx\n\t"
-        "cmovl %%ecx, %%eax\n\t"
-        : "=a" (r)
-        : "b" (a), "d" (b)
+        "movl %%eax, %%ebx\n\t" // save
+        "negl %%eax\n\t" // negate
+        "cmovll %%ebx, %%eax\n\t" // restore saved if negative
+        "movl %%ecx, %%edx\n\t" // save
+        "negl %%ecx\n\t" // negate
+        "cmovll %%edx, %%ecx\n\t" // restore saved if negative
+        "cmpl %%eax, %%ecx\n\t" // abs(b)<abs(a) (note reversed at&t syntax)
+        "cmovll %%edx, %%ebx\n\t" // b (orig a) to output if <
+//      "int3\n\t" // debug
+        : "=b" (r)
+        : "a" (a), "c" (b)
+        : "%edx"
     );
 #else// Portable version:
     r = abs(a) < abs(b) ? a : b;
 #endif
+#ifdef JBWM_DEBUG_ABSMIN
+    printf("%d\t",r);
+#endif//JBWM_DEBUG_ABSMIN
     return r;
 }
 __attribute__ ((const, warn_unused_result))
