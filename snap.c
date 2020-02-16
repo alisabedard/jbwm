@@ -81,7 +81,7 @@ static inline int absmin(int const a, int const b)
     return r;
 }
 __attribute__ ((const, warn_unused_result))
-static int jbwm_snap_dim(const int cxy, const int cwh, const int cixy,
+static inline int jbwm_snap_dim(const int cxy, const int cwh, const int cixy,
     const int ciwh, const int d)
 {
     const int s = cixy + ciwh - cxy, t = cixy - cxy;
@@ -92,7 +92,7 @@ static int jbwm_snap_dim(const int cxy, const int cwh, const int cixy,
  * JBWMRectangle.  This is performance critical, scaling O(n)
  * relative to the number of windows, so leave iterative in definition to
  * avoid further overhead.  */
-static struct JBWMPoint snap_search(struct JBWMClient * c)
+static inline struct JBWMPoint snap_search(struct JBWMClient * c)
 {
     struct JBWMPoint d = {JBWM_SNAP, JBWM_SNAP};
     for (struct JBWMClient * ci = jbwm_get_head_client();
@@ -117,8 +117,36 @@ void jbwm_snap_client(struct JBWMClient * restrict c)
     jbwm_snap_border(c);
     // Snap to other windows:
     const struct JBWMPoint d = snap_search(c);
+#if defined(__i386__) || defined(__x86_64__)
+    __asm__(
+        "movl %%ebx, %%eax\n\t"
+        "negl %%eax\n\t"
+        "cmovll %%ebx, %%eax\n\t" // abs(ebx) to eax
+        "movl %%edx,%%ecx\n\t"
+        "addl %%ebx,%%edx\n\t"
+        "cmpl %1, %%eax\n\t"
+        "cmovll  %%edx, %%ecx\n\t"
+        : "=c" (c->size.x)
+        : "i" (JBWM_SNAP), "b" (d.x), "d" (c->size.x)
+        : "%eax"
+    );
+    __asm__(
+        "movl %%ebx, %%eax\n\t"
+        "negl %%eax\n\t"
+        "cmovll %%ebx, %%eax\n\t" // abs(ebx) to eax
+        "movl %%edx,%%ecx\n\t"
+        "addl %%ebx,%%edx\n\t"
+        "cmpl %1, %%eax\n\t"
+        "cmovll  %%edx, %%ecx\n\t"
+        : "=c" (c->size.y)
+        : "i" (JBWM_SNAP), "b" (d.y), "d" (c->size.y)
+        : "%eax"
+    );
+
+#else // portable
     if (abs(d.x) < JBWM_SNAP)
         c->size.x += d.x;
     if (abs(d.y) < JBWM_SNAP)
         c->size.y += d.y;
+#endif
 }
