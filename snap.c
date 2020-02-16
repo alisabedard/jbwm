@@ -25,7 +25,7 @@ static inline int sborder(const int xy, const int edge)
         "movl %%eax, %%edx\n\t" // copy result
         "negl %%eax\n\t" // negate copy
         "cmovll %%edx, %%eax\n\t" // if negative copy, restore src - abs
-        "neg %%ecx\n\t" // -edge
+        "negl %%ecx\n\t" // -edge
         "cmpl %1, %%eax\n\t" // note reversed at&t operation order
         "cmovgel %%ebx,%%ecx\n\t" // result is xy if >=
         : "=c" (r)
