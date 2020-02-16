@@ -26,8 +26,7 @@ static inline void set_property(struct PropertyData * restrict p) {
 static inline void set_ewmh_property(Display * d,Window const win,
     Atom const property,Atom const type,
     void * data,uint16_t const size) {
-    set_property(&(struct PropertyData){.display=d,.data=data,
-        .target=win,.property=property,.size=size,.type=type});
+    jbwm_set_property(d, win, property, type, data, size);
 }
 static inline void set_root_property(Display * d,
     Atom const property,Atom const type,
@@ -62,6 +61,7 @@ static void debug_window_list(int n,Window * window_list)
 static Window * get_mixed_client_list(Display * d)
 {
     static Window * window_list;
+    Atom a;
     int n;
     if (window_list) {
         free(window_list);
@@ -69,8 +69,8 @@ static Window * get_mixed_client_list(Display * d)
     }
     n=get_client_list_r(&window_list,d,
         jbwm_get_head_client(),0);
-    set_root_property(d,XInternAtom(d,"_NET_CLIENT_LIST",false),XA_WINDOW,
-        window_list,n);
+    a=XInternAtom(d,"_NET_CLIENT_LIST",false);
+    set_root_property(d,a, XA_WINDOW, window_list,n);
     debug_window_list(n,window_list);
     return window_list;
 }
@@ -78,13 +78,13 @@ static inline bool query_tree(Display * d,Window ** children_return,
     unsigned int * restrict nchildren_return)
 {
     Window parent,root;
-    parent=0;
-    root=0;
-    assert(d);
-    assert(children_return);
-    assert(nchildren_return);
-    return XQueryTree(d,DefaultRootWindow(d),&parent,&root,children_return,
-        nchildren_return);
+    bool r;
+    if(d&&children_return&&nchildren_return)
+        r=XQueryTree(d,DefaultRootWindow(d),&parent,&root,children_return,
+          nchildren_return);
+    else
+        r=false;
+    return r;
 }
 static unsigned int get_window_list(Display * d,uint8_t const max_clients,
     Window * window_list)
@@ -103,11 +103,12 @@ static Window * get_ordered_client_list(Display * d)
 {
     enum {MAX_CLIENTS=64};
     static Window window_list[MAX_CLIENTS];
+    Atom a;
     // get ordered list of all windows on default screen:
     unsigned int const n=get_window_list(d,MAX_CLIENTS,window_list);
     JBWM_LOG("get_ordered_client_list() n: %d",(int)n);
-    set_root_property(d,XInternAtom(d,"_NET_CLIENT_LIST_STACKING",false),
-        XA_WINDOW,window_list,n);
+    a=XInternAtom(d,"_NET_CLIENT_LIST_STACKING",false);
+    set_root_property(d,a,XA_WINDOW,window_list,n);
     return window_list;
 }
 void jbwm_ewmh_update_client_list(Display * d)
@@ -195,8 +196,9 @@ static void set_name(Display * d,Window const w)
 static void set_supporting(Display * d,Window const w,
     Window * s)
 {
-    set_ewmh_property(d,w,XInternAtom(d,"_NET_SUPPORTING_WM_CHECK",false),
-        XA_WINDOW,s,1);
+    Atom a;
+    a=XInternAtom(d,"_NET_SUPPORTING_WM_CHECK", false);
+    set_ewmh_property(d,w,a,XA_WINDOW,s,1);
 }
 static Window init_supporting(Display * d,Window const r)
 {
@@ -210,10 +212,11 @@ static Window init_supporting(Display * d,Window const r)
     return w;
 }
 static void set_ewmh_client_list(Display *d,Window *r){
+    Atom a;
     /* Set this to the root window until we have some clients.
      * Declared r static so we don't lose scope.  */
-    set_ewmh_property(d,*r,XInternAtom(d,"_NET_CLIENT_LIST",false),
-        XA_WINDOW,r,1);
+    a=XInternAtom(d,"_NET_CLIENT_LIST",false);
+    set_ewmh_property(d,*r,a,XA_WINDOW,r,1);
 }
 static void set_ewmh_supported(Display *d,Window const r){
     char * names[]={
@@ -260,7 +263,7 @@ static void set_ewmh_supported(Display *d,Window const r){
     size_t const sz=sizeof(names)/sizeof(names[0]);
     Atom a[sz];
     XInternAtoms(d,names,sz,false,a);
-    set_ewmh_property(d,r,a[0]/*SUPPORTED*/,XA_ATOM,&a,sizeof(a));
+    set_ewmh_property(d,r,a[0]/*SUPPORTED*/,XA_ATOM,(unsigned char *)&a,sz);
 }
 void jbwm_ewmh_init_screen(Display * d,struct JBWMScreen * s)
 {
@@ -276,12 +279,13 @@ void jbwm_ewmh_init_screen(Display * d,struct JBWMScreen * s)
 void jbwm_set_frame_extents(struct JBWMClient * restrict c)
 {
     static uint32_t f[4];
+    Atom a;
     Display *d=c->screen->display;
     JBWM_LOG("jbwm_set_frame_extents()");
     // Fields: left,right,top,bottom
     f[0]=f[1]=f[2]=f[3]=c->opt.border;
     if (!c->opt.no_title_bar)
         f[2] += c->screen->font_height;
-    set_ewmh_property(c->screen->display,c->parent,XInternAtom(d,
-            "_NET_FRAME_EXTENTS",false),XA_CARDINAL,f,4);
+    a=XInternAtom(d, "_NET_FRAME_EXTENTS", false);
+    set_ewmh_property(c->screen->display,c->parent,a,XA_CARDINAL,f,4);
 }
