@@ -13,10 +13,35 @@
 #include "JBWMPoint.h"
 #include "JBWMSize.h"
 #include "log.h"
+#include <stdio.h>
 __attribute__ ((const, warn_unused_result))
-static int sborder(const int xy, const int edge)
+static inline int sborder(const int xy, const int edge)
 {
-    return abs(xy + edge) < JBWM_SNAP ? -edge : xy;
+    volatile int r;
+#if __i386__ || __x86_64__
+    __asm__(
+        //"mov %%ecx, %%eax\n\t"
+        "mov %%ebx, %%edx\n\t" // save xy
+        "add %%ecx, %%ebx\n\t" //xy + edge
+        "mov %%ebx, %%eax\n\t" // begin abs
+        "neg %%eax\n\t"
+        "cmovl %%ebx, %%eax\n\t" // finish abs
+        "cmp %1, %%eax\n\t"
+        "jge ge\n\t"
+        "neg %%ecx\n\t"
+        "mov %%ecx, %%eax\n\t"
+        "jmp ecmp\n\t"
+        "ge:\n\t"
+        "mov %%edx, %%eax\n\t" // restore xy
+        "ecmp:\n\t"
+        : "=a" (r)
+        : "i" (JBWM_SNAP), "b" (xy), "c" (edge)
+        : "%edx"
+    );
+#else// Portable version:
+    r=abs(xy + edge) < JBWM_SNAP ? -edge : xy;
+#endif
+    return r;
 }
 void jbwm_snap_border(struct JBWMClient * restrict c)
 {
@@ -35,9 +60,25 @@ void jbwm_snap_border(struct JBWMClient * restrict c)
  * and minimizes over-expansion (the full expansion of jbwm_snap_dim
  * is approximately a dozen lines).  */
 __attribute__ ((const, warn_unused_result))
-static inline int absmin(const int a, const int b)
+static inline int absmin(int const a, int const b)
 {
-    return abs(a) < abs(b) ? a : b;
+    int r;
+#if __i386__ || __x86_64__
+    __asm__(
+        "mov %%ebx, %%eax\n\t"
+        "neg %%eax\n\t"
+        "cmovl %%ebx, %%eax\n\t"
+        "mov %%edx, %%ecx\n\t"
+        "neg %%ecx\n\t"
+        "cmovl %%edx, %%ecx\n\t"
+        "cmovl %%ecx, %%eax\n\t"
+        : "=a" (r)
+        : "b" (a), "d" (b)
+    );
+#else// Portable version:
+    r = abs(a) < abs(b) ? a : b;
+#endif
+    return r;
 }
 __attribute__ ((const, warn_unused_result))
 static int jbwm_snap_dim(const int cxy, const int cwh, const int cixy,
