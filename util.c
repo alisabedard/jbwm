@@ -15,10 +15,9 @@ void jbwm_set_property(Display * d, const Window win,
     const Atom property, const Atom type,
     void * data, uint16_t size)
 {
-    if (!d || !data)
-        return;
-    XChangeProperty(d, win, property, type, 32, PropModeReplace,
-        data, size);
+    if (d && data)
+        XChangeProperty(d, win, property, type, 32, PropModeReplace,
+            data, size);
 }
 jbwm_pixel_t jbwm_get_pixel(Display * dpy,
     const uint8_t screen, const char * name)
