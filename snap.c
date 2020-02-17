@@ -40,16 +40,21 @@ static inline int sborder(const int xy, const int edge)
 }
 void jbwm_snap_border(struct JBWMClient * restrict c)
 {
+    int16_t x,y;
     struct JBWMScreen *scr = c->screen;
     struct JBWMRectangle * restrict g = &(c->size);
     const struct JBWMSize s = {scr->xlib->width,
         scr->xlib->height};
     const uint8_t b = c->opt.border << 1;
     // snap to screen border
-    g->x = sborder(g->x, 0);
-    g->x = sborder(g->x, g->width - s.width + b);
-    g->y = sborder(g->y, c->opt.no_title_bar ? 0 :-scr->font_height);
-    g->y = sborder(g->y, g->height - s.height + b);
+    x=g->x;
+    x = sborder(x, 0);
+    x = sborder(x, g->width - s.width + b);
+    g->x=x;
+    y=g->y;
+    y = sborder(y, (c->opt.no_title_bar^1)*-scr->font_height);
+    y = sborder(y, g->height - s.height + b);
+    g->y=y;
 }
 /* Definition of this as an inline function guarantees no side-effects
  * and minimizes over-expansion (the full expansion of jbwm_snap_dim
@@ -96,7 +101,7 @@ static inline int jbwm_snap_dim(const int cxy, const int cwh, const int cixy,
 static inline struct JBWMPoint snap_search(struct JBWMClient * c)
 {
     struct JBWMPoint d = {JBWM_SNAP, JBWM_SNAP};
-    for (struct JBWMClient * ci = jbwm_get_head_client();
+    for (struct JBWMClient * ci = *(c->head);
         ci; ci = ci->next) {
         if ((ci != c) && (ci->screen == c->screen)
             && (ci->vdesk == c->vdesk)) {
