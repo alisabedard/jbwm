@@ -66,15 +66,12 @@ void jbwm_set_client_vdesk(struct JBWMClient * restrict c,
 }
 /*  This is the third most called function.  Show restraint in adding any
  *  future tests.  */
-static inline bool matches(struct JBWMClient * restrict i, const Window w)
-{
-    return i->parent == w || i->window == w || i->tb.win == w;
-}
 __attribute__((pure))
-static struct JBWMClient * search_client_for_window(
+static inline struct JBWMClient * search_client_for_window(
     struct JBWMClient * restrict c, const Window w)
 {
-    return !c || matches(c, w) ? c : search_client_for_window(c->next, w);
+    return !c || c->parent == w || c->window == w || c->tb.win == w
+        ? c : search_client_for_window(c->next, w);
 }
 // Return the client that has specified window as either window or parent
 __attribute__((pure))
