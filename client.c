@@ -1,7 +1,7 @@
-// jbwm - Minimalist Window Manager for X
-// Copyright 2008-2020, Jeffrey E. Bedard <jefbed@gmail.com>
-// Copyright 1999-2015, Ciaran Anscomb <evilwm@6809.org.uk>
-// See README for license and other details.
+/*  jbwm - Minimalist Window Manager for X */
+/*  Copyright 2008-2020, Jeffrey E. Bedard <jefbed@gmail.com> */
+/*  Copyright 1999-2015, Ciaran Anscomb <evilwm@6809.org.uk> */
+/*  See README for license and other details. */
 #include "client.h"
 #include <stdlib.h>
 #include "ewmh.h"
@@ -37,14 +37,14 @@ static void relink_r(const struct JBWMClient * c, struct JBWMClient * i)
     if (i && i->next)
         relink_r(c, i->next != c ? i->next : (i->next = c->next));
 }
-// Relink c's linked list to exclude c
+/*  Relink c's linked list to exclude c */
 void jbwm_relink_client_list(struct JBWMClient * restrict c)
 {
-    if (current == c) // Remove selection target
+    if (current == c) /*  Remove selection target */
         current = NULL;
     if (head == c) {
         head = c->next;
-        return; // removed first client
+        return; /*  removed first client */
     }
     relink_r(c, head);
 }
@@ -57,32 +57,27 @@ void jbwm_set_client_vdesk(struct JBWMClient * restrict c,
         d=c->screen->display;
         a=XInternAtom(d,"_NET_WM_DESKTOP",false);
         c->vdesk=desktop;
-        // Save in an atomic property, useful for restart and deskbars.
+        /*  Save in an atomic property, useful for restart and deskbars. */
         jbwm_set_property(d, c->window, a, XA_CARDINAL,
             &(int32_t){desktop}, 1);
         if(c->screen->vdesk!=c->vdesk)
             jbwm_hide_client(c);
     }
 }
-/*  This is the third most called function.  Show restraint in adding any
+/* Return the client that has specified window as either window or parent.
+ *  This is the third most called function.  Show restraint in adding any
  *  future tests.  */
-__attribute__((pure))
-static inline struct JBWMClient * search_client_for_window(
-    struct JBWMClient * restrict c, const Window w)
+struct JBWMClient * jbwm_find_client(
+    struct JBWMClient * restrict head, const Window w)
 {
-    return !c || c->parent == w || c->window == w || c->tb.win == w
-        ? c : search_client_for_window(c->next, w);
+    return !head || head->parent == w || head->window == w
+        || head->tb.win == w ? head : jbwm_find_client(head->next, w);
 }
-// Return the client that has specified window as either window or parent
-__attribute__((pure))
-struct JBWMClient * jbwm_get_client(const Window w)
-{
-    return search_client_for_window(head, w);
-}
+
 void jbwm_toggle_sticky(struct JBWMClient * restrict c)
 {
     if(c){
-        c->opt.sticky ^= true; // toggle
+        c->opt.sticky ^= true; /*  toggle */
         jbwm_select_client(c);
         jbwm_update_title_bar(c);
         {
@@ -94,14 +89,14 @@ void jbwm_toggle_sticky(struct JBWMClient * restrict c)
         }
     }
 }
-// Free client and destroy its windows and properties.
+/*  Free client and destroy its windows and properties. */
 void jbwm_client_free(struct JBWMClient * restrict c)
 {
     Display *d;
     const Window w = c->window, parent = c->parent;
     const struct JBWMRectangle * restrict p = &c->size;
     d = c->screen->display;
-    // Per ICCCM + wm-spec
+    /*  Per ICCCM + wm-spec */
     XDeleteProperty(d, w, XInternAtom(d,"_NET_WM_STATE",false));
     XDeleteProperty(d, w, XInternAtom(d,"_NET_WM_DESKTOP",false));
     XReparentWindow(d, w, c->screen->xlib->root, p->x, p->y);

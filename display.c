@@ -8,23 +8,20 @@
 #include "config.h"
 #include "log.h"
 #include "util.h"
-static void cleanup(const Window w)
-{
-    struct JBWMClient * restrict c = jbwm_get_client(w);
-    if (c) // match found
-        jbwm_client_free(c);
-}
 __attribute__((pure))
 static int handle_xerror(Display * d __attribute__((unused)),
     XErrorEvent * restrict e)
 {
+    struct JBWMClient *c;
     switch (e->error_code) {
     case BadAccess:
         if (e->request_code == X_ChangeWindowAttributes)
             jbwm_error("Cannot access the root window");
         break;
     case BadWindow:
-        cleanup(e->resourceid);
+        c=jbwm_find_client(*jbwm_get_head_client(),e->resourceid);
+        if(c)
+            jbwm_client_free(c);
         return 0;
     case BadAtom:
         return 0;

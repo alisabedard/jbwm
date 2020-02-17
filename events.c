@@ -104,7 +104,8 @@ void jbwm_events_loop(struct JBWMScreen * s)
     for (;;) {
         XEvent ev;
         XNextEvent(d, &ev);
-        struct JBWMClient * c = jbwm_get_client(ev.xany.window);
+        struct JBWMClient * c = jbwm_find_client(*jbwm_get_head_client(),
+            ev.xany.window);
         //s=c->screen; // refer to the client's local screen
         switch (ev.type) {
         case ButtonRelease:
