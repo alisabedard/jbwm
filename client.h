@@ -13,8 +13,6 @@ void jbwm_client_free(struct JBWMClient * c);
 struct JBWMClient * jbwm_get_client(Window w) __attribute__((pure));
 // Get the client with input focus.
 struct JBWMClient * jbwm_get_current_client(void);
-// Get the head of the JBWMClient linked list
-struct JBWMClient * jbwm_get_head_client(void);
 void jbwm_hide_client(const struct JBWMClient * restrict c);
 /* Set c as the new head client, linking its next element
    to the previous head */
@@ -25,7 +23,8 @@ void jbwm_relink_client_list(struct JBWMClient * restrict c);
 void jbwm_set_client_vdesk(struct JBWMClient * restrict c,
     const uint8_t desktop);
 // Assign c as the current client
-void jbwm_set_current_client(struct JBWMClient * restrict c);
+void jbwm_set_current_client(struct JBWMClient * c);
 void jbwm_toggle_sticky(struct JBWMClient * restrict c);
 void jbwm_restore_client(const struct JBWMClient * restrict c);
+struct JBWMClient **jbwm_get_head_client(void);
 #endif//!JBWM_CLIENT_H

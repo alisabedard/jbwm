@@ -6,6 +6,9 @@
 #define JBWM_VDESK_H
 #include <X11/Xlib.h>
 #include <stdint.h>
+struct JBWMClient;
 struct JBWMScreen;
-uint8_t jbwm_set_vdesk(Display * d, struct JBWMScreen * s, uint8_t v);
+/* Require the screen parameter here in case the head is NULL.  */
+uint8_t jbwm_set_vdesk(struct JBWMScreen *s,
+    struct JBWMClient *head, uint32_t v);
 #endif//!JBWM_VDESK_H

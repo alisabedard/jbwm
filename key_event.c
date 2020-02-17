@@ -61,7 +61,7 @@ __attribute__((nonnull))
 static void key_move(struct JBWMClient * restrict c, const uint8_t flags)
 {
     const int8_t d = flags & KEY_MOVE_POSITIVE
-        ? JBWM_RESIZE_INCREMENT : - JBWM_RESIZE_INCREMENT;
+    ? JBWM_RESIZE_INCREMENT : - JBWM_RESIZE_INCREMENT;
     *get_antecedent(c, flags) += d;
     commit_key_move(c);
 }
@@ -165,7 +165,7 @@ static void warp_to(struct JBWMClient * restrict c){
 }
 static void next(struct JBWMClient *c,uint8_t const v){
     if(!c->next)
-        c=jbwm_get_head_client();
+        c=*(c->head);
     else
         c=c->next;
     if(c->vdesk != v)
@@ -173,13 +173,13 @@ static void next(struct JBWMClient *c,uint8_t const v){
     else
         warp_to(c);
 }
-static void cond_set_vdesk(Display * d, struct JBWMClient * c,
+static void cond_set_vdesk(struct JBWMClient * c,
     struct JBWMScreen * s, const uint8_t desktop, const bool mod)
 {
     if (mod && c)
         jbwm_set_client_vdesk(c, desktop);
     else
-        jbwm_set_vdesk(d, s, desktop);
+        jbwm_set_vdesk(s, *jbwm_get_head_client(), desktop);
 }
 void jbwm_handle_key_event(struct JBWMScreen *s, XKeyEvent * e)
 {
@@ -207,14 +207,14 @@ void jbwm_handle_key_event(struct JBWMScreen *s, XKeyEvent * e)
     case XK_1: case XK_2: case XK_3: case XK_4: case XK_5:
     case XK_6: case XK_7: case XK_8: case XK_9:
         // First desktop 0, per wm-spec
-        cond_set_vdesk(e->display, c, s, opt.zero
+        cond_set_vdesk(c, s, opt.zero
             ? 10 : key - XK_1, opt.mod);
         break;
     case JBWM_KEY_PREVDESK:
-        cond_set_vdesk(e->display, c, s, s->vdesk - 1, opt.mod);
+        cond_set_vdesk(c, s, s->vdesk - 1, opt.mod);
         break;
     case JBWM_KEY_NEXTDESK:
-        cond_set_vdesk(e->display, c, s, s->vdesk + 1, opt.mod);
+        cond_set_vdesk(c, s, s->vdesk + 1, opt.mod);
         break;
     default:
         if (c)

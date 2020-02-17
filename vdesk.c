@@ -10,31 +10,29 @@
 #include "config.h"
 #include "ewmh.h"
 #include "util.h"
-static void check_visibility(const struct JBWMScreen * s, struct
-        JBWMClient * restrict c, const uint8_t v)
+static void check_visibility(struct JBWMClient * restrict c,
+    const uint8_t v)
 {
     if (c) {
-        if (c->screen->id == s->id) {
-            if (c->vdesk == v || c->opt.sticky) {
-                // allow moving windows by sticking
-                c->vdesk = v;
-                jbwm_restore_client(c);
-            } else
-                jbwm_hide_client(c);
-        }
-        check_visibility(s, c->next, v);
+        if (c->vdesk == v || c->opt.sticky) {
+            // allow moving windows by sticking
+            c->vdesk = v;
+            jbwm_restore_client(c);
+        } else
+            jbwm_hide_client(c);
+        check_visibility(c->next, v);
     }
 }
-uint8_t jbwm_set_vdesk(Display * d, struct JBWMScreen * s, uint8_t v)
+uint8_t jbwm_set_vdesk(struct JBWMScreen *s,
+    struct JBWMClient *head, uint32_t v)
 {
-    if (v != s->vdesk && v <= JBWM_MAX_DESKTOPS) {
-        check_visibility(s, jbwm_get_head_client(), v);
-        s->vdesk = v;
-        /* Send anonymous variable of type uint32_t in order
-           to avoid potentially invalid data.  */
-        jbwm_set_property(d, RootWindowOfScreen(s->xlib),
-                XInternAtom(d,"_NET_CURRENT_DESKTOP",false),
-                XA_CARDINAL, &(uint32_t){v}, 1);
-    }
-    return s->vdesk;
+    Display *d;
+    check_visibility(head, v);
+    s->vdesk = v;
+    d=s->display;
+    // The data (v) must be a 32 bit type.
+    jbwm_set_property(d, s->xlib->root,
+        XInternAtom(d,"_NET_CURRENT_DESKTOP",false),
+        XA_CARDINAL, &v, 1);
+    return v;
 }

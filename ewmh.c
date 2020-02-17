@@ -46,7 +46,7 @@ static int get_client_list_r(Window ** list,Display * d,
         rval=count;
     return rval;
 }
-#ifdef DEBUG
+#ifdef JBWM_EWMH_DEBUG_WINDOW_LIST
 static void debug_window_list(int n,Window * window_list)
 {
     if (n > 0) {
@@ -55,20 +55,21 @@ static void debug_window_list(int n,Window * window_list)
         debug_window_list(n - 1,window_list);
     }
 }
-#else//!DEBUG
+#else//!JBWM_EWMH_DEBUG_WINDOW_LIST
 #define debug_window_list(n,w)
 #endif//DEBUG
-static Window * get_mixed_client_list(Display * d)
+static Window * get_mixed_client_list(struct JBWMClient *head)
 {
     static Window * window_list;
+    Display *d;
     Atom a;
     int n;
     if (window_list) {
         free(window_list);
         window_list=NULL;
     }
-    n=get_client_list_r(&window_list,d,
-        jbwm_get_head_client(),0);
+    d=head->screen->display;
+    n=get_client_list_r(&window_list,d,head,0);
     a=XInternAtom(d,"_NET_CLIENT_LIST",false);
     set_root_property(d,a, XA_WINDOW, window_list,n);
     debug_window_list(n,window_list);
@@ -81,7 +82,7 @@ static inline bool query_tree(Display * d,Window ** children_return,
     bool r;
     if(d&&children_return&&nchildren_return)
         r=XQueryTree(d,DefaultRootWindow(d),&parent,&root,children_return,
-          nchildren_return);
+            nchildren_return);
     else
         r=false;
     return r;
@@ -111,10 +112,12 @@ static Window * get_ordered_client_list(Display * d)
     set_root_property(d,a,XA_WINDOW,window_list,n);
     return window_list;
 }
-void jbwm_ewmh_update_client_list(Display * d)
+void jbwm_ewmh_update_client_list(struct JBWMClient *head)
 {
-    get_mixed_client_list(d);
-    get_ordered_client_list(d);
+    if(head){ // there may be no clients
+        get_mixed_client_list(head);
+        get_ordered_client_list(head->screen->display);
+    }
 }
 
 void jbwm_ewmh_set_allowed_actions(Display * d,
@@ -155,7 +158,7 @@ static void set_number_of_desktops(struct PropertyData * restrict p)
 
     Display *d=p->display;
     p->property=XInternAtom(d,"_NET_NUMBER_OF_DESKTOPS",false);
-    p->data=&(int32_t){JBWM_MAX_DESKTOPS};
+    p->data=&(int32_t){JBWM_NET_NUMBER_OF_DESKTOPS};
     set_property(p);
 }
 static void set_current_desktop(struct PropertyData * restrict p,

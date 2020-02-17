@@ -17,8 +17,8 @@
 static void allocate_xft_color(Display * d, struct JBWMScreen * s)
 {
     XftColorAllocName(d, DefaultVisualOfScreen(s->xlib),
-            DefaultColormapOfScreen(s->xlib), JBWM_FG,
-            &s->font_color);
+        DefaultColormapOfScreen(s->xlib), JBWM_FG,
+        &s->font_color);
 }
 #endif//JBWM_USE_XFT
 static void allocate_colors(struct JBWMScreen * restrict s)
@@ -43,21 +43,21 @@ static bool check_redirect(Display * d, const Window w)
     XWindowAttributes a;
     XGetWindowAttributes(d, w, &a);
     JBWM_LOG("check_redirect(0x%x): override_redirect: %s, "
-            "map_state: %s", (int)w,
-            a.override_redirect ? "true" : "false",
-            a.map_state == IsViewable ? "IsViewable"
-            : "not IsViewable");
+        "map_state: %s", (int)w,
+        a.override_redirect ? "true" : "false",
+        a.map_state == IsViewable ? "IsViewable"
+        : "not IsViewable");
     return (!a.override_redirect && (a.map_state == IsViewable));
 }
 // Free returned data with XFree()
 static Window * get_windows(Display * dpy, const Window root,
-        uint16_t * win_count)
+    uint16_t * win_count)
 {
     Window * w, d;
     unsigned int n;
     XQueryTree(dpy, root, &d, &d, &w, &n);
     *win_count = n;
-    return (Window *)w;
+    return w;
 }
 static void setup_clients(Display * d, struct JBWMScreen * s)
 {
@@ -67,7 +67,7 @@ static void setup_clients(Display * d, struct JBWMScreen * s)
     if (w) { // Avoid segmentation fault on empty list.
         while(n--)
             if(check_redirect(d,w[n]))
-                jbwm_new_client(d,s,w[n]);
+                jbwm_new_client(s,w[n]);
         XFree(w);
     }
 }
@@ -80,7 +80,7 @@ static inline void setup_gc(Display * d, struct JBWMScreen * s)
         .line_width = 1
     };
     unsigned long mask = GCSubwindowMode | GCLineWidth
-        | GCForeground | GCBackground;
+    | GCForeground | GCBackground;
 #ifndef JBWM_USE_XFT
     v.font=s->font->fid;
     mask|=GCFont; 
@@ -95,11 +95,11 @@ static inline void setup_event_listeners(Display * d, const Window root)
 {
     enum {
         EMASK = SubstructureRedirectMask | SubstructureNotifyMask |
-            EnterWindowMask | PropertyChangeMask
-            | ColormapChangeMask
+        EnterWindowMask | PropertyChangeMask
+        | ColormapChangeMask
     };
     XChangeWindowAttributes(d, root, CWEventMask,
-            &(XSetWindowAttributes){.event_mask = EMASK });
+        &(XSetWindowAttributes){.event_mask = EMASK });
 }
 #ifdef JBWM_USE_XFT
 /* Create a unique XftDraw for each screen to properly handle colormaps and
@@ -107,7 +107,7 @@ static inline void setup_event_listeners(Display * d, const Window root)
 static XftDraw * new_xft_draw(Screen * s)
 {
     return XftDrawCreate(DisplayOfScreen(s), RootWindowOfScreen(s),
-            DefaultVisualOfScreen(s), DefaultColormapOfScreen(s));
+        DefaultVisualOfScreen(s), DefaultColormapOfScreen(s));
 }
 #endif//JBWM_USE_XFT
 // Initialize SCREENS amount of screens.
@@ -122,8 +122,8 @@ void jbwm_init_screens(Display *d, struct JBWMScreen *s, const short screens)
         s->xlib = ScreenOfDisplay(d, screens);
         lprop=jbwm_get_property(d,s->xlib->root,
             XInternAtom(d,"_NET_CURRENT_DESKTOP",false),&n);
-        if(lprop){
-            s->vdesk=lprop[0]<JBWM_MAX_DESKTOPS?lprop[0]:0;
+        if(n){
+            s->vdesk=lprop[0];
             XFree(lprop);
         }else
             s->vdesk=0;

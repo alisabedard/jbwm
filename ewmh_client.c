@@ -16,7 +16,7 @@ static void handle_moveresize(XClientMessageEvent * e)
        l[0]: bits 0-7 idicate gravity,
        l[0]: bits 8-11 use x, y, width, height, respectively
        l[0]: bits 12-15 indicate the source,
-       */
+     */
     enum {
         SRC_SHIFT = 12, SRC_MASK = 3, VM_SHIFT = 8, VM_MASK = 0xf,
         USER_ACTION = 2
@@ -77,7 +77,7 @@ void jbwm_ewmh_handle_client_message(XClientMessageEvent * e,
     if(c && client_specific_message(e, c, t))
         return;
     if (t == XInternAtom(d,"_NET_CURRENT_DESKTOP",false)) {
-        jbwm_set_vdesk(d, s, e->data.l[0]);
+        jbwm_set_vdesk(s, *jbwm_get_head_client(), e->data.l[0]);
     } else if (t == XInternAtom(d,"_NET_MOVERESIZE_WINDOW",false)) {
         // If something else moves the window:
         handle_moveresize(e);

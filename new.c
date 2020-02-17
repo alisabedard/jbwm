@@ -23,7 +23,7 @@ static uint8_t wm_desktop(Display * d, const Window w, uint8_t vdesk)
     const Atom a = XInternAtom(d,"_NET_WM_DESKTOP",false);
     unsigned long *lprop = jbwm_get_property(d, w, a, &n);
     if (lprop) { // See if client has a preferred desktop (as on restart)
-        if (n && lprop[0] < JBWM_MAX_DESKTOPS) // is valid
+        if (n) // is valid
             vdesk = (uint8_t)lprop[0]; // Set vdesk to property value
         XFree(lprop);
     }
@@ -43,7 +43,7 @@ static Window get_parent(struct JBWMClient * restrict c)
         CFP = CopyFromParent,
         CW_VM = CWOverrideRedirect | CWEventMask,
         WA_EM = SubstructureRedirectMask | SubstructureNotifyMask |
-            ButtonPressMask | EnterWindowMask
+        ButtonPressMask | EnterWindowMask
     };
     struct JBWMRectangle * g;
     g = &c->size;
@@ -71,7 +71,8 @@ static struct JBWMClient * get_JBWMClient(const Window w,
     struct JBWMScreen * s)
 {
     struct JBWMClient * restrict c = malloc(sizeof(struct JBWMClient));
-    *c = (struct JBWMClient) {.screen = s, .window = w};
+    *c = (struct JBWMClient) {.screen = s, .window = w,
+        .head=jbwm_get_head_client()};
     c->opt.border = 1;
     return c;
 }
@@ -85,13 +86,12 @@ static void do_grabs(Display * d, const Window w)
     // keys to grab:
     jbwm_grab_button(d, w, jbwm_get_grab_mask());
 }
-void jbwm_new_client(Display * d, struct JBWMScreen * s, const Window w)
+void jbwm_new_client(struct JBWMScreen * s, const Window w)
 {
-    JBWM_LOG("jbwm_new_client(..., w: %d)", (int)w);
     struct JBWMClient * restrict c = get_JBWMClient(w, s);
-    c->screen->display = d; // convenience pointer;
+    JBWM_LOG("jbwm_new_client(..., w: %d)", (int)w);
     jbwm_prepend_client(c);
-    do_grabs(d, w);
+    do_grabs(s->display, w);
     jbwm_set_client_geometry(c);
     jbwm_handle_mwm_hints(c);
     c->vdesk = get_vdesk(c);

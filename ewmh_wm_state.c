@@ -57,13 +57,13 @@ static void check_state(XClientMessageEvent * e,	// event data
     switch (e->data.l[0]) {
     default:
     case 0:	// remove
-    set_state(c, false, atom);
-    jbwm_ewmh_remove_state(d, e->window, atom);
-    break;
+        set_state(c, false, atom);
+        jbwm_ewmh_remove_state(d, e->window, atom);
+        break;
     case 1:	// add
-    set_state(c,true,atom);
-    jbwm_ewmh_add_state(d, e->window, atom);
-    break;
+        set_state(c,true,atom);
+        jbwm_ewmh_add_state(d, e->window, atom);
+        break;
     case 2: { // toggle
         const bool add = !jbwm_ewmh_get_state(e->display,
             e->window, atom);

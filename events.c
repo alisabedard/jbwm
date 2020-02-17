@@ -22,19 +22,9 @@
 static struct JBWMScreen * get_screen(struct JBWMScreen *s,
     const Window root, const int i) {
     return RootWindowOfScreen(s[i].xlib) == root ? s
-        // Check that the next iteration is not outside array bounds, using
-        // suppporting field as validation
-        : s[i + 1].supporting ? get_screen(s,root, i + 1) : s;
-}
-static void cleanup(Display * d, struct JBWMClient * i)
-{
-    JBWM_LOG("cleanup");
-    if (!i)
-        return;
-    struct JBWMClient * next = i->next; // save
-    if (i->opt.remove)
-        jbwm_client_free(i);
-    cleanup(d, next);
+    // Check that the next iteration is not outside array bounds, using
+    // suppporting field as validation
+    : s[i + 1].supporting ? get_screen(s,root, i + 1) : s;
 }
 static void jbwm_handle_PropertyNotify(XEvent * ev, struct JBWMClient * c)
 {
@@ -62,19 +52,13 @@ static void jbwm_handle_MapRequest(XEvent * ev, struct JBWMClient * c,
          * certain Motif dialogs where an attempt is made to
          * request mapping twice: */
         static unsigned long serial;
-        if (e->serial == serial)
-            return;
-        serial = e->serial;
-        JBWM_LOG("jbwm_handle_MapRequest(), send_event:%d",
-            e->send_event);
-        jbwm_new_client(e->display, get_screen(s, e->parent, 0),
-            e->window);
+        if (e->serial != serial){
+            serial = e->serial;
+            JBWM_LOG("jbwm_handle_MapRequest(), send_event:%d",
+                e->send_event);
+            jbwm_new_client(get_screen(s, e->parent, 0),e->window);
+        }
     }
-}
-static inline bool mark_removal(struct JBWMClient * restrict c)
-{
-    JBWM_LOG("mark_removal(): ignore_unmap is %d", c->ignore_unmap);
-    return c->opt.remove = (c->ignore_unmap--<1);
 }
 static void jbwm_handle_ColormapNotify(XEvent * ev, struct JBWMClient * c)
 {
@@ -84,6 +68,7 @@ static void jbwm_handle_ColormapNotify(XEvent * ev, struct JBWMClient * c)
 }
 static void jbwm_handle_ConfigureNotify(XEvent * ev, struct JBWMClient * c)
 {
+    (void)ev;
     if (c && !ev->xconfigure.override_redirect)
         jbwm_move_resize(c);
 }
@@ -114,18 +99,14 @@ static void jbwm_handle_Expose(XEvent * ev, struct JBWMClient * c)
 }
 void jbwm_events_loop(struct JBWMScreen * s)
 {
-    static bool need_cleanup;
     Display *d;
     d=s->display;
     for (;;) {
         XEvent ev;
         XNextEvent(d, &ev);
         struct JBWMClient * c = jbwm_get_client(ev.xany.window);
-        if(c)
-            s=c->screen; // refer to the client's local screen
+        //s=c->screen; // refer to the client's local screen
         switch (ev.type) {
-#define ECASE(name) case name: JBWM_LOG("\tXEVENT: %s", #name);\
-            jbwm_handle_##name(&ev, c); break;
         case ButtonRelease:
         case KeyRelease:
         case MapNotify:
@@ -134,34 +115,42 @@ void jbwm_events_loop(struct JBWMScreen * s)
         case ReparentNotify:
             // ignore
             break;
-            ECASE(ConfigureNotify);
-            ECASE(ConfigureRequest);
+        case ConfigureNotify:
+            jbwm_handle_ConfigureNotify(&ev,c);
+            break;
+        case ConfigureRequest:
+            jbwm_handle_ConfigureRequest(&ev,c);
+            break;
         case KeyPress:
-            jbwm_handle_key_event(c?c->screen:s,&ev.xkey);
+            jbwm_handle_key_event(s,&ev.xkey);
             break;
         case ButtonPress:
             if(c)
                 jbwm_handle_button_event(&ev.xbutton, c);
             break;
-            ECASE(EnterNotify);
-            ECASE(Expose);
-        case CreateNotify:
-            if (ev.xcreatewindow.override_redirect) // internal
-                jbwm_ewmh_update_client_list(d);
+        case EnterNotify:
+            jbwm_handle_EnterNotify(&ev,c);
             break;
+        case Expose:
+            jbwm_handle_Expose(&ev,c);
+            break;
+        case CreateNotify:
         case DestroyNotify:
-            if (!c) // only bother if event was not on a client
-                jbwm_ewmh_update_client_list(d);
+            jbwm_ewmh_update_client_list(*jbwm_get_head_client());
             break;
         case UnmapNotify:
-            if (c)
-                need_cleanup=mark_removal(c);
+            if (c && (c->opt.remove || (c->ignore_unmap--<1)))
+                jbwm_client_free(c);
             break;
         case MapRequest:
             jbwm_handle_MapRequest(&ev,c,s);
             break;
-            ECASE(PropertyNotify);
-            ECASE(ColormapNotify);
+        case PropertyNotify:
+            jbwm_handle_PropertyNotify(&ev,c);
+            break;
+        case ColormapNotify:
+            jbwm_handle_ColormapNotify(&ev,c);
+            break;
         case ClientMessage:
             jbwm_ewmh_handle_client_message(&ev.xclient, c, s);
             break;
@@ -169,10 +158,6 @@ void jbwm_events_loop(struct JBWMScreen * s)
         default:
             JBWM_LOG("Unhandled event %d", ev.type);
 #endif//DEBUG
-        }
-        if (need_cleanup) {
-            cleanup(d, jbwm_get_head_client());
-            need_cleanup = false;
         }
     }
 }

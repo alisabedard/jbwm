@@ -18,13 +18,12 @@ struct JBWMClient * jbwm_get_current_client(void)
 {
     return current;
 }
-void jbwm_set_current_client(struct JBWMClient * restrict c)
+void jbwm_set_current_client(struct JBWMClient * c)
 {
     current = c;
 }
-struct JBWMClient * jbwm_get_head_client(void)
-{
-    return head;
+struct JBWMClient **jbwm_get_head_client(void){
+    return &head;
 }
 void jbwm_prepend_client(struct JBWMClient * restrict c)
 {

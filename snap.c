@@ -73,7 +73,7 @@ static inline int absmin(int const a, int const b)
         "cmovll %%edx, %%ecx\n\t" // restore saved if negative
         "cmpl %%eax, %%ecx\n\t" // abs(b)<abs(a) (note reversed at&t syntax)
         "cmovll %%edx, %%ebx\n\t" // b (orig a) to output if <
-//      "int3\n\t" // debug
+        //      "int3\n\t" // debug
         : "=b" (r)
         : "a" (a), "c" (b)
         : "%edx"

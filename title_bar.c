@@ -40,7 +40,7 @@ void jbwm_toggle_shade(struct JBWMClient * restrict c)
         const int8_t state = (s ? set_shaded : set_not_shaded)(c);
         d=c->screen->display;
         (state == IconicState ? jbwm_ewmh_add_state : jbwm_ewmh_remove_state)
-            (d, c->window, XInternAtom(d,"_NET_WM_STATE_SHADED",false));
+        (d, c->window, XInternAtom(d,"_NET_WM_STATE_SHADED",false));
         jbwm_move_resize(c);
         jbwm_set_wm_state(c, state);
     }
@@ -134,7 +134,7 @@ static void remove_title_bar(struct JBWMClient * restrict c)
 }
 static inline void resize_title_bar(Display * d, const Window win,
     struct JBWMClientTitleBar * restrict tb, const uint16_t new_width,
-        uint8_t const font_height) {
+    uint8_t const font_height) {
     // Expand/Contract the title bar width as necessary:
     XResizeWindow(d, win, move_buttons(d, tb, new_width, font_height),
         font_height);

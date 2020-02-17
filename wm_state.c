@@ -42,13 +42,13 @@ void jbwm_set_wm_state(const struct JBWMClient * restrict c,
     jbwm_set_property(d, w, jbwm_get_wm_state(d), XA_CARDINAL,
         &(uint32_t){state}, 1);
     (state == IconicState ? jbwm_ewmh_add_state : jbwm_ewmh_remove_state)
-        (d, w, XInternAtom(d,"_NET_WM_STATE_HIDDEN",false));
+    (d, w, XInternAtom(d,"_NET_WM_STATE_HIDDEN",false));
 }
 static bool find_delete_proto(const int i, const Atom * restrict p,
     Display * d)
 {
     return (i < 0) ? false : p[i] == get_wm_delete_window(d) ? true
-        : find_delete_proto(i - 1, p, d);
+    : find_delete_proto(i - 1, p, d);
 }
 static bool has_delete_proto(const Window w, Display * d)
 {
