@@ -9,10 +9,12 @@ autocmd FileType make setlocal shiftwidth=8
 autocmd FileType make setlocal softtabstop=8
 set visualbell
 set colorcolumn=80
+set helpheight=15
 "set guifont=Monospace\ 10
 set menuitems=10
 set linespace=1
 set guifont=-*-lucidatypewriter-medium-*-*-*-14-*-*-*-*-*-*-*
+set guioptions=c
 set autoread
 set mouse=a
 set smartindent
