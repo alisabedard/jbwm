@@ -11,6 +11,7 @@
 #include "JBWMScreen.h"
 struct JBWMScreen;
 struct JBWMClient {
+    struct JBWMClient ** head; // store to avoid call overhead
     struct JBWMClient * next;
     struct JBWMScreen * screen;
     struct JBWMClientTitleBar tb;
