@@ -128,31 +128,31 @@ void jbwm_snap_client(struct JBWMClient * restrict c)
         "movl %%ebx, %%eax\n\t"
         "negl %%eax\n\t"
         "cmovll %%ebx, %%eax\n\t" // abs(ebx) to eax
-        "movl %%edx,%%ecx\n\t"
+        "movl %%ecx,%%edx\n\t"
         "addl %%ebx,%%edx\n\t"
         "cmpl %1, %%eax\n\t"
         "cmovll  %%edx, %%ecx\n\t"
         : "=c" (c->size.x)
-        : "i" (JBWM_SNAP), "b" (d.x), "d" (c->size.x)
-        : "%eax"
+        : "i" (JBWM_SNAP), "b" (d.x), "c" (c->size.x)
+        : "%eax","%edx"
     );
     __asm__(
         "movl %%ebx, %%eax\n\t"
         "negl %%eax\n\t"
         "cmovll %%ebx, %%eax\n\t" // abs(ebx) to eax
-        "movl %%edx,%%ecx\n\t"
+        "movl %%ecx,%%edx\n\t"
         "addl %%ebx,%%edx\n\t"
         "cmpl %1, %%eax\n\t"
         "cmovll  %%edx, %%ecx\n\t"
         : "=c" (c->size.y)
-        : "i" (JBWM_SNAP), "b" (d.y), "d" (c->size.y)
-        : "%eax"
+        : "i" (JBWM_SNAP), "b" (d.y), "c" (c->size.y)
+        : "%eax","%edx"
     );
 
 #else // portable
-    if (abs(d.x) < JBWM_SNAP)
+   if (abs(d.x) < JBWM_SNAP)
         c->size.x += d.x;
-    if (abs(d.y) < JBWM_SNAP)
+   if (abs(d.y) < JBWM_SNAP)
         c->size.y += d.y;
 #endif
 }
