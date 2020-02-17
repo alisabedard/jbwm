@@ -8,7 +8,7 @@
 #include <X11/cursorfont.h>
 enum {
     JBWMMouseMask = ButtonPressMask | ButtonReleaseMask
-        | PointerMotionMask
+    | PointerMotionMask
 };
 extern inline void jbwm_warp(Display * dpy, const Window w, const short x,
     const short y);
@@ -63,7 +63,7 @@ __attribute__((nonnull))
 static void draw_outline(struct JBWMClient * restrict c)
 {
     const uint8_t fh=c->screen->font_height;
-    const uint8_t o = c->opt.no_title_bar ? 0 : fh;
+    const uint8_t o =  (c->opt.no_title_bar^1)*fh;
     const struct JBWMRectangle * restrict g = &c->size;
     enum { BORDER = 1 };
     Display * d = c->screen->display;
