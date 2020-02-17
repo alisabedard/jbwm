@@ -1,4 +1,4 @@
-// Copyright 2020, Jeffrey E. Bedard <jefbed@gmail.com>
+/*  Copyright 2020, Jeffrey E. Bedard <jefbed@gmail.com> */
 #include "drag.h"
 #include "font.h"
 #include "JBWMClient.h"
@@ -31,19 +31,14 @@ static void set_size(struct JBWMClient * restrict c,
     g->width = abs(g->x - p[0]);
     g->height = abs(g->y - p[1]);
 }
-__attribute__((nonnull,pure,warn_unused_result))
-static int get_diff(const uint8_t i, const int16_t * restrict original,
-    const int16_t * restrict start, const int16_t * restrict p)
-{
-    return original[i] - start[i] + p[i];
-}
+__attribute__((nonnull))
 static void set_position(struct JBWMClient * restrict c,
     const int16_t * restrict original,
     const int16_t * restrict start,
     const int16_t * restrict p)
 {
-    c->size.x = get_diff(0, original, start, p);
-    c->size.y = get_diff(1, original, start, p);
+    c->size.x = original[0]-start[0]+p[0];
+    c->size.y = original[1]-start[1]+p[1];
     jbwm_snap_client(c);
 }
 __attribute__((nonnull))
@@ -51,9 +46,9 @@ static void query_pointer(Display * dpy, Window w,
     int16_t * restrict p)
 {
     int x, y;
-    { // d, u scope
-        int d; // dummy integer
-        unsigned int u; // dummy unsigned integer
+    { /*  d, u scope */
+        int d; /*  dummy integer */
+        unsigned int u; /*  dummy unsigned integer */
         XQueryPointer(dpy, w, &w, &w, &d, &d, &x, &y, &u);
     }
     p[0] = x;
@@ -70,14 +65,6 @@ static void draw_outline(struct JBWMClient * restrict c)
     XDrawRectangle(d, c->screen->xlib->root, c->screen->border_gc,
         g->x, g->y - o, g->width + BORDER, g->height + BORDER + o);
 }
-// Returns true if we should continue the event loop
-static bool get_point(Display * d, int16_t * restrict p)
-{	XEvent e;
-    XMaskEvent(d, JBWMMouseMask, &e);
-    p[0] = e.xmotion.x;
-    p[1] = e.xmotion.y;
-    return e.type == MotionNotify;
-}
 static void drag_event_loop(struct JBWMClient * restrict c, const bool resize)
 {
     const Window root = c->screen->xlib->root;
@@ -87,9 +74,14 @@ static void drag_event_loop(struct JBWMClient * restrict c, const bool resize)
     query_pointer(d, root, start);
     const uint8_t b = c->opt.border;
     for (;;) {
+        XEvent e;
         int16_t p[2];
-        if (!get_point(d, p))
+        XMaskEvent(d, JBWMMouseMask, &e);
+        /*  Quit drag loop if any other event. */
+        if(e.type != MotionNotify)
             break;
+        p[0]=e.xmotion.x;
+        p[1]=e.xmotion.y;
         if (b)
             draw_outline(c);
         if (resize)
