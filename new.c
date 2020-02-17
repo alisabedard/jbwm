@@ -70,9 +70,10 @@ static void reparent(struct JBWMClient * restrict c)
 static struct JBWMClient * get_JBWMClient(const Window w,
     struct JBWMScreen * s)
 {
-    struct JBWMClient * restrict c = malloc(sizeof(struct JBWMClient));
-    *c = (struct JBWMClient) {.screen = s, .window = w,
-        .head=jbwm_get_head_client()};
+    struct JBWMClient * restrict c = calloc(1, sizeof(struct JBWMClient));
+    c->screen=s;
+    c->window=w;
+    c->head=jbwm_get_head_client();
     c->opt.border = 1;
     return c;
 }
