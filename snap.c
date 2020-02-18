@@ -13,22 +13,22 @@
 #include <stdio.h>
 #endif/* JBWM_DEBUG_ABSMIN */
 __attribute__ ((const, warn_unused_result))
-static inline int sborder(const int xy, const int edge)
+static inline int16_t sborder(const int16_t xy, const int16_t edge)
 {
-    int r;
+    int32_t r;
 #if defined(__i386__) || defined(__x86_64__)
     __asm__(
-        "movl %%ebx, %%eax\n\t" /*  copy xy */
-        "addl %%ecx, %%eax\n\t" /* xy + edge, preserve ecx for later */
-        "movl %%eax, %%edx\n\t" /*  copy result */
-        "negl %%eax\n\t" /*  negate copy */
-        "cmovll %%edx, %%eax\n\t" /*  if negative copy, restore src - abs */
-        "negl %%ecx\n\t" /*  -edge */
-        "cmpl %1, %%eax\n\t" /*  note reversed at&t operation order */
-        "cmovgel %%ebx,%%ecx\n\t" /*  result is xy if >= */
+        "movw %%bx, %%ax\n\t" /*  copy xy */
+        "addw %%cx, %%ax\n\t" /* xy + edge, preserve cx for later */
+        "movw %%ax, %%dx\n\t" /*  copy result */
+        "negw %%ax\n\t" /*  negate copy */
+        "cmovlw %%dx, %%ax\n\t" /*  if negative copy, restore src - abs */
+        "negw %%cx\n\t" /*  -edge */
+        "cmpw %1, %%ax\n\t" /*  note reversed at&t operation order */
+        "cmovgew %%bx,%%cx\n\t" /*  result is xy if >= */
         : "=c" (r)
         : "i" (JBWM_SNAP), "b" (xy), "c" (edge)
-        : "%eax", "%edx" /*  scratch */
+        : "%ax", "%dx" /*  scratch */
     );
 #else/*  Portable version: */
     r = abs(xy + edge) < JBWM_SNAP ? -edge : xy;
