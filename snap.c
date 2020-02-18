@@ -8,6 +8,7 @@
 #include "JBWMClient.h"
 #include "JBWMPoint.h"
 #include "JBWMSize.h"
+#include <stdlib.h>
 /***/
 #ifdef JBWM_DEBUG_ABSMIN
 #include <stdio.h>
@@ -35,23 +36,24 @@ static inline int16_t sborder(const int16_t xy, const int16_t edge)
 #endif
     return r;
 }
+__attribute__((const))
+static inline int16_t sborderdir(int16_t xy, int16_t const min,
+    int16_t const max){
+    xy=sborder(xy,min);
+    xy=sborder(xy,max);
+    return xy;
+}
 void jbwm_snap_border(struct JBWMClient * restrict c)
 {
-    int16_t x,y;
     struct JBWMScreen *scr = c->screen;
     struct JBWMRectangle * restrict g = &(c->size);
     const struct JBWMSize s = {scr->xlib->width,
         scr->xlib->height};
     const uint8_t b = c->opt.border << 1;
     /*  snap to screen border */
-    x=g->x;
-    x = sborder(x, 0);
-    x = sborder(x, g->width - s.width + b);
-    g->x=x;
-    y=g->y;
-    y = sborder(y, (c->opt.no_title_bar^1)*-scr->font_height);
-    y = sborder(y, g->height - s.height + b);
-    g->y=y;
+    g->x=sborderdir(g->x,0,g->width-s.width+b);
+    g->y=sborderdir(g->y,(c->opt.no_title_bar^1)*-scr->font_height,
+        g->height - s.height + b);
 }
 /* Definition of this as an inline function guarantees no side-effects
  * and minimizes over-expansion (the full expansion of jbwm_snap_dim
@@ -95,7 +97,7 @@ static inline int jbwm_snap_dim(const int cxy, const int cwh, const int cixy,
  * JBWMRectangle.  This is performance critical, scaling O(n)
  * relative to the number of windows, so leave iterative in definition to
  * avoid further overhead.  */
-static inline struct JBWMPoint snap_search(struct JBWMClient * c)
+static struct JBWMPoint snap_search(struct JBWMClient * c)
 {
     struct JBWMPoint d = {JBWM_SNAP, JBWM_SNAP};
     struct JBWMRectangle const s = c->size;
@@ -146,7 +148,6 @@ void jbwm_snap_client(struct JBWMClient * restrict c)
         : "i" (JBWM_SNAP), "b" (d.y), "c" (c->size.y)
         : "%eax","%edx"
     );
-
 #else /*  portable */
    if (abs(d.x) < JBWM_SNAP)
         c->size.x += d.x;
