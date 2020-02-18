@@ -9,12 +9,18 @@ echo "DESTDIR=${DESTDIR}" >> $CF
 echo "PREFIX=${PREFIX}" >> $CF
 DEBUG=false
 USE_GDB=false
-while getopts 'gd' opt; do
+SMALL=false
+XFT=false
+while getopts 'dgsx' opt; do
 	case $opt in
 	d) DEBUG=true ;;
 	g) USE_GDB=true ;;
+        s) SMALL=true ;;
+        x) XFT=true ;;
 	?) for line in '-d enable debugging with verbose log output' \
                 '-g enable debug symbols' \
+                '-s optimize for size' \
+                '-x use Xft fonts' \
 		'-? show usage'; \
 		do echo $line; done ;;
 	esac
@@ -63,11 +69,19 @@ fi
 if [ -d /opt/X11/lib ]; then
     echo 'jbwm_ldflags+=-L/opt/X11/lib' >> $CF
 fi
+if $SMALL; then
+    echo SMALL
+    echo 'jbwm_cflags+=-DJBWM_SMALL -Os' >> $CF
+fi
 if $DEBUG; then
     echo DEBUG
     echo 'include debug.mk' >> $CF
-elif $USE_GDB; then
+fi
+if $USE_GDB; then
     echo USE_GDB
     echo 'jbwm_cflags+=-ggdb -O0' >> $CF
     echo 'include debug_gcc.mk' >> $CF
+fi
+if $XFT; then
+    echo 'include xft.mk' >> $CF
 fi
