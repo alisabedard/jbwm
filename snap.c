@@ -92,6 +92,11 @@ static inline int jbwm_snap_dim(const int cxy, const int cwh, const int cixy,
     const int s = cixy + ciwh - cxy, t = cixy - cxy;
     return absmin(absmin(absmin(absmin(d, s), s - cwh), t - cwh), t);
 }
+__attribute__((const, warn_unused_result))
+static inline int16_t snap_cond(int16_t const xy, int16_t const wh,
+    int16_t const ixy, int16_t const iwh){
+    return (ixy - wh - xy <= JBWM_SNAP) && (xy-iwh-ixy<=JBWM_SNAP);
+}
 /* Don't use restrict for struct JBWMClient withing this function, as
  * c and ci may alias each other.  Qualifier restrict is fine for struct
  * JBWMRectangle.  This is performance critical, scaling O(n)
@@ -106,12 +111,10 @@ static struct JBWMPoint snap_search(struct JBWMClient * c)
         if ((ci != c) && (ci->screen == c->screen)
             && (ci->vdesk == c->vdesk)) {
             struct JBWMRectangle const gi = ci->size;
-            if ((gi.y - s.height - s.y <= d.x) &&
-                (s.y - gi.height - gi.y <= d.x))
+            if(snap_cond(s.y, s.height, gi.y, gi.height))
                 d.x = jbwm_snap_dim(s.x, s.width,
                     gi.x, gi.width, d.x);
-            if ((gi.x - s.width - s.x <= d.y) &&
-                (s.x - gi.width - gi.x <= d.y))
+            if(snap_cond(s.x, s.width, gi.x, gi.width))
                 d.y = jbwm_snap_dim(s.y, s.height,
                     gi.y, gi.height, d.y);
         }
