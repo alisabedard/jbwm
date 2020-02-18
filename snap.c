@@ -57,23 +57,23 @@ void jbwm_snap_border(struct JBWMClient * restrict c)
  * and minimizes over-expansion (the full expansion of jbwm_snap_dim
  * is approximately a dozen lines).  */
 __attribute__ ((const, warn_unused_result))
-static inline int absmin(int const a, int const b)
+static inline int16_t absmin(int16_t const a, int16_t const b)
 {
-    int r;
+    int16_t r;
 #if defined(__i386__) || defined(__x86_64__)
     __asm__(
-        "movl %%eax, %%ebx\n\t" /*  save */
-        "negl %%eax\n\t" /*  negate */
-        "cmovll %%ebx, %%eax\n\t" /*  restore saved if negative */
-        "movl %%ecx, %%edx\n\t" /*  save */
-        "negl %%ecx\n\t" /*  negate */
-        "cmovll %%edx, %%ecx\n\t" /*  restore saved if negative */
-        "cmpl %%eax, %%ecx\n\t" /*  abs(b)<abs(a) (note reversed at&t syntax) */
-        "cmovll %%edx, %%ebx\n\t" /*  b (orig a) to output if < */
+        "movw %%ax, %%bx\n\t" /*  save */
+        "negw %%ax\n\t" /*  negate */
+        "cmovlw %%bx, %%ax\n\t" /*  restore saved if negative */
+        "movw %%cx, %%dx\n\t" /*  save */
+        "negw %%cx\n\t" /*  negate */
+        "cmovlw %%dx, %%cx\n\t" /*  restore saved if negative */
+        "cmpw %%ax, %%cx\n\t" /*  abs(b)<abs(a) (note reversed at&t syntax) */
+        "cmovlw %%dx, %%bx\n\t" /*  b (orig a) to output if < */
         /*       "int3\n\t" // debug */
         : "=b" (r)
         : "a" (a), "c" (b)
-        : "%edx"
+        : "%dx"
     );
 #else/*  Portable version: */
     r = abs(a) < abs(b) ? a : b;
