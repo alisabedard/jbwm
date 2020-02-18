@@ -98,19 +98,20 @@ static inline int jbwm_snap_dim(const int cxy, const int cwh, const int cixy,
 static inline struct JBWMPoint snap_search(struct JBWMClient * c)
 {
     struct JBWMPoint d = {JBWM_SNAP, JBWM_SNAP};
+    struct JBWMRectangle const s = c->size;
     for (struct JBWMClient * ci = *(c->head);
         ci; ci = ci->next) {
         if ((ci != c) && (ci->screen == c->screen)
             && (ci->vdesk == c->vdesk)) {
-            struct JBWMRectangle * restrict gi = &(ci->size);
-            if ((gi->y - c->size.height - c->size.y <= d.x) &&
-                (c->size.y - gi->height - gi->y <= d.x))
-                d.x = jbwm_snap_dim(c->size.x, c->size.width,
-                    gi->x, gi->width, d.x);
-            if ((gi->x - c->size.width - c->size.x <= d.y) &&
-                (c->size.x - gi->width - gi->x <= d.y))
-                d.y = jbwm_snap_dim(c->size.y, c->size.height,
-                    gi->y, gi->height, d.y);
+            struct JBWMRectangle const gi = ci->size;
+            if ((gi.y - s.height - s.y <= d.x) &&
+                (s.y - gi.height - gi.y <= d.x))
+                d.x = jbwm_snap_dim(s.x, s.width,
+                    gi.x, gi.width, d.x);
+            if ((gi.x - s.width - s.x <= d.y) &&
+                (s.x - gi.width - gi.x <= d.y))
+                d.y = jbwm_snap_dim(s.y, s.height,
+                    gi.y, gi.height, d.y);
         }
     }
     return d;
