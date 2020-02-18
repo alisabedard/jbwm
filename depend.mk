@@ -22,7 +22,7 @@ mwm.o: mwm.c mwm.h JBWMClient.h log.h mwmproto.h util.h
 new.o: new.c new.h JBWMClient.h client.h config.h ewmh.h geometry.h key_masks.h log.h mwm.h select.h shape.h util.h vdesk.h
 select.o: select.c select.h client.h ewmh.h ewmh_state.h JBWMClient.h util.h
 shape.o: shape.c shape.h JBWMClient.h log.h
-snap.o: snap.c snap.h client.h config.h geometry.h JBWMClient.h JBWMPoint.h JBWMSize.h log.h
+snap.o: snap.c snap.h config.h JBWMClient.h JBWMPoint.h JBWMSize.h
 title_bar.o: title_bar.c title_bar.h config.h ewmh.h ewmh_state.h font.h move_resize.h util.h wm_state.h
 util.o: util.c util.h
 vdesk.o: vdesk.c vdesk.h JBWMClient.h JBWMScreen.h client.h config.h ewmh.h util.h
