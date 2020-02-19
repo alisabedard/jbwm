@@ -12,101 +12,90 @@ enum {
 };
 extern inline void jbwm_warp(Display * dpy, const Window w, const short x,
     const short y);
-static Cursor get_font_cursor(Display * d)
-{
-    static Cursor c;
-    if (!c)
-        c = XCreateFontCursor(d, XC_fleur);
-    return c;
-}
-static void grab_pointer(Display * d, const Window w)
-{
-    XGrabPointer(d, w, false, JBWMMouseMask, GrabModeAsync,
-        GrabModeAsync, None, get_font_cursor(d), CurrentTime);
-}
-static void set_size(struct JBWMClient * restrict c,
-    const int16_t * restrict p)
-{
-    union JBWMRectangle * restrict g = &c->size;
-    g->width = abs(g->x - p[0]);
-    g->height = abs(g->y - p[1]);
-}
 __attribute__((nonnull))
-static void set_position(struct JBWMClient * restrict c,
-    const int16_t * restrict original,
-    const int16_t * restrict start,
-    const int16_t * restrict p)
-{
-    c->size.x = original[0]-start[0]+p[0];
-    c->size.y = original[1]-start[1]+p[1];
-    jbwm_snap_client(c);
-}
-__attribute__((nonnull))
-static void query_pointer(Display * dpy, Window w,
+static inline void query_pointer(Display * dpy, Window w,
     int16_t * restrict p)
 {
     int x, y;
-    { /*  d, u scope */
-        int d; /*  dummy integer */
-        unsigned int u; /*  dummy unsigned integer */
-        XQueryPointer(dpy, w, &w, &w, &d, &d, &x, &y, &u);
-    }
+    int d; /*  dummy integer */
+    unsigned int u; /*  dummy unsigned integer */
+    XQueryPointer(dpy, w, &w, &w, &d, &d, &x, &y, &u);
     p[0] = x;
     p[1] = y;
 }
 __attribute__((nonnull))
 static void draw_outline(struct JBWMClient * restrict c)
 {
-    const uint8_t fh=c->screen->font_height;
-    const uint8_t o =  (c->opt.no_title_bar^1)*fh;
+    if(c->opt.border){
+    uint8_t const fh=c->screen->font_height, o = (c->opt.no_title_bar^1)*fh;
     const union JBWMRectangle * restrict g = &c->size;
     enum { BORDER = 1 };
     Display * d = c->screen->display;
     XDrawRectangle(d, c->screen->xlib->root, c->screen->border_gc,
         g->x, g->y - o, g->width + BORDER, g->height + BORDER + o);
+    } else {
+        jbwm_move_resize(c);
+    }
 }
-static void drag_event_loop(struct JBWMClient * restrict c, const bool resize)
+static void drag_event_loop(struct JBWMClient * c,
+    int16_t * start, bool const resize)
 {
+    Display *d;
+    union JBWMRectangle * restrict g;
     XEvent e;
-    int16_t start[2], p[2];
-    const Window root = c->screen->xlib->root;
-    const int16_t original[] = {c->size.x, c->size.y};
-    const uint8_t b = c->opt.border;
-    Display * d = c->screen->display;
-    query_pointer(d, root, start);
-    for (;;) {
+    /***/
+    d=c->screen->display;
+    g = &c->size;
+    for(;;){
         XMaskEvent(d, JBWMMouseMask, &e);
-        /*  Quit drag loop if any other event. */
-        if(e.type != MotionNotify)
-            break;
-        p[0]=e.xmotion.x;
-        p[1]=e.xmotion.y;
-        if (b)
+        if(e.type==MotionNotify){
+            int16_t p[]={e.xmotion.x,e.xmotion.y};
             draw_outline(c);
-        if (resize)
-            set_size(c, p);
-        else
-            set_position(c, original, start, p);
-        /* Clear the previous outline. */
-        (b ? draw_outline : jbwm_move_resize)(c);
+            if(resize){
+                /* Compute distance.  */
+                p[0]=abs(g->array[0]-p[0]);
+                p[1]=abs(g->array[1]-p[1]);
+                /* Avoid client crashes if the axis geometry is 0.  */
+                g->array[2]=p[0]>0?p[0]:1;
+                g->array[3]=p[1]>0?p[1]:1;
+            } else { /* move */
+                p[0]+=start[0];
+                p[1]+=start[1];
+                g->array[0]=p[0];
+                g->array[1]=p[1];
+                jbwm_snap_client(c);
+            }
+            draw_outline(c); /* Erase the previous outline.  */
+            /* Test that this function remains an atomic call by
+               using its recursive definition.
+               drag_event_loop(c, start, resize);  */
+        } else
+            break;
     }
 }
 /* Drag the specified client.  Resize the client if resize is true.  */
 void jbwm_drag(struct JBWMClient * restrict c, const bool resize)
 {
+    int16_t start[2];
     Display * d = c->screen->display;
+    Window const r = c->screen->xlib->root;
+    union JBWMRectangle * restrict g = &c->size;
+    Cursor const cursor = XCreateFontCursor(d, XC_fleur);
     XRaiseWindow(d, c->parent);
-    if (resize && (c->opt.no_resize || c->opt.shaded))
-        return;
-    grab_pointer(d, c->screen->xlib->root);
-    if (resize) {
-        union JBWMRectangle * restrict g = &c->size;
-        jbwm_warp(d, c->window, g->width, g->height);
-    }
-    drag_event_loop(c, resize);
-    if (c->opt.border)
+    if (!(resize && (c->opt.no_resize || c->opt.shaded))){
+        XGrabPointer(d, r, false, JBWMMouseMask, GrabModeAsync,
+            GrabModeAsync, None, cursor, CurrentTime);
+        if (resize){
+            jbwm_warp(d, c->window, g->width, g->height);
+        }
+        query_pointer(d, r, start);
+        /* Adjust for the current window position to find the offset.  */
+        start[0]=g->array[0]-start[0];
+        start[1]=g->array[1]-start[1];
+        drag_event_loop(c, start, resize);
         draw_outline(c);
-    XUngrabPointer(d, CurrentTime);
-    jbwm_move_resize(c);
+        XUngrabPointer(d, CurrentTime);
+        jbwm_move_resize(c);
+    }
 }
 
