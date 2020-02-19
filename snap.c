@@ -93,9 +93,32 @@ static inline int jbwm_snap_dim(const int cxy, const int cwh, const int cixy,
     return absmin(absmin(absmin(absmin(d, s), s - cwh), t - cwh), t);
 }
 __attribute__((const, warn_unused_result))
-static inline int16_t snap_cond(int16_t const xy, int16_t const wh,
+static inline bool snap_cond(int16_t const xy, int16_t const wh,
     int16_t const ixy, int16_t const iwh){
+#if defined(__x86_64__) || defined(__i386__)
+    bool r;
+    __asm__(
+        "movw %%ax, %%di\n\t" // save ixy in %di
+        "subw %%bx, %%ax\n\t" // ixy-wh
+        "subw %%cx, %%ax\n\t" // -xy
+        "xorw %%bx, %%bx\n\t" // clear (false)
+        "movw $1, %%si\n\t" // use %si as a 1 (true) register
+        "cmpw %1, %%ax\n\t" // compare against JBWM_SNAP
+        "cmovlew %%si, %%bx\n\t" // %bx true if %cx<=JBWM_SNAP
+        "subw %%dx, %%cx\n\t" // xy-iwh
+        "subw %%di, %%cx\n\t" // -ixy
+        "xorw %%ax, %%ax\n\t" // clear (false)
+        "cmpw %1, %%cx\n\t" // compare against JBWM_SNAP
+        "cmovlew %%si, %%ax\n\t" // %ax true if %cx<=JBWM_SNAP
+        "andb %%bl, %%al\n\t" // %a & %b in %a
+        :"=aq"(r)
+        :"i"(JBWM_SNAP),"a"(ixy),"b"(wh),"c"(xy),"d"(iwh)
+        :"%di","%si"
+    );
+    return r;
+#else// Portable:
     return (ixy - wh - xy <= JBWM_SNAP) && (xy-iwh-ixy<=JBWM_SNAP);
+#endif
 }
 /* Don't use restrict for struct JBWMClient withing this function, as
  * c and ci may alias each other.  Qualifier restrict is fine for struct
