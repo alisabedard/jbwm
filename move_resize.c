@@ -41,13 +41,7 @@ void jbwm_move_resize(struct JBWMClient * restrict c)
     } // Skip shaped and fullscreen clients.
     union JBWMRectangle * restrict s = &c->size;
     do_move(c->screen->display, c->parent, c->window, s, offset);
-    /* Use the XOR of the dimension to track changes, thus avoiding
-     * excessive updates. */
-    uint16_t szsum = s->width ^ s->height;
-    if (szsum != c->szsum) {
-        c->szsum = szsum;
-        jbwm_set_shape(c);
-    }
+    jbwm_set_shape(c);
     jbwm_configure_client(c);
 }
 
