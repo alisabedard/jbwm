@@ -67,15 +67,14 @@ static void draw_outline(struct JBWMClient * restrict c)
 }
 static void drag_event_loop(struct JBWMClient * restrict c, const bool resize)
 {
+    XEvent e;
+    int16_t start[2], p[2];
     const Window root = c->screen->xlib->root;
     const int16_t original[] = {c->size.x, c->size.y};
-    int16_t start[2];
+    const uint8_t b = c->opt.border;
     Display * d = c->screen->display;
     query_pointer(d, root, start);
-    const uint8_t b = c->opt.border;
     for (;;) {
-        XEvent e;
-        int16_t p[2];
         XMaskEvent(d, JBWMMouseMask, &e);
         /*  Quit drag loop if any other event. */
         if(e.type != MotionNotify)
@@ -88,6 +87,7 @@ static void drag_event_loop(struct JBWMClient * restrict c, const bool resize)
             set_size(c, p);
         else
             set_position(c, original, start, p);
+        /* Clear the previous outline. */
         (b ? draw_outline : jbwm_move_resize)(c);
     }
 }
