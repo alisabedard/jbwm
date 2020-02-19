@@ -27,12 +27,12 @@ __attribute__((nonnull))
 static void draw_outline(struct JBWMClient * restrict c)
 {
     if(c->opt.border){
-    uint8_t const fh=c->screen->font_height, o = (c->opt.no_title_bar^1)*fh;
-    const union JBWMRectangle * restrict g = &c->size;
-    enum { BORDER = 1 };
-    Display * d = c->screen->display;
-    XDrawRectangle(d, c->screen->xlib->root, c->screen->border_gc,
-        g->x, g->y - o, g->width + BORDER, g->height + BORDER + o);
+        uint8_t const fh=c->screen->font_height, o = (c->opt.no_title_bar^1)*fh;
+        const union JBWMRectangle * restrict g = &c->size;
+        enum { BORDER = 1 };
+        Display * d = c->screen->display;
+        XDrawRectangle(d, c->screen->xlib->root, c->screen->border_gc,
+            g->x, g->y - o, g->width + BORDER, g->height + BORDER + o);
     } else {
         jbwm_move_resize(c);
     }
