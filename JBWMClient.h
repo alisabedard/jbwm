@@ -18,7 +18,7 @@ struct JBWMClient {
     Colormap cmap;
     Window window, parent;
     struct JBWMClientOptions opt;
-    struct JBWMRectangle size, old_size, before_fullscreen;
+    union JBWMRectangle size, old_size, before_fullscreen;
     uint16_t szsum; // used to check size changes for shape setting
     uint8_t vdesk;
     int8_t ignore_unmap;

@@ -8,8 +8,8 @@
 #include <X11/Xutil.h>
 struct GeometryData {
     Display * display;
-    struct JBWMRectangle * restrict attribute;
-    struct JBWMRectangle * restrict geometry;
+    union JBWMRectangle * restrict attribute;
+    union JBWMRectangle * restrict geometry;
     Window window;
 };
 static long handle_wm_normal_hints(struct GeometryData * restrict g)
@@ -27,7 +27,7 @@ static long handle_wm_normal_hints(struct GeometryData * restrict g)
         *g->geometry = *g->attribute;
     return h.flags;
 }
-static void check_dimensions(struct JBWMRectangle * restrict g,
+static void check_dimensions(union JBWMRectangle * restrict g,
     const struct JBWMSize screen)
 {
     g->width = JB_MIN(g->width, screen.width);
@@ -39,7 +39,7 @@ static int16_t get_center(const int16_t window_size,
 {
     return (screen_size - window_size) >> 1;
 }
-static void center(struct JBWMRectangle * restrict g,
+static void center(union JBWMRectangle * restrict g,
     const struct JBWMSize s)
 {
     g->x = get_center(g->width, s.width);
@@ -47,7 +47,7 @@ static void center(struct JBWMRectangle * restrict g,
 }
 // returns true if window is viewable
 static bool get_window_attributes(struct JBWMClient * restrict c,
-    struct JBWMRectangle * restrict geometry_attribute)
+    union JBWMRectangle * restrict geometry_attribute)
 {
     XWindowAttributes a;
     Display * d = c->screen->display;
@@ -56,12 +56,12 @@ static bool get_window_attributes(struct JBWMClient * restrict c,
         "x: %d, y: %d, w: %d, h: %d",
         (int)c->window, a.x, a.y, a.width, a.height);
     c->cmap = a.colormap;
-    *geometry_attribute = (struct JBWMRectangle){.x = a.x, .y = a.y,
+    *geometry_attribute = (union JBWMRectangle){.x = a.x, .y = a.y,
         .width = a.width, .height = a.height};
     return a.map_state == IsViewable;
 }
 static void init_geometry_for_screen(struct JBWMClient * c,
-    struct JBWMRectangle * restrict geometry_attribute)
+    union JBWMRectangle * restrict geometry_attribute)
 {
     struct JBWMScreen *s=c->screen;
     Display * d = c->screen->display;
@@ -84,7 +84,7 @@ static void init_geometry_for_screen(struct JBWMClient * c,
 }
 void jbwm_set_client_geometry(struct JBWMClient * c)
 {
-    struct JBWMRectangle geometry_attribute;
+    union JBWMRectangle geometry_attribute;
     if (get_window_attributes(c, &geometry_attribute)) { // viewable
         /* Increment unmap event counter for the reparent event.  */
         ++c->ignore_unmap;

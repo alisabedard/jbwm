@@ -14,7 +14,7 @@ static void jbwm_configure_client(struct JBWMClient * restrict c)
     if (!c) // prevent segmentation fault
         return;
     const Window w = c->window;
-    struct JBWMRectangle * restrict g = &c->size;
+    union JBWMRectangle * restrict g = &c->size;
     XSendEvent(c->screen->display, w, true, StructureNotifyMask, (XEvent
             *) &(XConfigureEvent){.x = g->x, .y = g->y, .width = g->width,
         .height = g->height, .type = ConfigureNotify, .event = w,
@@ -22,7 +22,7 @@ static void jbwm_configure_client(struct JBWMClient * restrict c)
         .border_width = c->opt.border});
 }
 static void do_move(Display * d, const Window parent,
-    const Window window, struct JBWMRectangle * restrict sz,
+    const Window window, union JBWMRectangle * restrict sz,
     const uint8_t offset)
 {
     XMoveResizeWindow(d, parent, sz->x, sz->y - offset,
@@ -39,7 +39,7 @@ void jbwm_move_resize(struct JBWMClient * restrict c)
         jbwm_handle_mwm_hints(c);
         jbwm_update_title_bar(c);
     } // Skip shaped and fullscreen clients.
-    struct JBWMRectangle * restrict s = &c->size;
+    union JBWMRectangle * restrict s = &c->size;
     do_move(c->screen->display, c->parent, c->window, s, offset);
     /* Use the XOR of the dimension to track changes, thus avoiding
      * excessive updates. */

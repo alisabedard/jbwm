@@ -2,7 +2,10 @@
 #ifndef JBWM_JBWMRECTANGLE_H
 #define JBWM_JBWMRECTANGLE_H
 #include <stdint.h>
-struct JBWMRectangle {
-    int16_t x, y, width, height;
+union JBWMRectangle {
+    struct {
+        int16_t x, y, width, height;
+    };
+    int16_t array[4];
 };
 #endif//!JBWM_JBWMRECTANGLE_H

@@ -94,7 +94,7 @@ void jbwm_client_free(struct JBWMClient * restrict c)
 {
     Display *d;
     const Window w = c->window, parent = c->parent;
-    const struct JBWMRectangle * restrict p = &c->size;
+    const union JBWMRectangle * restrict p = &c->size;
     d = c->screen->display;
     /*  Per ICCCM + wm-spec */
     XDeleteProperty(d, w, XInternAtom(d,"_NET_WM_STATE",false));

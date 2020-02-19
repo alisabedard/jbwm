@@ -46,7 +46,7 @@ static inline int16_t sborderdir(int16_t xy, int16_t const min,
 void jbwm_snap_border(struct JBWMClient * restrict c)
 {
     struct JBWMScreen *scr = c->screen;
-    struct JBWMRectangle * restrict g = &(c->size);
+    union JBWMRectangle * restrict g = &(c->size);
     const struct JBWMSize s = {scr->xlib->width,
         scr->xlib->height};
     const uint8_t b = c->opt.border << 1;
@@ -125,15 +125,16 @@ static inline bool snap_cond(int16_t const xy, int16_t const wh,
  * JBWMRectangle.  This is performance critical, scaling O(n)
  * relative to the number of windows, so leave iterative in definition to
  * avoid further overhead.  */
-static struct JBWMPoint snap_search(struct JBWMClient * c)
+static union JBWMPoint snap_search(struct JBWMClient * c)
 {
-    struct JBWMPoint d = {JBWM_SNAP, JBWM_SNAP};
-    struct JBWMRectangle const s = c->size;
+    union JBWMPoint d;
+    union JBWMRectangle const s = c->size;
+    d.x=d.y=JBWM_SNAP;
     for (struct JBWMClient * ci = *(c->head);
         ci; ci = ci->next) {
         if ((ci != c) && (ci->screen == c->screen)
             && (ci->vdesk == c->vdesk)) {
-            struct JBWMRectangle const gi = ci->size;
+            union JBWMRectangle const gi = ci->size;
             if(snap_cond(s.y, s.height, gi.y, gi.height))
                 d.x = jbwm_snap_dim(s.x, s.width,
                     gi.x, gi.width, d.x);
@@ -144,40 +145,30 @@ static struct JBWMPoint snap_search(struct JBWMClient * c)
     }
     return d;
 }
+static inline void snap_dir(int16_t *out, int16_t diff){
+#if defined(__i386__) || defined(__x86_64__)
+    __asm__ (
+        "movw %%bx, %%ax\n\t"
+        "negw %%ax\n\t"
+        "cmovlw %%bx, %%ax\n\t" /*  abs(bx) to ax */
+        "movw %%cx,%%dx\n\t"
+        "addw %%bx,%%dx\n\t"
+        "cmpw %1, %%ax\n\t"
+        "cmovlw  %%dx, %%cx\n\t"
+        : "=c" (*out)
+        : "i" (JBWM_SNAP), "b" (diff), "c" (*out)
+        : "%ax","%dx"
+    );
+#else /* portable */
+    if(abs(diff)<JBWM_SNAP)
+        *out+=diff;
+#endif
+}
 void jbwm_snap_client(struct JBWMClient * restrict c)
 {
     jbwm_snap_border(c);
     /*  Snap to other windows: */
-    const struct JBWMPoint d = snap_search(c);
-#if defined(__i386__) || defined(__x86_64__)
-    __asm__(
-        "movl %%ebx, %%eax\n\t"
-        "negl %%eax\n\t"
-        "cmovll %%ebx, %%eax\n\t" /*  abs(ebx) to eax */
-        "movl %%ecx,%%edx\n\t"
-        "addl %%ebx,%%edx\n\t"
-        "cmpl %1, %%eax\n\t"
-        "cmovll  %%edx, %%ecx\n\t"
-        : "=c" (c->size.x)
-        : "i" (JBWM_SNAP), "b" (d.x), "c" (c->size.x)
-        : "%eax","%edx"
-    );
-    __asm__(
-        "movl %%ebx, %%eax\n\t"
-        "negl %%eax\n\t"
-        "cmovll %%ebx, %%eax\n\t" /*  abs(ebx) to eax */
-        "movl %%ecx,%%edx\n\t"
-        "addl %%ebx,%%edx\n\t"
-        "cmpl %1, %%eax\n\t"
-        "cmovll  %%edx, %%ecx\n\t"
-        : "=c" (c->size.y)
-        : "i" (JBWM_SNAP), "b" (d.y), "c" (c->size.y)
-        : "%eax","%edx"
-    );
-#else /*  portable */
-   if (abs(d.x) < JBWM_SNAP)
-        c->size.x += d.x;
-   if (abs(d.y) < JBWM_SNAP)
-        c->size.y += d.y;
-#endif
+    const union JBWMPoint d = snap_search(c);
+    snap_dir(&c->size.array[0],d.array[0]);
+    snap_dir(&c->size.array[1],d.array[1]);
 }

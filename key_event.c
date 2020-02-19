@@ -48,7 +48,7 @@ static int16_t * get_antecedent(struct JBWMClient * restrict c, const
     uint8_t flags)
 {
     int16_t * ret;
-    struct JBWMRectangle * restrict s = &c->size;
+    union JBWMRectangle * restrict s = &c->size;
     int16_t * wh = flags & KEY_MOVE_HORIZONTAL ? &s->width : &s->height;
     if((flags & KEY_MOVE_MODIFIER) && has_sufficient_size(*wh)
         && can_resize(&c->opt))

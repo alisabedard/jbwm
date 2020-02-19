@@ -27,7 +27,7 @@ static void grab_pointer(Display * d, const Window w)
 static void set_size(struct JBWMClient * restrict c,
     const int16_t * restrict p)
 {
-    struct JBWMRectangle * restrict g = &c->size;
+    union JBWMRectangle * restrict g = &c->size;
     g->width = abs(g->x - p[0]);
     g->height = abs(g->y - p[1]);
 }
@@ -59,7 +59,7 @@ static void draw_outline(struct JBWMClient * restrict c)
 {
     const uint8_t fh=c->screen->font_height;
     const uint8_t o =  (c->opt.no_title_bar^1)*fh;
-    const struct JBWMRectangle * restrict g = &c->size;
+    const union JBWMRectangle * restrict g = &c->size;
     enum { BORDER = 1 };
     Display * d = c->screen->display;
     XDrawRectangle(d, c->screen->xlib->root, c->screen->border_gc,
@@ -100,7 +100,7 @@ void jbwm_drag(struct JBWMClient * restrict c, const bool resize)
         return;
     grab_pointer(d, c->screen->xlib->root);
     if (resize) {
-        struct JBWMRectangle * restrict g = &c->size;
+        union JBWMRectangle * restrict g = &c->size;
         jbwm_warp(d, c->window, g->width, g->height);
     }
     drag_event_loop(c, resize);
