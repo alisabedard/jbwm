@@ -111,7 +111,7 @@ static inline bool snap_cond(int16_t const xy, int16_t const wh,
         "cmpw %1, %%cx\n\t" // compare against JBWM_SNAP
         "cmovlew %%si, %%ax\n\t" // %ax true if %cx<=JBWM_SNAP
         "andb %%bl, %%al\n\t" // %a & %b in %a
-        :"=aq"(r)
+        :"=a"(r)
         :"i"(JBWM_SNAP),"a"(ixy),"b"(wh),"c"(xy),"d"(iwh)
         :"%di","%si"
     );
