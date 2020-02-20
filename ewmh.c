@@ -5,12 +5,13 @@
 //#undef DEBUG
 #include "ewmh.h"
 #include <assert.h>
-#include "JBWMClient.h"
-#include "JBWMScreen.h"
 #include "client.h"
 #include "config.h"
 #include "font.h"
 #include "geometry.h"
+#include "JBWMAtomName.h"
+#include "JBWMClient.h"
+#include "JBWMScreen.h"
 #include "log.h"
 #include "macros.h"
 #include "PropertyData.h"
@@ -19,20 +20,64 @@
 #include <unistd.h>
 #include "util.h"
 #include <X11/Xatom.h>
+char * jbwm_atom_names[]={
+    "_NET_SUPPORTED",
+    "_NET_CURRENT_DESKTOP",
+    "_NET_NUMBER_OF_DESKTOPS",
+    "_NET_DESKTOP_VIEWPORT",
+    "_NET_DESKTOP_GEOMETRY",
+    "_NET_SUPPORTING_WM_CHECK",
+    "_NET_ACTIVE_WINDOW",
+    "_NET_MOVERESIZE_WINDOW",
+    "_NET_CLOSE_WINDOW",
+    "_NET_CLIENT_LIST",
+    "_NET_VIRTUAL_ROOTS",
+    "_NET_CLIENT_LIST_STACKING",
+    "_NET_FRAME_EXTENTS",
+    "_NET_WM_ALLOWED_ACTIONS",
+    "_NET_WM_NAME",
+    "_NET_WM_DESKTOP",
+    "_NET_WM_MOVERESIZE",
+    "_NET_WM_PID",
+    "_NET_WM_WINDOW_TYPE",
+    "_NET_WM_STATE",
+    "_NET_WM_ACTION_MOVE",
+    "_NET_WM_ACTION_RESIZE",
+    "_NET_WM_ACTION_CLOSE",
+    "_NET_WM_ACTION_SHADE",
+    "_NET_WM_ACTION_FULLSCREEN",
+    "_NET_WM_ACTION_CHANGE_DESKTOP",
+    "_NET_WM_ACTION_ABOVE",
+    "_NET_WM_ACTION_BELOW",
+    "_NET_WM_ACTION_MAXIMIZE_HORZ",
+    "_NET_WM_ACTION_MAXIMIZE_VERT",
+    "_NET_WM_STATE_STICKY",
+    "_NET_WM_STATE_MAXIMIZED_VERT",
+    "_NET_WM_STATE_MAXIMIZED_HORZ",
+    "_NET_WM_STATE_SHADED",
+    "_NET_WM_STATE_HIDDEN",
+    "_NET_WM_STATE_FULLSCREEN",
+    "_NET_WM_STATE_ABOVE",
+    "_NET_WM_STATE_BELOW",
+    "_NET_WM_STATE_FOCUSED",
+};
+Atom jbwm_atoms[JBWM_ATOM_COUNT];
+
 static inline void set_property(struct PropertyData * restrict p) {
     jbwm_set_property(p->display,p->target,p->property,
         p->type,p->data,p->size);
-}
-static inline void set_ewmh_property(Display * d,Window const win,
-    Atom const property,Atom const type,
-    void * data,uint16_t const size) {
-    jbwm_set_property(d, win, property, type, data, size);
-}
-static inline void set_root_property(Display * d,
-    Atom const property,Atom const type,
-    void * data,uint16_t const size) {
-    set_ewmh_property(d,DefaultRootWindow(d),property,type,data,size);
-}
+}/*
+     static inline void jbwm_set_property(Display * d,Window const win,
+     Atom const property,Atom const type,
+     void * data,uint16_t const size) {
+     jbwm_set_property(d, win, property, type, data, size);
+     }
+     static inline void set_root_property(Display * d,
+     Atom const property,Atom const type,
+     void * data,uint16_t const size) {
+     jbwm_set_property(d,DefaultRootWindow(d),property,type,data,size);
+     }
+  */
 // returns number of elements in window list
 static int get_client_list_r(Window ** list,Display * d,
     struct JBWMClient * i,int const count) {
@@ -70,8 +115,8 @@ static Window * get_mixed_client_list(struct JBWMClient *head)
     }
     d=head->screen->display;
     n=get_client_list_r(&window_list,d,head,0);
-    a=XInternAtom(d,"_NET_CLIENT_LIST",false);
-    set_root_property(d,a, XA_WINDOW, window_list,n);
+    a=jbwm_atoms[JBWM_NET_CLIENT_LIST];
+    jbwm_set_property(d,head->screen->xlib->root,a, XA_WINDOW, window_list,n);
     debug_window_list(n,window_list);
     return window_list;
 }
@@ -100,7 +145,7 @@ static unsigned int get_window_list(Display * d,uint8_t const max_clients,
     }
     return n;
 }
-static Window * get_ordered_client_list(Display * d)
+static Window * get_ordered_client_list(Display * d, Window const root)
 {
     enum {MAX_CLIENTS=64};
     static Window window_list[MAX_CLIENTS];
@@ -108,15 +153,16 @@ static Window * get_ordered_client_list(Display * d)
     // get ordered list of all windows on default screen:
     unsigned int const n=get_window_list(d,MAX_CLIENTS,window_list);
     JBWM_LOG("get_ordered_client_list() n: %d",(int)n);
-    a=XInternAtom(d,"_NET_CLIENT_LIST_STACKING",false);
-    set_root_property(d,a,XA_WINDOW,window_list,n);
+    a=jbwm_atoms[JBWM_NET_CLIENT_LIST_STACKING];
+    jbwm_set_property(d, root,a,XA_WINDOW,window_list,n);
     return window_list;
 }
 void jbwm_ewmh_update_client_list(struct JBWMClient *head)
 {
     if(head){ // there may be no clients
         get_mixed_client_list(head);
-        get_ordered_client_list(head->screen->display);
+        get_ordered_client_list(head->screen->display,
+            head->screen->xlib->root);
     }
 }
 
@@ -124,16 +170,16 @@ void jbwm_ewmh_set_allowed_actions(Display * d,
     Window const w)
 {
     Atom a[]={
-        XInternAtom(d,"_NET_WM_ACTION_MOVE",false),
-        XInternAtom(d,"_NET_WM_ACTION_RESIZE",false),
-        XInternAtom(d,"_NET_WM_ACTION_CLOSE",false),
-        XInternAtom(d,"_NET_WM_ACTION_SHADE",false),
-        XInternAtom(d,"_NET_WM_ACTION_FULLSCREEN",false),
-        XInternAtom(d,"_NET_WM_ACTION_CHANGE_DESKTOP",false),
-        XInternAtom(d,"_NET_WM_ACTION_ABOVE",false),
-        XInternAtom(d,"_NET_WM_ACTION_BELOW",false),
-        XInternAtom(d,"_NET_WM_ACTION_MAXIMIZE_HORZ",false),
-        XInternAtom(d,"_NET_WM_ACTION_MAXIMIZE_VERT",false),
+        jbwm_atoms[JBWM_NET_WM_ACTION_MOVE],
+        jbwm_atoms[JBWM_NET_WM_ACTION_RESIZE],
+        jbwm_atoms[JBWM_NET_WM_ACTION_CLOSE],
+        jbwm_atoms[JBWM_NET_WM_ACTION_SHADE],
+        jbwm_atoms[JBWM_NET_WM_ACTION_FULLSCREEN],
+        jbwm_atoms[JBWM_NET_WM_ACTION_CHANGE_DESKTOP],
+        jbwm_atoms[JBWM_NET_WM_ACTION_ABOVE],
+        jbwm_atoms[JBWM_NET_WM_ACTION_BELOW],
+        jbwm_atoms[JBWM_NET_WM_ACTION_MAXIMIZE_HORZ],
+        jbwm_atoms[JBWM_NET_WM_ACTION_MAXIMIZE_VERT],
     };
     jbwm_set_property(d,w,a[0],XA_ATOM,&a,sizeof(a) / sizeof(Atom));
 }
@@ -141,7 +187,7 @@ static void set_desktop_geometry(struct PropertyData * restrict p,
     struct JBWMScreen *s)
 {
     Display *d=p->display;
-    p->property=XInternAtom(d,"_NET_DESKTOP_GEOMETRY",false);
+    p->property=jbwm_atoms[JBWM_NET_DESKTOP_GEOMETRY];
     p->data=(int32_t[]){s->xlib->width,s->xlib->height};
     set_property(p);
 }
@@ -149,7 +195,7 @@ static void set_desktop_viewport(struct PropertyData * restrict p)
 {
     int32_t viewport_data[]={0,0};
     Display *d=p->display;
-    p->property=XInternAtom(d,"_NET_DESKTOP_VIEWPORT",false);
+    p->property=jbwm_atoms[JBWM_NET_DESKTOP_VIEWPORT];
     p->data=viewport_data;
     set_property(p);
 }
@@ -157,15 +203,15 @@ static void set_number_of_desktops(struct PropertyData * restrict p)
 {
 
     Display *d=p->display;
-    p->property=XInternAtom(d,"_NET_NUMBER_OF_DESKTOPS",false);
-    p->data=&(int32_t){JBWM_NET_NUMBER_OF_DESKTOPS};
+    p->property=jbwm_atoms[JBWM_NET_NUMBER_OF_DESKTOPS];
+    p->data=&(int32_t){JBWM_NUMBER_OF_DESKTOPS};
     set_property(p);
 }
 static void set_current_desktop(struct PropertyData * restrict p,
     void * restrict data)
 {
     Display *d=p->display;
-    p->property=XInternAtom(d,"_NET_CURRENT_DESKTOP",false);
+    p->property=jbwm_atoms[JBWM_NET_CURRENT_DESKTOP];
     p->data=data;
     set_property(p);
 }
@@ -174,7 +220,7 @@ static void set_virtual_roots(struct PropertyData * restrict p)
     // Declared r static to keep scope
     static Window r;
     Display *d=p->display;
-    p->property=XInternAtom(d,"_NET_VIRTUAL_ROOTS",false);
+    p->property=jbwm_atoms[JBWM_NET_VIRTUAL_ROOTS];
     p->type=XA_WINDOW;
     r=p->target;
     p->data=&r;
@@ -193,15 +239,15 @@ static void init_desktops(Display * d,struct JBWMScreen * s)
 }
 static void set_name(Display * d,Window const w)
 {
-    set_ewmh_property(d,w,XInternAtom(d,"_NET_WM_NAME",false),XA_STRING,
+    jbwm_set_property(d,w,jbwm_atoms[JBWM_NET_WM_NAME],XA_STRING,
         JBWM_NAME,sizeof(JBWM_NAME));
 }
 static void set_supporting(Display * d,Window const w,
     Window * s)
 {
     Atom a;
-    a=XInternAtom(d,"_NET_SUPPORTING_WM_CHECK", false);
-    set_ewmh_property(d,w,a,XA_WINDOW,s,1);
+    a=jbwm_atoms[JBWM_NET_SUPPORTING_WM_CHECK];
+    jbwm_set_property(d,w,a,XA_WINDOW,s,1);
 }
 static Window init_supporting(Display * d,Window const r)
 {
@@ -209,7 +255,7 @@ static Window init_supporting(Display * d,Window const r)
     w=XCreateSimpleWindow(d,r,0,0,1,1,0,0,0);
     set_supporting(d,r,&w);
     set_supporting(d,w,&w);
-    set_ewmh_property(d,w,XInternAtom(d,"_NET_WM_PID",false),XA_CARDINAL,
+    jbwm_set_property(d,w,jbwm_atoms[JBWM_NET_WM_PID],XA_CARDINAL,
         &(pid_t){getpid()},1);
     set_name(d,w);
     return w;
@@ -218,55 +264,13 @@ static void set_ewmh_client_list(Display *d,Window *r){
     Atom a;
     /* Set this to the root window until we have some clients.
      * Declared r static so we don't lose scope.  */
-    a=XInternAtom(d,"_NET_CLIENT_LIST",false);
-    set_ewmh_property(d,*r,a,XA_WINDOW,r,1);
+    a=jbwm_atoms[JBWM_NET_CLIENT_LIST];
+    jbwm_set_property(d,*r,a,XA_WINDOW,r,1);
 }
 static void set_ewmh_supported(Display *d,Window const r){
-    char * names[]={
-        "_NET_SUPPORTED",
-        "_NET_CURRENT_DESKTOP",
-        "_NET_NUMBER_OF_DESKTOPS",
-        "_NET_DESKTOP_VIEWPORT",
-        "_NET_DESKTOP_GEOMETRY",
-        "_NET_SUPPORTING_WM_CHECK",
-        "_NET_ACTIVE_WINDOW",
-        "_NET_MOVERESIZE_WINDOW",
-        "_NET_CLOSE_WINDOW",
-        "_NET_CLIENT_LIST",
-        "_NET_VIRTUAL_ROOTS",
-        "_NET_CLIENT_LIST_STACKING",
-        "_NET_FRAME_EXTENTS",
-        "_NET_WM_ALLOWED_ACTIONS",
-        "_NET_WM_NAME",
-        "_NET_WM_DESKTOP",
-        "_NET_WM_MOVERESIZE",
-        "_NET_WM_PID",
-        "_NET_WM_WINDOW_TYPE",
-        "_NET_WM_STATE",
-        "_NET_WM_ACTION_MOVE",
-        "_NET_WM_ACTION_RESIZE",
-        "_NET_WM_ACTION_CLOSE",
-        "_NET_WM_ACTION_SHADE",
-        "_NET_WM_ACTION_FULLSCREEN",
-        "_NET_WM_ACTION_CHANGE_DESKTOP",
-        "_NET_WM_ACTION_ABOVE",
-        "_NET_WM_ACTION_BELOW",
-        "_NET_WM_ACTION_MAXIMIZE_HORZ",
-        "_NET_WM_ACTION_MAXIMIZE_VERT",
-        "_NET_WM_STATE_STICKY",
-        "_NET_WM_STATE_MAXIMIZED_VERT",
-        "_NET_WM_STATE_MAXIMIZED_HORZ",
-        "_NET_WM_STATE_SHADED",
-        "_NET_WM_STATE_HIDDEN",
-        "_NET_WM_STATE_FULLSCREEN",
-        "_NET_WM_STATE_ABOVE",
-        "_NET_WM_STATE_BELOW",
-        "_NET_WM_STATE_FOCUSED",
-    };
-    size_t const sz=sizeof(names)/sizeof(names[0]);
-    Atom a[sz];
-    XInternAtoms(d,names,sz,false,a);
-    set_ewmh_property(d,r,a[0]/*SUPPORTED*/,XA_ATOM,(unsigned char *)&a,sz);
+    XInternAtoms(d,jbwm_atom_names,JBWM_ATOM_COUNT,false,jbwm_atoms);
+    jbwm_set_property(d,r,jbwm_atoms[JBWM_NET_SUPPORTED],
+        XA_ATOM,(unsigned char *)&jbwm_atoms,JBWM_ATOM_COUNT);
 }
 void jbwm_ewmh_init_screen(Display * d,struct JBWMScreen * s)
 {
@@ -289,6 +293,6 @@ void jbwm_set_frame_extents(struct JBWMClient * restrict c)
     f[0]=f[1]=f[2]=f[3]=c->opt.border;
     if (!c->opt.no_title_bar)
         f[2] += c->screen->font_height;
-    a=XInternAtom(d, "_NET_FRAME_EXTENTS", false);
-    set_ewmh_property(c->screen->display,c->parent,a,XA_CARDINAL,f,4);
+    a=jbwm_atoms[JBWM_NET_FRAME_EXTENTS];
+    jbwm_set_property(c->screen->display,c->parent,a,XA_CARDINAL,f,4);
 }

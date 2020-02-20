@@ -4,10 +4,12 @@
 // See README for license and other details.
 #ifndef JBWM_EWMH_H
 #define JBWM_EWMH_H
-#include <X11/Xlib.h>
 #include <stdint.h>
+#include <X11/Xlib.h>
 struct JBWMClient;
 struct JBWMScreen;
+extern char * jbwm_atom_names[];
+extern Atom jbwm_atoms[];
 void jbwm_ewmh_update_client_list(struct JBWMClient * head);
 void jbwm_ewmh_set_allowed_actions(Display * d,
     const Window w) __attribute__((nonnull));
