@@ -140,7 +140,8 @@ static union JBWMPoint snap_search(struct JBWMClient * c)
                     gi.x, gi.width, d.x);
             if(snap_cond(s.x, s.width, gi.x, gi.width))
                 d.y = jbwm_snap_dim(s.y, s.height,
-                    gi.y, gi.height, d.y);
+                    gi.y, gi.height+(c->opt.no_title_bar
+                        ?0:c->screen->font_height), d.y);
         }
     }
     return d;
