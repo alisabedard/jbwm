@@ -5,6 +5,7 @@
 #include "drag.h"
 #include "ewmh.h"
 #include "ewmh_wm_state.h"
+#include "JBWMAtomName.h"
 #include "select.h"
 #include "util.h"
 #include "vdesk.h"
@@ -39,17 +40,17 @@ static bool client_specific_message(XClientMessageEvent * e,
 {
     Display * d = e->display;
     jbwm_print_atom(d, t, __FILE__, __LINE__);
-    if (t == XInternAtom(d,"_NET_WM_DESKTOP",false))
+    if (t == jbwm_atoms[JBWM_NET_WM_DESKTOP])
         jbwm_set_client_vdesk(c, e->data.l[0]);
     // If user moves window (client-side title bars):
-    else if (t == XInternAtom(d,"_NET_WM_MOVERESIZE",false)) {
+    else if (t == jbwm_atoms[JBWM_NET_WM_MOVERESIZE]) {
         XRaiseWindow(d, c->parent);
         jbwm_drag(c, false);
-    } else if (t == XInternAtom(d,"_NET_WM_STATE",false))
+    } else if (t == jbwm_atoms[JBWM_NET_WM_STATE])
         jbwm_ewmh_handle_wm_state_changes(e, c);
-    else if (t == XInternAtom(d,"_NET_ACTIVE_WINDOW",false))
+    else if (t == jbwm_atoms[JBWM_NET_ACTIVE_WINDOW])
         jbwm_select_client(c);
-    else if (t == XInternAtom(d,"_NET_CLOSE_WINDOW",false))
+    else if (t == jbwm_atoms[JBWM_NET_CLOSE_WINDOW])
         jbwm_send_wm_delete(c);
     else
         return false;
@@ -76,9 +77,9 @@ void jbwm_ewmh_handle_client_message(XClientMessageEvent * e,
     debug_client_message(e);
     if(c && client_specific_message(e, c, t))
         return;
-    if (t == XInternAtom(d,"_NET_CURRENT_DESKTOP",false)) {
+    if (t == jbwm_atoms[JBWM_NET_CURRENT_DESKTOP]) {
         jbwm_set_vdesk(s, *jbwm_get_head_client(), e->data.l[0]);
-    } else if (t == XInternAtom(d,"_NET_MOVERESIZE_WINDOW",false)) {
+    } else if (t == jbwm_atoms[JBWM_NET_MOVERESIZE_WINDOW]) {
         // If something else moves the window:
         handle_moveresize(e);
     }

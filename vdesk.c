@@ -3,13 +3,14 @@
 // Copyright 1999-2015, Ciaran Anscomb <jbwm@6809.org.uk>
 // See README for license and other details.
 #include "vdesk.h"
-#include <X11/Xatom.h> // keep
-#include "JBWMClient.h"
-#include "JBWMScreen.h"
 #include "client.h"
 #include "config.h"
 #include "ewmh.h"
+#include "JBWMAtomName.h"
+#include "JBWMClient.h"
+#include "JBWMScreen.h"
 #include "util.h"
+#include <X11/Xatom.h> // keep
 static void check_visibility(struct JBWMClient * restrict c,
     const uint8_t v)
 {
@@ -32,7 +33,7 @@ uint8_t jbwm_set_vdesk(struct JBWMScreen *s,
     d=s->display;
     // The data (v) must be a 32 bit type.
     jbwm_set_property(d, s->xlib->root,
-        XInternAtom(d,"_NET_CURRENT_DESKTOP",false),
+        jbwm_atoms[JBWM_NET_CURRENT_DESKTOP],
         XA_CARDINAL, &v, 1);
     return v;
 }

@@ -3,6 +3,8 @@
 // Copyright 1999-2015, Ciaran Anscomb <jbwm@6809.org.uk>
 // See README for license and other details.
 #include "mwm.h"
+#include "ewmh.h"
+#include "JBWMAtomName.h"
 #include "JBWMClient.h"
 #include "log.h"
 #include "mwmproto.h"
@@ -37,7 +39,7 @@ static void do_decorations(struct JBWMClientOptions * restrict o,
 static Atom get_mwm_hints_atom(Display * d)
 {
     static Atom a;
-    return a ? a : (a = XInternAtom(d, "_MOTIF_WM_HINTS", false));
+    return a ? a : (a = jbwm_atoms[JBWM_MOTIF_WM_HINTS]);
 }
 void jbwm_handle_mwm_hints(struct JBWMClient * restrict c)
 {

@@ -7,6 +7,7 @@
 #include "ewmh.h"
 #include "ewmh_state.h"
 #include "font.h"
+#include "JBWMAtomName.h"
 #include "move_resize.h"
 #include <string.h>
 #include "util.h"
@@ -40,7 +41,7 @@ void jbwm_toggle_shade(struct JBWMClient * restrict c)
         const int8_t state = (s ? set_shaded : set_not_shaded)(c);
         d=c->screen->display;
         (state == IconicState ? jbwm_ewmh_add_state : jbwm_ewmh_remove_state)
-        (d, c->window, XInternAtom(d,"_NET_WM_STATE_SHADED",false));
+        (d, c->window, jbwm_atoms[JBWM_NET_WM_STATE_SHADED]);
         jbwm_move_resize(c);
         jbwm_set_wm_state(c, state);
     }

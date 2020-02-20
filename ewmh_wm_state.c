@@ -1,5 +1,6 @@
 // Copyright 2020, Jeffrey E. Bedard
 #include "ewmh_wm_state.h"
+#include "JBWMAtomName.h"
 #include "JBWMClient.h"
 #include "client.h"
 #include "ewmh.h"
@@ -25,19 +26,19 @@ static void set_state(struct JBWMClient * restrict c,
     if (c){
         d=c->screen->display;
         jbwm_print_atom(d, atom, __FILE__, __LINE__);
-        if(atom==XInternAtom(d,"_NET_WM_STATE_FULLSCREEN",false))
+        if(atom==jbwm_atoms[JBWM_NET_WM_STATE_FULLSCREEN])
             (add?jbwm_set_fullscreen:jbwm_set_not_fullscreen)(c);
-        else if(atom==XInternAtom(d,"_NET_WM_STATE_STICKY",false))
+        else if(atom==jbwm_atoms[JBWM_NET_WM_STATE_STICKY])
             c->opt.sticky=add;
-        else if(atom==XInternAtom(d,"_NET_WM_STATE_ABOVE",false))
+        else if(atom==jbwm_atoms[JBWM_NET_WM_STATE_ABOVE])
             add = !add; // fall through
-        else if(atom==XInternAtom(d,"_NET_WM_STATE_BELOW",false))
+        else if(atom==jbwm_atoms[JBWM_NET_WM_STATE_BELOW])
             (add ? XRaiseWindow : XLowerWindow)(c->screen->display, c->parent);
-        else if(atom==XInternAtom(d,"_NET_WM_STATE_HIDDEN",false))
+        else if(atom==jbwm_atoms[JBWM_NET_WM_STATE_HIDDEN])
             (add ? jbwm_hide_client : jbwm_restore_client)(c);
-        else if(atom==XInternAtom(d,"_NET_WM_STATE_MAXIMIZED_VERT",false))
+        else if(atom==jbwm_atoms[JBWM_NET_WM_STATE_MAXIMIZED_VERT])
             (add ? jbwm_set_vert : jbwm_set_not_vert)(c);
-        else if(atom==XInternAtom(d,"_NET_WM_STATE_MAXIMIZED_HORZ",false))
+        else if(atom==jbwm_atoms[JBWM_NET_WM_STATE_MAXIMIZED_HORZ])
             (add ? jbwm_set_horz : jbwm_set_not_horz)(c);
         else{
             JBWM_LOG("\tWARNING:  Unhandled state");
@@ -77,10 +78,10 @@ void jbwm_ewmh_handle_wm_state_changes(XClientMessageEvent * e,
     struct JBWMClient * restrict c){
     Display *d;
     d=e->display;
-    check_state(e, XInternAtom(d,"_NET_WM_STATE_ABOVE",false), c);
-    check_state(e, XInternAtom(d,"_NET_WM_STATE_BELOW",false), c);
-    check_state(e, XInternAtom(d,"_NET_WM_STATE_FULLSCREEN",false), c);
-    check_state(e, XInternAtom(d,"_NET_WM_STATE_MAXIMIZED_HORZ",false), c);
-    check_state(e, XInternAtom(d,"_NET_WM_STATE_MAXIMIZED_VERT",false), c);
-    check_state(e, XInternAtom(d,"_NET_WM_STATE_STICKY",false), c);
+    check_state(e, jbwm_atoms[JBWM_NET_WM_STATE_ABOVE], c);
+    check_state(e, jbwm_atoms[JBWM_NET_WM_STATE_BELOW], c);
+    check_state(e, jbwm_atoms[JBWM_NET_WM_STATE_FULLSCREEN], c);
+    check_state(e, jbwm_atoms[JBWM_NET_WM_STATE_MAXIMIZED_HORZ], c);
+    check_state(e, jbwm_atoms[JBWM_NET_WM_STATE_MAXIMIZED_VERT], c);
+    check_state(e, jbwm_atoms[JBWM_NET_WM_STATE_STICKY], c);
 }

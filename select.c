@@ -8,6 +8,7 @@
 #include "client.h"
 #include "ewmh.h"
 #include "ewmh_state.h"
+#include "JBWMAtomName.h"
 #include "JBWMClient.h"
 #include "util.h"
 #define WM_STATE(a) EWMH_ATOM(WM_STATE_##a)
@@ -40,7 +41,7 @@ static void set_focused(struct JBWMClient * c)
     XInstallColormap(d, c->cmap);
     const Window w = c->window;
     XSetInputFocus(d, w, RevertToPointerRoot, CurrentTime);
-    jbwm_ewmh_add_state(d, w, XInternAtom(d,"_NET_WM_STATE_FOCUSED",false));
+    jbwm_ewmh_add_state(d, w, jbwm_atoms[JBWM_NET_WM_STATE_FOCUSED]);
 }
 static void set_active_window(struct JBWMClient * c)
 {
@@ -53,7 +54,7 @@ static void set_active_window(struct JBWMClient * c)
     w = c->window;
     d=c->screen->display;
     jbwm_set_property(d, c->screen->xlib->root,
-        XInternAtom(d,"_NET_ACTIVE_WINDOW",false), XA_WINDOW, &w, 1);
+        jbwm_atoms[JBWM_NET_ACTIVE_WINDOW], XA_WINDOW, &w, 1);
     jbwm_set_current_client(c);
 }
 void jbwm_select_client(struct JBWMClient * c)

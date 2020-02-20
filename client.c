@@ -6,6 +6,7 @@
 #include <stdlib.h>
 #include "ewmh.h"
 #include "ewmh_state.h"
+#include "JBWMAtomName.h"
 #include "select.h"
 #include "title_bar.h"
 #include "util.h"
@@ -55,7 +56,7 @@ void jbwm_set_client_vdesk(struct JBWMClient * restrict c,
     Atom a;
     if(c){
         d=c->screen->display;
-        a=XInternAtom(d,"_NET_WM_DESKTOP",false);
+        a=jbwm_atoms[JBWM_NET_WM_DESKTOP];
         c->vdesk=desktop;
         /*  Save in an atomic property, useful for restart and deskbars. */
         jbwm_set_property(d, c->window, a, XA_CARDINAL,
@@ -85,7 +86,7 @@ void jbwm_toggle_sticky(struct JBWMClient * restrict c)
             d=c->screen->display;
             (c->opt.sticky ? jbwm_ewmh_add_state : jbwm_ewmh_remove_state)
             (d, c->window,
-                XInternAtom(d,"_NET_WM_STATE_STICKY",false));
+                jbwm_atoms[JBWM_NET_WM_STATE_STICKY]);
         }
     }
 }
@@ -97,8 +98,8 @@ void jbwm_client_free(struct JBWMClient * restrict c)
     const union JBWMRectangle * restrict p = &c->size;
     d = c->screen->display;
     /*  Per ICCCM + wm-spec */
-    XDeleteProperty(d, w, XInternAtom(d,"_NET_WM_STATE",false));
-    XDeleteProperty(d, w, XInternAtom(d,"_NET_WM_DESKTOP",false));
+    XDeleteProperty(d, w, jbwm_atoms[JBWM_NET_WM_STATE]);
+    XDeleteProperty(d, w, jbwm_atoms[JBWM_NET_WM_DESKTOP]);
     XReparentWindow(d, w, c->screen->xlib->root, p->x, p->y);
     XRemoveFromSaveSet(d, w);
     if(parent)

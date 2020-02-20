@@ -60,6 +60,7 @@ char * jbwm_atom_names[]={
     "_NET_WM_STATE_ABOVE",
     "_NET_WM_STATE_BELOW",
     "_NET_WM_STATE_FOCUSED",
+    "_MOTIF_WM_HINTS"
 };
 Atom jbwm_atoms[JBWM_ATOM_COUNT];
 

@@ -3,24 +3,25 @@
 // Copyright 1999-2015, Ciaran Anscomb <jbwm@6809.org.uk>
 // See README for license and other details.
 #include "new.h"
-#include <X11/Xatom.h> // for XA_CARDINAL
-#include <stdlib.h>
-#include "JBWMClient.h"
 #include "client.h"
 #include "config.h" // for JBWM_MAX_DESKTOPS
 #include "ewmh.h"
 #include "geometry.h"
+#include "JBWMAtomName.h"
+#include "JBWMClient.h"
 #include "key_masks.h"
 #include "log.h" // for JBWM_LOG
 #include "mwm.h" // for jbwm_handle_mwm_hints
 #include "select.h"
 #include "shape.h" // for jbwm_new_shaped_client
+#include <stdlib.h>
 #include "util.h"
 #include "vdesk.h"
+#include <X11/Xatom.h> // for XA_CARDINAL
 static uint8_t wm_desktop(Display * d, const Window w, uint8_t vdesk)
 {
     uint16_t n;
-    const Atom a = XInternAtom(d,"_NET_WM_DESKTOP",false);
+    const Atom a = jbwm_atoms[JBWM_NET_WM_DESKTOP];
     unsigned long *lprop = jbwm_get_property(d, w, a, &n);
     if (lprop) { // See if client has a preferred desktop (as on restart)
         if (n) // is valid

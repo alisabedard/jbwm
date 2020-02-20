@@ -7,6 +7,7 @@
 #include "config.h"
 #include "ewmh.h"
 #include "font.h"
+#include "JBWMAtomName.h"
 #include "JBWMScreen.h"
 #include "keys.h"
 #include "log.h"
@@ -121,7 +122,7 @@ void jbwm_init_screens(Display *d, struct JBWMScreen *s, const short screens)
         s->id = screens;
         s->xlib = ScreenOfDisplay(d, screens);
         lprop=jbwm_get_property(d,s->xlib->root,
-            XInternAtom(d,"_NET_CURRENT_DESKTOP",false),&n);
+            jbwm_atoms[JBWM_NET_CURRENT_DESKTOP],&n);
         if(n){
             s->vdesk=lprop[0];
             XFree(lprop);

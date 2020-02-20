@@ -1,11 +1,11 @@
 // Copyright 2020, Jeffrey E. Bedard <jefbed@gmail.com>
 #undef DEBUG
 #include "ewmh_state.h"
-#include <assert.h>
 #include "client.h"
 #include "drag.h"
 #include "ewmh.h"
 #include "jbwm.h"
+#include "JBWMAtomName.h"
 #include "log.h"
 #include "max.h"
 #include "select.h"
@@ -17,7 +17,7 @@ void jbwm_ewmh_remove_state(Display * d,
     const Window w, const Atom state)
 {
     uint16_t n;
-    const Atom ws = XInternAtom(d,"_NET_WM_STATE",false);
+    const Atom ws = jbwm_atoms[JBWM_NET_WM_STATE];
     Atom *a = jbwm_get_property(d, w, ws, &n);
     if(a){ // found property
         uint16_t i;
@@ -37,7 +37,7 @@ bool jbwm_ewmh_get_state(Display * d,
 {
     uint16_t n;
     Atom *a = jbwm_get_property(d, w,
-        XInternAtom(d,"_NET_WM_STATE",false), &n);
+        jbwm_atoms[JBWM_NET_WM_STATE], &n);
     bool found = false;
     if (a) {
         found = find_state(state, n, a);
@@ -48,7 +48,7 @@ bool jbwm_ewmh_get_state(Display * d,
 void jbwm_ewmh_add_state(Display * d, const Window w,
     Atom state)
 {
-    XChangeProperty(d, w, XInternAtom(d,"_NET_WM_STATE",false),
+    XChangeProperty(d, w, jbwm_atoms[JBWM_NET_WM_STATE],
         XA_ATOM, 32, PropModePrepend,
         (unsigned char *)&state, 1);
 }
