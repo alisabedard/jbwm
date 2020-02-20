@@ -4,14 +4,9 @@
 // See README for license and other details.
 //#undef DEBUG
 #include "ewmh.h"
-#include <assert.h>
-#include "client.h"
-#include "config.h"
-#include "font.h"
-#include "geometry.h"
 #include "atom.h"
+#include "config.h"
 #include "JBWMClient.h"
-#include "JBWMScreen.h"
 #include "log.h"
 #include "macros.h"
 #include "PropertyData.h"
