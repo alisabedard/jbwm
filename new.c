@@ -7,7 +7,7 @@
 #include "config.h" // for JBWM_MAX_DESKTOPS
 #include "ewmh.h"
 #include "geometry.h"
-#include "JBWMAtomName.h"
+#include "atom.h"
 #include "JBWMClient.h"
 #include "key_masks.h"
 #include "log.h" // for JBWM_LOG

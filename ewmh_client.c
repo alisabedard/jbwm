@@ -5,7 +5,7 @@
 #include "drag.h"
 #include "ewmh.h"
 #include "ewmh_wm_state.h"
-#include "JBWMAtomName.h"
+#include "atom.h"
 #include "select.h"
 #include "util.h"
 #include "vdesk.h"

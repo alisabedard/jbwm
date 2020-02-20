@@ -4,7 +4,7 @@
 // See README for license and other details.
 #include "mwm.h"
 #include "ewmh.h"
-#include "JBWMAtomName.h"
+#include "atom.h"
 #include "JBWMClient.h"
 #include "log.h"
 #include "mwmproto.h"

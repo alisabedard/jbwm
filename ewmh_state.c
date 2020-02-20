@@ -5,7 +5,7 @@
 #include "drag.h"
 #include "ewmh.h"
 #include "jbwm.h"
-#include "JBWMAtomName.h"
+#include "atom.h"
 #include "log.h"
 #include "max.h"
 #include "select.h"

@@ -7,7 +7,7 @@
 #include "ewmh.h"
 #include "ewmh_state.h"
 #include "font.h"
-#include "JBWMAtomName.h"
+#include "atom.h"
 #include "move_resize.h"
 #include <string.h>
 #include "util.h"

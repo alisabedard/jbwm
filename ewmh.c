@@ -9,7 +9,7 @@
 #include "config.h"
 #include "font.h"
 #include "geometry.h"
-#include "JBWMAtomName.h"
+#include "atom.h"
 #include "JBWMClient.h"
 #include "JBWMScreen.h"
 #include "log.h"
@@ -20,65 +20,10 @@
 #include <unistd.h>
 #include "util.h"
 #include <X11/Xatom.h>
-char * jbwm_atom_names[]={
-    "_NET_SUPPORTED",
-    "_NET_CURRENT_DESKTOP",
-    "_NET_NUMBER_OF_DESKTOPS",
-    "_NET_DESKTOP_VIEWPORT",
-    "_NET_DESKTOP_GEOMETRY",
-    "_NET_SUPPORTING_WM_CHECK",
-    "_NET_ACTIVE_WINDOW",
-    "_NET_MOVERESIZE_WINDOW",
-    "_NET_CLOSE_WINDOW",
-    "_NET_CLIENT_LIST",
-    "_NET_VIRTUAL_ROOTS",
-    "_NET_CLIENT_LIST_STACKING",
-    "_NET_FRAME_EXTENTS",
-    "_NET_WM_ALLOWED_ACTIONS",
-    "_NET_WM_NAME",
-    "_NET_WM_DESKTOP",
-    "_NET_WM_MOVERESIZE",
-    "_NET_WM_PID",
-    "_NET_WM_WINDOW_TYPE",
-    "_NET_WM_STATE",
-    "_NET_WM_ACTION_MOVE",
-    "_NET_WM_ACTION_RESIZE",
-    "_NET_WM_ACTION_CLOSE",
-    "_NET_WM_ACTION_SHADE",
-    "_NET_WM_ACTION_FULLSCREEN",
-    "_NET_WM_ACTION_CHANGE_DESKTOP",
-    "_NET_WM_ACTION_ABOVE",
-    "_NET_WM_ACTION_BELOW",
-    "_NET_WM_ACTION_MAXIMIZE_HORZ",
-    "_NET_WM_ACTION_MAXIMIZE_VERT",
-    "_NET_WM_STATE_STICKY",
-    "_NET_WM_STATE_MAXIMIZED_VERT",
-    "_NET_WM_STATE_MAXIMIZED_HORZ",
-    "_NET_WM_STATE_SHADED",
-    "_NET_WM_STATE_HIDDEN",
-    "_NET_WM_STATE_FULLSCREEN",
-    "_NET_WM_STATE_ABOVE",
-    "_NET_WM_STATE_BELOW",
-    "_NET_WM_STATE_FOCUSED",
-    "_MOTIF_WM_HINTS"
-};
-Atom jbwm_atoms[JBWM_ATOM_COUNT];
-
 static inline void set_property(struct PropertyData * restrict p) {
     jbwm_set_property(p->display,p->target,p->property,
         p->type,p->data,p->size);
-}/*
-     static inline void jbwm_set_property(Display * d,Window const win,
-     Atom const property,Atom const type,
-     void * data,uint16_t const size) {
-     jbwm_set_property(d, win, property, type, data, size);
-     }
-     static inline void set_root_property(Display * d,
-     Atom const property,Atom const type,
-     void * data,uint16_t const size) {
-     jbwm_set_property(d,DefaultRootWindow(d),property,type,data,size);
-     }
-  */
+}
 // returns number of elements in window list
 static int get_client_list_r(Window ** list,Display * d,
     struct JBWMClient * i,int const count) {

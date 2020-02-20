@@ -1,6 +1,6 @@
 // Copyright 2020, Jeffrey E. Bedard
 #include "ewmh_wm_state.h"
-#include "JBWMAtomName.h"
+#include "atom.h"
 #include "JBWMClient.h"
 #include "client.h"
 #include "ewmh.h"

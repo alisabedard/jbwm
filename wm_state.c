@@ -2,7 +2,7 @@
 #include "wm_state.h"
 #include "ewmh.h"
 #include "ewmh_state.h"
-#include "JBWMAtomName.h"
+#include "atom.h"
 #include "log.h"
 #include "util.h"
 #include <X11/Xatom.h>

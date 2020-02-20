@@ -7,7 +7,7 @@
 #include "config.h"
 #include "ewmh.h"
 #include "font.h"
-#include "JBWMAtomName.h"
+#include "atom.h"
 #include "JBWMScreen.h"
 #include "keys.h"
 #include "log.h"

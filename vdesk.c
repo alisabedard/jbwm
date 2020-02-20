@@ -6,7 +6,7 @@
 #include "client.h"
 #include "config.h"
 #include "ewmh.h"
-#include "JBWMAtomName.h"
+#include "atom.h"
 #include "JBWMClient.h"
 #include "JBWMScreen.h"
 #include "util.h"

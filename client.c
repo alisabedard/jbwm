@@ -6,7 +6,7 @@
 #include <stdlib.h>
 #include "ewmh.h"
 #include "ewmh_state.h"
-#include "JBWMAtomName.h"
+#include "atom.h"
 #include "select.h"
 #include "title_bar.h"
 #include "util.h"
