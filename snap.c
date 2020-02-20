@@ -120,6 +120,13 @@ static inline bool snap_cond(int16_t const xy, int16_t const wh,
     return (ixy - wh - xy <= JBWM_SNAP) && (xy-iwh-ixy<=JBWM_SNAP);
 #endif
 }
+static inline void adjust_for_titlebar(union JBWMRectangle * geo,
+    uint8_t const font_height, bool const titled){
+    if(titled){
+        geo->y-=font_height;
+        geo->height+=font_height;
+    }
+}
 /* Don't use restrict for struct JBWMClient withing this function, as
  * c and ci may alias each other.  Qualifier restrict is fine for struct
  * JBWMRectangle.  This is performance critical, scaling O(n)
@@ -128,20 +135,25 @@ static inline bool snap_cond(int16_t const xy, int16_t const wh,
 static union JBWMPoint snap_search(struct JBWMClient * c)
 {
     union JBWMPoint d;
-    union JBWMRectangle const s = c->size;
+    union JBWMRectangle s = c->size;
+    struct JBWMScreen *scr=c->screen;
+    bool const ctb = !c->opt.no_title_bar;
+    uint8_t const fh = scr->font_height;
+    adjust_for_titlebar(&s,fh,ctb);
     d.x=d.y=JBWM_SNAP;
     for (struct JBWMClient * ci = *(c->head);
         ci; ci = ci->next) {
-        if ((ci != c) && (ci->screen == c->screen)
+        if ((ci != c) && (ci->screen == scr)
             && (ci->vdesk == c->vdesk)) {
-            union JBWMRectangle const gi = ci->size;
+            union JBWMRectangle gi = ci->size;
+            bool const citb = !ci->opt.no_title_bar;
+            adjust_for_titlebar(&gi,fh,citb);
             if(snap_cond(s.y, s.height, gi.y, gi.height))
                 d.x = jbwm_snap_dim(s.x, s.width,
                     gi.x, gi.width, d.x);
             if(snap_cond(s.x, s.width, gi.x, gi.width))
                 d.y = jbwm_snap_dim(s.y, s.height,
-                    gi.y, gi.height+(c->opt.no_title_bar
-                        ?0:c->screen->font_height), d.y);
+                    gi.y, gi.height, d.y);
         }
     }
     return d;
