@@ -7,18 +7,18 @@ echo "CFLAGS=${CFLAGS}" >> $CF
 echo "LDFLAGS=${LDFLAGS}" >> $CF
 echo "DESTDIR=${DESTDIR}" >> $CF
 echo "PREFIX=${PREFIX}" >> $CF
-DEBUG=false
-USE_GDB=false
-SMALL=false
-XFT=false
-while getopts 'dgsx' opt; do
+DEBUG=false USE_GDB=false SMALL=false XFT=false
+while getopts 'dgSsx' opt; do
 	case $opt in
 	d) DEBUG=true ;;
 	g) USE_GDB=true ;;
+        S) USE_GDB=true SMALL=true ;;
         s) SMALL=true ;;
         x) XFT=true ;;
-	?) for line in '-d enable debugging with verbose log output' \
+	?) for line in \
+            '-d enable debugging with verbose log output' \
                 '-g enable debug symbols' \
+                '-S optimize for size with symbols' \
                 '-s optimize for size' \
                 '-x use Xft fonts' \
 		'-? show usage'; \
