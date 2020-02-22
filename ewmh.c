@@ -127,7 +127,6 @@ void jbwm_ewmh_set_allowed_actions(Display * d,
 static void set_desktop_geometry(struct PropertyData * restrict p,
     struct JBWMScreen *s)
 {
-    Display *d=p->display;
     p->property=jbwm_atoms[JBWM_NET_DESKTOP_GEOMETRY];
     p->data=(int32_t[]){s->xlib->width,s->xlib->height};
     set_property(p);
@@ -135,15 +134,12 @@ static void set_desktop_geometry(struct PropertyData * restrict p,
 static void set_desktop_viewport(struct PropertyData * restrict p)
 {
     int32_t viewport_data[]={0,0};
-    Display *d=p->display;
     p->property=jbwm_atoms[JBWM_NET_DESKTOP_VIEWPORT];
     p->data=viewport_data;
     set_property(p);
 }
 static void set_number_of_desktops(struct PropertyData * restrict p)
 {
-
-    Display *d=p->display;
     p->property=jbwm_atoms[JBWM_NET_NUMBER_OF_DESKTOPS];
     p->data=&(int32_t){JBWM_NUMBER_OF_DESKTOPS};
     set_property(p);
@@ -151,16 +147,13 @@ static void set_number_of_desktops(struct PropertyData * restrict p)
 static void set_current_desktop(struct PropertyData * restrict p,
     void * restrict data)
 {
-    Display *d=p->display;
     p->property=jbwm_atoms[JBWM_NET_CURRENT_DESKTOP];
     p->data=data;
     set_property(p);
 }
 static void set_virtual_roots(struct PropertyData * restrict p)
 {
-    // Declared r static to keep scope
-    static Window r;
-    Display *d=p->display;
+    Window r;
     p->property=jbwm_atoms[JBWM_NET_VIRTUAL_ROOTS];
     p->type=XA_WINDOW;
     r=p->target;
@@ -178,7 +171,7 @@ static void init_desktops(Display * d,struct JBWMScreen * s)
     set_current_desktop(&p,&s->vdesk);
     set_virtual_roots(&p);
 }
-static void set_name(Display * d,Window const w)
+static inline void set_name(Display * d,Window const w)
 {
     jbwm_set_property(d,w,jbwm_atoms[JBWM_NET_WM_NAME],XA_STRING,
         JBWM_NAME,sizeof(JBWM_NAME));
@@ -228,7 +221,6 @@ void jbwm_set_frame_extents(struct JBWMClient * restrict c)
 {
     static uint32_t f[4];
     Atom a;
-    Display *d=c->screen->display;
     JBWM_LOG("jbwm_set_frame_extents()");
     // Fields: left,right,top,bottom
     f[0]=f[1]=f[2]=f[3]=c->opt.border;

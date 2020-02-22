@@ -72,7 +72,6 @@ static void debug_client_message(XClientMessageEvent * e)
 void jbwm_ewmh_handle_client_message(XClientMessageEvent * e,
     struct JBWMClient * c, struct JBWMScreen *s)
 {
-    Display *d=e->display;
     const Atom t = e->message_type;
     debug_client_message(e);
     if(c && client_specific_message(e, c, t))

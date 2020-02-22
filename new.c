@@ -14,6 +14,7 @@
 #include "mwm.h" // for jbwm_handle_mwm_hints
 #include "select.h"
 #include "shape.h" // for jbwm_new_shaped_client
+#include "snap.h"
 #include <stdlib.h>
 #include "util.h"
 #include "vdesk.h"
@@ -96,8 +97,9 @@ void jbwm_new_client(struct JBWMScreen * s, const Window w)
     do_grabs(s->display, w);
     jbwm_set_client_geometry(c);
     jbwm_handle_mwm_hints(c);
-    c->vdesk = get_vdesk(c);
     reparent(c);
+    c->vdesk = get_vdesk(c);
+    jbwm_snap_client(c);
     jbwm_restore_client(c);
     jbwm_select_client(c);
     if(c->screen->vdesk!=c->vdesk)

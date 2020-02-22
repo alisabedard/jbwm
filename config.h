@@ -38,7 +38,7 @@
 enum {
     JBWM_KEYMASK_GRAB = Mod4Mask,
     JBWM_KEYMASK_MOD = ControlMask,
-    JBWM_SNAP = 15,
+    JBWM_SNAP = 10,
     JBWM_RESIZE_INCREMENT = 20,
     JBWM_NUMBER_OF_DESKTOPS = 10
 };
