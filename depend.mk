@@ -20,7 +20,7 @@ main.o: main.c command_line.h display.h events.h font.h JBWMClient.h jbwm.h vdes
 max.o: max.c max.h ewmh.h ewmh_state.h font.h atom.h JBWMClient.h move_resize.h title_bar.h
 move_resize.o: move_resize.c move_resize.h JBWMClient.h font.h log.h mwm.h shape.h title_bar.h
 mwm.o: mwm.c mwm.h ewmh.h atom.h JBWMClient.h log.h mwmproto.h util.h
-new.o: new.c new.h client.h config.h ewmh.h geometry.h atom.h JBWMClient.h key_masks.h log.h mwm.h select.h shape.h util.h vdesk.h
+new.o: new.c new.h client.h config.h ewmh.h geometry.h atom.h JBWMClient.h key_masks.h log.h mwm.h select.h shape.h snap.h util.h vdesk.h
 select.o: select.c select.h client.h ewmh.h ewmh_state.h atom.h JBWMClient.h util.h
 shape.o: shape.c shape.h JBWMClient.h log.h
 snap.o: snap.c snap.h config.h JBWMClient.h JBWMPoint.h JBWMSize.h
