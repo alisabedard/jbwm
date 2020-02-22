@@ -124,40 +124,38 @@ void jbwm_ewmh_set_allowed_actions(Display * d,
     };
     jbwm_set_property(d,w,a[0],XA_ATOM,&a,sizeof(a) / sizeof(Atom));
 }
-static void set_desktop_geometry(struct PropertyData * restrict p,
+static inline void set_desktop_geometry(struct PropertyData * restrict p,
     struct JBWMScreen *s)
 {
     p->property=jbwm_atoms[JBWM_NET_DESKTOP_GEOMETRY];
     p->data=(int32_t[]){s->xlib->width,s->xlib->height};
     set_property(p);
 }
-static void set_desktop_viewport(struct PropertyData * restrict p)
+static inline void set_desktop_viewport(struct PropertyData * restrict p)
 {
     int32_t viewport_data[]={0,0};
     p->property=jbwm_atoms[JBWM_NET_DESKTOP_VIEWPORT];
     p->data=viewport_data;
     set_property(p);
 }
-static void set_number_of_desktops(struct PropertyData * restrict p)
+static inline void set_number_of_desktops(struct PropertyData * restrict p)
 {
     p->property=jbwm_atoms[JBWM_NET_NUMBER_OF_DESKTOPS];
     p->data=&(int32_t){JBWM_NUMBER_OF_DESKTOPS};
     set_property(p);
 }
-static void set_current_desktop(struct PropertyData * restrict p,
+static inline void set_current_desktop(struct PropertyData * restrict p,
     void * restrict data)
 {
     p->property=jbwm_atoms[JBWM_NET_CURRENT_DESKTOP];
     p->data=data;
     set_property(p);
 }
-static void set_virtual_roots(struct PropertyData * restrict p)
+static inline void set_virtual_roots(struct PropertyData * restrict p)
 {
-    Window r;
     p->property=jbwm_atoms[JBWM_NET_VIRTUAL_ROOTS];
     p->type=XA_WINDOW;
-    r=p->target;
-    p->data=&r;
+    p->data=&(p->target);
     set_property(p);
 }
 static void init_desktops(Display * d,struct JBWMScreen * s)
