@@ -42,3 +42,6 @@ char * jbwm_atom_names[]={
     "_MOTIF_WM_HINTS"
 };
 Atom jbwm_atoms[JBWM_ATOM_COUNT];
+void jbwm_create_atoms(Display *d){
+    XInternAtoms(d,jbwm_atom_names,JBWM_ATOM_COUNT,False,jbwm_atoms);
+}

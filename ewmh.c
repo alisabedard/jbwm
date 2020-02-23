@@ -160,7 +160,7 @@ static inline void set_virtual_roots(struct PropertyData * restrict p)
 }
 static void init_desktops(Display * d,struct JBWMScreen * s)
 {
-    struct PropertyData p={d,NULL,RootWindowOfScreen(s->xlib),
+    struct PropertyData p={d,NULL,s->xlib->root,
         0,2,XA_CARDINAL};
     set_desktop_geometry(&p,s);
     set_desktop_viewport(&p);
@@ -168,11 +168,6 @@ static void init_desktops(Display * d,struct JBWMScreen * s)
     set_number_of_desktops(&p);
     set_current_desktop(&p,&s->vdesk);
     set_virtual_roots(&p);
-}
-static inline void set_name(Display * d,Window const w)
-{
-    jbwm_set_property(d,w,jbwm_atoms[JBWM_NET_WM_NAME],XA_STRING,
-        JBWM_NAME,sizeof(JBWM_NAME));
 }
 static void set_supporting(Display * d,Window const w,
     Window * s)
@@ -189,30 +184,26 @@ static Window init_supporting(Display * d,Window const r)
     set_supporting(d,w,&w);
     jbwm_set_property(d,w,jbwm_atoms[JBWM_NET_WM_PID],XA_CARDINAL,
         &(pid_t){getpid()},1);
-    set_name(d,w);
+    jbwm_set_property(d,w,jbwm_atoms[JBWM_NET_WM_NAME],XA_STRING,
+        JBWM_NAME,sizeof(JBWM_NAME));
     return w;
-}
-static void set_ewmh_client_list(Display *d,Window *r){
-    Atom a;
-    /* Set this to the root window until we have some clients.
-     * Declared r static so we don't lose scope.  */
-    a=jbwm_atoms[JBWM_NET_CLIENT_LIST];
-    jbwm_set_property(d,*r,a,XA_WINDOW,r,1);
-}
-static void set_ewmh_supported(Display *d,Window const r){
-    XInternAtoms(d,jbwm_atom_names,JBWM_ATOM_COUNT,false,jbwm_atoms);
-    jbwm_set_property(d,r,jbwm_atoms[JBWM_NET_SUPPORTED],
-        XA_ATOM,(unsigned char *)&jbwm_atoms,JBWM_ATOM_COUNT);
 }
 void jbwm_ewmh_init_screen(Display * d,struct JBWMScreen * s)
 {
-    static Window r;
-    r=RootWindowOfScreen(s->xlib);
-    set_ewmh_supported(d,r);
-    set_name(d,r);
-    set_ewmh_client_list(d,&r);
+    Window *r;
+    /* Use a pointer to the original screen data to prevent
+     * the pointers passed as property data from being invalid
+     * once this function looses scope.  */
+    r=&s->xlib->root;
+    /* Set this to the root window until we have some clients. */
+    jbwm_set_property(d,*r,jbwm_atoms[JBWM_NET_CLIENT_LIST],XA_WINDOW,
+        r,1); // Point to original screen data.
+    jbwm_set_property(d,*r,jbwm_atoms[JBWM_NET_SUPPORTED],
+        XA_ATOM,(unsigned char *)&jbwm_atoms,JBWM_ATOM_COUNT);
+    jbwm_set_property(d,*r,jbwm_atoms[JBWM_NET_WM_NAME],XA_STRING,
+        JBWM_NAME,sizeof(JBWM_NAME));
     init_desktops(d,s);
-    s->supporting=init_supporting(d,r);
+    s->supporting=init_supporting(d,*r);
 }
 // Required by wm-spec:
 void jbwm_set_frame_extents(struct JBWMClient * restrict c)
