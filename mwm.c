@@ -36,15 +36,10 @@ static void do_decorations(struct JBWMClientOptions * restrict o,
     o->no_shade = !(f & MWM_DECOR_MINIMIZE);
     o->no_title_bar = !(f & MWM_DECOR_TITLE);
 }
-static Atom get_mwm_hints_atom(Display * d)
-{
-    static Atom a;
-    return a ? a : (a = jbwm_atoms[JBWM_MOTIF_WM_HINTS]);
-}
 void jbwm_handle_mwm_hints(struct JBWMClient * restrict c)
 {
     Display * d = c->screen->display;
-    const Atom mwm_hints = get_mwm_hints_atom(d);
+    const Atom mwm_hints = jbwm_atoms[JBWM_MOTIF_WM_HINTS];
     struct JBWMMwm * m = jbwm_get_property(d, c->window,
         mwm_hints, &(uint16_t){0});
     if (m) { // property successfully retrieved
