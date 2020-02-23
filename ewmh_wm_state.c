@@ -22,10 +22,7 @@
         other data.l[] elements = 0 */
 static void set_state(struct JBWMClient * restrict c,
     bool add, Atom const atom){
-    Display *d;
     if (c){
-        d=c->screen->display;
-        jbwm_print_atom(d, atom, __FILE__, __LINE__);
         if(atom==jbwm_atoms[JBWM_NET_WM_STATE_FULLSCREEN])
             (add?jbwm_set_fullscreen:jbwm_set_not_fullscreen)(c);
         else if(atom==jbwm_atoms[JBWM_NET_WM_STATE_STICKY])
@@ -76,8 +73,6 @@ static void check_state(XClientMessageEvent * e,	// event data
 }
 void jbwm_ewmh_handle_wm_state_changes(XClientMessageEvent * e,
     struct JBWMClient * restrict c){
-    Display *d;
-    d=e->display;
     check_state(e, jbwm_atoms[JBWM_NET_WM_STATE_ABOVE], c);
     check_state(e, jbwm_atoms[JBWM_NET_WM_STATE_BELOW], c);
     check_state(e, jbwm_atoms[JBWM_NET_WM_STATE_FULLSCREEN], c);
