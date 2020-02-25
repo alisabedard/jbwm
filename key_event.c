@@ -172,10 +172,12 @@ static void next(struct JBWMClient * c,
         c=*(c->head);
     else
         c=c->next;
-    if(c->vdesk != v)
-        next(c, current_client, v);
-    else
-        warp_to(c, current_client);
+    if (c!=*current_client) { // prevent infinite recursion with dessktop
+        if(c->vdesk != v)
+            next(c, current_client, v);
+        else
+            warp_to(c, current_client);
+    }
 }
 static void cond_set_vdesk(struct JBWMClient * c,
     struct JBWMScreen * s, const uint8_t desktop, const bool mod)
@@ -203,7 +205,8 @@ void jbwm_handle_key_event(struct JBWMScreen *s, XKeyEvent * e,
         exit(0);
     case JBWM_KEY_NEXT:
         if(*current_client)
-            next(*current_client, current_client, (*current_client)->vdesk);
+            next(*current_client, current_client,
+                (*current_client)->screen->vdesk);
         break;
     case XK_0:
         opt.zero = true;
