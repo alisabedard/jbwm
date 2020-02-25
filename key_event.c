@@ -108,10 +108,12 @@ static void toggle_maximize(struct JBWMClient * restrict c)
             ? set_not_maximized : set_maximized)(c);
 }
 __attribute__((nonnull))
-static void handle_client_key_event(struct JBWMClient * restrict c,
+static void handle_client_key_event(struct JBWMClient ** current_client,
     const bool mod, const KeySym key)
 {
+    struct JBWMClient * c;
     JBWM_LOG("handle_client_key_event: %d", (int)key);
+    c=*current_client;
     if (c->opt.fullscreen) {
         // only allow exiting from fullscreen
         if (key == JBWM_KEY_FS)
@@ -148,7 +150,7 @@ static void handle_client_key_event(struct JBWMClient * restrict c,
         (c->opt.max_vert ? jbwm_set_not_vert : jbwm_set_vert)(c);
         break;
     case JBWM_KEY_STICK:
-        jbwm_toggle_sticky(c);
+        jbwm_toggle_sticky(c, current_client);
         break;
     case JBWM_KEY_MOVE:
         jbwm_drag(c, false);
@@ -158,20 +160,22 @@ static void handle_client_key_event(struct JBWMClient * restrict c,
         break;
     }
 }
-static void warp_to(struct JBWMClient * restrict c){
+static void warp_to(struct JBWMClient * restrict c,
+    struct JBWMClient ** current_client){
     point(c, 0, 0);
     point(c, c->size.width-1, c->size.height-1);
-    jbwm_select_client(c);
+    jbwm_select_client(c, current_client);
 }
-static void next(struct JBWMClient *c,uint8_t const v){
+static void next(struct JBWMClient * c,
+    struct JBWMClient ** current_client, uint8_t const v){
     if(!c->next)
         c=*(c->head);
     else
         c=c->next;
     if(c->vdesk != v)
-        next(c,v);
+        next(c, current_client, v);
     else
-        warp_to(c);
+        warp_to(c, current_client);
 }
 static void cond_set_vdesk(struct JBWMClient * c,
     struct JBWMScreen * s, const uint8_t desktop, const bool mod)
@@ -181,11 +185,11 @@ static void cond_set_vdesk(struct JBWMClient * c,
     else
         jbwm_set_vdesk(s, *jbwm_get_head_client(), desktop);
 }
-void jbwm_handle_key_event(struct JBWMScreen *s, XKeyEvent * e)
+void jbwm_handle_key_event(struct JBWMScreen *s, XKeyEvent * e,
+    struct JBWMClient ** current_client)
 {
     JBWM_LOG("jbwm_handle_key_event");
     const KeySym key = XLookupKeysym(e, 0);
-    struct JBWMClient * restrict c = jbwm_get_current_client();
     struct {
         uint8_t vdesk:6;
         bool mod:1;
@@ -198,8 +202,8 @@ void jbwm_handle_key_event(struct JBWMScreen *s, XKeyEvent * e)
     case JBWM_KEY_QUIT:
         exit(0);
     case JBWM_KEY_NEXT:
-        if(c)
-            next(c,c->vdesk);
+        if(*current_client)
+            next(*current_client, current_client, (*current_client)->vdesk);
         break;
     case XK_0:
         opt.zero = true;
@@ -207,17 +211,17 @@ void jbwm_handle_key_event(struct JBWMScreen *s, XKeyEvent * e)
     case XK_1: case XK_2: case XK_3: case XK_4: case XK_5:
     case XK_6: case XK_7: case XK_8: case XK_9:
         // First desktop 0, per wm-spec
-        cond_set_vdesk(c, s, opt.zero
+        cond_set_vdesk(*current_client, s, opt.zero
             ? 10 : key - XK_1, opt.mod);
         break;
     case JBWM_KEY_PREVDESK:
-        cond_set_vdesk(c, s, s->vdesk - 1, opt.mod);
+        cond_set_vdesk(*current_client, s, s->vdesk - 1, opt.mod);
         break;
     case JBWM_KEY_NEXTDESK:
-        cond_set_vdesk(c, s, s->vdesk + 1, opt.mod);
+        cond_set_vdesk(*current_client, s, s->vdesk + 1, opt.mod);
         break;
     default:
-        if (c)
-            handle_client_key_event(c, opt.mod, key);
+        if (*current_client)
+            handle_client_key_event(current_client, opt.mod, key);
     }
 }

@@ -19,11 +19,13 @@ int main(int argc, char **argv)
     jbwm_create_atoms(d);
     jbwm_open_font(d);
     {
+        struct JBWMClient *current_client;
         uint8_t const n = ScreenCount(d);
         // allocate using dynamically sized array on stack
         struct JBWMScreen s[n]; // remains in scope till exit.
         memset(s,0,sizeof(s));
-        jbwm_init_screens(d, s, n - 1); // -1 for index
-        jbwm_events_loop(s); // does not return
+        current_client=NULL; // flag as empty list
+        jbwm_init_screens(d, s, &current_client, n - 1); // -1 for index
+        jbwm_events_loop(s,&current_client); // does not return
     }
 }

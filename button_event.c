@@ -10,7 +10,7 @@
 #include "title_bar.h"
 #include "wm_state.h"
 static void handle_title_bar_button(XButtonEvent * e,
-    struct JBWMClient * restrict c)
+    struct JBWMClient * c, struct JBWMClient ** current_client)
 {
     JBWM_LOG("e->window: %d, c->title_bar: %d, e->subwindow: %d",
         (int)e->window, (int)c->tb.win, (int)e->subwindow);
@@ -24,13 +24,13 @@ static void handle_title_bar_button(XButtonEvent * e,
     else if (e->subwindow == c->tb.shade && !o->no_shade)
         jbwm_toggle_shade(c);
     else if (e->subwindow == c->tb.stick)
-        jbwm_toggle_sticky(c);
+        jbwm_toggle_sticky(c, current_client);
     else
         jbwm_drag(c, false);
 }
 __attribute__((nonnull))
 void jbwm_handle_button_event(XButtonEvent * e,
-    struct JBWMClient * restrict c)
+    struct JBWMClient * c, struct JBWMClient ** current_client)
 {
     JBWM_LOG("jbwm_handle_button_event");
     const bool fs = c->opt.fullscreen;
@@ -40,7 +40,7 @@ void jbwm_handle_button_event(XButtonEvent * e,
         if (fs)
             XRaiseWindow(d, c->parent);
         else
-            handle_title_bar_button(e, c);
+            handle_title_bar_button(e, c, current_client);
         break;
     case Button2:
         XLowerWindow(d, c->parent);

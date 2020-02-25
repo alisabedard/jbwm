@@ -89,7 +89,8 @@ static void do_grabs(Display * d, const Window w)
     // keys to grab:
     jbwm_grab_button(d, w, jbwm_get_grab_mask());
 }
-void jbwm_new_client(struct JBWMScreen * s, const Window w)
+void jbwm_new_client(struct JBWMScreen * s,
+    struct JBWMClient ** current_client, const Window w)
 {
     struct JBWMClient * restrict c = get_JBWMClient(w, s);
     JBWM_LOG("jbwm_new_client(..., w: %d)", (int)w);
@@ -101,7 +102,7 @@ void jbwm_new_client(struct JBWMScreen * s, const Window w)
     c->vdesk = get_vdesk(c);
     jbwm_snap_client(c);
     jbwm_restore_client(c);
-    jbwm_select_client(c);
+    jbwm_select_client(c, current_client);
     if(c->screen->vdesk!=c->vdesk)
         jbwm_hide_client(c);
 }

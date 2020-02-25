@@ -7,5 +7,6 @@
 #include <X11/Xlib.h>
 struct JBWMClient;
 void jbwm_handle_button_event(XButtonEvent * e,
-    struct JBWMClient * restrict c) __attribute__((nonnull));
+    struct JBWMClient * c, struct JBWMClient ** current_client)
+    __attribute__((nonnull));
 #endif /* JBWM_BUTTON_EVENT_H */

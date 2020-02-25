@@ -45,7 +45,7 @@ static void jbwm_handle_PropertyNotify(XEvent * ev, struct JBWMClient * c)
     }
 }
 static void jbwm_handle_MapRequest(XEvent * ev, struct JBWMClient * c,
-    struct JBWMScreen * s) {
+    struct JBWMScreen * s, struct JBWMClient ** current_client) {
     if (!c) {
         XMapRequestEvent * restrict e = &ev->xmaprequest;
         /* This check fixes a race condition in old libreoffice and
@@ -56,7 +56,8 @@ static void jbwm_handle_MapRequest(XEvent * ev, struct JBWMClient * c,
             serial = e->serial;
             JBWM_LOG("jbwm_handle_MapRequest(), send_event:%d",
                 e->send_event);
-            jbwm_new_client(get_screen(s, e->parent, 0),e->window);
+            jbwm_new_client(get_screen(s, e->parent, 0), current_client,
+                e->window);
         }
     }
 }
@@ -87,17 +88,19 @@ static void jbwm_handle_ConfigureRequest(XEvent * ev, struct JBWMClient * c)
     if (c)
         jbwm_move_resize(c);
 }
-static void jbwm_handle_EnterNotify(XEvent * ev, struct JBWMClient * c)
+static void jbwm_handle_EnterNotify(XEvent * ev, struct JBWMClient * c,
+    struct JBWMClient ** current_client)
 {
     if (c && ev->xcrossing.window == c->parent)
-        jbwm_select_client(c);
+        jbwm_select_client(c, current_client);
 }
 static void jbwm_handle_Expose(XEvent * ev, struct JBWMClient * c)
 {
     if (c && !ev->xexpose.count)
         jbwm_update_title_bar(c);
 }
-void jbwm_events_loop(struct JBWMScreen * s)
+void jbwm_events_loop(struct JBWMScreen * s,
+    struct JBWMClient ** current_client)
 {
     Display *d;
     d=s->display;
@@ -123,14 +126,14 @@ void jbwm_events_loop(struct JBWMScreen * s)
             jbwm_handle_ConfigureRequest(&ev,c);
             break;
         case KeyPress:
-            jbwm_handle_key_event(s,&ev.xkey);
+            jbwm_handle_key_event(s,&ev.xkey, current_client);
             break;
         case ButtonPress:
             if(c)
-                jbwm_handle_button_event(&ev.xbutton, c);
+                jbwm_handle_button_event(&ev.xbutton, c, current_client);
             break;
         case EnterNotify:
-            jbwm_handle_EnterNotify(&ev,c);
+            jbwm_handle_EnterNotify(&ev, c, current_client);
             break;
         case Expose:
             jbwm_handle_Expose(&ev,c);
@@ -144,7 +147,7 @@ void jbwm_events_loop(struct JBWMScreen * s)
                 jbwm_client_free(c);
             break;
         case MapRequest:
-            jbwm_handle_MapRequest(&ev,c,s);
+            jbwm_handle_MapRequest(&ev, c, s, current_client);
             break;
         case PropertyNotify:
             jbwm_handle_PropertyNotify(&ev,c);
@@ -153,7 +156,7 @@ void jbwm_events_loop(struct JBWMScreen * s)
             jbwm_handle_ColormapNotify(&ev,c);
             break;
         case ClientMessage:
-            jbwm_ewmh_handle_client_message(&ev.xclient, c, s);
+            jbwm_ewmh_handle_client_message(&ev.xclient, c, current_client);
             break;
 #ifdef DEBUG
         default:

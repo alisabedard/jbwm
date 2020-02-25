@@ -14,15 +14,17 @@
 #include "wm_state.h"
 #include <X11/Xatom.h>
 #include <X11/Xutil.h>
-static struct JBWMClient * current, * head;
+static struct JBWMClient /** current,*/ * head;
+/*
 struct JBWMClient * jbwm_get_current_client(void)
 {
     return current;
-}
+}*/
+/*
 void jbwm_set_current_client(struct JBWMClient * c)
 {
     current = c;
-}
+}*/
 struct JBWMClient **jbwm_get_head_client(void){
     return &head;
 }
@@ -31,23 +33,20 @@ void jbwm_prepend_client(struct JBWMClient * restrict c)
     c->next = head;
     head = c;
 }
-/* Note:  As *c and *i may alias each other, use of 'restrict'
-   in relink_r would be invalid. */
-static void relink_r(const struct JBWMClient * c, struct JBWMClient * i)
+/*  Relink client linked list to exclude c */
+void jbwm_relink_client_list(struct JBWMClient * c)
 {
-    if (i && i->next)
-        relink_r(c, i->next != c ? i->next : (i->next = c->next));
-}
-/*  Relink c's linked list to exclude c */
-void jbwm_relink_client_list(struct JBWMClient * restrict c)
-{
-    if (current == c) /*  Remove selection target */
-        current = NULL;
-    if (head == c) {
-        head = c->next;
-        return; /*  removed first client */
+    struct JBWMClient *i, *prev;
+    for (i=head, prev=NULL; i; prev=i, i=i->next) {
+        if (i==c) {
+           if (i==head) { // prev == NULL in this case
+               head=i->next;
+           } else {
+               prev->next=i->next;
+           } 
+           break;
+        }
     }
-    relink_r(c, head);
 }
 void jbwm_set_client_vdesk(struct JBWMClient * restrict c,
     const uint8_t desktop)
@@ -75,11 +74,12 @@ struct JBWMClient * jbwm_find_client(
         || head->tb.win == w ? head : jbwm_find_client(head->next, w);
 }
 
-void jbwm_toggle_sticky(struct JBWMClient * restrict c)
+void jbwm_toggle_sticky(struct JBWMClient * restrict c,
+    struct JBWMClient ** current_client)
 {
     if(c){
         c->opt.sticky ^= true; /*  toggle */
-        jbwm_select_client(c);
+        jbwm_select_client(c,current_client);
         jbwm_update_title_bar(c);
         {
             Display *d;
@@ -91,7 +91,7 @@ void jbwm_toggle_sticky(struct JBWMClient * restrict c)
     }
 }
 /*  Free client and destroy its windows and properties. */
-void jbwm_client_free(struct JBWMClient * restrict c)
+void jbwm_client_free(struct JBWMClient * c)
 {
     Display *d;
     const Window w = c->window, parent = c->parent;

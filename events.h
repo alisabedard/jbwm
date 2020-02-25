@@ -4,6 +4,8 @@
 // See README for license and other details.
 #ifndef JBWM_EVENTS_H
 #define JBWM_EVENTS_H
-struct JBWMScreen;
-void jbwm_events_loop(struct JBWMScreen * s) __attribute__((noreturn));
+struct JBWMClient;
+struct JBWMScreen; 
+void jbwm_events_loop(struct JBWMScreen * s, struct JBWMClient
+    **current_client) __attribute__((noreturn));
 #endif /* ! JBWM_EVENTS_H */

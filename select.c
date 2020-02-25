@@ -23,12 +23,6 @@ static void set_state_not_focused(struct JBWMClient * c)
     jbwm_ewmh_remove_state(d, c->window, XInternAtom(d,
             "_NET_WM_STATE_FOCUSED",false));
 }
-static void unselect_current(struct JBWMClient * c)
-{
-    struct JBWMClient * current = jbwm_get_current_client();
-    if (current && current != c)
-        set_state_not_focused(current);
-}
 static void set_border(struct JBWMClient * c)
 {
     struct JBWMPixels * restrict p = &c->screen->pixels;
@@ -43,7 +37,7 @@ static void set_focused(struct JBWMClient * c)
     XSetInputFocus(d, w, RevertToPointerRoot, CurrentTime);
     jbwm_ewmh_add_state(d, w, jbwm_atoms[JBWM_NET_WM_STATE_FOCUSED]);
 }
-static void set_active_window(struct JBWMClient * c)
+static void set_active_window_property(struct JBWMClient * c)
 {
     /* Store the window id as a static variable here in case
      * client c is freed before the X server handles the event.
@@ -55,15 +49,17 @@ static void set_active_window(struct JBWMClient * c)
     d=c->screen->display;
     jbwm_set_property(d, c->screen->xlib->root,
         jbwm_atoms[JBWM_NET_ACTIVE_WINDOW], XA_WINDOW, &w, 1);
-    jbwm_set_current_client(c);
 }
-void jbwm_select_client(struct JBWMClient * c)
+void jbwm_select_client(struct JBWMClient * c,
+    struct JBWMClient ** current_client)
 {
     if (!c)
         return;
-    unselect_current(c);
+    if (*current_client)
+        set_state_not_focused(*current_client);
     set_border(c);
     set_focused(c);
-    set_active_window(c);
+    set_active_window_property(c);
+    *current_client=c;
 }
 

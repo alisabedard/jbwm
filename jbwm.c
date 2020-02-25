@@ -60,7 +60,8 @@ static Window * get_windows(Display * dpy, const Window root,
     *win_count = n;
     return w;
 }
-static void setup_clients(Display * d, struct JBWMScreen * s)
+static void setup_clients(Display * d, struct JBWMScreen * s,
+    struct JBWMClient ** current_client)
 {
     uint16_t n;
     Window * w = get_windows(d, RootWindow(d, s->id), &n);
@@ -68,7 +69,7 @@ static void setup_clients(Display * d, struct JBWMScreen * s)
     if (w) { // Avoid segmentation fault on empty list.
         while(n--)
             if(check_redirect(d,w[n]))
-                jbwm_new_client(s,w[n]);
+                jbwm_new_client(s,current_client,w[n]);
         XFree(w);
     }
 }
@@ -112,7 +113,8 @@ static XftDraw * new_xft_draw(Screen * s)
 }
 #endif//JBWM_USE_XFT
 // Initialize SCREENS amount of screens.
-void jbwm_init_screens(Display *d, struct JBWMScreen *s, const short screens)
+void jbwm_init_screens(Display *d, struct JBWMScreen *s,
+    struct JBWMClient ** current_client, const short screens)
 {
     if(screens>=0){
         uint16_t n;
@@ -142,8 +144,8 @@ void jbwm_init_screens(Display *d, struct JBWMScreen *s, const short screens)
             jbwm_grab_root_keys(d, r);
         }
         /* scan all the windows on this screen */
-        setup_clients(d, s);
+        setup_clients(d, s, current_client);
         jbwm_ewmh_init_screen(d, s);
-        jbwm_init_screens(d, s, screens - 1);
+        jbwm_init_screens(d, s, current_client, screens - 1);
     }
 }
