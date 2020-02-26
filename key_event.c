@@ -92,24 +92,20 @@ static void handle_key_move(struct JBWMClient * restrict c,
         return;
     key_move(c, get_move_flags(k, mod));
 }
-static void set_maximized(struct JBWMClient * restrict c)
-{
-    jbwm_set_horz(c);
-    jbwm_set_vert(c);
-}
-static void set_not_maximized(struct JBWMClient * restrict c)
-{
-    jbwm_set_not_horz(c);
-    jbwm_set_not_vert(c);
-}
 static void toggle_maximize(struct JBWMClient * restrict c)
 {
     const struct JBWMClientOptions o = c->opt;
     /* Honor mwm hints.  Do not maximize shaped windows. */
     /* Ignore fullscreen windows.  Let the fullscreen code handle them. */
-    if (!o.no_max && !o.fullscreen && !o.shaped)
-        (o.max_horz && o.max_vert
-            ? set_not_maximized : set_maximized)(c);
+    if (!o.no_max && !o.fullscreen && !o.shaped) {
+        if (o.max_horz && o.max_vert) {
+            jbwm_set_not_horz(c);
+            jbwm_set_not_vert(c);
+        } else {
+            jbwm_set_horz(c);
+            jbwm_set_vert(c);
+        }
+    }
 }
 __attribute__((nonnull))
 static void handle_client_key_event(struct JBWMClient ** current_client,
