@@ -6,6 +6,6 @@
 #define JBWM_EVENTS_H
 struct JBWMClient;
 struct JBWMScreen; 
-void jbwm_events_loop(struct JBWMScreen * s, struct JBWMClient
-    **current_client) __attribute__((noreturn));
+void jbwm_events_loop(struct JBWMScreen * s, struct JBWMClient ** head_client,
+    struct JBWMClient ** current_client) __attribute__((noreturn));
 #endif /* ! JBWM_EVENTS_H */

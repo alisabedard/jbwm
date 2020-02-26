@@ -8,24 +8,20 @@
 #include <X11/Xlib.h>
 struct JBWMClient;
 /*  Free client and destroy its windows and properties. */
-void jbwm_client_free(struct JBWMClient * c);
+void jbwm_client_free(struct JBWMClient * c,
+    struct JBWMClient ** head_client);
 /*  Get the client with input focus. */
 //struct JBWMClient * jbwm_get_current_client(void);
 void jbwm_hide_client(const struct JBWMClient * restrict c);
-/* Set c as the new head client, linking its next element
-   to the previous head */
-void jbwm_prepend_client(struct JBWMClient * restrict c);
-/*  Relink the client linked list to exclude c */
-void jbwm_relink_client_list(struct JBWMClient * c);
+/*  Relink client linked list to exclude c */
+void jbwm_relink_client_list(struct JBWMClient * c,
+    struct JBWMClient ** head_client);
 /*  Move the client to the specified virtual desktop */
 void jbwm_set_client_vdesk(struct JBWMClient * restrict c,
     const uint8_t desktop);
-/*  Assign c as the current client */
-//void jbwm_set_current_client(struct JBWMClient * c);
 void jbwm_toggle_sticky(struct JBWMClient * restrict c,
     struct JBWMClient ** current_client);
 void jbwm_restore_client(const struct JBWMClient * restrict c);
-struct JBWMClient **jbwm_get_head_client(void);
 __attribute__((pure))
 /* Return the client that has specified window as either window or parent.
  *  This is the third most called function.  Show restraint in adding any

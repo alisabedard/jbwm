@@ -45,7 +45,8 @@ static void jbwm_handle_PropertyNotify(XEvent * ev, struct JBWMClient * c)
     }
 }
 static void jbwm_handle_MapRequest(XEvent * ev, struct JBWMClient * c,
-    struct JBWMScreen * s, struct JBWMClient ** current_client) {
+    struct JBWMScreen * s, struct JBWMClient ** head_client,
+    struct JBWMClient ** current_client) {
     if (!c) {
         XMapRequestEvent * restrict e = &ev->xmaprequest;
         /* This check fixes a race condition in old libreoffice and
@@ -56,8 +57,8 @@ static void jbwm_handle_MapRequest(XEvent * ev, struct JBWMClient * c,
             serial = e->serial;
             JBWM_LOG("jbwm_handle_MapRequest(), send_event:%d",
                 e->send_event);
-            jbwm_new_client(get_screen(s, e->parent, 0), current_client,
-                e->window);
+            jbwm_new_client(get_screen(s, e->parent, 0), head_client,
+                current_client, e->window);
         }
     }
 }
@@ -99,7 +100,7 @@ static void jbwm_handle_Expose(XEvent * ev, struct JBWMClient * c)
     if (c && !ev->xexpose.count)
         jbwm_update_title_bar(c);
 }
-void jbwm_events_loop(struct JBWMScreen * s,
+void jbwm_events_loop(struct JBWMScreen * s, struct JBWMClient ** head_client,
     struct JBWMClient ** current_client)
 {
     Display *d;
@@ -107,8 +108,7 @@ void jbwm_events_loop(struct JBWMScreen * s,
     for (;;) {
         XEvent ev;
         XNextEvent(d, &ev);
-        struct JBWMClient * c = jbwm_find_client(*jbwm_get_head_client(),
-            ev.xany.window);
+        struct JBWMClient * c = jbwm_find_client(*head_client, ev.xany.window);
         //s=c->screen; // refer to the client's local screen
         switch (ev.type) {
         case ButtonRelease:
@@ -126,7 +126,7 @@ void jbwm_events_loop(struct JBWMScreen * s,
             jbwm_handle_ConfigureRequest(&ev,c);
             break;
         case KeyPress:
-            jbwm_handle_key_event(s,&ev.xkey, current_client);
+            jbwm_handle_key_event(s,&ev.xkey, head_client, current_client);
             break;
         case ButtonPress:
             if(c)
@@ -140,14 +140,14 @@ void jbwm_events_loop(struct JBWMScreen * s,
             break;
         case CreateNotify:
         case DestroyNotify:
-            jbwm_ewmh_update_client_list(*jbwm_get_head_client());
+            jbwm_ewmh_update_client_list(*head_client);
             break;
         case UnmapNotify:
             if (c && (c->opt.remove || (c->ignore_unmap--<1)))
-                jbwm_client_free(c);
+                jbwm_client_free(c,head_client);
             break;
         case MapRequest:
-            jbwm_handle_MapRequest(&ev, c, s, current_client);
+            jbwm_handle_MapRequest(&ev, c, s, head_client, current_client);
             break;
         case PropertyNotify:
             jbwm_handle_PropertyNotify(&ev,c);

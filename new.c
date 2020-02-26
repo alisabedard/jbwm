@@ -54,7 +54,7 @@ static Window get_parent(struct JBWMClient * restrict c)
         NULL, CW_VM, &(XSetWindowAttributes){
             .override_redirect=true, .event_mask = WA_EM});
 }
-static void reparent_window(Display * d, Window parent, Window window)
+static inline void reparent_window(Display * d, Window parent, Window window)
 {
     XAddToSaveSet(d, window);
     XReparentWindow(d, window, parent, 0, 0);
@@ -70,12 +70,12 @@ static void reparent(struct JBWMClient * restrict c)
 }
 // Allocate the client structure with some defaults set
 static struct JBWMClient * get_JBWMClient(const Window w,
-    struct JBWMScreen * s)
+    struct JBWMScreen * s, struct JBWMClient ** head_client)
 {
     struct JBWMClient * restrict c = calloc(1, sizeof(struct JBWMClient));
     c->screen=s;
     c->window=w;
-    c->head=jbwm_get_head_client();
+    c->head=head_client;
     c->opt.border = 1;
     return c;
 }
@@ -90,11 +90,14 @@ static void do_grabs(Display * d, const Window w)
     jbwm_grab_button(d, w, jbwm_get_grab_mask());
 }
 void jbwm_new_client(struct JBWMScreen * s,
+    struct JBWMClient ** head_client,
     struct JBWMClient ** current_client, const Window w)
 {
-    struct JBWMClient * restrict c = get_JBWMClient(w, s);
+    struct JBWMClient * restrict c = get_JBWMClient(w, s, head_client);
     JBWM_LOG("jbwm_new_client(..., w: %d)", (int)w);
-    jbwm_prepend_client(c);
+    /* Prepend client.  */
+    c->next=*head_client;
+    *head_client=c;
     do_grabs(s->display, w);
     jbwm_set_client_geometry(c);
     jbwm_handle_mwm_hints(c);

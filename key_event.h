@@ -5,5 +5,7 @@
 struct JBWMClient;
 struct JBWMScreen;
 void jbwm_handle_key_event(struct JBWMScreen *s, XKeyEvent * e,
+    struct JBWMClient ** head_client,
     struct JBWMClient ** current_client);
+
 #endif//!JBWM_KEY_EVENT_H

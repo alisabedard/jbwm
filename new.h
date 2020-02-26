@@ -7,6 +7,6 @@
 #include <X11/Xlib.h>
 struct JBWMClient;
 struct JBWMScreen;
-void jbwm_new_client(struct JBWMScreen * s,
+void jbwm_new_client(struct JBWMScreen * s, struct JBWMClient **head_client,
     struct JBWMClient ** current_client, const Window w);
 #endif//!JBWM_NEW_H

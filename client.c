@@ -14,33 +14,15 @@
 #include "wm_state.h"
 #include <X11/Xatom.h>
 #include <X11/Xutil.h>
-static struct JBWMClient /** current,*/ * head;
-/*
-struct JBWMClient * jbwm_get_current_client(void)
-{
-    return current;
-}*/
-/*
-void jbwm_set_current_client(struct JBWMClient * c)
-{
-    current = c;
-}*/
-struct JBWMClient **jbwm_get_head_client(void){
-    return &head;
-}
-void jbwm_prepend_client(struct JBWMClient * restrict c)
-{
-    c->next = head;
-    head = c;
-}
 /*  Relink client linked list to exclude c */
-void jbwm_relink_client_list(struct JBWMClient * c)
+void jbwm_relink_client_list(struct JBWMClient * c,
+    struct JBWMClient ** head_client)
 {
     struct JBWMClient *i, *prev;
-    for (i=head, prev=NULL; i; prev=i, i=i->next) {
+    for (i=*head_client, prev=NULL; i; prev=i, i=i->next) {
         if (i==c) {
-           if (i==head) { // prev == NULL in this case
-               head=i->next;
+           if (i==*head_client) { // prev == NULL in this case
+               *head_client=i->next;
            } else {
                prev->next=i->next;
            } 
@@ -91,7 +73,7 @@ void jbwm_toggle_sticky(struct JBWMClient * restrict c,
     }
 }
 /*  Free client and destroy its windows and properties. */
-void jbwm_client_free(struct JBWMClient * c)
+void jbwm_client_free(struct JBWMClient * c, struct JBWMClient ** head_client)
 {
     Display *d;
     const Window w = c->window, parent = c->parent;
@@ -104,7 +86,7 @@ void jbwm_client_free(struct JBWMClient * c)
     XRemoveFromSaveSet(d, w);
     if(parent)
         XDestroyWindow(d, parent);
-    jbwm_relink_client_list(c);
+    jbwm_relink_client_list(c, head_client);
     free(c);
 }
 void jbwm_hide_client(const struct JBWMClient * restrict c)
