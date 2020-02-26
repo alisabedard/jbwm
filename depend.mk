@@ -9,11 +9,11 @@ ewmh.o: ewmh.c ewmh.h atom.h config.h JBWMClient.h log.h macros.h PropertyData.h
 ewmh_client.o: ewmh_client.c ewmh_client.h client.h config.h drag.h ewmh.h ewmh_wm_state.h atom.h select.h util.h vdesk.h wm_state.h
 ewmh_state.o: ewmh_state.c ewmh_state.h client.h drag.h ewmh.h jbwm.h atom.h log.h max.h select.h util.h wm_state.h
 ewmh_wm_state.o: ewmh_wm_state.c ewmh_wm_state.h atom.h JBWMClient.h client.h ewmh.h ewmh_state.h log.h max.h util.h
-exec.o: exec.c exec.h
+exec.o: exec.c exec.h config.h
 font.o: font.c font.h config.h util.h
 geometry.o: geometry.c geometry.h JBWMClient.h JBWMScreen.h JBWMSize.h log.h macros.h
 jbwm.o: jbwm.c jbwm.h config.h ewmh.h font.h atom.h JBWMScreen.h keys.h log.h new.h util.h
-key_event.o: key_event.c key_event.h JBWMClient.h JBWMKeys.h JBWMScreen.h client.h drag.h exec.h key_masks.h log.h max.h move_resize.h select.h snap.h title_bar.h vdesk.h wm_state.h
+key_event.o: key_event.c key_event.h JBWMClient.h JBWMKeys.h JBWMScreen.h client.h config.h drag.h exec.h key_masks.h log.h max.h move_resize.h select.h snap.h title_bar.h vdesk.h wm_state.h
 key_masks.o: key_masks.c key_masks.h config.h
 keys.o: keys.c keys.h JBWMKeys.h key_masks.h
 main.o: main.c atom.h command_line.h display.h events.h font.h JBWMClient.h jbwm.h vdesk.h

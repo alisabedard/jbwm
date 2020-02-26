@@ -3,11 +3,13 @@
 #include "key_event.h"
 /* System: */
 #include <stdbool.h>
+#include <stdlib.h>
 /* Local: */
 #include "JBWMClient.h"
 #include "JBWMKeys.h"
 #include "JBWMScreen.h"
 #include "client.h"
+#include "config.h"
 #include "drag.h"
 #include "exec.h"
 #include "key_masks.h"

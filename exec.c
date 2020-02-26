@@ -1,6 +1,8 @@
 // Copyright 2020, Jeffrey E. Bedard <jefbed@gmail.com>
 #include "exec.h"
+#include "config.h"
 #include <signal.h> // for signal()
+#include <stdlib.h>
 #include <unistd.h> // for fork(), execl()
 void jbwm_exec(const char * command)
 {
