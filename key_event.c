@@ -1,12 +1,15 @@
-// Copyright 2020, Jeffrey E. Bedard
+/* Copyright 2020, Jeffrey E. Bedard */
+/* Module: */
 #include "key_event.h"
+/* System: */
 #include <stdbool.h>
+/* Local: */
+#include "JBWMClient.h"
 #include "JBWMKeys.h"
 #include "JBWMScreen.h"
 #include "client.h"
 #include "drag.h"
 #include "exec.h"
-#include "keys.h"
 #include "key_masks.h"
 #include "log.h"
 #include "max.h"
@@ -16,6 +19,7 @@
 #include "title_bar.h"
 #include "vdesk.h"
 #include "wm_state.h"
+/* Program: */
 __attribute__((nonnull))
 static void point(struct JBWMClient * restrict c,
     const int16_t x, const int16_t y)
@@ -71,7 +75,7 @@ static uint8_t get_move_flags(const KeySym k, const bool mod)
     switch (k) {
     case JBWM_KEY_LEFT:
         flags &= ~KEY_MOVE_POSITIVE;
-        // FALLTHROUGH
+        /* FALLTHROUGH */
     case JBWM_KEY_RIGHT:
         flags |= KEY_MOVE_HORIZONTAL;
         break;
@@ -101,8 +105,8 @@ static void set_not_maximized(struct JBWMClient * restrict c)
 static void toggle_maximize(struct JBWMClient * restrict c)
 {
     const struct JBWMClientOptions o = c->opt;
-    // Honor mwm hints.  Do not maximize shaped windows.
-    // Ignore fullscreen windows.  Let the fullscreen code handle them.
+    /* Honor mwm hints.  Do not maximize shaped windows. */
+    /* Ignore fullscreen windows.  Let the fullscreen code handle them. */
     if (!o.no_max && !o.fullscreen && !o.shaped)
         (o.max_horz && o.max_vert
             ? set_not_maximized : set_maximized)(c);
@@ -115,10 +119,10 @@ static void handle_client_key_event(struct JBWMClient ** current_client,
     JBWM_LOG("handle_client_key_event: %d", (int)key);
     c=*current_client;
     if (c->opt.fullscreen) {
-        // only allow exiting from fullscreen
+        /* only allow exiting from fullscreen */
         if (key == JBWM_KEY_FS)
             jbwm_set_not_fullscreen(c);
-        return; // prevent other operations while fullscreen
+        return; /* prevent other operations while fullscreen */
     }
     switch (key) {
     case JBWM_KEY_LEFT:
@@ -172,7 +176,7 @@ static void next(struct JBWMClient * c,
         c=*(c->head);
     else
         c=c->next;
-    if (c!=*current_client) { // prevent infinite recursion with dessktop
+    if (c!=*current_client) { /* prevent infinite recursion with dessktop */
         if(c->vdesk != v)
             next(c, current_client, v);
         else
@@ -212,10 +216,10 @@ void jbwm_handle_key_event(struct JBWMScreen *s, XKeyEvent * e,
         break;
     case XK_0:
         opt.zero = true;
-        // FALLTHROUGH
+        /* FALLTHROUGH */
     case XK_1: case XK_2: case XK_3: case XK_4: case XK_5:
     case XK_6: case XK_7: case XK_8: case XK_9:
-        // First desktop 0, per wm-spec
+        /* First desktop 0, per wm-spec */
         cond_set_vdesk(*current_client, *head_client, s, opt.zero
             ? 10 : key - XK_1, opt.mod);
         break;
