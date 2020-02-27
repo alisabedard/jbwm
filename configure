@@ -9,21 +9,25 @@ echo "LDFLAGS=${LDFLAGS}" >> $CF
 echo "DESTDIR=${DESTDIR}" >> $CF
 echo "PREFIX=${PREFIX}" >> $CF
 DEBUG=false USE_GDB=false SMALL=false XFT=false
-while getopts 'dgSsx' opt; do
+while getopts 'dghSsx' opt; do
     case $opt in
         d) DEBUG=true ;;
         g) USE_GDB=true ;;
         S) USE_GDB=true SMALL=true ;;
         s) SMALL=true ;;
         x) XFT=true ;;
-        ?) for line in \
+        h|?) for line in \
             '-d enable debugging with verbose log output' \
             '-g enable debug symbols' \
+            '-h show configure usage' \
             '-S optimize for size with symbols' \
             '-s optimize for size' \
             '-x use Xft fonts' \
             '-? show usage' \
-        ; do echo $line; done ;;
+            ; do
+                echo $line
+            done
+            exit 0 ;;
     esac
 done
 # Append path if exists: 1:path, 2:destinatio, 3:prefix
