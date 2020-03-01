@@ -34,14 +34,12 @@ void jbwm_set_client_vdesk(struct JBWMClient * restrict c,
     const uint8_t desktop)
 {
     Display *d;
-    Atom a;
     if(c){
         d=c->screen->display;
-        a=jbwm_atoms[JBWM_NET_WM_DESKTOP];
         c->vdesk=desktop;
         /*  Save in an atomic property, useful for restart and deskbars. */
-        jbwm_set_property(d, c->window, a, XA_CARDINAL,
-            &(int32_t){desktop}, 1);
+        XChangeProperty(d, c->window, jbwm_atoms[JBWM_NET_WM_DESKTOP],
+            XA_CARDINAL, 8, PropModeReplace, (unsigned char *)&desktop, 1);
         if(c->screen->vdesk!=c->vdesk)
             jbwm_hide_client(c);
     }

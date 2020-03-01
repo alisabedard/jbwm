@@ -9,16 +9,11 @@
 #include "JBWMClient.h"
 #include "log.h"
 #include "macros.h"
-#include "PropertyData.h"
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
 #include "util.h"
 #include <X11/Xatom.h>
-static inline void set_property(struct PropertyData * restrict p) {
-    jbwm_set_property(p->display,p->target,p->property,
-        p->type,p->data,p->size);
-}
 // returns number of elements in window list
 static int get_client_list_r(Window ** list,Display * d,
     struct JBWMClient * i,int const count) {
@@ -57,7 +52,8 @@ static Window * get_mixed_client_list(struct JBWMClient *head)
     d=head->screen->display;
     n=get_client_list_r(&window_list,d,head,0);
     a=jbwm_atoms[JBWM_NET_CLIENT_LIST];
-    jbwm_set_property(d,head->screen->xlib->root,a, XA_WINDOW, window_list,n);
+    XChangeProperty(d, head->screen->xlib->root, a, XA_WINDOW, 32,
+        PropModeReplace, (unsigned char *)window_list, n);
     debug_window_list(n,window_list);
     return window_list;
 }
@@ -95,7 +91,9 @@ static Window * get_ordered_client_list(Display * d, Window const root)
     unsigned int const n=get_window_list(d,MAX_CLIENTS,window_list);
     JBWM_LOG("get_ordered_client_list() n: %d",(int)n);
     a=jbwm_atoms[JBWM_NET_CLIENT_LIST_STACKING];
-    jbwm_set_property(d, root,a,XA_WINDOW,window_list,n);
+//    XChangeProperty(d, root, a, XA_WINDOW, 32, PropModeReplace,
+//        (unsigned char *), 
+    XChangeProperty(d, root,a,XA_WINDOW, 32, PropModeReplace, (unsigned char *)window_list,n);
     return window_list;
 }
 void jbwm_ewmh_update_client_list(struct JBWMClient *head)
@@ -122,70 +120,39 @@ void jbwm_ewmh_set_allowed_actions(Display * d,
         jbwm_atoms[JBWM_NET_WM_ACTION_MAXIMIZE_HORZ],
         jbwm_atoms[JBWM_NET_WM_ACTION_MAXIMIZE_VERT],
     };
-    jbwm_set_property(d,w,a[0],XA_ATOM,&a,sizeof(a) / sizeof(Atom));
-}
-static inline void set_desktop_geometry(struct PropertyData * restrict p,
-    struct JBWMScreen *s)
-{
-    p->property=jbwm_atoms[JBWM_NET_DESKTOP_GEOMETRY];
-    p->data=(int32_t[]){s->xlib->width,s->xlib->height};
-    set_property(p);
-}
-static inline void set_desktop_viewport(struct PropertyData * restrict p)
-{
-    int32_t viewport_data[]={0,0};
-    p->property=jbwm_atoms[JBWM_NET_DESKTOP_VIEWPORT];
-    p->data=viewport_data;
-    set_property(p);
-}
-static inline void set_number_of_desktops(struct PropertyData * restrict p)
-{
-    p->property=jbwm_atoms[JBWM_NET_NUMBER_OF_DESKTOPS];
-    p->data=&(int32_t){JBWM_NUMBER_OF_DESKTOPS};
-    set_property(p);
-}
-static inline void set_current_desktop(struct PropertyData * restrict p,
-    void * restrict data)
-{
-    p->property=jbwm_atoms[JBWM_NET_CURRENT_DESKTOP];
-    p->data=data;
-    set_property(p);
-}
-static inline void set_virtual_roots(struct PropertyData * restrict p)
-{
-    p->property=jbwm_atoms[JBWM_NET_VIRTUAL_ROOTS];
-    p->type=XA_WINDOW;
-    p->data=&(p->target);
-    set_property(p);
+    XChangeProperty(d,w,a[0],XA_ATOM, 32, PropModeReplace, (unsigned char *)&a,sizeof(a) / sizeof(Atom));
 }
 static void init_desktops(Display * d,struct JBWMScreen * s)
 {
-    struct PropertyData p={d,NULL,s->xlib->root,
-        0,2,XA_CARDINAL};
-    set_desktop_geometry(&p,s);
-    set_desktop_viewport(&p);
-    p.size=1; // single dimension data follows
-    set_number_of_desktops(&p);
-    set_current_desktop(&p,&s->vdesk);
-    set_virtual_roots(&p);
-}
-static void set_supporting(Display * d,Window const w,
-    Window * s)
-{
-    Atom a;
-    a=jbwm_atoms[JBWM_NET_SUPPORTING_WM_CHECK];
-    jbwm_set_property(d,w,a,XA_WINDOW,s,1);
+    int32_t data[2];
+    Window root=s->xlib->root;
+    data[0]=s->xlib->width;
+    data[1]=s->xlib->height;
+    XChangeProperty(d, root, jbwm_atoms[JBWM_NET_DESKTOP_GEOMETRY],
+        XA_CARDINAL, 32, PropModeReplace, (unsigned char*)data, 2);
+    data[0]=data[1]=0;
+    XChangeProperty(d, root, jbwm_atoms[JBWM_NET_DESKTOP_VIEWPORT],
+        XA_CARDINAL, 32, PropModeReplace, (unsigned char*)data, 2);
+    data[0]=JBWM_NUMBER_OF_DESKTOPS;
+    XChangeProperty(d, root, jbwm_atoms[JBWM_NET_NUMBER_OF_DESKTOPS],
+        XA_CARDINAL, 32, PropModeReplace, (unsigned char*)data, 1);
+    XChangeProperty(d, root, jbwm_atoms[JBWM_NET_CURRENT_DESKTOP],
+        XA_CARDINAL, 32, PropModeReplace, (unsigned char*)&s->vdesk, 1);
+    XChangeProperty(d, root, jbwm_atoms[JBWM_NET_VIRTUAL_ROOTS],
+        XA_WINDOW, 32, PropModeReplace, (unsigned char*)&root, 1);
 }
 static Window init_supporting(Display * d,Window const r)
 {
     Window w;
     w=XCreateSimpleWindow(d,r,0,0,1,1,0,0,0);
-    set_supporting(d,r,&w);
-    set_supporting(d,w,&w);
-    jbwm_set_property(d,w,jbwm_atoms[JBWM_NET_WM_PID],XA_CARDINAL,
-        &(pid_t){getpid()},1);
-    jbwm_set_property(d,w,jbwm_atoms[JBWM_NET_WM_NAME],XA_STRING,
-        JBWM_NAME,sizeof(JBWM_NAME));
+    XChangeProperty(d, r, jbwm_atoms[JBWM_NET_SUPPORTING_WM_CHECK],
+        XA_WINDOW, 32, PropModeReplace, (unsigned char *)&w, 1);
+    XChangeProperty(d, w, jbwm_atoms[JBWM_NET_SUPPORTING_WM_CHECK],
+        XA_WINDOW, 32, PropModeReplace, (unsigned char *)&w, 1);
+    XChangeProperty(d, w, jbwm_atoms[JBWM_NET_WM_PID], XA_CARDINAL,
+        32, PropModeReplace, (unsigned char *)&(pid_t){getpid()},1);
+    XChangeProperty(d, w, jbwm_atoms[JBWM_NET_WM_NAME], XA_STRING,
+        8, PropModeReplace, JBWM_NAME, sizeof(JBWM_NAME));
     return w;
 }
 void jbwm_ewmh_init_screen(Display * d,struct JBWMScreen * s)
@@ -195,13 +162,15 @@ void jbwm_ewmh_init_screen(Display * d,struct JBWMScreen * s)
      * the pointers passed as property data from being invalid
      * once this function looses scope.  */
     r=&s->xlib->root;
-    /* Set this to the root window until we have some clients. */
-    jbwm_set_property(d,*r,jbwm_atoms[JBWM_NET_CLIENT_LIST],XA_WINDOW,
-        r,1); // Point to original screen data.
-    jbwm_set_property(d,*r,jbwm_atoms[JBWM_NET_SUPPORTED],
-        XA_ATOM,(unsigned char *)&jbwm_atoms,JBWM_ATOM_COUNT);
-    jbwm_set_property(d,*r,jbwm_atoms[JBWM_NET_WM_NAME],XA_STRING,
-        JBWM_NAME,sizeof(JBWM_NAME));
+    /* Set this to the root window until we have some clients.
+        Point to original screen data. */
+    XChangeProperty(d, *r, jbwm_atoms[JBWM_NET_CLIENT_LIST], XA_WINDOW,
+        32, PropModeReplace, (unsigned char *)r, 1);
+    XChangeProperty(d,*r,jbwm_atoms[JBWM_NET_SUPPORTED],
+        XA_ATOM, 32, PropModeReplace, (unsigned char *)&jbwm_atoms,
+        JBWM_ATOM_COUNT);
+    XChangeProperty(d,*r,jbwm_atoms[JBWM_NET_WM_NAME],XA_STRING,
+        8, PropModeReplace, JBWM_NAME, sizeof(JBWM_NAME));
     init_desktops(d,s);
     s->supporting=init_supporting(d,*r);
 }
@@ -216,5 +185,6 @@ void jbwm_set_frame_extents(struct JBWMClient * restrict c)
     if (!c->opt.no_title_bar)
         f[2] += c->screen->font_height;
     a=jbwm_atoms[JBWM_NET_FRAME_EXTENTS];
-    jbwm_set_property(c->screen->display,c->parent,a,XA_CARDINAL,f,4);
+    XChangeProperty(c->screen->display, c->parent, a, XA_CARDINAL, 32,
+        PropModeReplace, (unsigned char *)f, 4);
 }

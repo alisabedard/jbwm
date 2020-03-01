@@ -25,15 +25,14 @@ static void check_visibility(struct JBWMClient * restrict c,
     }
 }
 uint8_t jbwm_set_vdesk(struct JBWMScreen *s,
-    struct JBWMClient *head, uint32_t v)
+    struct JBWMClient *head, uint8_t v)
 {
     Display *d;
     check_visibility(head, v);
     s->vdesk = v;
     d=s->display;
     // The data (v) must be a 32 bit type.
-    jbwm_set_property(d, s->xlib->root,
-        jbwm_atoms[JBWM_NET_CURRENT_DESKTOP],
-        XA_CARDINAL, &v, 1);
+    XChangeProperty(d, s->xlib->root, jbwm_atoms[JBWM_NET_CURRENT_DESKTOP],
+        XA_CARDINAL, 8, PropModeReplace, (unsigned char *)&v, 1);
     return v;
 }

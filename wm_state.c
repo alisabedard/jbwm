@@ -40,8 +40,8 @@ void jbwm_set_wm_state(const struct JBWMClient * restrict c,
 {
     const Window w = c->window;
     Display * d = c->screen->display;
-    jbwm_set_property(d, w, jbwm_get_wm_state(d), XA_CARDINAL,
-        &(uint32_t){state}, 1);
+    XChangeProperty(d, w, jbwm_get_wm_state(d), XA_CARDINAL, 8,
+        PropModeReplace, (unsigned char *) &state, 1);
     (state == IconicState ? jbwm_ewmh_add_state : jbwm_ewmh_remove_state)
     (d, w, jbwm_atoms[JBWM_NET_WM_STATE_HIDDEN]);
 }

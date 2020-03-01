@@ -47,8 +47,9 @@ static void set_active_window_property(struct JBWMClient * c)
     Display *d;
     w = c->window;
     d=c->screen->display;
-    jbwm_set_property(d, c->screen->xlib->root,
-        jbwm_atoms[JBWM_NET_ACTIVE_WINDOW], XA_WINDOW, &w, 1);
+    XChangeProperty(d, c->screen->xlib->root,
+        jbwm_atoms[JBWM_NET_ACTIVE_WINDOW], XA_WINDOW, 32,
+        PropModeReplace, (unsigned char *)&w, 1);
 }
 void jbwm_select_client(struct JBWMClient * c,
     struct JBWMClient ** current_client)

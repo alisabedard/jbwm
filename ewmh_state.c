@@ -13,18 +13,19 @@
 #include "wm_state.h"
 #include <X11/Xatom.h>
 // Remove specified atom from WM_STATE
-void jbwm_ewmh_remove_state(Display * d,
-    const Window w, const Atom state)
+void jbwm_ewmh_remove_state(Display * display,
+    const Window window, const Atom state)
 {
     uint16_t n;
-    const Atom ws = jbwm_atoms[JBWM_NET_WM_STATE];
-    Atom *a = jbwm_get_property(d, w, ws, &n);
+    const Atom wm_state = jbwm_atoms[JBWM_NET_WM_STATE];
+    Atom *a = jbwm_get_property(display, window, wm_state, &n);
     if(a){ // found property
         uint16_t i;
         for(i=0;i<n;++i)
             if(a[i]==state)
                 a[i]=0;
-        jbwm_set_property(d, w, ws, XA_ATOM, a, n);
+        XChangeProperty(display, window, wm_state, XA_ATOM, 32,
+            PropModeReplace, (unsigned char *)a, n);
         XFree(a);
     }
 }
