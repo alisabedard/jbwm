@@ -44,13 +44,15 @@ void jbwm_set_client_vdesk(struct JBWMClient * restrict c, uint8_t desktop)
     }
 }
 /* Return the client that has specified window as either window or parent.
- *  This is the third most called function.  Show restraint in adding any
+ *  This is the a frequently called function.  Show restraint in adding any
  *  future tests.  */
 struct JBWMClient * jbwm_find_client(
     struct JBWMClient * restrict head, const Window w)
 {
-    return !head || head->parent == w || head->window == w
-        || head->tb.win == w ? head : jbwm_find_client(head->next, w);
+    for(;head && head->parent != w && head->window != w
+        && head->tb.win != w; head=head->next)
+        ;
+    return head;
 }
 
 void jbwm_toggle_sticky(struct JBWMClient * restrict c,
