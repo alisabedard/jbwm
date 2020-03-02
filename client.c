@@ -30,8 +30,7 @@ void jbwm_relink_client_list(struct JBWMClient * c,
         }
     }
 }
-void jbwm_set_client_vdesk(struct JBWMClient * restrict c,
-    const uint8_t desktop)
+void jbwm_set_client_vdesk(struct JBWMClient * restrict c, uint8_t desktop)
 {
     Display *d;
     if(c){

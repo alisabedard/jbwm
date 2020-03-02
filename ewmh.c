@@ -91,9 +91,8 @@ static Window * get_ordered_client_list(Display * d, Window const root)
     unsigned int const n=get_window_list(d,MAX_CLIENTS,window_list);
     JBWM_LOG("get_ordered_client_list() n: %d",(int)n);
     a=jbwm_atoms[JBWM_NET_CLIENT_LIST_STACKING];
-//    XChangeProperty(d, root, a, XA_WINDOW, 32, PropModeReplace,
-//        (unsigned char *), 
-    XChangeProperty(d, root,a,XA_WINDOW, 32, PropModeReplace, (unsigned char *)window_list,n);
+    XChangeProperty(d, root,a,XA_WINDOW, 32, PropModeReplace,
+        (unsigned char *)window_list,n);
     return window_list;
 }
 void jbwm_ewmh_update_client_list(struct JBWMClient *head)
@@ -120,7 +119,8 @@ void jbwm_ewmh_set_allowed_actions(Display * d,
         jbwm_atoms[JBWM_NET_WM_ACTION_MAXIMIZE_HORZ],
         jbwm_atoms[JBWM_NET_WM_ACTION_MAXIMIZE_VERT],
     };
-    XChangeProperty(d,w,a[0],XA_ATOM, 32, PropModeReplace, (unsigned char *)&a,sizeof(a) / sizeof(Atom));
+    XChangeProperty(d,w,a[0],XA_ATOM, 32, PropModeReplace,
+        (unsigned char *)&a,sizeof(a) / sizeof(Atom));
 }
 static void init_desktops(Display * d,struct JBWMScreen * s)
 {
@@ -152,10 +152,10 @@ static Window init_supporting(Display * d,Window const r)
     XChangeProperty(d, w, jbwm_atoms[JBWM_NET_WM_PID], XA_CARDINAL,
         32, PropModeReplace, (unsigned char *)&(pid_t){getpid()},1);
     XChangeProperty(d, w, jbwm_atoms[JBWM_NET_WM_NAME], XA_STRING,
-        8, PropModeReplace, JBWM_NAME, sizeof(JBWM_NAME));
+        8, PropModeReplace, (unsigned char *)JBWM_NAME, sizeof(JBWM_NAME));
     return w;
 }
-void jbwm_ewmh_init_screen(Display * d,struct JBWMScreen * s)
+void jbwm_ewmh_init_screen(Display * d, struct JBWMScreen * s)
 {
     Window *r;
     /* Use a pointer to the original screen data to prevent
@@ -170,7 +170,7 @@ void jbwm_ewmh_init_screen(Display * d,struct JBWMScreen * s)
         XA_ATOM, 32, PropModeReplace, (unsigned char *)&jbwm_atoms,
         JBWM_ATOM_COUNT);
     XChangeProperty(d,*r,jbwm_atoms[JBWM_NET_WM_NAME],XA_STRING,
-        8, PropModeReplace, JBWM_NAME, sizeof(JBWM_NAME));
+        8, PropModeReplace, (unsigned char *)JBWM_NAME, sizeof(JBWM_NAME));
     init_desktops(d,s);
     s->supporting=init_supporting(d,*r);
 }
