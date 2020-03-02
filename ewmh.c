@@ -12,7 +12,6 @@
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
-#include "util.h"
 #include <X11/Xatom.h>
 // returns number of elements in window list
 static int get_client_list_r(Window ** list,Display * d,
