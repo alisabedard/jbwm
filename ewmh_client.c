@@ -17,7 +17,7 @@ static void handle_moveresize(XClientMessageEvent * e)
        l[0]: bits 0-7 idicate gravity,
        l[0]: bits 8-11 use x, y, width, height, respectively
        l[0]: bits 12-15 indicate the source,
-     */
+       */
     enum {
         SRC_SHIFT = 12, SRC_MASK = 3, VM_SHIFT = 8, VM_MASK = 0xf,
         USER_ACTION = 2
@@ -36,10 +36,10 @@ static void handle_moveresize(XClientMessageEvent * e)
 }
 // returns true if handled, false if not
 static bool client_specific_message(XClientMessageEvent * e,
-    struct JBWMClient * restrict c, struct JBWMClient ** current_client,
-    const Atom t)
+    struct JBWMClient * restrict c, const Atom t)
 {
-    Display * d = e->display;
+    Display * d;
+    d = e->display;
     jbwm_print_atom(d, t, __FILE__, __LINE__);
     if (t == jbwm_atoms[JBWM_NET_WM_DESKTOP])
         jbwm_set_client_vdesk(c, e->data.l[0]);
@@ -50,7 +50,7 @@ static bool client_specific_message(XClientMessageEvent * e,
     } else if (t == jbwm_atoms[JBWM_NET_WM_STATE])
         jbwm_ewmh_handle_wm_state_changes(e, c);
     else if (t == jbwm_atoms[JBWM_NET_ACTIVE_WINDOW])
-        jbwm_select_client(c, current_client);
+        jbwm_select_client(c);
     else if (t == jbwm_atoms[JBWM_NET_CLOSE_WINDOW])
         jbwm_send_wm_delete(c);
     else
@@ -71,11 +71,11 @@ static void debug_client_message(XClientMessageEvent * e)
 #define debug_client_message(e)
 #endif//JBWM_DEBUG_EWMH_STATE&&DEBUG
 void jbwm_ewmh_handle_client_message(XClientMessageEvent * e,
-    struct JBWMClient * c, struct JBWMClient ** current_client)
+    struct JBWMClient * c)
 {
     const Atom t = e->message_type;
     debug_client_message(e);
-    if(client_specific_message(e, c, current_client, t))
+    if(client_specific_message(e, c, t))
         return;
     if (t == jbwm_atoms[JBWM_NET_CURRENT_DESKTOP]) {
         jbwm_set_vdesk(c->screen, *(c->head), e->data.l[0]);

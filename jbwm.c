@@ -61,8 +61,7 @@ static Window * get_windows(Display * dpy, const Window root,
     return w;
 }
 static void setup_clients(Display * d, struct JBWMScreen * s,
-    struct JBWMClient ** head_client,
-    struct JBWMClient ** current_client)
+    struct JBWMClient ** head_client, struct JBWMClient ** current_client)
 {
     uint16_t n;
     Window * w = get_windows(d, RootWindow(d, s->id), &n);
@@ -70,7 +69,7 @@ static void setup_clients(Display * d, struct JBWMScreen * s,
     if (w) { // Avoid segmentation fault on empty list.
         while(n--)
             if(check_redirect(d,w[n]))
-                jbwm_new_client(s,head_client, current_client,w[n]);
+                jbwm_new_client(s, head_client, current_client, w[n]);
         XFree(w);
     }
 }

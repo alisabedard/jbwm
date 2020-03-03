@@ -89,11 +89,10 @@ static void jbwm_handle_ConfigureRequest(XEvent * ev, struct JBWMClient * c)
     if (c)
         jbwm_move_resize(c);
 }
-static void jbwm_handle_EnterNotify(XEvent * ev, struct JBWMClient * c,
-    struct JBWMClient ** current_client)
+static void jbwm_handle_EnterNotify(XEvent * ev, struct JBWMClient * c)
 {
     if (c && ev->xcrossing.window == c->parent)
-        jbwm_select_client(c, current_client);
+        jbwm_select_client(c);
 }
 static void jbwm_handle_Expose(XEvent * ev, struct JBWMClient * c)
 {
@@ -130,10 +129,10 @@ void jbwm_events_loop(struct JBWMScreen * s, struct JBWMClient ** head_client,
             break;
         case ButtonPress:
             if(c)
-                jbwm_handle_button_event(&ev.xbutton, c, current_client);
+                jbwm_handle_button_event(&ev.xbutton, c);
             break;
         case EnterNotify:
-            jbwm_handle_EnterNotify(&ev, c, current_client);
+            jbwm_handle_EnterNotify(&ev, c);
             break;
         case Expose:
             jbwm_handle_Expose(&ev,c);
@@ -156,7 +155,7 @@ void jbwm_events_loop(struct JBWMScreen * s, struct JBWMClient ** head_client,
             jbwm_handle_ColormapNotify(&ev,c);
             break;
         case ClientMessage:
-            jbwm_ewmh_handle_client_message(&ev.xclient, c, current_client);
+            jbwm_ewmh_handle_client_message(&ev.xclient, c);
             break;
 #ifdef DEBUG
         default:

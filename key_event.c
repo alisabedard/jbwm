@@ -152,7 +152,7 @@ static void handle_client_key_event(struct JBWMClient ** current_client,
         (c->opt.max_vert ? jbwm_set_not_vert : jbwm_set_vert)(c);
         break;
     case JBWM_KEY_STICK:
-        jbwm_toggle_sticky(c, current_client);
+        jbwm_toggle_sticky(c);
         break;
     case JBWM_KEY_MOVE:
         jbwm_drag(c, false);
@@ -162,11 +162,10 @@ static void handle_client_key_event(struct JBWMClient ** current_client,
         break;
     }
 }
-static void warp_to(struct JBWMClient * restrict c,
-    struct JBWMClient ** current_client){
+static void warp_to(struct JBWMClient * restrict c) {
     point(c, 0, 0);
     point(c, c->size.width-1, c->size.height-1);
-    jbwm_select_client(c, current_client);
+    jbwm_select_client(c);
 }
 static void next(struct JBWMClient * c,
     struct JBWMClient ** current_client, uint8_t const v){
@@ -178,7 +177,7 @@ static void next(struct JBWMClient * c,
         if(c->vdesk != v)
             next(c, current_client, v);
         else
-            warp_to(c, current_client);
+            warp_to(c);
     }
 }
 static void cond_set_vdesk(struct JBWMClient * c,

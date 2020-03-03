@@ -14,21 +14,17 @@
 #include "wm_state.h"
 #include <X11/Xatom.h>
 #include <X11/Xutil.h>
-/*  Relink client linked list to exclude c */
-void jbwm_relink_client_list(struct JBWMClient * c,
-    struct JBWMClient ** head_client)
+/* Relink c's linked list to exclude c.
+ * Note:  As *c and *i may alias each other, use of 'restrict'
+ * in relink would be invalid. */
+static void relink(const struct JBWMClient * c, struct JBWMClient * i)
 {
-    struct JBWMClient *i, *prev;
-    for (i=*head_client, prev=NULL; i; prev=i, i=i->next) {
-        if (i==c) {
-           if (i==*head_client) { // prev == NULL in this case
-               *head_client=i->next;
-           } else {
-               prev->next=i->next;
-           } 
-           break;
-        }
-    }
+    if (*(c->current_client) == c)
+        *(c->current_client) = NULL; // flag as invalid
+    if (i == c) /* c is head client.  */
+        *(c->head) = c->next; /* removed first client. */
+    if (i && i->next)
+        relink(c, i->next != c ? i->next : (i->next = c->next));
 }
 void jbwm_set_client_vdesk(struct JBWMClient * restrict c, uint8_t desktop)
 {
@@ -55,12 +51,11 @@ struct JBWMClient * jbwm_find_client(
     return head;
 }
 
-void jbwm_toggle_sticky(struct JBWMClient * restrict c,
-    struct JBWMClient ** current_client)
+void jbwm_toggle_sticky(struct JBWMClient * restrict c)
 {
     if(c){
         c->opt.sticky ^= true; /*  toggle */
-        jbwm_select_client(c,current_client);
+        jbwm_select_client(c);
         jbwm_update_title_bar(c);
         {
             Display *d;
@@ -85,7 +80,9 @@ void jbwm_client_free(struct JBWMClient * c, struct JBWMClient ** head_client)
     XRemoveFromSaveSet(d, w);
     if(parent)
         XDestroyWindow(d, parent);
-    jbwm_relink_client_list(c, head_client);
+    relink(c, *head_client);
+    c->screen=NULL;
+    c->head=NULL;
     free(c);
 }
 void jbwm_hide_client(const struct JBWMClient * restrict c)

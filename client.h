@@ -13,13 +13,9 @@ void jbwm_client_free(struct JBWMClient * c,
 /*  Get the client with input focus. */
 //struct JBWMClient * jbwm_get_current_client(void);
 void jbwm_hide_client(const struct JBWMClient * restrict c);
-/*  Relink client linked list to exclude c */
-void jbwm_relink_client_list(struct JBWMClient * c,
-    struct JBWMClient ** head_client);
 /*  Move the client to the specified virtual desktop */
 void jbwm_set_client_vdesk(struct JBWMClient * restrict c, uint8_t desktop);
-void jbwm_toggle_sticky(struct JBWMClient * restrict c,
-    struct JBWMClient ** current_client);
+void jbwm_toggle_sticky(struct JBWMClient * restrict c);
 void jbwm_restore_client(const struct JBWMClient * restrict c);
 __attribute__((pure))
 /* Return the client that has specified window as either window or parent.

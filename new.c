@@ -35,12 +35,12 @@ static uint8_t wm_desktop(Display * d, const Window w, int32_t vdesk)
     JBWM_LOG("wm_desktop(w: %d): vdesk is %d\n", (int) w, vdesk);
     return vdesk;
 }
-static inline uint8_t get_vdesk(struct JBWMClient * restrict c)
+static inline uint8_t get_vdesk(struct JBWMClient *  c)
 {
     return wm_desktop(c->screen->display, c->window, c->screen->vdesk);
 }
 __attribute__((nonnull))
-static Window get_parent(struct JBWMClient * restrict c)
+static Window get_parent(struct JBWMClient *  c)
 {
     enum {
         CFP = CopyFromParent,
@@ -61,7 +61,7 @@ static inline void reparent_window(Display * d, Window parent, Window window)
     XReparentWindow(d, window, parent, 0, 0);
     XMapWindow(d, window);
 }
-static void reparent(struct JBWMClient * restrict c)
+static void reparent(struct JBWMClient *  c)
 {
     JBWM_LOG("reparent()");
     jbwm_new_shaped_client(c);
@@ -73,7 +73,7 @@ static void reparent(struct JBWMClient * restrict c)
 static struct JBWMClient * get_JBWMClient(const Window w,
     struct JBWMScreen * s, struct JBWMClient ** head_client)
 {
-    struct JBWMClient * restrict c = calloc(1, sizeof(struct JBWMClient));
+    struct JBWMClient *  c = calloc(1, sizeof(struct JBWMClient));
     c->screen=s;
     c->window=w;
     c->head=head_client;
@@ -92,12 +92,14 @@ static void do_grabs(Display * d, const Window w)
 }
 void jbwm_new_client(struct JBWMScreen * s,
     struct JBWMClient ** head_client,
-    struct JBWMClient ** current_client, const Window w)
+    struct JBWMClient ** current_client,
+    const Window w)
 {
-    struct JBWMClient * restrict c = get_JBWMClient(w, s, head_client);
+    struct JBWMClient * c = get_JBWMClient(w, s, head_client);
     JBWM_LOG("jbwm_new_client(..., w: %d)", (int)w);
     /* Prepend client.  */
     c->next=*head_client;
+    c->current_client = current_client;
     *head_client=c;
     do_grabs(s->display, w);
     jbwm_set_client_geometry(c);
@@ -106,7 +108,7 @@ void jbwm_new_client(struct JBWMScreen * s,
     c->vdesk = get_vdesk(c);
     jbwm_snap_client(c);
     jbwm_restore_client(c);
-    jbwm_select_client(c, current_client);
+    jbwm_select_client(c);
     if(c->screen->vdesk!=c->vdesk)
         jbwm_hide_client(c);
 }
