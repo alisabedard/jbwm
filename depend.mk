@@ -1,4 +1,4 @@
--e atom.o: atom.c atom.h
+-e 45atom.o: atom.c atom.h
 button_event.o: button_event.c button_event.h client.h drag.h log.h title_bar.h wm_state.h
 client.o: client.c client.h ewmh.h ewmh_state.h atom.h select.h title_bar.h util.h vdesk.h wm_state.h
 command_line.o: command_line.c command_line.h config.h key_masks.h log.h

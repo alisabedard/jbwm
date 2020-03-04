@@ -125,7 +125,7 @@ void jbwm_events_loop(struct JBWMScreen * s, struct JBWMClient ** head_client,
             jbwm_handle_ConfigureRequest(&ev,c);
             break;
         case KeyPress:
-            jbwm_handle_key_event(s,&ev.xkey, head_client, current_client);
+            jbwm_handle_key_event(s, c, &ev.xkey);
             break;
         case ButtonPress:
             if(c)
