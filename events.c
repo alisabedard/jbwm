@@ -8,6 +8,7 @@
 #include "client.h"
 #include "ewmh.h"
 #include "ewmh_client.h"
+#include "ewmh_client_list.h"
 #include "JBWMScreen.h"
 #include "key_event.h"
 #include "log.h"

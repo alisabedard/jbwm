@@ -1,12 +1,13 @@
--e 45atom.o: atom.c atom.h
+-e atom.o: atom.c atom.h
 button_event.o: button_event.c button_event.h client.h drag.h log.h title_bar.h wm_state.h
 client.o: client.c client.h ewmh.h ewmh_state.h atom.h select.h title_bar.h util.h vdesk.h wm_state.h
 command_line.o: command_line.c command_line.h config.h key_masks.h log.h
 display.o: display.c display.h client.h config.h log.h util.h
 drag.o: drag.c drag.h font.h JBWMClient.h move_resize.h snap.h
-events.o: events.c events.h button_event.h client.h ewmh.h ewmh_client.h JBWMScreen.h key_event.h log.h move_resize.h new.h select.h title_bar.h util.h wm_state.h
+events.o: events.c events.h button_event.h client.h ewmh.h ewmh_client.h ewmh_client_list.h JBWMScreen.h key_event.h log.h move_resize.h new.h select.h title_bar.h util.h wm_state.h
 ewmh.o: ewmh.c ewmh.h atom.h config.h JBWMClient.h log.h macros.h
 ewmh_client.o: ewmh_client.c ewmh_client.h client.h config.h drag.h ewmh.h ewmh_wm_state.h atom.h select.h util.h vdesk.h wm_state.h
+ewmh_client_list.o: ewmh_client_list.c ewmh_client_list.h JBWMClient.h atom.h config.h log.h macros.h
 ewmh_state.o: ewmh_state.c ewmh_state.h client.h drag.h ewmh.h jbwm.h atom.h log.h max.h select.h util.h wm_state.h
 ewmh_wm_state.o: ewmh_wm_state.c ewmh_wm_state.h atom.h JBWMClient.h client.h ewmh.h ewmh_state.h log.h max.h util.h
 exec.o: exec.c exec.h config.h

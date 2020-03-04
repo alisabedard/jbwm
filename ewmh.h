@@ -8,7 +8,6 @@
 #include <X11/Xlib.h>
 struct JBWMClient;
 struct JBWMScreen;
-void jbwm_ewmh_update_client_list(struct JBWMClient * head);
 void jbwm_ewmh_set_allowed_actions(Display * d,
     const Window w) __attribute__((nonnull));
 void jbwm_ewmh_init_screen(Display * d, struct JBWMScreen * s)
