@@ -4,7 +4,7 @@
 #include <X11/Xlib.h>
 struct JBWMClient;
 struct JBWMScreen;
-void jbwm_handle_key_event(struct JBWMScreen *s, 
-    struct JBWMClient * target, XKeyEvent * e);
-
+void jbwm_handle_key_event(struct JBWMScreen *s, struct JBWMClient * target, 
+    struct JBWMClient ** head_client, struct JBWMClient ** current_client,
+    XKeyEvent * e);
 #endif//!JBWM_KEY_EVENT_H

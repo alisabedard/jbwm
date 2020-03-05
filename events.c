@@ -90,10 +90,11 @@ static void jbwm_handle_ConfigureRequest(XEvent * ev, struct JBWMClient * c)
     if (c)
         jbwm_move_resize(c);
 }
-static void jbwm_handle_EnterNotify(XEvent * ev, struct JBWMClient * c)
+static void jbwm_handle_EnterNotify(XEvent * ev, struct JBWMClient * c,
+    struct JBWMClient ** current_client)
 {
     if (c && ev->xcrossing.window == c->parent)
-        jbwm_select_client(c);
+        jbwm_select_client(c, current_client);
 }
 static void jbwm_handle_Expose(XEvent * ev, struct JBWMClient * c)
 {
@@ -126,14 +127,15 @@ void jbwm_events_loop(struct JBWMScreen * s, struct JBWMClient ** head_client,
             jbwm_handle_ConfigureRequest(&ev,c);
             break;
         case KeyPress:
-            jbwm_handle_key_event(s, c, &ev.xkey);
+            jbwm_handle_key_event(s, c, head_client, current_client, &ev.xkey);
             break;
         case ButtonPress:
             if(c)
-                jbwm_handle_button_event(&ev.xbutton, c);
+                jbwm_handle_button_event(&ev.xbutton, c, head_client,
+                    current_client);
             break;
         case EnterNotify:
-            jbwm_handle_EnterNotify(&ev, c);
+            jbwm_handle_EnterNotify(&ev, c, current_client);
             break;
         case Expose:
             jbwm_handle_Expose(&ev,c);
@@ -144,7 +146,7 @@ void jbwm_events_loop(struct JBWMScreen * s, struct JBWMClient ** head_client,
             break;
         case UnmapNotify:
             if (c && (c->opt.remove || (c->ignore_unmap--<1)))
-                jbwm_client_free(c,head_client);
+                jbwm_client_free(c, head_client, current_client);
             break;
         case MapRequest:
             jbwm_handle_MapRequest(&ev, c, s, head_client, current_client);
@@ -156,7 +158,8 @@ void jbwm_events_loop(struct JBWMScreen * s, struct JBWMClient ** head_client,
             jbwm_handle_ColormapNotify(&ev,c);
             break;
         case ClientMessage:
-            jbwm_ewmh_handle_client_message(&ev.xclient, c);
+            jbwm_ewmh_handle_client_message(&ev.xclient, c, head_client,
+                current_client);
             break;
 #ifdef DEBUG
         default:

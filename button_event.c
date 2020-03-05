@@ -9,26 +9,28 @@
 #include "log.h"
 #include "title_bar.h"
 #include "wm_state.h"
-static void handle_title_bar_button(XButtonEvent * e, struct JBWMClient * c)
+static void handle_title_bar_button(XButtonEvent * e, struct JBWMClient * c,
+    struct JBWMClient ** head_client, struct JBWMClient ** current_client)
 {
     JBWM_LOG("e->window: %d, c->title_bar: %d, e->subwindow: %d",
         (int)e->window, (int)c->tb.win, (int)e->subwindow);
     struct JBWMClientOptions * o = &c->opt;
     if (!e->subwindow)
-        jbwm_drag(c, false);
+        jbwm_drag(c, head_client, false);
     else if (e->subwindow == c->tb.close && !o->no_close)
         jbwm_send_wm_delete(c);
     else if (e->subwindow == c->tb.resize && !o->no_resize)
-        jbwm_drag(c, !c->opt.no_resize);
+        jbwm_drag(c, head_client, !c->opt.no_resize);
     else if (e->subwindow == c->tb.shade && !o->no_shade)
         jbwm_toggle_shade(c);
     else if (e->subwindow == c->tb.stick)
-        jbwm_toggle_sticky(c);
+        jbwm_toggle_sticky(c, current_client);
     else
-        jbwm_drag(c, false);
+        jbwm_drag(c, head_client, false);
 }
-__attribute__((nonnull))
-void jbwm_handle_button_event(XButtonEvent * e, struct JBWMClient * c)
+void jbwm_handle_button_event(XButtonEvent * e, struct JBWMClient * c,
+    struct JBWMClient ** head_client,
+    struct JBWMClient ** current_client)
 {
     JBWM_LOG("jbwm_handle_button_event");
     const bool fs = c->opt.fullscreen;
@@ -38,7 +40,7 @@ void jbwm_handle_button_event(XButtonEvent * e, struct JBWMClient * c)
         if (fs)
             XRaiseWindow(d, c->parent);
         else
-            handle_title_bar_button(e, c);
+            handle_title_bar_button(e, c, head_client, current_client);
         break;
     case Button2:
         XLowerWindow(d, c->parent);
@@ -52,7 +54,7 @@ void jbwm_handle_button_event(XButtonEvent * e, struct JBWMClient * c)
         if (fs)
             XLowerWindow(d, c->parent);
         else
-            jbwm_drag(c, !c->opt.shaded);
+            jbwm_drag(c, head_client, !c->opt.shaded);
         break;
     }
 }

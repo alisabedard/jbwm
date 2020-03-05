@@ -121,8 +121,6 @@ void jbwm_init_screens(Display *d, struct JBWMScreen *s,
         uint16_t n;
         unsigned long *lprop;
         JBWM_LOG("jbwm_init_screen(d, screens), screens is %d", screens);
-        s->head_client = head_client;
-        s->current_client = current_client;
         s->display=d;
         s->id = screens;
         s->xlib = ScreenOfDisplay(d, screens);

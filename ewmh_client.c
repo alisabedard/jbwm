@@ -36,7 +36,8 @@ static void handle_moveresize(XClientMessageEvent * e)
 }
 // returns true if handled, false if not
 static bool client_specific_message(XClientMessageEvent * e,
-    struct JBWMClient * restrict c, const Atom t)
+    struct JBWMClient * restrict c, struct JBWMClient ** head_client,
+    struct JBWMClient ** current_client, const Atom t)
 {
     Display * d;
     d = e->display;
@@ -46,11 +47,11 @@ static bool client_specific_message(XClientMessageEvent * e,
     // If user moves window (client-side title bars):
     else if (t == jbwm_atoms[JBWM_NET_WM_MOVERESIZE]) {
         XRaiseWindow(d, c->parent);
-        jbwm_drag(c, false);
+        jbwm_drag(c, head_client, false);
     } else if (t == jbwm_atoms[JBWM_NET_WM_STATE])
         jbwm_ewmh_handle_wm_state_changes(e, c);
     else if (t == jbwm_atoms[JBWM_NET_ACTIVE_WINDOW])
-        jbwm_select_client(c);
+        jbwm_select_client(c, current_client);
     else if (t == jbwm_atoms[JBWM_NET_CLOSE_WINDOW])
         jbwm_send_wm_delete(c);
     else
@@ -71,14 +72,15 @@ static void debug_client_message(XClientMessageEvent * e)
 #define debug_client_message(e)
 #endif//JBWM_DEBUG_EWMH_STATE&&DEBUG
 void jbwm_ewmh_handle_client_message(XClientMessageEvent * e,
-    struct JBWMClient * c)
+    struct JBWMClient * c, struct JBWMClient ** head_client,
+    struct JBWMClient ** current_client)
 {
     const Atom t = e->message_type;
     debug_client_message(e);
-    if(client_specific_message(e, c, t))
+    if(client_specific_message(e, c, head_client, current_client, t))
         return;
     if (t == jbwm_atoms[JBWM_NET_CURRENT_DESKTOP]) {
-        jbwm_set_vdesk(c->screen, *(c->head), e->data.l[0]);
+        jbwm_set_vdesk(c->screen, *head_client, e->data.l[0]);
     } else if (t == jbwm_atoms[JBWM_NET_MOVERESIZE_WINDOW]) {
         // If something else moves the window:
         handle_moveresize(e);

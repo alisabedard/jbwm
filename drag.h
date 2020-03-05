@@ -5,7 +5,8 @@
 #include <stdbool.h>
 struct JBWMClient;
 /* Drag the specified client.  Resize the client if resize is true.  */
-void jbwm_drag(struct JBWMClient * restrict c, const bool resize)
+void jbwm_drag(struct JBWMClient * c, struct JBWMClient ** head_client,
+    const bool resize)
 __attribute__((nonnull));
 /* Warp the pointer to the specified position.  */
 inline void jbwm_warp(Display * dpy, const Window w, const short x,

@@ -51,16 +51,16 @@ static void set_active_window_property(struct JBWMClient * c)
         jbwm_atoms[JBWM_NET_ACTIVE_WINDOW], XA_WINDOW, 32,
         PropModeReplace, (unsigned char *)&w, 1);
 }
-void jbwm_select_client(struct JBWMClient * c)
+void jbwm_select_client(struct JBWMClient * target,
+    struct JBWMClient ** current_client)
 {
-    struct JBWMClient ** current, * prev;
-    current = c->current_client;
-    prev = *current;
-        set_border(c);
-        set_focused(c);
-        set_active_window_property(c);
-        *current = c;
-    if (prev != c) {
+    struct JBWMClient * prev;
+    prev = *current_client;
+    set_border(target);
+    set_focused(target);
+    set_active_window_property(target);
+    *current_client = target;
+    if (prev != target) {
         if (prev)
             set_state_not_focused(prev);
     }

@@ -132,7 +132,8 @@ static inline void adjust_for_titlebar(union JBWMRectangle * geo,
  * JBWMRectangle.  This is performance critical, scaling O(n)
  * relative to the number of windows, so leave iterative in definition to
  * avoid further overhead.  */
-static union JBWMPoint snap_search(struct JBWMClient * c)
+static union JBWMPoint snap_search(struct JBWMClient * c,
+    struct JBWMClient ** head_client)
 {
     union JBWMPoint d;
     union JBWMRectangle s = c->size;
@@ -141,7 +142,7 @@ static union JBWMPoint snap_search(struct JBWMClient * c)
     uint8_t const fh = scr->font_height;
     adjust_for_titlebar(&s,fh,ctb);
     d.x=d.y=JBWM_SNAP;
-    for (struct JBWMClient * ci = *(c->head);
+    for (struct JBWMClient * ci = *head_client;
         ci; ci = ci->next) {
         if ((ci != c) && (ci->screen == scr)
             && (ci->vdesk == c->vdesk)) {
@@ -177,11 +178,11 @@ static inline void snap_dir(int16_t *out, int16_t diff){
         *out+=diff;
 #endif
 }
-void jbwm_snap_client(struct JBWMClient * restrict c)
+void jbwm_snap_client(struct JBWMClient * c, struct JBWMClient ** head_client)
 {
     jbwm_snap_border(c);
     /*  Snap to other windows: */
-    const union JBWMPoint d = snap_search(c);
+    const union JBWMPoint d = snap_search(c, head_client);
     snap_dir(&c->size.array[0],d.array[0]);
     snap_dir(&c->size.array[1],d.array[1]);
 }

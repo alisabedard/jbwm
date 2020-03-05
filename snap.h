@@ -7,6 +7,5 @@
 struct JBWMClient;
 void jbwm_snap_border(struct JBWMClient * restrict c)
 __attribute__((nonnull));
-void jbwm_snap_client(struct JBWMClient * restrict c)
-__attribute__((nonnull));
+void jbwm_snap_client(struct JBWMClient * c, struct JBWMClient ** head_client);
 #endif//JBWM_SNAP_H

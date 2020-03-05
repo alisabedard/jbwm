@@ -71,12 +71,11 @@ static void reparent(struct JBWMClient *  c)
 }
 // Allocate the client structure with some defaults set
 static struct JBWMClient * get_JBWMClient(const Window w,
-    struct JBWMScreen * s, struct JBWMClient ** head_client)
+    struct JBWMScreen * s)
 {
     struct JBWMClient *  c = calloc(1, sizeof(struct JBWMClient));
     c->screen=s;
     c->window=w;
-    c->head=head_client;
     c->opt.border = 1;
     return c;
 }
@@ -93,22 +92,21 @@ static void do_grabs(Display * d, const Window w)
 void jbwm_new_client(struct JBWMScreen * s,
     struct JBWMClient ** head_client,
     struct JBWMClient ** current_client,
-    const Window w)
+    Window const w)
 {
-    struct JBWMClient * c = get_JBWMClient(w, s, head_client);
+    struct JBWMClient * c = get_JBWMClient(w, s);
     JBWM_LOG("jbwm_new_client(..., w: %d)", (int)w);
     /* Prepend client.  */
     c->next=*head_client;
-    c->current_client = current_client;
     *head_client=c;
     do_grabs(s->display, w);
     jbwm_set_client_geometry(c);
     jbwm_handle_mwm_hints(c);
     reparent(c);
     c->vdesk = get_vdesk(c);
-    jbwm_snap_client(c);
+    jbwm_snap_client(c, head_client);
     jbwm_restore_client(c);
-    jbwm_select_client(c);
+    jbwm_select_client(c, current_client);
     if(c->screen->vdesk!=c->vdesk)
         jbwm_hide_client(c);
 }

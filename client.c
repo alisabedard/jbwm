@@ -17,14 +17,16 @@
 /* Relink c's linked list to exclude c.
  * Note:  As *c and *i may alias each other, use of 'restrict'
  * in relink would be invalid. */
-static void relink(const struct JBWMClient * c, struct JBWMClient * i)
+static void relink(const struct JBWMClient * c, struct JBWMClient * i,
+    struct JBWMClient ** head_client, struct JBWMClient ** current_client)
 {
-    if (*(c->current_client) == c)
-        *(c->current_client) = NULL; // flag as invalid
+    if (*(current_client) == c)
+        *(current_client) = NULL; // flag as invalid
     if (i == c) /* c is head client.  */
-        *(c->head) = c->next; /* removed first client. */
+        *(head_client) = c->next; /* removed first client. */
     if (i && i->next)
-        relink(c, i->next != c ? i->next : (i->next = c->next));
+        relink(c, i->next != c ? i->next : (i->next = c->next),
+            head_client, current_client);
 }
 void jbwm_set_client_vdesk(struct JBWMClient * restrict c, uint8_t desktop)
 {
@@ -51,11 +53,12 @@ struct JBWMClient * jbwm_find_client(
     return head;
 }
 
-void jbwm_toggle_sticky(struct JBWMClient * restrict c)
+void jbwm_toggle_sticky(struct JBWMClient * restrict c,
+    struct JBWMClient ** current_client)
 {
     if(c){
         c->opt.sticky ^= true; /*  toggle */
-        jbwm_select_client(c);
+        jbwm_select_client(c, current_client);
         jbwm_update_title_bar(c);
         {
             Display *d;
@@ -67,7 +70,8 @@ void jbwm_toggle_sticky(struct JBWMClient * restrict c)
     }
 }
 /*  Free client and destroy its windows and properties. */
-void jbwm_client_free(struct JBWMClient * c, struct JBWMClient ** head_client)
+void jbwm_client_free(struct JBWMClient * c, struct JBWMClient ** head_client,
+    struct JBWMClient ** current_client)
 {
     Display *d;
     const Window w = c->window, parent = c->parent;
@@ -80,9 +84,7 @@ void jbwm_client_free(struct JBWMClient * c, struct JBWMClient ** head_client)
     XRemoveFromSaveSet(d, w);
     if(parent)
         XDestroyWindow(d, parent);
-    relink(c, *head_client);
-    c->screen=NULL;
-    c->head=NULL;
+    relink(c, *head_client, head_client, current_client);
     free(c);
 }
 void jbwm_hide_client(const struct JBWMClient * restrict c)

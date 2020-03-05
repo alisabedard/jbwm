@@ -8,9 +8,12 @@
 #include "config.h"
 #include "log.h"
 #include "util.h"
-static struct JBWMClient ** head;
-void jbwm_set_up_error_handler(struct JBWMClient ** head_client){
-    head=head_client;
+static struct JBWMClient ** current_client;
+static struct JBWMClient ** head_client;
+void jbwm_set_up_error_handler(struct JBWMClient ** head_client_arg,
+    struct JBWMClient ** current_client_arg){
+    head_client=head_client_arg;
+    current_client=current_client_arg;
 }
 __attribute__((pure))
 static int handle_xerror(Display * d __attribute__((unused)),
@@ -23,11 +26,9 @@ static int handle_xerror(Display * d __attribute__((unused)),
             jbwm_error("Cannot access the root window.");
         break;
     case BadWindow:
-        if(head){
-            c=jbwm_find_client(*head, e->resourceid);
-            if(c)
-                jbwm_client_free(c, head);
-        }
+        c=jbwm_find_client(*head_client, e->resourceid);
+        if(c)
+            jbwm_client_free(c, head_client, current_client);
         break;
     case BadAtom:
         break;

@@ -14,7 +14,7 @@ extern inline void jbwm_warp(Display * dpy, const Window w, const short x,
     const short y);
 __attribute__((nonnull))
 static inline void query_pointer(Display * dpy, Window w,
-    int16_t * restrict p)
+    int16_t * p)
 {
     int x, y;
     int d; /*  dummy integer */
@@ -24,11 +24,11 @@ static inline void query_pointer(Display * dpy, Window w,
     p[1] = y;
 }
 __attribute__((nonnull))
-static void draw_outline(struct JBWMClient * restrict c)
+static void draw_outline(struct JBWMClient * c)
 {
     if(c->opt.border){
         uint8_t const fh=c->screen->font_height, o = (c->opt.no_title_bar^1)*fh;
-        const union JBWMRectangle * restrict g = &c->size;
+        const union JBWMRectangle * g = &c->size;
         enum { BORDER = 1 };
         Display * d = c->screen->display;
         XDrawRectangle(d, c->screen->xlib->root, c->screen->border_gc,
@@ -38,10 +38,10 @@ static void draw_outline(struct JBWMClient * restrict c)
     }
 }
 static void drag_event_loop(struct JBWMClient * c,
-    int16_t * start, bool const resize)
+    struct JBWMClient ** head_client, int16_t * start, bool const resize)
 {
     Display *d;
-    union JBWMRectangle * restrict g;
+    union JBWMRectangle * g;
     XEvent e;
     /***/
     d=c->screen->display;
@@ -63,7 +63,7 @@ static void drag_event_loop(struct JBWMClient * c,
                 p[1]+=start[1];
                 g->array[0]=p[0];
                 g->array[1]=p[1];
-                jbwm_snap_client(c);
+                jbwm_snap_client(c, head_client);
             }
             draw_outline(c); /* Erase the previous outline.  */
             /* Test that this function remains an atomic call by
@@ -74,12 +74,13 @@ static void drag_event_loop(struct JBWMClient * c,
     }
 }
 /* Drag the specified client.  Resize the client if resize is true.  */
-void jbwm_drag(struct JBWMClient * restrict c, const bool resize)
+void jbwm_drag(struct JBWMClient * c, struct JBWMClient ** head_client,
+    const bool resize)
 {
     int16_t start[2];
     Display * d = c->screen->display;
     Window const r = c->screen->xlib->root;
-    union JBWMRectangle * restrict g = &c->size;
+    union JBWMRectangle * g = &c->size;
     Cursor const cursor = XCreateFontCursor(d, XC_fleur);
     XRaiseWindow(d, c->parent);
     if (!(resize && (c->opt.no_resize || c->opt.shaded))){
@@ -92,7 +93,7 @@ void jbwm_drag(struct JBWMClient * restrict c, const bool resize)
         /* Adjust for the current window position to find the offset.  */
         start[0]=g->array[0]-start[0];
         start[1]=g->array[1]-start[1];
-        drag_event_loop(c, start, resize);
+        drag_event_loop(c, head_client, start, resize);
         draw_outline(c);
         XUngrabPointer(d, CurrentTime);
         jbwm_move_resize(c);

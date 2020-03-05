@@ -6,5 +6,6 @@
 #define JBWM_SELECT_H
 struct JBWMClient;
 // Set client as that receiving focus
-void jbwm_select_client(struct JBWMClient * c);
+void jbwm_select_client(struct JBWMClient * target,
+    struct JBWMClient ** current_client);
 #endif//!JBWM_SELECT_H

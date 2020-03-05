@@ -11,7 +11,6 @@
 #endif//JBWM_USE_XFT
 struct JBWMClient;
 struct JBWMScreen {
-    struct JBWMClient **head_client, **current_client;
     Display *display;
     Screen * xlib;
 #ifdef JBWM_USE_XFT

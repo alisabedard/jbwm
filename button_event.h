@@ -6,6 +6,7 @@
 #define JBWM_BUTTON_EVENT_H
 #include <X11/Xlib.h>
 struct JBWMClient;
-void jbwm_handle_button_event(XButtonEvent * e, struct JBWMClient * c)
-    __attribute__((nonnull));
+void jbwm_handle_button_event(XButtonEvent * e, struct JBWMClient * c,
+    struct JBWMClient ** head_client,
+    struct JBWMClient ** current_client);
 #endif /* JBWM_BUTTON_EVENT_H */
