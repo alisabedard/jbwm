@@ -5,6 +5,6 @@
 #ifndef JBWM_TITLE_BAR_H
 #define JBWM_TITLE_BAR_H
 struct JBWMClient;
-void jbwm_toggle_shade(struct JBWMClient * restrict c);
-void jbwm_update_title_bar(struct JBWMClient * restrict c);
+void jbwm_toggle_shade(struct JBWMClient * c);
+void jbwm_update_title_bar(struct JBWMClient * c);
 #endif /* JBWM_TITLE_BAR_H */

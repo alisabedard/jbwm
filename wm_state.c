@@ -8,7 +8,7 @@
 #include <X11/Xatom.h>
 #include <X11/Xutil.h>
 // Returns 0 on failure.
-static Status xmsg(Display * restrict d, const Window w,
+static Status xmsg(Display * d, const Window w,
     const Atom a, const long x)
 {
     JBWM_LOG("xmsg");
@@ -16,14 +16,14 @@ static Status xmsg(Display * restrict d, const Window w,
         .message_type = a, .format = 32 };
     // Split initialization to avoid old gcc warnings.
     { // * l scope
-        long * restrict l = e.data.l;
+        long * l = e.data.l;
         l[0] = x;
         l[1] = CurrentTime;
     }
     return XSendEvent(d, w, false, NoEventMask, (void*)&e);
 }
-static Atom get_atom(Display * restrict d,
-    Atom * restrict a, const char * restrict name)
+static Atom get_atom(Display * d,
+    Atom * a, const char * name)
 {
     return *a ? *a : (*a = XInternAtom(d, name, false));
 }
@@ -35,7 +35,7 @@ static Atom get_atom(Display * restrict d,
 static ATOM_GETTER(get_wm_protocols, "WM_PROTOCOLS")
 static ATOM_GETTER(get_wm_delete_window, "WM_DELETE_WINDOW")
 ATOM_GETTER(jbwm_get_wm_state, "WM_STATE")
-void jbwm_set_wm_state(const struct JBWMClient * restrict c, int8_t state)
+void jbwm_set_wm_state(const struct JBWMClient * c, int8_t state)
 {
     const Window w = c->window;
     Display * d = c->screen->display;
@@ -44,7 +44,7 @@ void jbwm_set_wm_state(const struct JBWMClient * restrict c, int8_t state)
     (state == IconicState ? jbwm_ewmh_add_state : jbwm_ewmh_remove_state)
     (d, w, jbwm_atoms[JBWM_NET_WM_STATE_HIDDEN]);
 }
-static bool find_delete_proto(const int i, const Atom * restrict p,
+static bool find_delete_proto(const int i, const Atom * p,
     Display * d)
 {
     return (i < 0) ? false : p[i] == get_wm_delete_window(d) ? true
@@ -63,7 +63,7 @@ static bool has_delete_proto(const Window w, Display * d)
     }
     return found;
 }
-void jbwm_send_wm_delete(struct JBWMClient * restrict c)
+void jbwm_send_wm_delete(struct JBWMClient * c)
 {
     const Window w = c->window;
     Display * d = c->screen->display;

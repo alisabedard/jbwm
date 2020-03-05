@@ -5,5 +5,5 @@
 #ifndef JBWM_MOVE_RESIZE_H
 #define JBWM_MOVE_RESIZE_H
 struct JBWMClient;
-void jbwm_move_resize(struct JBWMClient * restrict c);
+void jbwm_move_resize(struct JBWMClient * c);
 #endif//!JBWM_MOVE_RESIZE_H

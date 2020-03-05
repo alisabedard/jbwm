@@ -29,7 +29,7 @@ void jbwm_ewmh_remove_state(Display * display,
         XFree(a);
     }
 }
-static bool find_state(const Atom state, const int n, Atom * restrict a)
+static bool find_state(const Atom state, const int n, Atom * a)
 {
     return n ? a[n] == state ? true : find_state(state, n - 1, a) : false;
 }

@@ -22,7 +22,7 @@ static void allocate_xft_color(Display * d, struct JBWMScreen * s)
         &s->font_color);
 }
 #endif//JBWM_USE_XFT
-static void allocate_colors(struct JBWMScreen * restrict s)
+static void allocate_colors(struct JBWMScreen * s)
 {
     Display * d=s->display;
     const uint8_t n = s->id;

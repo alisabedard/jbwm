@@ -7,7 +7,7 @@
 #include <X11/Xlib.h>
 #include <stdint.h>
 #include "pixel_t.h"
-void jbwm_error(const char * restrict msg) __attribute__((noreturn));
+void jbwm_error(const char * msg) __attribute__((noreturn));
 jbwm_pixel_t jbwm_get_pixel(Display * dpy, const uint8_t screen,
     const char * name);
 // Free the result with XFree

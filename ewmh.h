@@ -12,5 +12,5 @@ void jbwm_ewmh_set_allowed_actions(Display * d,
     const Window w) __attribute__((nonnull));
 void jbwm_ewmh_init_screen(Display * d, struct JBWMScreen * s)
 __attribute__((nonnull));
-void jbwm_set_frame_extents(struct JBWMClient * restrict c);
+void jbwm_set_frame_extents(struct JBWMClient * c);
 #endif//!JBWM_EWMH_H

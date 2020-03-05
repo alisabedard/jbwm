@@ -200,7 +200,7 @@ void jbwm_handle_key_event(struct JBWMScreen * s, struct JBWMClient * target,
     uint8_t vdesk:6;
     bool mod:1;
     bool zero:1;
-  } opt = {s->vdesk, e->state & jbwm_get_mod_mask(), 0};
+  } opt = {s->vdesk, e->state & jbwm_get_mod_mask(), false};
   JBWM_LOG("jbwm_handle_key_event");
   switch (key) {
   case JBWM_KEY_NEW:
@@ -228,7 +228,12 @@ void jbwm_handle_key_event(struct JBWMScreen * s, struct JBWMClient * target,
     cond_set_vdesk(target, *head_client, s, s->vdesk + 1, opt.mod);
     break;
   default:
-    if (target)
+    if (target) {
       handle_client_key_event(head_client, current_client, opt.mod, key);
+#ifdef DEBUG
+    } else {
+        JBWM_LOG("target is NULL");
+#endif // DEBUG
+    }
   }
 }

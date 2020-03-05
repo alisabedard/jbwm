@@ -28,7 +28,7 @@ static void relink(const struct JBWMClient * c, struct JBWMClient * i,
         relink(c, i->next != c ? i->next : (i->next = c->next),
             head_client, current_client);
 }
-void jbwm_set_client_vdesk(struct JBWMClient * restrict c, uint8_t desktop)
+void jbwm_set_client_vdesk(struct JBWMClient * c, uint8_t desktop)
 {
     Display *d;
     if(c){
@@ -45,15 +45,13 @@ void jbwm_set_client_vdesk(struct JBWMClient * restrict c, uint8_t desktop)
  *  This is the a frequently called function.  Show restraint in adding any
  *  future tests.  */
 struct JBWMClient * jbwm_find_client(
-    struct JBWMClient * restrict head, const Window w)
+    struct JBWMClient *head, const Window w)
 {
-    for(;head && head->parent != w && head->window != w
-        && head->tb.win != w; head=head->next)
-        ;
-    return head;
+    return (head && head->parent != w && head->window != w
+        && head->tb.win != w) ? jbwm_find_client(head->next, w) : head;
 }
 
-void jbwm_toggle_sticky(struct JBWMClient * restrict c,
+void jbwm_toggle_sticky(struct JBWMClient * c,
     struct JBWMClient ** current_client)
 {
     if(c){
@@ -75,7 +73,7 @@ void jbwm_client_free(struct JBWMClient * c, struct JBWMClient ** head_client,
 {
     Display *d;
     const Window w = c->window, parent = c->parent;
-    const union JBWMRectangle * restrict p = &c->size;
+    const union JBWMRectangle * p = &c->size;
     d = c->screen->display;
     /*  Per ICCCM + wm-spec */
     XDeleteProperty(d, w, jbwm_atoms[JBWM_NET_WM_STATE]);
@@ -87,12 +85,12 @@ void jbwm_client_free(struct JBWMClient * c, struct JBWMClient ** head_client,
     relink(c, *head_client, head_client, current_client);
     free(c);
 }
-void jbwm_hide_client(const struct JBWMClient * restrict c)
+void jbwm_hide_client(const struct JBWMClient * c)
 {
     XUnmapWindow(c->screen->display, c->parent);
     jbwm_set_wm_state(c, IconicState);
 }
-void jbwm_restore_client(const struct JBWMClient * restrict c)
+void jbwm_restore_client(const struct JBWMClient * c)
 {
     XMapWindow(c->screen->display, c->parent);
     jbwm_set_wm_state(c, NormalState);

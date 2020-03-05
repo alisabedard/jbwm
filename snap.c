@@ -43,10 +43,10 @@ static inline int16_t sborderdir(int16_t xy, int16_t const min,
     xy=sborder(xy,max);
     return xy;
 }
-void jbwm_snap_border(struct JBWMClient * restrict c)
+void jbwm_snap_border(struct JBWMClient * c)
 {
     struct JBWMScreen *scr = c->screen;
-    union JBWMRectangle * restrict g = &(c->size);
+    union JBWMRectangle * g = &(c->size);
     const struct JBWMSize s = {scr->xlib->width,
         scr->xlib->height};
     const uint8_t b = c->opt.border << 1;
@@ -127,8 +127,8 @@ static inline void adjust_for_titlebar(union JBWMRectangle * geo,
         geo->height+=font_height;
     }
 }
-/* Don't use restrict for struct JBWMClient withing this function, as
- * c and ci may alias each other.  Qualifier restrict is fine for struct
+/* Don't use for struct JBWMClient withing this function, as
+ * c and ci may alias each other.  Qualifier is fine for struct
  * JBWMRectangle.  This is performance critical, scaling O(n)
  * relative to the number of windows, so leave iterative in definition to
  * avoid further overhead.  */

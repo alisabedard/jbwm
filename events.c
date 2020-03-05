@@ -30,7 +30,7 @@ static struct JBWMScreen * get_screen(struct JBWMScreen *s,
 static void jbwm_handle_PropertyNotify(XEvent * ev, struct JBWMClient * c)
 {
     if (c) {
-        XPropertyEvent * restrict e = &ev->xproperty;
+        XPropertyEvent * e = &ev->xproperty;
         if (e->state != PropertyNewValue)
             return;
         if (e->atom == XA_WM_NAME)
@@ -49,7 +49,7 @@ static void jbwm_handle_MapRequest(XEvent * ev, struct JBWMClient * c,
     struct JBWMScreen * s, struct JBWMClient ** head_client,
     struct JBWMClient ** current_client) {
     if (!c) {
-        XMapRequestEvent * restrict e = &ev->xmaprequest;
+        XMapRequestEvent * e = &ev->xmaprequest;
         /* This check fixes a race condition in old libreoffice and
          * certain Motif dialogs where an attempt is made to
          * request mapping twice: */
@@ -65,7 +65,7 @@ static void jbwm_handle_MapRequest(XEvent * ev, struct JBWMClient * c,
 }
 static void jbwm_handle_ColormapNotify(XEvent * ev, struct JBWMClient * c)
 {
-    XColormapEvent * restrict e = &ev->xcolormap;
+    XColormapEvent * e = &ev->xcolormap;
     if (c && e->new)
         XInstallColormap(e->display, c->cmap = e->colormap);
 }
@@ -77,7 +77,7 @@ static void jbwm_handle_ConfigureNotify(XEvent * ev, struct JBWMClient * c)
 }
 static void jbwm_handle_ConfigureRequest(XEvent * ev, struct JBWMClient * c)
 {
-    XConfigureRequestEvent * restrict e = &ev->xconfigurerequest;
+    XConfigureRequestEvent * e = &ev->xconfigurerequest;
     JBWM_LOG("handle_configure_request():"
         "x: %d, y: %d, w: %d, h: %d, b: %d",
         e->x, e->y, e->width, e->height, e->border_width);

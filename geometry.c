@@ -8,11 +8,11 @@
 #include <X11/Xutil.h>
 struct GeometryData {
     Display * display;
-    union JBWMRectangle * restrict attribute;
-    union JBWMRectangle * restrict geometry;
+    union JBWMRectangle * attribute;
+    union JBWMRectangle * geometry;
     Window window;
 };
-static long handle_wm_normal_hints(struct GeometryData * restrict g)
+static long handle_wm_normal_hints(struct GeometryData * g)
 {
     /* Though these statements may be combined, writing the following
      * assignment this way ensures the conditional is only evaluated once.
@@ -27,7 +27,7 @@ static long handle_wm_normal_hints(struct GeometryData * restrict g)
         *g->geometry = *g->attribute;
     return h.flags;
 }
-static void check_dimensions(union JBWMRectangle * restrict g,
+static void check_dimensions(union JBWMRectangle * g,
     const struct JBWMSize screen)
 {
     g->width = JB_MIN(g->width, screen.width);
@@ -39,15 +39,15 @@ static int16_t get_center(const int16_t window_size,
 {
     return (screen_size - window_size) >> 1;
 }
-static void center(union JBWMRectangle * restrict g,
+static void center(union JBWMRectangle * g,
     const struct JBWMSize s)
 {
     g->x = get_center(g->width, s.width);
     g->y = get_center(g->height, s.height);
 }
 // returns true if window is viewable
-static bool get_window_attributes(struct JBWMClient * restrict c,
-    union JBWMRectangle * restrict geometry_attribute)
+static bool get_window_attributes(struct JBWMClient * c,
+    union JBWMRectangle * geometry_attribute)
 {
     XWindowAttributes a;
     Display * d = c->screen->display;
@@ -61,7 +61,7 @@ static bool get_window_attributes(struct JBWMClient * restrict c,
     return a.map_state == IsViewable;
 }
 static void init_geometry_for_screen(struct JBWMClient * c,
-    union JBWMRectangle * restrict geometry_attribute)
+    union JBWMRectangle * geometry_attribute)
 {
     struct JBWMScreen *s=c->screen;
     Display * d = c->screen->display;

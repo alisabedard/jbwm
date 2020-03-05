@@ -11,7 +11,7 @@
 #include "JBWMScreen.h"
 #include "util.h"
 #include <X11/Xatom.h> // keep
-static void check_visibility(struct JBWMClient * restrict c,
+static void check_visibility(struct JBWMClient * c,
     const uint8_t v)
 {
     if (c) {

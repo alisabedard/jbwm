@@ -52,7 +52,7 @@ static Window * get_mixed_client_list(struct JBWMClient *head)
     return window_list;
 }
 static inline bool query_tree(Display * d,Window ** children_return,
-    unsigned int * restrict nchildren_return)
+    unsigned int * nchildren_return)
 {
     Window parent,root;
     bool r;

@@ -17,7 +17,7 @@ void jbwm_set_up_error_handler(struct JBWMClient ** head_client_arg,
 }
 __attribute__((pure))
 static int handle_xerror(Display * d __attribute__((unused)),
-    XErrorEvent * restrict e)
+    XErrorEvent * e)
 {
     struct JBWMClient *c;
     switch (e->error_code) {

@@ -36,7 +36,7 @@ static void handle_moveresize(XClientMessageEvent * e)
 }
 // returns true if handled, false if not
 static bool client_specific_message(XClientMessageEvent * e,
-    struct JBWMClient * restrict c, struct JBWMClient ** head_client,
+    struct JBWMClient * c, struct JBWMClient ** head_client,
     struct JBWMClient ** current_client, const Atom t)
 {
     Display * d;

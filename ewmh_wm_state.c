@@ -20,7 +20,7 @@
         data.l[2] = second property to alter
         data.l[3] = source indication
         other data.l[] elements = 0 */
-static void set_state(struct JBWMClient * restrict c,
+static void set_state(struct JBWMClient * c,
     bool add, Atom const atom){
     if (c){
         if(atom==jbwm_atoms[JBWM_NET_WM_STATE_FULLSCREEN])
@@ -45,7 +45,7 @@ static void set_state(struct JBWMClient * restrict c,
 __attribute__((nonnull))
 static void check_state(XClientMessageEvent * e,	// event data
     Atom const atom, // state to test
-    struct JBWMClient * restrict c){
+    struct JBWMClient * c){
     // 2 atoms can be set at once
     long * l = &e->data.l[0];
     const bool set = l[1] == (long)atom || l[2] == (long)atom;
@@ -72,7 +72,7 @@ static void check_state(XClientMessageEvent * e,	// event data
     }
 }
 void jbwm_ewmh_handle_wm_state_changes(XClientMessageEvent * e,
-    struct JBWMClient * restrict c){
+    struct JBWMClient * c){
     check_state(e, jbwm_atoms[JBWM_NET_WM_STATE_ABOVE], c);
     check_state(e, jbwm_atoms[JBWM_NET_WM_STATE_BELOW], c);
     check_state(e, jbwm_atoms[JBWM_NET_WM_STATE_FULLSCREEN], c);

@@ -84,7 +84,7 @@ void jbwm_ewmh_init_screen(Display * d, struct JBWMScreen * s)
     s->supporting=init_supporting(d,*r);
 }
 // Required by wm-spec:
-void jbwm_set_frame_extents(struct JBWMClient * restrict c)
+void jbwm_set_frame_extents(struct JBWMClient * c)
 {
     static uint32_t f[4];
     Atom a;

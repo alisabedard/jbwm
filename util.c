@@ -6,7 +6,7 @@
 #include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
-void jbwm_error(const char * restrict msg)
+void jbwm_error(const char * msg)
 {
     perror(msg);
     exit(1);

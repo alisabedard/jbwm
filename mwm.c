@@ -9,7 +9,7 @@
 #include "log.h"
 #include "mwmproto.h"
 #include "util.h"
-static void process_flags(struct JBWMClientOptions * restrict o)
+static void process_flags(struct JBWMClientOptions * o)
 {
     if (o->tearoff) {
         o->no_resize = o->no_shade = o->no_max
@@ -17,7 +17,7 @@ static void process_flags(struct JBWMClientOptions * restrict o)
         o->border = 0;
     }
 }
-static void do_functions(struct JBWMClientOptions * restrict o,
+static void do_functions(struct JBWMClientOptions * o,
     const enum MwmFunctions f)
 {
     o->no_close = !(f & MWM_FUNC_CLOSE);
@@ -26,7 +26,7 @@ static void do_functions(struct JBWMClientOptions * restrict o,
     o->no_resize = !(f & MWM_FUNC_RESIZE);
     o->no_shade = !(f & MWM_FUNC_MINIMIZE);
 }
-static void do_decorations(struct JBWMClientOptions * restrict o,
+static void do_decorations(struct JBWMClientOptions * o,
     const enum MwmDecor f)
 {
     o->border = f & MWM_DECOR_BORDER ? 1 : 0;
@@ -36,14 +36,14 @@ static void do_decorations(struct JBWMClientOptions * restrict o,
     o->no_shade = !(f & MWM_DECOR_MINIMIZE);
     o->no_title_bar = !(f & MWM_DECOR_TITLE);
 }
-void jbwm_handle_mwm_hints(struct JBWMClient * restrict c)
+void jbwm_handle_mwm_hints(struct JBWMClient * c)
 {
     Display * d = c->screen->display;
     const Atom mwm_hints = jbwm_atoms[JBWM_MOTIF_WM_HINTS];
     struct JBWMMwm * m = jbwm_get_property(d, c->window,
         mwm_hints, &(uint16_t){0});
     if (m) { // property successfully retrieved
-        struct JBWMClientOptions * restrict o = &c->opt;
+        struct JBWMClientOptions * o = &c->opt;
         if (!((c->opt.tearoff = m->flags
                     & MWM_HINTS_STATUS && m->status &
                     MWM_TEAROFF_WINDOW))) {
