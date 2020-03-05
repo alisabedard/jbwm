@@ -110,16 +110,9 @@ void jbwm_events_loop(struct JBWMScreen * s, struct JBWMClient ** head_client,
         XEvent ev;
         XNextEvent(d, &ev);
         struct JBWMClient * c = jbwm_find_client(*head_client, ev.xany.window);
-        //s=c->screen; // refer to the client's local screen
+        if (!c) /* Use current client for root window events.  */
+            c=*current_client;
         switch (ev.type) {
-        case ButtonRelease:
-        case KeyRelease:
-        case MapNotify:
-        case MappingNotify:
-        case MotionNotify:
-        case ReparentNotify:
-            // ignore
-            break;
         case ConfigureNotify:
             jbwm_handle_ConfigureNotify(&ev,c);
             break;
@@ -127,6 +120,8 @@ void jbwm_events_loop(struct JBWMScreen * s, struct JBWMClient ** head_client,
             jbwm_handle_ConfigureRequest(&ev,c);
             break;
         case KeyPress:
+            JBWM_LOG("c: %d, window: %d, root: %d", (int)c,
+                (int)ev.xkey.window, (int)ev.xkey.root);
             jbwm_handle_key_event(s, c, head_client, current_client, &ev.xkey);
             break;
         case ButtonPress:
@@ -161,10 +156,6 @@ void jbwm_events_loop(struct JBWMScreen * s, struct JBWMClient ** head_client,
             jbwm_ewmh_handle_client_message(&ev.xclient, c, head_client,
                 current_client);
             break;
-#ifdef DEBUG
-        default:
-            JBWM_LOG("Unhandled event %d", ev.type);
-#endif//DEBUG
         }
     }
 }
