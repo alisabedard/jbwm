@@ -61,7 +61,7 @@ static inline void reparent_window(Display * d, Window parent, Window window)
     XReparentWindow(d, window, parent, 0, 0);
     XMapWindow(d, window);
 }
-static void reparent(struct JBWMClient *  c)
+static inline void reparent(struct JBWMClient *  c)
 {
     JBWM_LOG("reparent()");
     jbwm_new_shaped_client(c);
