@@ -2,6 +2,7 @@
 // Copyright 2008-2020, Jeffrey E. Bedard <jefbed@gmail.com>
 // Copyright 1999-2015, Ciaran Anscomb <evilwm@6809.org.uk>
 // See README for license and other details.
+#include <string.h>
 #include "JBWMScreen.h"
 #include "atom.h"
 #include "command_line.h"
@@ -9,7 +10,6 @@
 #include "events.h"
 #include "font.h"
 #include "jbwm.h"
-#include <string.h>
 int main(int argc, char **argv)
 {
     Display * d;
