@@ -10,15 +10,16 @@
 #include "JBWMRectangle.h"
 #include "JBWMScreen.h"
 struct JBWMScreen;
+/* Sizes given for x86_64 architecture. */
 struct JBWMClient {
-    struct JBWMClient * next;
-    struct JBWMScreen * screen;
-    struct JBWMClientTitleBar tb;
+    struct JBWMClientTitleBar tb; /* 40 bytes */
+    union JBWMRectangle size, old_size, before_fullscreen;
     Colormap cmap;
     Window window, parent;
-    struct JBWMClientOptions opt;
-    union JBWMRectangle size, old_size, before_fullscreen;
+    struct JBWMClient * next;
+    struct JBWMScreen * screen;
+    struct JBWMClientOptions opt; /* 2 bytes */
     uint8_t vdesk;
     int8_t ignore_unmap;
-};
+} __attribute__((packed)); /* 108 bytes */
 #endif /* JBWM_CLIENT_STRUCT_H */
