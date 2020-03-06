@@ -19,7 +19,7 @@
 #include "util.h"
 #include "vdesk.h"
 #include <X11/Xatom.h> // for XA_CARDINAL
-static uint8_t wm_desktop(Display * d, const Window w, int32_t vdesk)
+static uint8_t wm_desktop(Display * d, const Window w, uint8_t vdesk)
 {
     uint16_t n;
     const Atom a = jbwm_atoms[JBWM_NET_WM_DESKTOP];
@@ -30,7 +30,7 @@ static uint8_t wm_desktop(Display * d, const Window w, int32_t vdesk)
         XFree(lprop);
     }
     // Set the property in any case to ensure it exists henceforth.
-    XChangeProperty(d, w, a, XA_CARDINAL, 32, PropModeReplace,
+    XChangeProperty(d, w, a, XA_CARDINAL, 8, PropModeReplace,
         (unsigned char *)&vdesk, 1);
     JBWM_LOG("wm_desktop(w: %d): vdesk is %d\n", (int) w, vdesk);
     return vdesk;
