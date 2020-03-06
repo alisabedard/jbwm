@@ -26,6 +26,8 @@ enum MwmStatus {
     MWM_TEAROFF_WINDOW = 1
 };
 struct JBWMMwm { // paraphrased from MwmUtil.h
-    unsigned long flags, functions, decor, input_mode, status;
+    unsigned long flags, functions, decor;
+    long input_mode;
+    unsigned long status;
 };
 #endif//!JBWM_MWMPROTO_H
