@@ -18,7 +18,7 @@ static inline jbwm_pixel_t get_bg(struct JBWMClient * c)
 }
 static void set_state_not_focused(struct JBWMClient * c)
 {
-    Display *d=c->screen->display;
+    Display *d=c->screen->xlib->display;
     XSetWindowBorder(d, c->parent, get_bg(c));
     jbwm_ewmh_remove_state(d, c->window, XInternAtom(d,
             "_NET_WM_STATE_FOCUSED",false));
@@ -26,12 +26,12 @@ static void set_state_not_focused(struct JBWMClient * c)
 static void set_border(struct JBWMClient * c)
 {
     struct JBWMPixels * p = &c->screen->pixels;
-    XSetWindowBorder(c->screen->display, c->parent,
+    XSetWindowBorder(c->screen->xlib->display, c->parent,
         c->opt.sticky ? p->fc : p->fg);
 }
 static void set_focused(struct JBWMClient * c)
 {
-    Display * d = c->screen->display;
+    Display * d = c->screen->xlib->display;
     XInstallColormap(d, c->cmap);
     const Window w = c->window;
     XSetInputFocus(d, w, RevertToPointerRoot, CurrentTime);
@@ -46,7 +46,7 @@ static void set_active_window_property(struct JBWMClient * c)
     static Window w;
     Display *d;
     w = c->window;
-    d=c->screen->display;
+    d=c->screen->xlib->display;
     XChangeProperty(d, c->screen->xlib->root,
         jbwm_atoms[JBWM_NET_ACTIVE_WINDOW], XA_WINDOW, 32,
         PropModeReplace, (unsigned char *)&w, 1);

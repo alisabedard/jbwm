@@ -15,7 +15,7 @@ static void jbwm_configure_client(struct JBWMClient * c)
         return;
     const Window w = c->window;
     union JBWMRectangle * g = &c->size;
-    XSendEvent(c->screen->display, w, true, StructureNotifyMask, (XEvent
+    XSendEvent(c->screen->xlib->display, w, true, StructureNotifyMask, (XEvent
             *) &(XConfigureEvent){.x = g->x, .y = g->y, .width = g->width,
         .height = g->height, .type = ConfigureNotify, .event = w,
         .window = w, .above = c->parent, .override_redirect = true,
@@ -40,7 +40,7 @@ void jbwm_move_resize(struct JBWMClient * c)
         jbwm_update_title_bar(c);
     } // Skip shaped and fullscreen clients.
     union JBWMRectangle * s = &c->size;
-    do_move(c->screen->display, c->parent, c->window, s, offset);
+    do_move(c->screen->xlib->display, c->parent, c->window, s, offset);
     jbwm_set_shape(c);
     jbwm_configure_client(c);
 }

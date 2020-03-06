@@ -43,7 +43,7 @@ static Window * get_mixed_client_list(struct JBWMClient *head)
         free(window_list);
         window_list=NULL;
     }
-    d=head->screen->display;
+    d=head->screen->xlib->display;
     n=get_client_list_r(&window_list,d,head,0);
     a=jbwm_atoms[JBWM_NET_CLIENT_LIST];
     XChangeProperty(d, head->screen->xlib->root, a, XA_WINDOW, 32,
@@ -93,7 +93,7 @@ void jbwm_ewmh_update_client_list(struct JBWMClient *head)
 {
     if(head){ // there may be no clients
         get_mixed_client_list(head);
-        get_ordered_client_list(head->screen->display,
+        get_ordered_client_list(head->screen->xlib->display,
             head->screen->xlib->root);
     }
 }

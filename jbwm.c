@@ -24,7 +24,7 @@ static void allocate_xft_color(Display * d, struct JBWMScreen * s)
 #endif//JBWM_USE_XFT
 static void allocate_colors(struct JBWMScreen * s)
 {
-    Display * d=s->display;
+    Display * d=s->xlib->display;
     const uint8_t n = s->id;
 #define PIX(field, color) s->pixels.field = jbwm_get_pixel(d, n, color);
     PIX(bg, JBWM_BG);
@@ -121,7 +121,7 @@ void jbwm_init_screens(Display *d, struct JBWMScreen *s,
         uint16_t n;
         unsigned long *lprop;
         JBWM_LOG("jbwm_init_screen(d, screens), screens is %d", screens);
-        s->display=d;
+        s->xlib->display=d;
         s->id = screens;
         s->xlib = ScreenOfDisplay(d, screens);
         lprop=jbwm_get_property(d,s->xlib->root,

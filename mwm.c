@@ -38,7 +38,7 @@ static void do_decorations(struct JBWMClientOptions * o,
 }
 void jbwm_handle_mwm_hints(struct JBWMClient * c)
 {
-    Display * d = c->screen->display;
+    Display * d = c->screen->xlib->display;
     const Atom mwm_hints = jbwm_atoms[JBWM_MOTIF_WM_HINTS];
     struct JBWMMwm * m = jbwm_get_property(d, c->window,
         mwm_hints, &(uint16_t){0});

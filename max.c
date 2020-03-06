@@ -16,7 +16,7 @@ static void set_not_horz(struct JBWMClient * c)
     c->opt.max_horz = false;
     c->size.x = c->old_size.x;
     c->size.width = c->old_size.width;
-    d=c->screen->display;
+    d=c->screen->xlib->display;
     jbwm_ewmh_remove_state(d, c->window,
         jbwm_atoms[JBWM_NET_WM_STATE_MAXIMIZED_HORZ]);
 }
@@ -40,7 +40,7 @@ void jbwm_set_horz(struct JBWMClient * c)
     Display *d;
     if (c->opt.max_horz)
         return;
-    d=c->screen->display;
+    d=c->screen->xlib->display;
     jbwm_ewmh_add_state(d, c->window,
         jbwm_atoms[JBWM_NET_WM_STATE_MAXIMIZED_HORZ]);
     set_horz(c, DisplayWidth(d, c->screen->id));
@@ -53,7 +53,7 @@ static void set_not_vert(struct JBWMClient * c)
     c->opt.max_vert = false;
     c->size.y = c->old_size.y;
     c->size.height = c->old_size.height;
-    d=c->screen->display;
+    d=c->screen->xlib->display;
     jbwm_ewmh_remove_state(d, c->window,
         jbwm_atoms[JBWM_NET_WM_STATE_MAXIMIZED_VERT]);
 }
@@ -70,7 +70,7 @@ static void set_vert(struct JBWMClient * c)
     c->old_size.y = c->size.y;
     c->old_size.height = c->size.height;
     c->size.y = 0;
-    d=c->screen->display;
+    d=c->screen->xlib->display;
     c->size.height = DisplayHeight(d, c->screen->id);
     jbwm_ewmh_add_state(d, c->window,
         jbwm_atoms[JBWM_NET_WM_STATE_MAXIMIZED_VERT]);
@@ -94,7 +94,7 @@ static void set_not_fullscreen(struct JBWMClient * c)
 {
     c->opt.fullscreen = false;
     c->size = c->before_fullscreen;
-    Display * d = c->screen->display;
+    Display * d = c->screen->xlib->display;
     XSetWindowBorderWidth(d, c->parent, c->opt.border);
     jbwm_ewmh_remove_state(d, c->window,
         jbwm_atoms[JBWM_NET_WM_STATE_FULLSCREEN]);
@@ -113,7 +113,7 @@ static void set_fullscreen(struct JBWMClient * c)
     c->opt.fullscreen = true;
     c->before_fullscreen = c->size;
     c->size.x = c->size.y = 0;
-    d = c->screen->display;
+    d = c->screen->xlib->display;
     c->size.width = DisplayWidth(d, id);
     c->size.height = DisplayHeight(d, id);
     XSetWindowBorderWidth(d, c->parent, 0);

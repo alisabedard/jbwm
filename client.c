@@ -32,7 +32,7 @@ void jbwm_set_client_vdesk(struct JBWMClient * c, uint8_t desktop)
 {
     Display *d;
     if(c){
-        d=c->screen->display;
+        d=c->screen->xlib->display;
         c->vdesk=desktop;
         /*  Save in an atomic property, useful for restart and deskbars. */
         XChangeProperty(d, c->window, jbwm_atoms[JBWM_NET_WM_DESKTOP],
@@ -60,7 +60,7 @@ void jbwm_toggle_sticky(struct JBWMClient * c,
         jbwm_update_title_bar(c);
         {
             Display *d;
-            d=c->screen->display;
+            d=c->screen->xlib->display;
             (c->opt.sticky ? jbwm_ewmh_add_state : jbwm_ewmh_remove_state)
             (d, c->window,
                 jbwm_atoms[JBWM_NET_WM_STATE_STICKY]);
@@ -74,7 +74,7 @@ void jbwm_client_free(struct JBWMClient * c, struct JBWMClient ** head_client,
     Display *d;
     const Window w = c->window, parent = c->parent;
     const union JBWMRectangle * p = &c->size;
-    d = c->screen->display;
+    d = c->screen->xlib->display;
     /*  Per ICCCM + wm-spec */
     XDeleteProperty(d, w, jbwm_atoms[JBWM_NET_WM_STATE]);
     XDeleteProperty(d, w, jbwm_atoms[JBWM_NET_WM_DESKTOP]);
@@ -87,11 +87,11 @@ void jbwm_client_free(struct JBWMClient * c, struct JBWMClient ** head_client,
 }
 void jbwm_hide_client(const struct JBWMClient * c)
 {
-    XUnmapWindow(c->screen->display, c->parent);
+    XUnmapWindow(c->screen->xlib->display, c->parent);
     jbwm_set_wm_state(c, IconicState);
 }
 void jbwm_restore_client(const struct JBWMClient * c)
 {
-    XMapWindow(c->screen->display, c->parent);
+    XMapWindow(c->screen->xlib->display, c->parent);
     jbwm_set_wm_state(c, NormalState);
 }

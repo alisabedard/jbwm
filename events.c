@@ -105,7 +105,7 @@ void jbwm_events_loop(struct JBWMScreen * s, struct JBWMClient ** head_client,
     struct JBWMClient ** current_client)
 {
     Display *d;
-    d=s->display;
+    d=s->xlib->display;
     for (;;) {
         XEvent ev;
         XNextEvent(d, &ev);

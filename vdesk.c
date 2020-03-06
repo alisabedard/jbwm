@@ -30,7 +30,7 @@ uint8_t jbwm_set_vdesk(struct JBWMScreen *s,
     Display *d;
     check_visibility(head, v);
     s->vdesk = v;
-    d=s->display;
+    d=s->xlib->display;
     // The data (v) must be a 32 bit type.
     XChangeProperty(d, s->xlib->root, jbwm_atoms[JBWM_NET_CURRENT_DESKTOP],
         XA_CARDINAL, 8, PropModeReplace, (unsigned char *)&v, 1);

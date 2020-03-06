@@ -94,6 +94,6 @@ void jbwm_set_frame_extents(struct JBWMClient * c)
     if (!c->opt.no_title_bar)
         f[2] += c->screen->font_height;
     a=jbwm_atoms[JBWM_NET_FRAME_EXTENTS];
-    XChangeProperty(c->screen->display, c->parent, a, XA_CARDINAL, 32,
+    XChangeProperty(c->screen->xlib->display, c->parent, a, XA_CARDINAL, 32,
         PropModeReplace, (unsigned char *)f, 4);
 }

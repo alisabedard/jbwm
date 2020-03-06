@@ -30,7 +30,7 @@ static void draw_outline(struct JBWMClient * c)
         uint8_t const fh=c->screen->font_height, o = (c->opt.no_title_bar^1)*fh;
         const union JBWMRectangle * g = &c->size;
         enum { BORDER = 1 };
-        Display * d = c->screen->display;
+        Display * d = c->screen->xlib->display;
         XDrawRectangle(d, c->screen->xlib->root, c->screen->border_gc,
             g->x, g->y - o, g->width + BORDER, g->height + BORDER + o);
     } else {
@@ -44,7 +44,7 @@ static void drag_event_loop(struct JBWMClient * c,
     union JBWMRectangle * g;
     XEvent e;
     /***/
-    d=c->screen->display;
+    d=c->screen->xlib->display;
     g = &c->size;
     for(;;){
         XMaskEvent(d, JBWMMouseMask, &e);
@@ -78,7 +78,7 @@ void jbwm_drag(struct JBWMClient * c, struct JBWMClient ** head_client,
     const bool resize)
 {
     int16_t start[2];
-    Display * d = c->screen->display;
+    Display * d = c->screen->xlib->display;
     Window const r = c->screen->xlib->root;
     union JBWMRectangle * g = &c->size;
     Cursor const cursor = XCreateFontCursor(d, XC_fleur);

@@ -30,7 +30,7 @@ static void set_state(struct JBWMClient * c,
         else if(atom==jbwm_atoms[JBWM_NET_WM_STATE_ABOVE])
             add = !add; // fall through
         else if(atom==jbwm_atoms[JBWM_NET_WM_STATE_BELOW])
-            (add ? XRaiseWindow : XLowerWindow)(c->screen->display, c->parent);
+            (add ? XRaiseWindow : XLowerWindow)(c->screen->xlib->display, c->parent);
         else if(atom==jbwm_atoms[JBWM_NET_WM_STATE_HIDDEN])
             (add ? jbwm_hide_client : jbwm_restore_client)(c);
         else if(atom==jbwm_atoms[JBWM_NET_WM_STATE_MAXIMIZED_VERT])

@@ -26,7 +26,7 @@ __attribute__((nonnull))
 static void point(struct JBWMClient * c,
   const int16_t x, const int16_t y)
 {
-  Display * d = c->screen->display;
+  Display * d = c->screen->xlib->display;
   XRaiseWindow(d, c->parent);
   jbwm_warp(d, c->window, x, y);
 }
@@ -136,10 +136,10 @@ static void handle_client_key_event(struct JBWMClient ** head_client,
       break;
     case JBWM_KEY_LOWER:
     case JBWM_KEY_ALTLOWER:
-      XLowerWindow(c->screen->display, c->parent);
+      XLowerWindow(c->screen->xlib->display, c->parent);
       break;
     case JBWM_KEY_RAISE:
-      XRaiseWindow(c->screen->display, c->parent);
+      XRaiseWindow(c->screen->xlib->display, c->parent);
       break;
     case JBWM_KEY_FS:
       jbwm_set_fullscreen(c);

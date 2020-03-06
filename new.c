@@ -37,7 +37,7 @@ static uint8_t wm_desktop(Display * d, const Window w, uint8_t vdesk)
 }
 static inline uint8_t get_vdesk(struct JBWMClient *  c)
 {
-    return wm_desktop(c->screen->display, c->window, c->screen->vdesk);
+    return wm_desktop(c->screen->xlib->display, c->window, c->screen->vdesk);
 }
 __attribute__((nonnull))
 static Window get_parent(struct JBWMClient *  c)
@@ -50,7 +50,7 @@ static Window get_parent(struct JBWMClient *  c)
     };
     union JBWMRectangle * g;
     g = &c->size;
-    return XCreateWindow(c->screen->display, c->screen->xlib->root, g->x, g->y,
+    return XCreateWindow(c->screen->xlib->display, c->screen->xlib->root, g->x, g->y,
         g->width, g->height, c->opt.border, CFP, CFP,
         NULL, CW_VM, &(XSetWindowAttributes){
             .override_redirect=true, .event_mask = WA_EM});
@@ -65,7 +65,7 @@ static inline void reparent(struct JBWMClient *  c)
 {
     JBWM_LOG("reparent()");
     jbwm_new_shaped_client(c);
-    reparent_window(c->screen->display, c->parent = get_parent(c), c->window);
+    reparent_window(c->screen->xlib->display, c->parent = get_parent(c), c->window);
     // Required by wm-spec:
     jbwm_set_frame_extents(c);
 }
@@ -99,7 +99,7 @@ void jbwm_new_client(struct JBWMScreen * s,
     /* Prepend client.  */
     c->next=*head_client;
     *head_client=c;
-    do_grabs(s->display, w);
+    do_grabs(s->xlib->display, w);
     jbwm_set_client_geometry(c);
     jbwm_handle_mwm_hints(c);
     reparent(c);
