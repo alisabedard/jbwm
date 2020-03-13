@@ -67,7 +67,7 @@ __attribute__((nonnull))
 static void key_move(struct JBWMClient * c, uint8_t const flags)
 {
   int8_t const d = flags & KEY_MOVE_POSITIVE
-      ? JBWM_RESIZE_INCREMENT : - JBWM_RESIZE_INCREMENT;
+  ? JBWM_RESIZE_INCREMENT : - JBWM_RESIZE_INCREMENT;
   *get_antecedent(c, flags) += d;
   commit_key_move(c);
 }
@@ -195,13 +195,12 @@ void jbwm_handle_key_event(struct JBWMScreen * s, struct JBWMClient * target,
   struct JBWMClient ** head_client, struct JBWMClient ** current_client,
   XKeyEvent * e)
 {
+  enum { MOD = 1 << 0, ZERO = 1 << 1};
+  uint8_t vdesk;
+  uint8_t flags;
   const KeySym key = XLookupKeysym(e, 0);
-  struct {
-    uint8_t vdesk:6;
-    bool mod:1;
-    bool zero:1;
-  } opt = {s->vdesk, e->state & jbwm_get_mod_mask(), false};
   JBWM_LOG("jbwm_handle_key_event");
+  flags = e->state & jbwm_get_mod_mask() ? MOD : 0;
   switch (key) {
   case JBWM_KEY_NEW:
     jbwm_exec(JBWM_TERM);
@@ -213,26 +212,26 @@ void jbwm_handle_key_event(struct JBWMScreen * s, struct JBWMClient * target,
       next(*current_client, current_client, head_client, s->vdesk);
     break;
   case XK_0:
-    opt.zero = true;
+    flags |= ZERO;
     /* FALLTHROUGH */
   case XK_1: case XK_2: case XK_3: case XK_4: case XK_5:
   case XK_6: case XK_7: case XK_8: case XK_9:
     /* First desktop 0, per wm-spec */
-    cond_set_vdesk(target, *head_client, s, opt.zero
-      ? 10 : key - XK_1, opt.mod);
+    cond_set_vdesk(target, *head_client, s, flags & ZERO
+      ? 10 : key - XK_1, flags & MOD);
     break;
   case JBWM_KEY_PREVDESK:
-    cond_set_vdesk(target, *head_client, s, s->vdesk - 1, opt.mod);
+    cond_set_vdesk(target, *head_client, s, s->vdesk - 1, flags & MOD);
     break;
   case JBWM_KEY_NEXTDESK:
-    cond_set_vdesk(target, *head_client, s, s->vdesk + 1, opt.mod);
+    cond_set_vdesk(target, *head_client, s, s->vdesk + 1, flags & MOD);
     break;
   default:
     if (target) {
-      handle_client_key_event(head_client, current_client, opt.mod, key);
+      handle_client_key_event(head_client, current_client, flags & MOD, key);
 #ifdef DEBUG
     } else {
-        JBWM_LOG("target is NULL");
+      JBWM_LOG("target is NULL");
 #endif // DEBUG
     }
   }
