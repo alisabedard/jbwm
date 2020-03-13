@@ -1,9 +1,6 @@
 /* Copyright 2020, Jeffrey E. Bedard */
 /* Module: */
 #include "key_event.h"
-/* System: */
-#include <stdbool.h>
-#include <stdlib.h>
 /* Local: */
 #include "JBWMClient.h"
 #include "JBWMKeys.h"
@@ -21,6 +18,9 @@
 #include "title_bar.h"
 #include "vdesk.h"
 #include "wm_state.h"
+/* System: */
+#include <stdbool.h>
+#include <stdlib.h>
 /* Program: */
 __attribute__((nonnull))
 static void point(struct JBWMClient * c,

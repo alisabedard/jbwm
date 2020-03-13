@@ -29,4 +29,3 @@ title_bar.o: title_bar.c title_bar.h config.h ewmh.h ewmh_state.h font.h atom.h 
 util.o: util.c util.h
 vdesk.o: vdesk.c vdesk.h client.h config.h ewmh.h atom.h JBWMClient.h JBWMScreen.h util.h
 wm_state.o: wm_state.c wm_state.h ewmh.h ewmh_state.h atom.h log.h util.h
-
