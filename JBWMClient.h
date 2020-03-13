@@ -21,5 +21,5 @@ struct JBWMClient {
     struct JBWMClientOptions opt; /* 2 bytes */
     uint8_t vdesk;
     int8_t ignore_unmap;
-} __attribute__((packed)); /* 108 bytes */
+};
 #endif /* JBWM_CLIENT_STRUCT_H */
