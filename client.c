@@ -47,9 +47,9 @@ void jbwm_set_client_vdesk(struct JBWMClient * c, uint8_t desktop)
 struct JBWMClient * jbwm_find_client(
     struct JBWMClient *head, const Window w)
 {
-    return !head || head->parent == w || head->window == w
-        || head->tb.win == w ? head : jbwm_find_client(head->next, w);
-}
+return (head && head->parent != w && head->window != w
+        && head->tb.win != w) ? jbwm_find_client(head->next, w) : head;
+
 
 void jbwm_toggle_sticky(struct JBWMClient * c,
     struct JBWMClient ** current_client)
