@@ -50,48 +50,48 @@ struct JBWMClient * jbwm_find_client(
   return (head && head->parent != w && head->window != w
     && head->tb.win != w) ? jbwm_find_client(head->next, w) : head;
 
-
-  void jbwm_toggle_sticky(struct JBWMClient * c,
-    struct JBWMClient ** current_client)
-  {
-    if(c){
-      c->opt.sticky ^= true; /*  toggle */
-      jbwm_select_client(c, current_client);
-      jbwm_update_title_bar(c);
-      {
-        Display *d;
-        d=c->screen->xlib->display;
-        (c->opt.sticky ? jbwm_ewmh_add_state : jbwm_ewmh_remove_state)
-        (d, c->window,
-          jbwm_atoms[JBWM_NET_WM_STATE_STICKY]);
-      }
+}
+void jbwm_toggle_sticky(struct JBWMClient * c,
+  struct JBWMClient ** current_client)
+{
+  if(c){
+    c->opt.sticky ^= true; /*  toggle */
+    jbwm_select_client(c, current_client);
+    jbwm_update_title_bar(c);
+    {
+      Display *d;
+      d=c->screen->xlib->display;
+      (c->opt.sticky ? jbwm_ewmh_add_state : jbwm_ewmh_remove_state)
+      (d, c->window,
+        jbwm_atoms[JBWM_NET_WM_STATE_STICKY]);
     }
   }
-  /*  Free client and destroy its windows and properties. */
-  void jbwm_client_free(struct JBWMClient * c, struct JBWMClient ** head_client,
-    struct JBWMClient ** current_client)
-  {
-    Display *d;
-    const Window w = c->window, parent = c->parent;
-    const union JBWMRectangle * p = &c->size;
-    d = c->screen->xlib->display;
-    /*  Per ICCCM + wm-spec */
-    XDeleteProperty(d, w, jbwm_atoms[JBWM_NET_WM_STATE]);
-    XDeleteProperty(d, w, jbwm_atoms[JBWM_NET_WM_DESKTOP]);
-    XReparentWindow(d, w, c->screen->xlib->root, p->x, p->y);
-    XRemoveFromSaveSet(d, w);
-    if(parent)
-      XDestroyWindow(d, parent);
-    relink(c, *head_client, head_client, current_client);
-    free(c);
-  }
-  void jbwm_hide_client(const struct JBWMClient * c)
-  {
-    XUnmapWindow(c->screen->xlib->display, c->parent);
-    jbwm_set_wm_state(c, IconicState);
-  }
-  void jbwm_restore_client(const struct JBWMClient * c)
-  {
-    XMapWindow(c->screen->xlib->display, c->parent);
-    jbwm_set_wm_state(c, NormalState);
-  }
+}
+/*  Free client and destroy its windows and properties. */
+void jbwm_client_free(struct JBWMClient * c, struct JBWMClient ** head_client,
+  struct JBWMClient ** current_client)
+{
+  Display *d;
+  const Window w = c->window, parent = c->parent;
+  const union JBWMRectangle * p = &c->size;
+  d = c->screen->xlib->display;
+  /*  Per ICCCM + wm-spec */
+  XDeleteProperty(d, w, jbwm_atoms[JBWM_NET_WM_STATE]);
+  XDeleteProperty(d, w, jbwm_atoms[JBWM_NET_WM_DESKTOP]);
+  XReparentWindow(d, w, c->screen->xlib->root, p->x, p->y);
+  XRemoveFromSaveSet(d, w);
+  if(parent)
+    XDestroyWindow(d, parent);
+  relink(c, *head_client, head_client, current_client);
+  free(c);
+}
+void jbwm_hide_client(const struct JBWMClient * c)
+{
+  XUnmapWindow(c->screen->xlib->display, c->parent);
+  jbwm_set_wm_state(c, IconicState);
+}
+void jbwm_restore_client(const struct JBWMClient * c)
+{
+  XMapWindow(c->screen->xlib->display, c->parent);
+  jbwm_set_wm_state(c, NormalState);
+}
