@@ -137,8 +137,9 @@ static inline void resize_title_bar(Display * d, const Window win,
     struct JBWMClientTitleBar * tb, const uint16_t new_width,
     uint8_t const font_height) {
     // Expand/Contract the title bar width as necessary:
-    XResizeWindow(d, win, move_buttons(d, tb, new_width, font_height),
-        font_height);
+    if (tb)
+      XResizeWindow(d, win, move_buttons(d, tb, new_width, font_height),
+          font_height);
 }
 void jbwm_update_title_bar(struct JBWMClient * c)
 {
