@@ -9,9 +9,10 @@
 #include "font.h"
 #include "atom.h"
 #include "move_resize.h"
-#include <string.h>
 #include "util.h"
 #include "wm_state.h"
+#include <stdlib.h>
+#include <string.h>
 #include <X11/Xatom.h>
 #ifdef JBWM_USE_XFT
 #include <X11/Xft/Xft.h>
@@ -140,6 +141,10 @@ static inline void resize_title_bar(Display * d, const Window win,
     if (tb)
       XResizeWindow(d, win, move_buttons(d, tb, new_width, font_height),
           font_height);
+#ifdef DEBUG
+    else
+      abort();
+#endif//DEBUG
 }
 void jbwm_update_title_bar(struct JBWMClient * c)
 {
