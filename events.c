@@ -110,14 +110,14 @@ void jbwm_events_loop(struct JBWMScreen * s, struct JBWMClient ** head_client,
     XEvent ev;
     XNextEvent(d, &ev);
     struct JBWMClient * c = jbwm_find_client(*head_client, ev.xany.window);
+    if (c)
+      s = c->screen;
     switch (ev.type) {
     case ConfigureNotify:
-      if (c)
-        jbwm_handle_ConfigureNotify(&ev,c);
+      jbwm_handle_ConfigureNotify(&ev,c);
       break;
     case ConfigureRequest:
-      if (c)
-        jbwm_handle_ConfigureRequest(&ev,c);
+      jbwm_handle_ConfigureRequest(&ev,c);
       break;
     case KeyPress:
       JBWM_LOG("c: %d, window: %d, root: %d", (int)c,
@@ -125,17 +125,14 @@ void jbwm_events_loop(struct JBWMScreen * s, struct JBWMClient ** head_client,
       jbwm_handle_key_event(s, c, head_client, current_client, &ev.xkey);
       break;
     case ButtonPress:
-      if(c)
-        jbwm_handle_button_event(&ev.xbutton, c, head_client,
-          current_client);
+      jbwm_handle_button_event(&ev.xbutton, c, head_client,
+        current_client);
       break;
     case EnterNotify:
-      if (c)
-        jbwm_handle_EnterNotify(&ev, c, current_client);
+      jbwm_handle_EnterNotify(&ev, c, current_client);
       break;
     case Expose:
-      if (c)
-        jbwm_handle_Expose(&ev,c);
+      jbwm_handle_Expose(&ev,c);
       break;
     case CreateNotify:
     case DestroyNotify:
@@ -149,17 +146,23 @@ void jbwm_events_loop(struct JBWMScreen * s, struct JBWMClient ** head_client,
       jbwm_handle_MapRequest(&ev, c, s, head_client, current_client);
       break;
     case PropertyNotify:
-      if (c)
-        jbwm_handle_PropertyNotify(&ev,c);
+      jbwm_handle_PropertyNotify(&ev,c);
       break;
     case ColormapNotify:
-      if (c)
-        jbwm_handle_ColormapNotify(&ev,c);
+      jbwm_handle_ColormapNotify(&ev,c);
       break;
     case ClientMessage:
-      if (c)
-        jbwm_ewmh_handle_client_message(&ev.xclient, c, head_client,
-          current_client);
+      jbwm_ewmh_handle_client_message(&ev.xclient, c, head_client,
+        current_client);
+      break;
+      // ignore
+    case ButtonRelease:
+    case KeyRelease:
+    case MapNotify:
+    case MappingNotify:
+    case MotionNotify:
+    case ReparentNotify:
+    default:
       break;
     }
   }
