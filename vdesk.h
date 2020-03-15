@@ -10,5 +10,5 @@ struct JBWMClient;
 struct JBWMScreen;
 /* Require the screen parameter here in case the head is NULL.  */
 uint8_t jbwm_set_vdesk(struct JBWMScreen *s,
-    struct JBWMClient *head, uint8_t v);
+  struct JBWMClient *head, uint8_t v);
 #endif//!JBWM_VDESK_H

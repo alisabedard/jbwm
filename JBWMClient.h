@@ -12,14 +12,14 @@
 struct JBWMScreen;
 /* Sizes given for x86_64 architecture. */
 struct JBWMClient {
-    struct JBWMClientTitleBar tb; /* 40 bytes */
-    union JBWMRectangle size, old_size, before_fullscreen;
-    Colormap cmap;
-    Window window, parent;
-    struct JBWMClient * next;
-    struct JBWMScreen * screen;
-    struct JBWMClientOptions opt; /* 2 bytes */
-    uint8_t vdesk;
-    int8_t ignore_unmap;
+  struct JBWMClientTitleBar tb; /* 40 bytes */
+  union JBWMRectangle size, old_size, before_fullscreen;
+  Colormap cmap;
+  Window window, parent;
+  struct JBWMClient * next;
+  struct JBWMScreen * screen;
+  struct JBWMClientOptions opt; /* 2 bytes */
+  uint8_t vdesk;
+  int8_t ignore_unmap;
 };
 #endif /* JBWM_CLIENT_STRUCT_H */

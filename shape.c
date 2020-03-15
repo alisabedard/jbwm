@@ -10,27 +10,27 @@
 __attribute__((pure))
 static bool is_shaped(Display * dpy, const Window win)
 {
-    int s, d;
-    unsigned int u;
-    return XShapeQueryExtents(dpy, win, &s, &d, &d,
-        &u, &u, &d, &d, &d, &u, &u) && s;
+  int s, d;
+  unsigned int u;
+  return XShapeQueryExtents(dpy, win, &s, &d, &d,
+    &u, &u, &d, &d, &d, &u, &u) && s;
 }
 void jbwm_set_shape(struct JBWMClient * c)
 {
-    if(c->opt.shaped) {
-        JBWM_LOG("XShapeCombineShape: %d", (int)c->window);
-        Display * d = c->screen->xlib->display;
-        XFlush(d);
-        XShapeCombineShape(d, c->parent, ShapeBounding,
-            1, 1, c->window, ShapeBounding, ShapeSet);
-    }
+  if(c->opt.shaped) {
+    JBWM_LOG("XShapeCombineShape: %d", (int)c->window);
+    Display * d = c->screen->xlib->display;
+    XFlush(d);
+    XShapeCombineShape(d, c->parent, ShapeBounding,
+      1, 1, c->window, ShapeBounding, ShapeSet);
+  }
 }
 void jbwm_new_shaped_client(struct JBWMClient * c)
 {
-    if (is_shaped(c->screen->xlib->display, c->window)) {
-        JBWM_LOG("Window %d is shaped", (int)c->window);
-        struct JBWMClientOptions * o = &c->opt;
-        o->no_title_bar = o->shaped = true;
-        o->border = 0;
-    }
+  if (is_shaped(c->screen->xlib->display, c->window)) {
+    JBWM_LOG("Window %d is shaped", (int)c->window);
+    struct JBWMClientOptions * o = &c->opt;
+    o->no_title_bar = o->shaped = true;
+    o->border = 0;
+  }
 }

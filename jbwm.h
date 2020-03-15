@@ -8,6 +8,6 @@
 struct JBWMClient;
 struct JBWMScreen;
 void jbwm_init_screens(Display *d, struct JBWMScreen *s,
-    struct JBWMClient ** head_client, struct JBWMClient ** current_client,
-    const short screens);
+  struct JBWMClient ** head_client, struct JBWMClient ** current_client,
+  const short screens);
 #endif /* not JBWM_JBWM_H */

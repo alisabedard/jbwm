@@ -16,7 +16,7 @@ void jbwm_hide_client(const struct JBWMClient * c);
 /* Move the client to the specified virtual desktop */
 void jbwm_set_client_vdesk(struct JBWMClient * c, uint8_t desktop);
 void jbwm_toggle_sticky(struct JBWMClient * c,
-    struct JBWMClient ** current_client);
+  struct JBWMClient ** current_client);
 void jbwm_restore_client(struct JBWMClient const * c);
 __attribute__((pure))
 /* Return the client that has specified window as either window or parent.

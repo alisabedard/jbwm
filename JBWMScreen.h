@@ -11,16 +11,16 @@
 #endif//JBWM_USE_XFT
 struct JBWMClient;
 struct JBWMScreen {
-    Screen * xlib;
+  Screen * xlib;
 #ifdef JBWM_USE_XFT
-    XftDraw * xft;
-    XftColor font_color;
+  XftDraw * xft;
+  XftColor font_color;
 #else//!JBWM_USE_XFT
-    XFontStruct *font;
+  XFontStruct *font;
 #endif//JBWM_USE_XFT
-    Window supporting;
-    struct JBWMPixels pixels;
-    GC gc,border_gc;
-    uint8_t id, vdesk, font_height;
+  Window supporting;
+  struct JBWMPixels pixels;
+  GC gc,border_gc;
+  uint8_t id, vdesk, font_height;
 };
 #endif//!JBWM_JBWMSCREEN_H

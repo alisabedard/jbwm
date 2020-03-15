@@ -8,5 +8,5 @@
 struct JBWMClient;
 struct JBWMScreen;
 void jbwm_new_client(struct JBWMScreen * s, struct JBWMClient **head_client,
-    struct JBWMClient ** current_client, Window const w);
+  struct JBWMClient ** current_client, Window const w);
 #endif//!JBWM_NEW_H
