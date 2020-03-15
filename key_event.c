@@ -196,7 +196,6 @@ void jbwm_handle_key_event(struct JBWMScreen * s, struct JBWMClient * target,
   XKeyEvent * e)
 {
   enum { MOD = 1 << 0, ZERO = 1 << 1};
-  uint8_t vdesk;
   uint8_t flags;
   const KeySym key = XLookupKeysym(e, 0);
   JBWM_LOG("jbwm_handle_key_event");
