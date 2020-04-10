@@ -3,8 +3,11 @@
 // Copyright 1999-2015, Ciaran Anscomb <evilwm@6809.org.uk>
 // See README for license and other details.
 #include "keys.h"
+//
 #include "JBWMKeys.h"
+#include "config.h"
 #include "key_masks.h"
+//
 __attribute__((nonnull(1,2)))
 static void grab_r(Display * d, const KeySym * k,
   const Window r, const uint32_t mask)
@@ -20,5 +23,5 @@ void jbwm_grab_root_keys(Display * d, const Window root)
   const uint32_t m = jbwm_get_grab_mask();
   grab_r(d, (KeySym[]){JBWM_KEYS_TO_GRAB}, root, m);
   grab_r(d, (KeySym[]){JBWM_ALT_KEYS_TO_GRAB}, root,
-    m | jbwm_get_mod_mask());
+    m | JBWM_KEYMASK_MOD);
 }

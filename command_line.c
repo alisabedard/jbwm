@@ -49,9 +49,9 @@ void jbwm_parse_command_line(const int argc, char **argv)
     case '1':
       jbwm_set_grab_mask(parse_modifiers(optarg));
       break;
-    case '2':
-      jbwm_set_mod_mask(parse_modifiers(optarg));
-      break;
+//    case '2':
+//     jbwm_set_mod_mask(parse_modifiers(optarg));
+//      break;
     case 'v':
       printf("%s version %s\n", argv[0], VERSION);
       exit(0);

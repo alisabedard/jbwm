@@ -19,7 +19,7 @@
 #include "util.h"
 #include "wm_state.h"
 // Set log level for events
-#define JBWM_LOG_EVENTS 5
+#define JBWM_LOG_EVENTS 1
 static struct JBWMScreen * get_screen(struct JBWMScreen *s,
   const Window root, const int i) {
   return RootWindowOfScreen(s[i].xlib) == root ? s
@@ -122,6 +122,8 @@ void jbwm_events_loop(struct JBWMScreen * s, struct JBWMClient ** head_client,
     case KeyPress:
       JBWM_LOG("c: %d, window: %d, root: %d", (int)c,
         (int)ev.xkey.window, (int)ev.xkey.root);
+      if (!c)
+        c = *current_client;
       jbwm_handle_key_event(s, c, head_client, current_client, &ev.xkey);
       break;
     case ButtonPress:

@@ -16,7 +16,7 @@ geometry.o: geometry.c geometry.h JBWMClient.h JBWMScreen.h JBWMSize.h log.h mac
 jbwm.o: jbwm.c jbwm.h config.h ewmh.h font.h atom.h JBWMScreen.h keys.h log.h new.h util.h
 key_event.o: key_event.c key_event.h JBWMClient.h JBWMKeys.h JBWMScreen.h client.h config.h drag.h exec.h key_masks.h log.h max.h move_resize.h select.h snap.h title_bar.h vdesk.h wm_state.h
 key_masks.o: key_masks.c key_masks.h config.h
-keys.o: keys.c keys.h JBWMKeys.h key_masks.h
+keys.o: keys.c keys.h JBWMKeys.h config.h key_masks.h
 main.o: main.c JBWMScreen.h atom.h command_line.h display.h events.h font.h jbwm.h
 max.o: max.c max.h ewmh.h ewmh_state.h font.h atom.h JBWMClient.h move_resize.h title_bar.h
 move_resize.o: move_resize.c move_resize.h JBWMClient.h font.h log.h mwm.h shape.h title_bar.h

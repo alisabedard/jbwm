@@ -198,8 +198,8 @@ void jbwm_handle_key_event(struct JBWMScreen * s, struct JBWMClient * target,
   enum { MOD = 1 << 0, ZERO = 1 << 1};
   uint8_t flags;
   const KeySym key = XLookupKeysym(e, 0);
-  JBWM_LOG("jbwm_handle_key_event");
-  flags = e->state & jbwm_get_mod_mask() ? MOD : 0;
+  flags = e->state & JBWM_KEYMASK_MOD ? MOD : 0;
+  JBWM_LOG("jbwm_handle_key_event mod: %d", flags);
   switch (key) {
   case JBWM_KEY_NEW:
     jbwm_exec(JBWM_TERM);
