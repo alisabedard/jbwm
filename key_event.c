@@ -228,6 +228,8 @@ void jbwm_handle_key_event(struct JBWMScreen * s, struct JBWMClient * target,
   default:
     if (!target)
       target = *current_client;
+    if (!target)
+      target = *head_client;
     if (target) {
       handle_client_key_event(head_client, current_client, flags & MOD, key);
 #ifdef DEBUG
