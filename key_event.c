@@ -9,7 +9,6 @@
 #include "config.h"
 #include "drag.h"
 #include "exec.h"
-#include "key_masks.h"
 #include "log.h"
 #include "max.h"
 #include "move_resize.h"

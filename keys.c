@@ -6,11 +6,12 @@
 //
 #include "JBWMKeys.h"
 #include "config.h"
-#include "key_masks.h"
+//
+#include <stdint.h>
 //
 __attribute__((nonnull(1,2)))
-static void grab_r(Display * d, const KeySym * k,
-  const Window r, const uint32_t mask)
+static void grab_r(Display * d, KeySym const * k,
+  Window const r, uint32_t const mask)
 {
   if (*k) { // Terminate at KeySym 0
     XGrabKey(d, XKeysymToKeycode(d, *k), mask, r, True,
@@ -18,10 +19,12 @@ static void grab_r(Display * d, const KeySym * k,
     grab_r(d, k + 1, r, mask);
   }
 }
-void jbwm_grab_root_keys(Display * d, const Window root)
+void jbwm_grab_root_keys(Display * d, Window const root)
 {
-  const uint32_t m = jbwm_get_grab_mask();
-  grab_r(d, (KeySym[]){JBWM_KEYS_TO_GRAB}, root, m);
-  grab_r(d, (KeySym[]){JBWM_ALT_KEYS_TO_GRAB}, root,
-    m | JBWM_KEYMASK_MOD);
+  grab_r(d, (KeySym[]){JBWM_KEYS_TO_GRAB}, root, JBWM_KEYMASK_GRAB);
+  grab_r(d, (KeySym[]){JBWM_KEYS_TO_GRAB}, root, JBWM_KEYMASK_GRAB | LockMask);
+  grab_r(d, (KeySym[]){JBWM_ALT_KEYS_TO_GRAB}, root, JBWM_KEYMASK_GRAB
+    | JBWM_KEYMASK_MOD);
+  grab_r(d, (KeySym[]){JBWM_ALT_KEYS_TO_GRAB}, root, JBWM_KEYMASK_GRAB
+    | JBWM_KEYMASK_MOD | LockMask);
 }

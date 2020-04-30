@@ -9,7 +9,7 @@
 #include "geometry.h"
 #include "atom.h"
 #include "JBWMClient.h"
-#include "key_masks.h"
+//#include "keys.h"
 #include "log.h" // for JBWM_LOG
 #include "mwm.h" // for jbwm_handle_mwm_hints
 #include "select.h"
@@ -87,7 +87,7 @@ static void do_grabs(Display * d, const Window w)
   XSelectInput(d, w, EnterWindowMask | PropertyChangeMask
     | ColormapChangeMask);
   // keys to grab:
-  jbwm_grab_button(d, w, jbwm_get_grab_mask());
+  jbwm_grab_button(d, w, JBWM_KEYMASK_GRAB);//jbwm_get_grab_mask());
 }
 void jbwm_new_client(struct JBWMScreen * s,
   struct JBWMClient ** head_client,
