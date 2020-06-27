@@ -25,9 +25,13 @@ static void set_state_not_focused(struct JBWMClient * c)
 }
 static void set_border(struct JBWMClient * c)
 {
-  struct JBWMPixels * p = &c->screen->pixels;
-  XSetWindowBorder(c->screen->xlib->display, c->parent,
-    c->opt.sticky ? p->fc : p->fg);
+  if (c && c->screen && c->screen->xlib) {
+    struct JBWMPixels * p = &c->screen->pixels;
+    if (p) {
+      XSetWindowBorder(c->screen->xlib->display, c->parent,
+        c->opt.sticky ? p->fc : p->fg);
+    }
+  }
 }
 static void set_focused(struct JBWMClient * c)
 {
