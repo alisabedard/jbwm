@@ -77,12 +77,12 @@ void jbwm_ewmh_handle_client_message(XClientMessageEvent * e,
 {
   const Atom t = e->message_type;
   debug_client_message(e);
-  if(client_specific_message(e, c, head_client, current_client, t))
-    return;
-  if (t == jbwm_atoms[JBWM_NET_CURRENT_DESKTOP]) {
-    jbwm_set_vdesk(c->screen, *head_client, e->data.l[0]);
-  } else if (t == jbwm_atoms[JBWM_NET_MOVERESIZE_WINDOW]) {
-    // If something else moves the window:
-    handle_moveresize(e);
+  if(!(c && client_specific_message(e, c, head_client, current_client, t))){
+    if (t == jbwm_atoms[JBWM_NET_CURRENT_DESKTOP]) {
+      jbwm_set_vdesk(c->screen, *head_client, e->data.l[0]);
+    } else if (t == jbwm_atoms[JBWM_NET_MOVERESIZE_WINDOW]) {
+      // If something else moves the window:
+      handle_moveresize(e);
+    }
   }
 }
