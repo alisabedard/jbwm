@@ -33,28 +33,30 @@ void jbwm_handle_button_event(XButtonEvent * e, struct JBWMClient * c,
   struct JBWMClient ** current_client)
 {
   JBWM_LOG("jbwm_handle_button_event");
-  const bool fs = c->opt.fullscreen;
-  Display * d = e->display;
-  switch (e->button) {
-  case Button1:
-    if (fs)
-      XRaiseWindow(d, c->parent);
-    else
-      handle_title_bar_button(e, c, head_client, current_client);
-    break;
-  case Button2:
-    XLowerWindow(d, c->parent);
-    break;
-  case Button3:
-    /* Resize operations more useful here,
-       rather than for third button, for laptop
-       users especially, where it is difficult
-       to register a middle button press, even
-       with X Emulate3Buttons enabled.  */
-    if (fs)
+  if (c) { // keep this check, added in response to segfault
+    const bool fs = c->opt.fullscreen;
+    Display * d = e->display;
+    switch (e->button) {
+    case Button1:
+      if (fs)
+        XRaiseWindow(d, c->parent);
+      else
+        handle_title_bar_button(e, c, head_client, current_client);
+      break;
+    case Button2:
       XLowerWindow(d, c->parent);
-    else
-      jbwm_drag(c, head_client, !c->opt.shaded);
-    break;
+      break;
+    case Button3:
+      /* Resize operations more useful here,
+         rather than for third button, for laptop
+         users especially, where it is difficult
+         to register a middle button press, even
+         with X Emulate3Buttons enabled.  */
+      if (fs)
+        XLowerWindow(d, c->parent);
+      else
+        jbwm_drag(c, head_client, !c->opt.shaded);
+      break;
+    }
   }
 }
