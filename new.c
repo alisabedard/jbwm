@@ -50,10 +50,12 @@ static Window get_parent(struct JBWMClient *  c)
   };
   union JBWMRectangle * g;
   g = &c->size;
-  return XCreateWindow(c->screen->xlib->display, c->screen->xlib->root, g->x, g->y,
-    g->width, g->height, c->opt.border, CFP, CFP,
+  return XCreateWindow(c->screen->xlib->display, c->screen->xlib->root,
+    g->x, g->y, g->width, g->height, c->opt.border, CFP, CFP,
     NULL, CW_VM, &(XSetWindowAttributes){
-      .override_redirect=true, .event_mask = WA_EM});
+      .event_mask = WA_EM,
+      .override_redirect=true
+    });
 }
 static inline void reparent_window(Display * d, Window parent, Window window)
 {
