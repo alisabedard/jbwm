@@ -49,8 +49,9 @@ void jbwm_toggle_shade(struct JBWMClient * c)
 }
 static inline uint16_t mv(Display * const d, Window const w, 
   uint8_t const font_height, uint16_t x) {
-  if (w)
+  if (w){
     XMoveWindow(d, w, x -= font_height, 0);
+  }
   return x;
 }
 // Return of width allows chain-calling

@@ -2,7 +2,7 @@
 // Copyright 2008-2020, Jeffrey E. Bedard <jefbed@gmail.com>
 // Copyright 1999-2015, Ciaran Anscomb <evilwm@6809.org.uk>
 // See README for license and other details.
-#undef DEBUG
+//#undef DEBUG
 #include "button_event.h"
 #include "client.h"
 #include "drag.h"
@@ -14,6 +14,8 @@ static void handle_title_bar_button(XButtonEvent * e, struct JBWMClient * c,
 {
   JBWM_LOG("e->window: %d, c->title_bar: %d, e->subwindow: %d",
     (int)e->window, (int)c->tb.win, (int)e->subwindow);
+  JBWM_LOG("c->tb.close: %d", (int)c->tb.close);
+  JBWM_LOG("e->button: %d", (int)e->button);
   struct JBWMClientOptions * o = &c->opt;
   if (!e->subwindow)
     jbwm_drag(c, head_client, false);

@@ -3,9 +3,20 @@
 #define JBWM_JBWMKEYS_H
 #include <X11/keysym.h>
 enum JBWMKeys {
+  JBWM_KEY_0 = XK_0,
+  JBWM_KEY_1 = XK_1,
+  JBWM_KEY_2 = XK_2,
+  JBWM_KEY_3 = XK_3,
+  JBWM_KEY_4 = XK_4,
+  JBWM_KEY_5 = XK_5,
+  JBWM_KEY_6 = XK_6,
+  JBWM_KEY_7 = XK_7,
+  JBWM_KEY_8 = XK_8,
+  JBWM_KEY_9 = XK_9,
+  JBWM_KEY_KILL = XK_q,
   JBWM_KEY_ALTLOWER = XK_minus,
-  JBWM_KEY_BOTTOMLEFT = XK_KP_End,
-  JBWM_KEY_BOTTOMRIGHT = XK_KP_Page_Down,
+  JBWM_KEY_VDESK_NEXT_ROW = XK_Page_Up,
+  JBWM_KEY_VDESK_PREV_ROW = XK_Page_Down,
   JBWM_KEY_DOWN = XK_j,
   JBWM_KEY_DOWN_UP = XK_J,
   JBWM_KEY_FS = XK_a,
@@ -27,8 +38,6 @@ enum JBWMKeys {
   JBWM_KEY_RIGHT_UP = XK_L,
   JBWM_KEY_SHADE = XK_s,
   JBWM_KEY_STICK = XK_period,
-  JBWM_KEY_TOPLEFT = XK_KP_Home,
-  JBWM_KEY_TOPRIGHT = XK_KP_Page_Up,
   JBWM_KEY_UP = XK_k,
   JBWM_KEY_UP_UP = XK_K,
 };

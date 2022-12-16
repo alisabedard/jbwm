@@ -23,8 +23,11 @@ void jbwm_grab_root_keys(Display * d, Window const root)
 {
   grab_r(d, (KeySym[]){JBWM_KEYS_TO_GRAB}, root, JBWM_KEYMASK_GRAB);
   grab_r(d, (KeySym[]){JBWM_KEYS_TO_GRAB}, root, JBWM_KEYMASK_GRAB | LockMask);
+  grab_r(d, (KeySym[]){JBWM_KEYS_TO_GRAB}, root, JBWM_KEYMASK_GRAB | Mod3Mask);
   grab_r(d, (KeySym[]){JBWM_ALT_KEYS_TO_GRAB}, root, JBWM_KEYMASK_GRAB
     | JBWM_KEYMASK_MOD);
   grab_r(d, (KeySym[]){JBWM_ALT_KEYS_TO_GRAB}, root, JBWM_KEYMASK_GRAB
     | JBWM_KEYMASK_MOD | LockMask);
+  grab_r(d, (KeySym[]){JBWM_ALT_KEYS_TO_GRAB}, root, JBWM_KEYMASK_GRAB
+    | JBWM_KEYMASK_MOD | Mod3Mask);
 }

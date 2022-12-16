@@ -19,3 +19,4 @@ jbwm_cflags+=-Wredundant-decls -Wpointer-sign
 jbwm_cflags+=-fstrict-aliasing -Wstrict-aliasing=2
 jbwm_cflags+=-Wformat=2
 jbwm_cflags+=-Wno-pointer-to-int-cast
+jbwm_cflags+=-Wno-narrowing

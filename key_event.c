@@ -194,7 +194,7 @@ void jbwm_handle_key_event(struct JBWMScreen * s, struct JBWMClient * target,
   struct JBWMClient ** head_client, struct JBWMClient ** current_client,
   XKeyEvent * e)
 {
-  enum { MOD = 1 << 0, ZERO = 1 << 1};
+  enum { MOD = 1 << 0, ZERO = 1 << 1, VDESK_ROW_INCREMENT=16};
   uint8_t flags;
   const KeySym key = XLookupKeysym(e, 0);
   flags = e->state & JBWM_KEYMASK_MOD ? MOD : 0;
@@ -209,20 +209,35 @@ void jbwm_handle_key_event(struct JBWMScreen * s, struct JBWMClient * target,
     if(*current_client)
       next(*current_client, current_client, head_client, s->vdesk);
     break;
-  case XK_0:
+  case JBWM_KEY_0:
     flags |= ZERO;
     /* FALLTHROUGH */
-  case XK_1: case XK_2: case XK_3: case XK_4: case XK_5:
-  case XK_6: case XK_7: case XK_8: case XK_9:
+  case JBWM_KEY_1:
+  case JBWM_KEY_2:
+  case JBWM_KEY_3:
+  case JBWM_KEY_4:
+  case JBWM_KEY_5:
+  case JBWM_KEY_6:
+  case JBWM_KEY_7:
+  case JBWM_KEY_8:
+  case JBWM_KEY_9:
     /* First desktop 0, per wm-spec */
     cond_set_vdesk(target, *head_client, s, flags & ZERO
-      ? 10 : key - XK_1, flags & MOD);
+      ? 10 : key - JBWM_KEY_1, flags & MOD);
     break;
   case JBWM_KEY_PREVDESK:
     cond_set_vdesk(target, *head_client, s, s->vdesk - 1, flags & MOD);
     break;
   case JBWM_KEY_NEXTDESK:
     cond_set_vdesk(target, *head_client, s, s->vdesk + 1, flags & MOD);
+    break;
+  case JBWM_KEY_VDESK_NEXT_ROW:
+    cond_set_vdesk(target, *head_client, s,
+        s->vdesk - VDESK_ROW_INCREMENT, flags & MOD);
+    break;
+  case JBWM_KEY_VDESK_PREV_ROW:
+    cond_set_vdesk(target, *head_client, s,
+      s->vdesk + VDESK_ROW_INCREMENT, flags & MOD);
     break;
   default:
     if (!target)
