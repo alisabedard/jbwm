@@ -14,6 +14,7 @@
 #include "new.h"
 #include <stdbool.h>
 #include "util.h"
+#include "vdesk.h"
 #ifdef JBWM_USE_XFT
 static void allocate_xft_color(Display * d, struct JBWMScreen * s)
 {
@@ -118,18 +119,19 @@ void jbwm_init_screens(Display *d, struct JBWMScreen *s,
   const short screens)
 {
   if(screens>=0){
-    uint16_t n;
     unsigned long *lprop;
+    uint16_t n;
+    uint8_t vdesk;
     JBWM_LOG("jbwm_init_screen(d, screens), screens is %d", screens);
     s->id = screens;
     s->xlib = ScreenOfDisplay(d, screens);
     lprop=jbwm_get_property(d,s->xlib->root,
       jbwm_atoms[JBWM_NET_CURRENT_DESKTOP],&n);
     if(n){
-      s->vdesk=lprop[0];
+      vdesk=lprop[0];
       XFree(lprop);
     }else
-      s->vdesk=0;
+      vdesk=0;
 #ifdef JBWM_USE_XFT
     s->xft = new_xft_draw(s->xlib);
 #else//!JBWM_USE_XFT
@@ -147,5 +149,6 @@ void jbwm_init_screens(Display *d, struct JBWMScreen *s,
     setup_clients(d, s, head_client, current_client);
     jbwm_ewmh_init_screen(d, s);
     jbwm_init_screens(d, s, head_client, current_client, screens - 1);
+    jbwm_set_vdesk(s, *head_client, vdesk);
   }
 }

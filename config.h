@@ -16,7 +16,7 @@
 /* Default colors */
 #ifndef USE_OLD_THEME
 //#define JBWM_FG "#bbf"
-#define JBWM_FG "grey"
+#define JBWM_FG "white"
 #define JBWM_FC "green1"
 #define JBWM_BG "black"
 #define JBWM_CLOSE "green4"

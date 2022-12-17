@@ -4,6 +4,7 @@ client.o: client.c client.h ewmh.h ewmh_state.h atom.h select.h title_bar.h util
 command_line.o: command_line.c command_line.h config.h log.h
 display.o: display.c display.h client.h config.h log.h util.h
 drag.o: drag.c drag.h font.h JBWMClient.h move_resize.h snap.h
+draw.o: draw.c draw.h font.h
 events.o: events.c events.h button_event.h client.h ewmh.h ewmh_client.h ewmh_client_list.h JBWMScreen.h key_event.h log.h move_resize.h new.h select.h title_bar.h util.h wm_state.h
 ewmh.o: ewmh.c ewmh.h atom.h config.h JBWMClient.h log.h macros.h
 ewmh_client.o: ewmh_client.c ewmh_client.h client.h config.h drag.h ewmh.h ewmh_wm_state.h atom.h select.h util.h vdesk.h wm_state.h
@@ -13,7 +14,7 @@ ewmh_wm_state.o: ewmh_wm_state.c ewmh_wm_state.h atom.h JBWMClient.h client.h ew
 exec.o: exec.c exec.h config.h
 font.o: font.c font.h config.h util.h
 geometry.o: geometry.c geometry.h JBWMClient.h JBWMScreen.h JBWMSize.h log.h macros.h
-jbwm.o: jbwm.c jbwm.h config.h ewmh.h font.h atom.h JBWMScreen.h keys.h log.h new.h util.h
+jbwm.o: jbwm.c jbwm.h config.h ewmh.h font.h atom.h JBWMScreen.h keys.h log.h new.h util.h vdesk.h
 key_event.o: key_event.c key_event.h JBWMClient.h JBWMKeys.h JBWMScreen.h client.h config.h drag.h exec.h log.h max.h move_resize.h select.h snap.h title_bar.h vdesk.h wm_state.h
 keys.o: keys.c keys.h JBWMKeys.h config.h
 main.o: main.c JBWMScreen.h atom.h command_line.h display.h events.h font.h jbwm.h
@@ -24,7 +25,7 @@ new.o: new.c new.h client.h config.h ewmh.h geometry.h atom.h JBWMClient.h keys.
 select.o: select.c select.h client.h ewmh.h ewmh_state.h atom.h JBWMClient.h util.h
 shape.o: shape.c shape.h JBWMClient.h log.h
 snap.o: snap.c snap.h config.h JBWMClient.h JBWMPoint.h JBWMSize.h
-title_bar.o: title_bar.c title_bar.h config.h ewmh.h ewmh_state.h font.h atom.h move_resize.h util.h wm_state.h
+title_bar.o: title_bar.c title_bar.h config.h draw.h ewmh.h ewmh_state.h font.h atom.h move_resize.h util.h wm_state.h
 util.o: util.c util.h
-vdesk.o: vdesk.c vdesk.h client.h config.h ewmh.h font.h atom.h JBWMClient.h JBWMScreen.h util.h
+vdesk.o: vdesk.c vdesk.h client.h config.h draw.h ewmh.h font.h atom.h JBWMClient.h JBWMScreen.h util.h
 wm_state.o: wm_state.c wm_state.h ewmh.h ewmh_state.h atom.h log.h util.h

@@ -5,6 +5,7 @@
 #include "vdesk.h"
 #include "client.h"
 #include "config.h"
+#include "draw.h"
 #include "ewmh.h"
 #include "font.h"
 #include "atom.h"
@@ -27,7 +28,7 @@ static void check_visibility(struct JBWMClient * c,
   }
 }
 static void show_desktop(struct JBWMScreen *s){
-  enum { BORDER = 2 };
+  enum { BORDER = 4 };
   Display *d;
   char buf[4]; // accomodate up to "255", plus '-', plus NUL
   uint8_t const desk = s->vdesk;
@@ -35,7 +36,10 @@ static void show_desktop(struct JBWMScreen *s){
   Window const r = s->xlib->root;
   d=s->xlib->display;
   XClearWindow(d, r);
-  nul_index= snprintf(buf, sizeof(buf), "%d", s->vdesk);
+  nul_index = snprintf(buf, sizeof(buf), "%d", s->vdesk);
+  jbwm_draw_string(s, r, BORDER, BORDER+jbwm_get_font_ascent(),
+    buf, nul_index);
+#if 0
 #ifdef JBWM_USE_XFT
   XftDraw *xd;
   xd = s->xft;
@@ -45,6 +49,7 @@ static void show_desktop(struct JBWMScreen *s){
 #else//!JBWM_USE_XFT
   XDrawString(d,r,s->gc,BORDER,jbwm_get_font_ascent()+BORDER, buf, nul_index);
 #endif//JBWM_USE_XFT
+#endif
 }
 uint8_t jbwm_set_vdesk(struct JBWMScreen *s,
   struct JBWMClient *head, uint8_t v)

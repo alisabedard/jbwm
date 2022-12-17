@@ -4,6 +4,7 @@
 // See README for license and other details.
 #include "title_bar.h"
 #include "config.h"
+#include "draw.h"
 #include "ewmh.h"
 #include "ewmh_state.h"
 #include "font.h"
@@ -98,21 +99,6 @@ static Window new_title_bar(struct JBWMClient * c)
   configure_title_bar(d, t);
   return t;
 }
-static void draw_text(struct JBWMClient * c,
-  const int16_t * p, char * name, const size_t l)
-{
-  struct JBWMScreen * scr;
-  scr = c->screen;
-#ifdef JBWM_USE_XFT
-  XftDraw *xd;
-  xd = scr->xft;
-  XftDrawChange(xd, c->tb.win); // set target
-  XftDrawStringUtf8(xd, &scr->font_color, jbwm_get_font(),
-    p[0], p[1], (XftChar8 *)name, l);
-#else//!JBWM_USE_XFT
-  XDrawString(c->screen->xlib->display,c->tb.win,scr->gc,p[0],p[1],name,l);
-#endif//JBWM_USE_XFT
-}
 // Free result with XFree if not NULL
 static inline char * jbwm_get_title(Display * d, const Window w)
 {
@@ -123,9 +109,8 @@ static void draw_title(struct JBWMClient * c)
   char *name;
   name = jbwm_get_title(c->screen->xlib->display, c->window);
   if (name) {
-    const int16_t p[] = {c->screen->font_height + 4,
-      jbwm_get_font_ascent()};
-    draw_text(c, p, name, strlen(name));
+    jbwm_draw_string(c->screen, c->tb.win, c->screen->font_height+4,
+      jbwm_get_font_ascent(), name, strlen(name));
     XFree(name);
   }
 }
