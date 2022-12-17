@@ -3,11 +3,10 @@
 # Copyright 1999-2015, Ciaran Anscomb <evilwm@6809.org.uk>
 # See README for license and other details.
 version=1.63
+# PREFIX may be overridden in config.mk
 include config.mk
 exe=jbwm
 distname=$(exe)-$(version)
-# Edit/override this line if you don't want jbwm to install under /usr/local.
-PREFIX=/usr/local
 #SCHEME=mit-scheme
 SCHEME=echo
 # Note that $(DESTDIR) is used by the Debian build process.

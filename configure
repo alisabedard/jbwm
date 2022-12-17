@@ -7,7 +7,7 @@ echo "# Configuration for $OS" > $CF
 echo "CFLAGS=${CFLAGS}" >> $CF
 echo "LDFLAGS=${LDFLAGS}" >> $CF
 echo "DESTDIR=${DESTDIR}" >> $CF
-echo "PREFIX=${PREFIX}" >> $CF
+echo "PREFIX=${PREFIX:-/usr/local}" >> $CF
 DEBUG=false USE_GDB=false SMALL=false XFT=false
 while getopts 'dghSsx' opt; do
     case $opt in
