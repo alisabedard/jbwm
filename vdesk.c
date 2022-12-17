@@ -39,17 +39,6 @@ static void show_desktop(struct JBWMScreen *s){
   nul_index = snprintf(buf, sizeof(buf), "%d", s->vdesk);
   jbwm_draw_string(s, r, BORDER, BORDER+jbwm_get_font_ascent(),
     buf, nul_index);
-#if 0
-#ifdef JBWM_USE_XFT
-  XftDraw *xd;
-  xd = s->xft;
-  XftDrawChange(xd, r);
-  XftDrawStringUtf8(xd, &s->font_color, jbwm_get_font(),
-    BORDER, jbwm_get_font_ascent()+BORDER, (XftChar8 *)buf, nul_index);
-#else//!JBWM_USE_XFT
-  XDrawString(d,r,s->gc,BORDER,jbwm_get_font_ascent()+BORDER, buf, nul_index);
-#endif//JBWM_USE_XFT
-#endif
 }
 uint8_t jbwm_set_vdesk(struct JBWMScreen *s,
   struct JBWMClient *head, uint8_t v)

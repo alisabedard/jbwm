@@ -25,7 +25,7 @@ static void relink(const struct JBWMClient * c, struct JBWMClient * i,
   if (i == c) /* c is head client.  */
     *(head_client) = c->next; /* removed first client. */
   if (i && i->next)
-    relink(c, i->next != c ? i->next : (i->next = c->next),
+    relink(c, (i->next != c) ? i->next : (i->next = c->next),
       head_client, current_client);
 }
 void jbwm_set_client_vdesk(struct JBWMClient * c, uint8_t desktop)
