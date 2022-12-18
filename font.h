@@ -1,4 +1,4 @@
-// Copyright 2020, Jeffrey E. Bedard
+// Copyright 2020, Alisa Bedard
 #ifndef JBWM_FONT_H
 #define JBWM_FONT_H
 #include <stdint.h>

@@ -1,4 +1,4 @@
-// Copyright 2017-2019, Jeffrey E. Bedard
+// Copyright 2017-2019, Alisa Bedard
 #include "max.h"
 #include "ewmh.h"
 #include "ewmh_state.h"

@@ -1,4 +1,4 @@
-// Copyright 2020, Jeffrey E. Bedard
+// Copyright 2020, Alisa Bedard
 #include "ewmh_wm_state.h"
 #include "atom.h"
 #include "JBWMClient.h"

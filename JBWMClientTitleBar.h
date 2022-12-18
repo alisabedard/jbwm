@@ -1,4 +1,4 @@
-// Copyright 2020, Jeffrey E. Bedard
+// Copyright 2020, Alisa Bedard
 #ifndef JBWM_JBWMCLIENTTITLEBAR_H
 #define JBWM_JBWMCLIENTTITLEBAR_H
 #include <X11/X.h>

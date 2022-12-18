@@ -1,4 +1,4 @@
-// Copyright 2020, Jeffrey E. Bedard
+// Copyright 2020, Alisa Bedard
 #include "wm_state.h"
 #include "ewmh.h"
 #include "ewmh_state.h"

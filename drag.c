@@ -1,4 +1,4 @@
-/*  Copyright 2020, Jeffrey E. Bedard <jefbed@gmail.com> */
+/*  Copyright 2020, Alisa Bedard <alisabedard@gmail.com> */
 #include "drag.h"
 #include "font.h"
 #include "JBWMClient.h"

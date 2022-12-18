@@ -1,4 +1,4 @@
-// Copyright 2020, Jeffrey E. Bedard
+// Copyright 2020, Alisa Bedard
 #include "ewmh_client.h"
 #include "client.h"
 #include "config.h"

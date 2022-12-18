@@ -1,4 +1,4 @@
-// Copyright 2020, Jeffrey E. Bedard
+// Copyright 2020, Alisa Bedard
 #ifndef JBWM_EWMH_WM_STATE_H
 #define JBWM_EWMH_WM_STATE_H
 #include <X11/Xlib.h>

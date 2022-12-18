@@ -1,4 +1,4 @@
-/* Copyright 2020, Jeffrey E. Bedard */
+/* Copyright 2020, Alisa Bedard */
 /* Module: */
 #include "key_event.h"
 /* Local: */

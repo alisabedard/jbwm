@@ -1,4 +1,4 @@
-// Copyright 2020, Jeffrey E. Bedard <jefbed@gmail.com>
+// Copyright 2020, Alisa Bedard <alisabedard@gmail.com>
 #ifndef JBWM_PIXEL_T_H
 #define JBWM_PIXEL_T_H
 #include <stdint.h>

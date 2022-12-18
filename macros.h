@@ -1,4 +1,4 @@
-// Copyright 2020, Jeffrey E. Bedard
+// Copyright 2020, Alisa Bedard
 #ifndef LIBJB_MACROS_H
 #define LIBJB_MACROS_H
 #define JB_MAX(a,b) ((a) > (b) ? (a) : (b))
