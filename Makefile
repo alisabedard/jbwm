@@ -13,7 +13,7 @@ SCHEME=echo
 dest=${DESTDIR}${PREFIX}
 jbwm_cflags+=-DVERSION=\"$(version)\" $(DEBIAN)
 jbwm_cflags+=-D_XOPEN_SOURCE=700 -std=c99
-jbwm_ldflags+=-lX11 -lXext
+jbwm_ldflags+=-lX11 -lXext -lpthread
 objects+=client.o events.o jbwm.o new.o mwm.o wm_state.o drag.o
 objects+=button_event.o keys.o util.o max.o select.o snap.o display.o
 objects+=exec.o main.o move_resize.o key_event.o vdesk.o draw.o

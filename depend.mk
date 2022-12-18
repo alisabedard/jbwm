@@ -27,5 +27,5 @@ shape.o: shape.c shape.h JBWMClient.h log.h
 snap.o: snap.c snap.h config.h JBWMClient.h JBWMPoint.h JBWMSize.h
 title_bar.o: title_bar.c title_bar.h config.h draw.h ewmh.h ewmh_state.h font.h atom.h move_resize.h util.h wm_state.h
 util.o: util.c util.h
-vdesk.o: vdesk.c vdesk.h client.h config.h draw.h ewmh.h font.h atom.h JBWMClient.h JBWMScreen.h util.h
+vdesk.o: vdesk.c vdesk.h client.h config.h draw.h ewmh.h font.h log.h atom.h JBWMClient.h JBWMScreen.h util.h
 wm_state.o: wm_state.c wm_state.h ewmh.h ewmh_state.h atom.h log.h util.h
