@@ -17,8 +17,12 @@
 #include <assert.h>
 #include <pthread.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <sys/select.h>
 #include <unistd.h>
+#ifdef JBWM_USE_XOSD
+#include <xosd.h>
+#endif//JBWM_USE_XOSD
 static void check_visibility(struct JBWMClient * c,
   const uint8_t v)
 {
@@ -32,6 +36,7 @@ static void check_visibility(struct JBWMClient * c,
     check_visibility(c->next, v);
   }
 }
+#ifndef JBWM_USE_XOSD
 static void *delayed_clear_thread(void *data) {
   Display *d;
   struct JBWMScreen * s = (struct JBWMScreen *)data;
@@ -50,7 +55,33 @@ static void delayed_clear(struct JBWMScreen *s){
   assert(!r);
   JBWM_LOG("thread launched");
 }
+#endif//!JBWM_USE_XOSD
+#ifdef JBWM_USE_XOSD
+static xosd *osd;
+static void clean_osd(void){
+  JBWM_LOG("xosd_destroy");
+  xosd_destroy(osd);
+}
+#endif//JBWM_USE_XOSD
 static void show_desktop(struct JBWMScreen *s){
+#ifdef JBWM_USE_XOSD
+  char buf[4]; // accomodate up to "255", plus '-', plus NUL
+  if (!osd){
+    osd = xosd_create(1);
+    xosd_set_timeout(osd, 1);
+    xosd_set_colour(osd, "white");
+    xosd_set_font(osd, "variable");
+    xosd_set_shadow_offset(osd, 2);
+    xosd_set_align(osd, XOSD_center);
+    xosd_set_pos(osd, XOSD_middle);
+    xosd_set_outline_colour(osd, "black");
+    xosd_set_outline_offset(osd, 1);
+    // set up cleanup routine at exit
+    atexit(clean_osd);
+  }
+  snprintf(buf, sizeof(buf), "%d", s->vdesk);
+  xosd_display(osd, 0, XOSD_string, buf);
+#else//!JBWM_USE_XOSD
   enum { BORDER = 4 };
   Display *d;
   char buf[4]; // accomodate up to "255", plus '-', plus NUL
@@ -62,6 +93,7 @@ static void show_desktop(struct JBWMScreen *s){
   jbwm_draw_string(s, r, BORDER, BORDER+jbwm_get_font_ascent(),
     buf, nul_index);
   delayed_clear(s);
+#endif//JBWM_USE_XOSD
 }
 uint8_t jbwm_set_vdesk(struct JBWMScreen *s,
   struct JBWMClient *head, uint8_t v)

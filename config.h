@@ -9,7 +9,7 @@
 #define JBWM_TERM "xterm"
 /* Default fonts */
 #ifdef JBWM_USE_XFT
-#define JBWM_FONT "Sans:size=10:aspect=1.2"
+#define JBWM_FONT "Sans:size=8:aspect=1.2"
 #else//!JBWM_USE_XFT
 #define JBWM_FONT "fixed"
 #endif//JBWM_USE_XFT

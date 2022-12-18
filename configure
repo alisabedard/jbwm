@@ -8,14 +8,15 @@ echo "CFLAGS=${CFLAGS}" >> $CF
 echo "LDFLAGS=${LDFLAGS}" >> $CF
 echo "DESTDIR=${DESTDIR}" >> $CF
 echo "PREFIX=${PREFIX:-/usr/local}" >> $CF
-DEBUG=false USE_GDB=false SMALL=false XFT=false
-while getopts 'dghSsx' opt; do
+DEBUG=false USE_GDB=false SMALL=false USE_XFT=false USE_XOSD=false
+while getopts 'dghoSsx' opt; do
     case $opt in
         d) DEBUG=true ;;
         g) USE_GDB=true ;;
+        o) USE_XOSD=true ;;
         S) USE_GDB=true SMALL=true ;;
         s) SMALL=true ;;
-        x) XFT=true ;;
+        x) USE_XFT=true ;;
         h|?) for line in \
             '-d enable debugging with verbose log output' \
             '-g enable debug symbols' \
@@ -23,6 +24,7 @@ while getopts 'dghSsx' opt; do
             '-S optimize for size with symbols' \
             '-s optimize for size' \
             '-x use Xft fonts' \
+            '-o use xosd library' \
             '-? show usage' \
             ; do
                 echo $line
@@ -69,6 +71,9 @@ if $USE_GDB; then
     echo 'jbwm_cflags+=-ggdb -O0' >> $CF
     echo 'include debug_gcc.mk' >> $CF
 fi
-if $XFT; then
+if $USE_XFT; then
     echo 'include xft.mk' >> $CF
+fi
+if $USE_XOSD; then
+    echo 'include xosd.mk'  >> $CF
 fi
